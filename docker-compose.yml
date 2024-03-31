@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  admin:
+    container_name: athlonix-admin
+    build:
+      context: .
+      dockerfile: ./apps/admin/Dockerfile
+      target: dev
+    restart: always
+    ports:
+      - 3100:3100
+    volumes:
+      - /app/node_modules
+      - ./apps/admin:/app/apps/admin
+
+  client:
+    container_name: athlonix-client
+    build:
+      context: .
+      dockerfile: ./apps/client/Dockerfile
+      target: dev
+    restart: always
+    ports:
+      - 3102:3102
+    volumes:
+      - /app/node_modules
+      - ./apps/client:/app/apps/client
+
+  api:
+    container_name: athlonix-api
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+      target: dev
+    restart: always
+    ports:
+      - 3103:3103
+    volumes:
+      - /app/node_modules
+      - ./apps/api:/app/apps/api

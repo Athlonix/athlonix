@@ -1,55 +1,53 @@
-# Base image
 FROM node:21-alpine AS base
 WORKDIR /app
 
-EXPOSE ${PORT}
-ENV PORT ${PORT}
-
 # hadolint ignore=DL3018
 RUN apk add --no-cache libc6-compat && \
-    npm i -g pnpm@latest
+    npm install -g pnpm@latest turbo@latest
 
-COPY --chown=node:node package.json pnpm-lock.yaml ./
+FROM base AS pruner
+WORKDIR /app
 
-# Development
-FROM base AS dev
-ENV NODE_ENV development
+COPY . .
+
+RUN turbo prune admin --docker
+
+FROM base as deps
+WORKDIR /app
+
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 
 RUN pnpm fetch && \
     pnpm install
 
-COPY --chown=node:node . .
+FROM deps AS builder
+
+RUN pnpm run build && \
+    pnpm prune --prod
+
+FROM base AS dev
+WORKDIR /app
+ENV NODE_ENV=development
+ENV PORT 3103
+EXPOSE 3103
+
+COPY --from=pruner --chown=node:node /app/out/full/ ./
+COPY --from=deps --chown=node:node /app/ ./
 
 USER node
 CMD ["pnpm", "run", "dev"]
 
 
-# Builder
-FROM base AS builder
-WORKDIR /app
-
-RUN pnpm fetch --frozen-lockfile && \
-    pnpm install --frozen-lockfile && \
-    pnpm store prune
-
-COPY --chown=node:node . .
-
-RUN pnpm run build
-
-
-# Production
 FROM base AS prod
 WORKDIR /app
+ENV NODE_ENV=production
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN mkdir .next && \
-    chown node:node .next
-
-COPY --from=builder --chown=node:node /app/public ./public
-COPY --from=builder --chown=node:node /app/.next/standalone ./
-COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/full/next.config.js .
+COPY --from=builder --chown=node:node /app/full/package.json .
+COPY --from=builder --chown=node:node /app/full/.next .
+COPY --from=builder --chown=node:node /app/full/.next/static ./standalone/.next/static
+COPY --from=builder --chown=node:node /app/full/public ./standalone/public
 
 USER node
-CMD ["node", "server.js"]
+CMD ["node", "./standalone/server.js"]

@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat && \
     npm install -g pnpm@latest turbo@latest
 
-HEALTHCHECK --interval=5s --timeout=1s \
+HEALTHCHECK --interval=30s --timeout=5s \
     CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/health || exit 1
 
 FROM base AS pruner
@@ -18,6 +18,7 @@ RUN turbo prune api --docker
 FROM base as deps
 WORKDIR /app
 
+COPY /apps/api/tsconfig.json .
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 
@@ -25,9 +26,14 @@ RUN pnpm fetch && \
     pnpm install
 
 FROM deps AS builder
+WORKDIR /app
 
-RUN pnpm run build && \
-    pnpm prune --prod
+COPY --from=pruner --chown=node:node /app/out/full/ ./
+COPY --from=pruner --chown=node:node /app/out/full ./
+
+RUN pnpm turbo run build --filter api && \
+    pnpm prune --prod && \
+    pnpm --filter api deploy --prod --ignore-scripts ./out
 
 FROM base AS dev
 WORKDIR /app
@@ -35,7 +41,6 @@ ENV NODE_ENV=development
 ENV PORT 3103
 EXPOSE 3103
 
-COPY --from=pruner --chown=node:node /app/out/full/ ./
 COPY --from=deps --chown=node:node /app/ ./
 
 USER node
@@ -46,8 +51,9 @@ FROM base AS prod
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY --from=builder --chown=node:node /app/full/package.json .
-COPY --from=builder --chown=node:node /app/full/dist .
+COPY --from=builder --chown=node:node /app/out/package.json .
+COPY --from=builder --chown=node:node /app/out/node_modules/ ./node_modules
+COPY --from=builder --chown=node:node /app/apps/api/dist/ ./dist
 
 USER node
-CMD ["node", "./dist/server.js"]
+CMD ["node", "dist/index.js"]

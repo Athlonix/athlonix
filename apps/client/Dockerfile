@@ -22,8 +22,11 @@ RUN pnpm fetch && \
     pnpm install
 
 FROM deps AS builder
+WORKDIR /app
 
-RUN pnpm run build && \
+COPY --from=pruner --chown=node:node /app/out/full/ ./
+
+RUN pnpm turbo run build --filter client && \
     pnpm prune --prod
 
 FROM base AS dev
@@ -41,13 +44,18 @@ CMD ["pnpm", "run", "dev"]
 
 FROM base AS prod
 WORKDIR /app
-ENV NODE_ENV=production
 
-COPY --from=builder --chown=node:node /app/full/next.config.js .
-COPY --from=builder --chown=node:node /app/full/package.json .
-COPY --from=builder --chown=node:node /app/full/.next .
-COPY --from=builder --chown=node:node /app/full/.next/static ./standalone/.next/static
-COPY --from=builder --chown=node:node /app/full/public ./standalone/public
+ENV NODE_ENV production
+ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN mkdir .next && \
+    chown node:node .next
+
+COPY --from=builder --chown=node:node /app/apps/client/next.config.js .
+COPY --from=builder --chown=node:node /app/apps/client/package.json .
+COPY --from=builder --chown=node:node /app/apps/client/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/client/.next/static ./apps/client/.next/static
+COPY --from=builder --chown=node:node /app/apps/client/public ./apps/client/public
 
 USER node
-CMD ["node", "./standalone/server.js"]
+CMD ["node", "apps/client/server.js"]

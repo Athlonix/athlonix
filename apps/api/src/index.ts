@@ -2,14 +2,19 @@ import {serve} from '@hono/node-server';
 import {Hono} from 'hono';
 import {prettyJSON} from 'hono/pretty-json';
 import {secureHeaders} from 'hono/secure-headers';
+import authRoutes from './handlers/auth';
+import {compress} from 'hono/compress';
+import authMiddleware from './middlewares/auth';
 
 const app = new Hono();
 app.use(prettyJSON());
 app.use(secureHeaders());
+app.use(compress());
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!');
-});
+app.get('/', (c) => c.text('Hello, Hono!', 200));
+app.route('/', authRoutes);
+app.get('/health', (c) => c.json('OK', 200));
+app.get('/protected', authMiddleware, (c) => c.json({message: 'Protected route'}, 200));
 
 const port = Number(process.env.PORT || 3101);
 console.log(`Server is running on port ${port}`);

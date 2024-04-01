@@ -1,43 +1,48 @@
-# Base image
 FROM node:21-alpine AS base
 WORKDIR /app
 
-EXPOSE ${PORT}
-ENV PORT ${PORT}
+ENV PORT 3102
+EXPOSE 3102
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache libc6-compat && \
-    npm i -g pnpm@latest
+    npm install -g pnpm@latest turbo@latest
 
-COPY --chown=node:node package.json pnpm-lock.yaml ./
+FROM base AS pruner
+WORKDIR /app
 
-# Development
-FROM base AS dev
-ENV NODE_ENV development
+COPY . .
+
+RUN turbo prune client --docker
+
+FROM base as deps
+WORKDIR /app
+
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 
 RUN pnpm fetch && \
     pnpm install
 
-COPY --chown=node:node . .
+FROM deps AS builder
+WORKDIR /app
+
+COPY --from=pruner --chown=node:node /app/out/full/ ./
+
+RUN pnpm turbo run build --filter client && \
+    pnpm prune --prod
+
+FROM base AS dev
+WORKDIR /app
+ENV NODE_ENV=development
+
+COPY --from=pruner --chown=node:node /app/out/full/ ./
+COPY --from=deps --chown=node:node /app/ ./
 
 USER node
 CMD ["pnpm", "run", "dev"]
 
 
-# Builder
-FROM base AS builder
-WORKDIR /app
-
-RUN pnpm fetch --frozen-lockfile && \
-    pnpm install --frozen-lockfile && \
-    pnpm store prune
-
-COPY --chown=node:node . .
-
-RUN pnpm run build
-
-
-# Production
 FROM base AS prod
 WORKDIR /app
 
@@ -47,9 +52,11 @@ ENV NEXT_TELEMETRY_DISABLED 1
 RUN mkdir .next && \
     chown node:node .next
 
-COPY --from=builder --chown=node:node /app/public ./public
-COPY --from=builder --chown=node:node /app/.next/standalone ./
-COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/apps/client/next.config.js .
+COPY --from=builder --chown=node:node /app/apps/client/package.json .
+COPY --from=builder --chown=node:node /app/apps/client/.next/standalone ./
+COPY --from=builder --chown=node:node /app/apps/client/.next/static ./apps/client/.next/static
+COPY --from=builder --chown=node:node /app/apps/client/public ./apps/client/public
 
 USER node
-CMD ["node", "server.js"]
+CMD ["node", "apps/client/server.js"]

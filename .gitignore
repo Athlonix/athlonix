@@ -2,11 +2,6 @@
 
 # Dependencies
 node_modules/
-apps/admin/node_modules/
-apps/api/node_modules/
-apps/client/node_modules/
-apps/admin/.next/
-apps/client/.next/
 .pnp
 .pnp.js
 

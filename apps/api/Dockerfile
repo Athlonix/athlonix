@@ -1,42 +1,60 @@
-# Base server
-FROM node:21-alpine as base
+FROM node:21-alpine AS base
+WORKDIR /app
+
+ENV PORT 3103
+EXPOSE 3103
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache libc6-compat && \
-    npm install -g pnpm@latest
+    npm install -g pnpm@latest turbo@latest
 
-USER node
+HEALTHCHECK --interval=30s --timeout=5s \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3103/health || exit 1
+
+FROM base AS pruner
 WORKDIR /app
 
-COPY --chown=node:node package*.json .
+COPY . .
 
-ENV PORT $PORT
-EXPOSE $PORT
+RUN turbo prune api --docker
 
-HEALTHCHECK --interval=5s --timeout=1s \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/health || exit 1
+FROM base as deps
+WORKDIR /app
 
-# Development
-FROM base as dev
-ENV NODE_ENV=development
+COPY /apps/api/tsconfig.json .
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+
 RUN pnpm fetch && \
     pnpm install
-COPY --chown=node:node . .
+
+FROM deps AS builder
+WORKDIR /app
+
+COPY --from=pruner --chown=node:node /app/out/full/ ./
+
+RUN pnpm turbo run build --filter api && \
+    pnpm prune --prod && \
+    pnpm --filter api deploy --prod --ignore-scripts ./out
+
+FROM base AS dev
+WORKDIR /app
+ENV NODE_ENV=development
+
+COPY --from=pruner --chown=node:node /app/out/full/ ./
+COPY --from=deps --chown=node:node /app/ ./
+
+USER node
 CMD ["pnpm", "run", "dev"]
 
 
-# Build
-FROM base as build
-RUN pnpm fetch && \
-    pnpm install
-COPY --chown=node:node . .
-RUN pnpm run build && \
-    pnpm prune --prod
-
-# Production
-FROM base as prod
+FROM base AS prod
+WORKDIR /app
 ENV NODE_ENV=production
-COPY --from=build --chown=node:node /app/dist ./dist
-COPY --from=build --chown=node:node /app/node_modules ./node_modules
-COPY --from=build --chown=node:node /app/prisma ./prisma
-CMD ["node", "dist/app.js"]
+
+COPY --from=builder --chown=node:node /app/out/package.json .
+COPY --from=builder --chown=node:node /app/out/node_modules/ ./node_modules
+COPY --from=builder --chown=node:node /app/apps/api/dist/ ./dist
+
+USER node
+CMD ["node", "dist/index.js"]

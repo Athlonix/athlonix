@@ -9,7 +9,7 @@ This Turborepo includes the following packages/apps:
 - `admin`: a [Next.js](https://nextjs.org/) app
 - `client`: another [Next.js](https://nextjs.org/) app
 - `api`: a [hono](https://hono.dev/) API
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
+- `@repo/ui`: a stub React component library shared by both `admin` and `client` applications
 - `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
 - `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
@@ -28,7 +28,6 @@ This Turborepo has some additional tools already setup for you:
 To build all apps and packages, run the following command:
 
 ```sh
-cd my-turborepo
 pnpm build
 ```
 
@@ -37,8 +36,21 @@ pnpm build
 To develop all apps and packages, run the following command:
 
 ```sh
-cd my-turborepo
 pnpm dev
+```
+
+### Format and Lint
+
+To format all apps and packages, run the following command:
+
+```sh
+pnpm format
+```
+
+To lint all apps and packages, run the following command:
+
+```sh
+pnpm lint
 ```
 
 ## Useful Links

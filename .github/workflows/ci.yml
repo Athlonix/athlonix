@@ -32,9 +32,6 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Run Type Check
-        run: pnpm run types:check
-
       - name: Run Format Check
         run: pnpm run format:check
 

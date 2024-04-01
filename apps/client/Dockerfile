@@ -1,6 +1,9 @@
 FROM node:21-alpine AS base
 WORKDIR /app
 
+ENV PORT 3102
+EXPOSE 3102
+
 # hadolint ignore=DL3018
 RUN apk add --no-cache libc6-compat && \
     npm install -g pnpm@latest turbo@latest
@@ -32,8 +35,6 @@ RUN pnpm turbo run build --filter client && \
 FROM base AS dev
 WORKDIR /app
 ENV NODE_ENV=development
-ENV PORT 3102
-EXPOSE 3102
 
 COPY --from=pruner --chown=node:node /app/out/full/ ./
 COPY --from=deps --chown=node:node /app/ ./

@@ -1,12 +1,15 @@
 FROM node:21-alpine AS base
 WORKDIR /app
 
+ENV PORT 3103
+EXPOSE 3103
+
 # hadolint ignore=DL3018
 RUN apk add --no-cache libc6-compat && \
     npm install -g pnpm@latest turbo@latest
 
 HEALTHCHECK --interval=30s --timeout=5s \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3103/health || exit 1
 
 FROM base AS pruner
 WORKDIR /app
@@ -29,7 +32,6 @@ FROM deps AS builder
 WORKDIR /app
 
 COPY --from=pruner --chown=node:node /app/out/full/ ./
-COPY --from=pruner --chown=node:node /app/out/full ./
 
 RUN pnpm turbo run build --filter api && \
     pnpm prune --prod && \
@@ -38,9 +40,8 @@ RUN pnpm turbo run build --filter api && \
 FROM base AS dev
 WORKDIR /app
 ENV NODE_ENV=development
-ENV PORT 3103
-EXPOSE 3103
 
+COPY --from=pruner --chown=node:node /app/out/full/ ./
 COPY --from=deps --chown=node:node /app/ ./
 
 USER node

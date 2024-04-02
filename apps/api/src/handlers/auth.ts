@@ -22,8 +22,8 @@ const authRoutes = new Hono()
         email,
         password,
       });
+
       if (error || !data?.user?.email) {
-        console.log(error);
         throw new Error(error?.message || 'Error while signing up', {
           cause: error,
         });

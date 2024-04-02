@@ -49,9 +49,6 @@ WORKDIR /app
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN mkdir .next && \
-    chown node:node .next
-
 COPY --from=builder --chown=node:node /app/apps/client/next.config.js .
 COPY --from=builder --chown=node:node /app/apps/client/package.json .
 COPY --from=builder --chown=node:node /app/apps/client/.next/standalone ./

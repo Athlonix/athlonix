@@ -12,7 +12,7 @@ app.use(secureHeaders());
 app.use(compress());
 
 app.get('/', (c) => c.text('Hello, Hono!', 200));
-app.route('/', authRoutes);
+app.route('/auth/', authRoutes);
 app.get('/health', (c) => c.json('OK', 200));
 app.get('/protected', authMiddleware, (c) => c.json({message: 'Protected route'}, 200));
 

@@ -11,7 +11,7 @@ services:
       - .env
     restart: unless-stopped
     ports:
-      - 3100:3100
+      - ${ADMIN_PORT}:3100
     volumes:
       - /app/node_modules
       - /app/apps/admin/node_modules
@@ -27,7 +27,7 @@ services:
       - .env
     restart: unless-stopped
     ports:
-      - 3102:3102
+      - ${CLIENT_PORT}:3102
     volumes:
       - /app/node_modules
       - /app/apps/client/node_modules
@@ -45,7 +45,7 @@ services:
     stdin_open: true
     restart: unless-stopped
     ports:
-      - 3103:3103
+      - ${API_PORT}:3101
     volumes:
       - /app/node_modules
       - /app/apps/api/node_modules

@@ -1,15 +1,15 @@
 FROM node:21-alpine AS base
 WORKDIR /app
 
-ENV PORT 3103
-EXPOSE 3103
+ENV PORT 3101
+EXPOSE 3101
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache libc6-compat && \
     npm install -g pnpm@latest turbo@latest
 
 HEALTHCHECK --interval=30s --timeout=5s \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:3103/health || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:3101/health || exit 1
 
 FROM base AS pruner
 WORKDIR /app

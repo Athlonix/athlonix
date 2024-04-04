@@ -87,3 +87,12 @@ jobs:
         run: |
           # shellcheck disable=SC2086
           echo "image-tag=${{ steps.docker_meta.outputs.version }}" >> $GITHUB_OUTPUT
+
+
+      - name: Deploy to Kubernetes
+        if: github.ref == 'refs/heads/main'
+        uses: actions-hub/kubectl@master
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        with:
+          args: rollout restart deployment athlonix-admin

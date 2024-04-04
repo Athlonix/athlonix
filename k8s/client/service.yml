@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: athlonix-admin
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 3102
+    protocol: TCP
+    targetPort: 3102
+    nodePort: 31002
+  selector:
+    app: athlonix
+  type: NodePort

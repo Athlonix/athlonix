@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: athlonix-client
+  labels:
+    app: athlonix
+spec:
+  selector:
+    matchLabels:
+      app: athlonix
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: athlonix
+        octopusexport: OctopusExport
+    spec:
+      containers:
+        - name: athlonix-client
+          image: 'ghcr.io/athlonix/athlonix/client:latest'
+          imagePullPolicy: Always
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - name: PORT
+              containerPort: 3102
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+            requests:
+              cpu: "0.5"
+              memory: "256Mi"
+      imagePullSecrets:
+      - name: docker-athlonix

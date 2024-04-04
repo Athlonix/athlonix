@@ -22,9 +22,12 @@ spec:
           imagePullPolicy: Always
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
-            - name: http
-              containerPort: 3100
-              protocol: TCP
+            - containerPort: 3100
+          env:
+            - name: ATHLONIX_API_URL
+              value: 'http://athlonix-api:3101'
+            - name: PORT
+              value: '3100'
           resources:
             limits:
               cpu: '1'

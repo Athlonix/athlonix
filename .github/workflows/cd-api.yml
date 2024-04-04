@@ -5,17 +5,17 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'apps/api/**'
-      - '.github/workflows/cd-api.yml'
-      - 'packages/**'
+    paths-ignore:
+      - 'apps/admin/**'
+      - 'apps/client/**'
+      - '**/*.md'
   pull_request:
     branches:
       - main
-    paths:
-      - 'apps/api/**'
-      - '.github/workflows/cd-api.yml'
-      - 'packages/**'
+    paths-ignore:
+      - 'apps/admin/**'
+      - 'apps/client/**'
+      - '**/*.md'
 
 # cancel any previously-started, yet still active runs of this workflow on the same branch
 concurrency:

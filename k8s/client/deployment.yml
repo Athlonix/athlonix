@@ -22,15 +22,15 @@ spec:
           imagePullPolicy: Always
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
-            - name: PORT
+            - name: http
               containerPort: 3102
               protocol: TCP
           resources:
             limits:
-              cpu: "1"
-              memory: "1Gi"
+              cpu: '1'
+              memory: '1Gi'
             requests:
-              cpu: "0.5"
-              memory: "256Mi"
+              cpu: '0.5'
+              memory: '256Mi'
       imagePullSecrets:
-      - name: docker-athlonix
+        - name: docker-athlonix

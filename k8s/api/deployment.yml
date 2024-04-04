@@ -15,22 +15,26 @@ spec:
     metadata:
       labels:
         app: athlonix
+        octopusexport: OctopusExport
     spec:
       containers:
         - name: athlonix-api
           image: 'ghcr.io/athlonix/athlonix/api:latest'
           imagePullPolicy: Always
           terminationMessagePolicy: FallbackToLogsOnError
+          envFrom:
+            - secretRef:
+                name: athlonix-api-env
           ports:
-            - name: PORT
+            - name: http
               containerPort: 3101
               protocol: TCP
           resources:
             limits:
-              cpu: "1"
-              memory: "1Gi"
+              cpu: '1'
+              memory: '1Gi'
             requests:
-              cpu: "0.5"
-              memory: "256Mi"
+              cpu: '0.5'
+              memory: '256Mi'
       imagePullSecrets:
-      - name: docker-athlonix
+        - name: docker-athlonix

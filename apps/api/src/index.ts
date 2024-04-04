@@ -1,10 +1,10 @@
 import {serve} from '@hono/node-server';
 import {Hono} from 'hono';
+import {compress} from 'hono/compress';
 import {prettyJSON} from 'hono/pretty-json';
 import {secureHeaders} from 'hono/secure-headers';
-import authRoutes from './handlers/auth';
-import {compress} from 'hono/compress';
-import authMiddleware from './middlewares/auth';
+import authRoutes from './handlers/auth.js';
+import authMiddleware from './middlewares/auth.js';
 
 const app = new Hono();
 app.use(prettyJSON());

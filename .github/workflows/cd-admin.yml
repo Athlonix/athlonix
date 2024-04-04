@@ -5,17 +5,17 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'apps/admin/**'
-      - '.github/workflows/cd-admin.yml'
-      - 'packages/**'
+    paths-ignore:
+      - 'apps/client/**'
+      - 'apps/api/**'
+      - '**/*.md'
   pull_request:
     branches:
       - main
-    paths:
-      - 'apps/admin/**'
-      - '.github/workflows/cd-admin.yml'
-      - 'packages/**'
+    paths-ignore:
+      - 'apps/client/**'
+      - 'apps/api/**'
+      - '**/*.md'
 
 # cancel any previously-started, yet still active runs of this workflow on the same branch
 concurrency:
@@ -95,4 +95,3 @@ jobs:
           KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
         with:
           args: rollout restart deployment athlonix-admin
-          

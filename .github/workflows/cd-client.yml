@@ -5,17 +5,17 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'apps/client/**'
-      - '.github/workflows/cd-client.yml'
-      - 'packages/**'
+    paths-ignore:
+      - 'apps/admin/**'
+      - 'apps/api/**'
+      - '**/*.md'
   pull_request:
     branches:
       - main
-    paths:
-      - 'apps/client/**'
-      - '.github/workflows/cd-client.yml'
-      - 'packages/**'
+    paths-ignore:
+      - 'apps/admin/**'
+      - 'apps/api/**'
+      - '**/*.md'
 
 # cancel any previously-started, yet still active runs of this workflow on the same branch
 concurrency:
@@ -87,7 +87,6 @@ jobs:
         run: |
           # shellcheck disable=SC2086
           echo "image-tag=${{ steps.docker_meta.outputs.version }}" >> $GITHUB_OUTPUT
-
 
       - name: Deploy to Kubernetes
         if: github.ref == 'refs/heads/main'

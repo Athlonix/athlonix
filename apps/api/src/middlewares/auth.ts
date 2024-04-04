@@ -1,7 +1,7 @@
-import {supabase} from '../libs/supabase';
 import {type MiddlewareHandler} from 'hono';
 import {getCookie} from 'hono/cookie';
 import {HTTPException} from 'hono/http-exception';
+import {supabase} from '../libs/supabase.js';
 
 const authMiddleware: MiddlewareHandler = async (c, next) => {
   const refresh_token = getCookie(c, 'refresh_token');

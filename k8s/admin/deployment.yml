@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: athlonix-admin
+  labels:
+    app: athlonix
+spec:
+  selector:
+    matchLabels:
+      app: athlonix
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: athlonix
+    spec:
+      containers:
+        - name: athlonix-admin
+          image: 'ghcr.io/athlonix/athlonix/admin:latest'
+          imagePullPolicy: Always
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - name: http
+              containerPort: 3100
+              protocol: TCP
+          resources:
+            limits:
+              cpu: '1'
+              memory: '1Gi'
+            requests:
+              cpu: '0.5'
+              memory: '256Mi'
+      imagePullSecrets:
+        - name: docker-athlonix

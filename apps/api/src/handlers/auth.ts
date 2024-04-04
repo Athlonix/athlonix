@@ -1,9 +1,9 @@
-import {supabase} from '../libs/supabase';
 import {zValidator} from '@hono/zod-validator';
 import {Hono} from 'hono';
 import {getCookie, setCookie} from 'hono/cookie';
 import {HTTPException} from 'hono/http-exception';
 import {z} from 'zod';
+import {supabase} from '../libs/supabase.js';
 
 const authRoutes = new Hono()
   .post(

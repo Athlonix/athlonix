@@ -15,7 +15,6 @@ spec:
     metadata:
       labels:
         app: athlonix-api
-        octopusexport: OctopusExport
     spec:
       containers:
         - name: athlonix-api

@@ -3,19 +3,18 @@ kind: Deployment
 metadata:
   name: athlonix-api
   labels:
-    app: athlonix
+    app: athlonix-api
 spec:
   selector:
     matchLabels:
-      app: athlonix
+      app: athlonix-api
   replicas: 2
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: athlonix
-        octopusexport: OctopusExport
+        app: athlonix-api
     spec:
       containers:
         - name: athlonix-api
@@ -32,10 +31,10 @@ spec:
               value: '3101'
           resources:
             limits:
-              cpu: '1'
-              memory: '1Gi'
+              memory: "2Gi"
+              cpu: "2000m"
             requests:
-              cpu: '0.5'
-              memory: '256Mi'
+              memory: "128Mi"
+              cpu: "250m"
       imagePullSecrets:
         - name: docker-athlonix

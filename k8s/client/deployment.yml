@@ -3,37 +3,37 @@ kind: Deployment
 metadata:
   name: athlonix-client
   labels:
-    app: athlonix
+    app: athlonix-client
+
 spec:
+  replicas: 2
   selector:
     matchLabels:
-      app: athlonix
-  replicas: 2
+      app: athlonix-client
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: athlonix
+        app: athlonix-client
     spec:
       containers:
-        - name: athlonix-client
-          image: 'ghcr.io/athlonix/athlonix/client:latest'
-          imagePullPolicy: Always
-          terminationMessagePolicy: FallbackToLogsOnError
-          ports:
-            - containerPort: 3102
-          env:
-            - name: ATHLONIX_API_URL
-              value: 'http://athlonix-api:3101'
-            - name: PORT
-              value: '3102'
-          resources:
-            limits:
-              cpu: '1'
-              memory: '1Gi'
-            requests:
-              cpu: '0.5'
-              memory: '256Mi'
+      - name: athlonix-client
+        image: ghcr.io/athlonix/athlonix/client:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 3102
+        env:
+          - name: PORT
+            value: "3102"
+          - name: ATHLONIX_API_URL
+            value: "http://athlonix-api:3101"
+        resources:
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
       imagePullSecrets:
         - name: docker-athlonix

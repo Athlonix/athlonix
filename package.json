@@ -6,10 +6,11 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "lint:check": "turbo lint:check",
-    "types:check": "turbo types:check"
+    "types:check": "turbo types:check",
+    "biome:ci": "biome ci .",
+    "lint:all": "biome check --apply ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.6.4",
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "turbo": "^1.13.2"

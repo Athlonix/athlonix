@@ -1,36 +1,27 @@
-name: CI
+name: Code quality
 
 on:
-  pull_request:
-    paths-ignore:
-      - '*.md'
   push:
     branches:
       - main
-    paths-ignore:
-      - '*.md'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
-  ci:
-    name: CI
+  quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+        
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
 
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          cache: 'pnpm'
-          node-version: '21'
-
-      - name: Install Dependencies
-        run: pnpm install
-
-      - name: Check Linting and Formatting
-        run: pnpm run biome:ci
+      - name: Run Biome
+        run: biome ci .

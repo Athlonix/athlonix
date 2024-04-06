@@ -17,6 +17,9 @@ importers:
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:packages/typescript-config
+      supabase:
+        specifier: ^1.153.4
+        version: 1.153.4
       turbo:
         specifier: ^1.13.2
         version: 1.13.2

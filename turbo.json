@@ -23,9 +23,5 @@
       "outputs": []
     }
   },
-  "globalEnv": [
-    "SUPABASE_URL",
-    "SUPABASE_KEY",
-    "SUPABASE_SERVICE_KEY"
-  ]
+  "globalEnv": ["SUPABASE_URL", "SUPABASE_KEY", "SUPABASE_SERVICE_KEY"]
 }

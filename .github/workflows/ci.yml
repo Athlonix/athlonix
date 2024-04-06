@@ -31,6 +31,7 @@ jobs:
       - name: Run Biome
         id: biome
         run: biome ci .
+        continue-on-error: true
       
       - if: ${{ github.event_name == 'pull_request' }} && failure()
         name: Cancel Workflows

@@ -7,6 +7,7 @@
 **/*dist
 **/*node_modules
 **/*.next
+**/*biome.json
 .github/
 .vscode/
-.mega-linter.yml
+k8s/

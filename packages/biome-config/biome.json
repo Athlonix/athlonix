@@ -26,7 +26,7 @@
     }
   },
   "files": {
-    "include": ["**/*.js", "**/*.ts", "**/*.tsx", "**/*.jsx", "**/*.json", "**/*.md"],
+    "include": ["**/*.js", "**/*.ts", "**/*.tsx", "**/*.jsx", "**/*.json", "**/*.css", "**/*.scss"],
     "ignore": ["node_modules/**", "dist/**", ".next/**", "build/**"]
   }
 }

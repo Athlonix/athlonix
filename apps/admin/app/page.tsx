@@ -1,8 +1,8 @@
+import { Button } from '@repo/ui/button';
+import { Card } from '@repo/ui/card';
+import { Code } from '@repo/ui/code';
 import Image from 'next/image';
-import {Card} from '@repo/ui/card';
-import {Code} from '@repo/ui/code';
 import styles from './page.module.css';
-import {Button} from '@repo/ui/button';
 
 function Gradient({
   conic,
@@ -65,14 +65,7 @@ export default function Page(): JSX.Element {
             target="_blank"
           >
             By{' '}
-            <Image
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              height={24}
-              priority
-              src="/vercel.svg"
-              width={100}
-            />
+            <Image alt="Vercel Logo" className={styles.vercelLogo} height={24} priority src="/vercel.svg" width={100} />
           </a>
         </div>
       </div>
@@ -85,13 +78,7 @@ export default function Page(): JSX.Element {
         <div className={styles.heroContent}>
           <div className={styles.logos}>
             <div className={styles.circles}>
-              <Image
-                alt=""
-                height={614}
-                src="circles.svg"
-                width={614}
-                style={{pointerEvents: 'none'}}
-              />
+              <Image alt="" height={614} src="circles.svg" width={614} style={{ pointerEvents: 'none' }} />
             </div>
             <div className={styles.logoGradientContainer}>
               <Gradient className={styles.logoGradient} conic small />
@@ -104,7 +91,7 @@ export default function Page(): JSX.Element {
                 priority
                 src="turborepo.svg"
                 width={120}
-                style={{pointerEvents: 'none'}}
+                style={{ pointerEvents: 'none' }}
               />
             </div>
           </div>
@@ -132,7 +119,7 @@ export default function Page(): JSX.Element {
       </div>
 
       <div className={styles.grid}>
-        {LINKS.map(({title, href, description}) => (
+        {LINKS.map(({ title, href, description }) => (
           <Card className={styles.card} href={href} key={title} title={title}>
             {description}
           </Card>

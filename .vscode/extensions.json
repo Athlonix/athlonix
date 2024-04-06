@@ -1,13 +1,11 @@
 {
     "recommendations": [
-      "esbenp.prettier-vscode",
-      "dbaeumer.vscode-eslint",
       "yoavbls.pretty-ts-errors",
       "mylesmurphy.prettify-ts",
       "ms-azuretools.vscode-docker",
       "christian-kohler.path-intellisense",
-      "prisma.prisma",
       "meganrogge.template-string-converter",
-      "vitest.explorer"
+      "vitest.explorer",
+      "biomejs.biome"
     ]
   }

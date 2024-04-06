@@ -1,4 +1,4 @@
-name: Code quality
+name: Continuous Integration
 
 on:
   push:
@@ -8,12 +8,16 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pull-requests: read
 
 jobs:
-  quality:
+  ci:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -24,4 +28,12 @@ jobs:
         uses: biomejs/setup-biome@v2
 
       - name: Run Biome
+        id: biome
         run: biome ci .
+      
+      - if: ${{ github.event_name == 'pull_request' }} && failure()
+        name: Cancel Workflows
+        uses: styfle/cancel-workflow-action@0.12.1
+        with:
+          workflow_id: cd-api.yml,cd-client.yml,cd-admin.yml
+          access_token: ${{ github.token }}

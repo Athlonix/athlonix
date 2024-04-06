@@ -1,9 +1,9 @@
-import {zValidator} from '@hono/zod-validator';
-import {Hono} from 'hono';
-import {getCookie, setCookie} from 'hono/cookie';
-import {HTTPException} from 'hono/http-exception';
-import {z} from 'zod';
-import {supabase} from '../libs/supabase.js';
+import { zValidator } from '@hono/zod-validator';
+import { Hono } from 'hono';
+import { getCookie, setCookie } from 'hono/cookie';
+import { HTTPException } from 'hono/http-exception';
+import { z } from 'zod';
+import { supabase } from '../libs/supabase.js';
 
 const authRoutes = new Hono()
   .post(
@@ -13,12 +13,12 @@ const authRoutes = new Hono()
       z.object({
         email: z.string(),
         password: z.string().min(8),
-      })
+      }),
     ),
     async (c) => {
-      const {email, password} = c.req.valid('json');
+      const { email, password } = c.req.valid('json');
 
-      const {data, error} = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
       });
@@ -28,8 +28,8 @@ const authRoutes = new Hono()
           cause: error,
         });
       }
-      return c.json({message: 'User created successfully'});
-    }
+      return c.json({ message: 'User created successfully' });
+    },
   )
   .post(
     '/login',
@@ -38,27 +38,27 @@ const authRoutes = new Hono()
       z.object({
         email: z.string(),
         password: z.string().min(8),
-      })
+      }),
     ),
     async (c) => {
-      const {email, password} = c.req.valid('json');
+      const { email, password } = c.req.valid('json');
 
-      const {data, error} = await supabase.auth.signInWithPassword({email, password});
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
         console.error('Error while signing in', error);
-        throw new HTTPException(401, {message: error.message});
+        throw new HTTPException(401, { message: error.message });
       }
 
       setCookie(c, 'access_token', data?.session.access_token, {
-        ...(data?.session.expires_at && {expires: new Date(data.session.expires_at)}),
+        ...(data?.session.expires_at && { expires: new Date(data.session.expires_at) }),
         httpOnly: true,
         path: '/',
         secure: true,
       });
 
       setCookie(c, 'refresh_token', data?.session.refresh_token, {
-        ...(data?.session.expires_at && {expires: new Date(data.session.expires_at)}),
+        ...(data?.session.expires_at && { expires: new Date(data.session.expires_at) }),
         httpOnly: true,
         path: '/',
         secure: true,
@@ -68,30 +68,30 @@ const authRoutes = new Hono()
         access_token: data.session.access_token,
         refresh_token: data.session.refresh_token,
       });
-    }
+    },
   )
   .get('/refresh', async (c) => {
     const refresh_token = getCookie(c, 'refresh_token');
     if (!refresh_token) {
-      throw new HTTPException(403, {message: 'No refresh token'});
+      throw new HTTPException(403, { message: 'No refresh token' });
     }
 
-    const {data, error} = await supabase.auth.refreshSession({
+    const { data, error } = await supabase.auth.refreshSession({
       refresh_token,
     });
 
     if (error) {
       console.error('Error while refreshing token', error);
-      throw new HTTPException(403, {message: error.message});
+      throw new HTTPException(403, { message: error.message });
     }
 
     if (data?.session) {
       setCookie(c, 'refresh_token', data.session.refresh_token, {
-        ...(data.session.expires_at && {expires: new Date(data.session.expires_at)}),
+        ...(data.session.expires_at && { expires: new Date(data.session.expires_at) }),
       });
     }
 
-    return c.json({message: 'Token refreshed'});
+    return c.json({ message: 'Token refreshed' });
   });
 
 export default authRoutes;

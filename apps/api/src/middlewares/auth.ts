@@ -1,12 +1,12 @@
-import {type MiddlewareHandler} from 'hono';
-import {getCookie} from 'hono/cookie';
-import {HTTPException} from 'hono/http-exception';
-import {supabase} from '../libs/supabase.js';
+import type { MiddlewareHandler } from 'hono';
+import { getCookie } from 'hono/cookie';
+import { HTTPException } from 'hono/http-exception';
+import { supabase } from '../libs/supabase.js';
 
 const authMiddleware: MiddlewareHandler = async (c, next) => {
   const refresh_token = getCookie(c, 'refresh_token');
   const access_token = getCookie(c, 'access_token');
-  const {data, error} = await supabase.auth.getUser(access_token);
+  const { data, error } = await supabase.auth.getUser(access_token);
 
   if (data.user) {
     c.set('user', {
@@ -19,16 +19,16 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
   if (error) {
     console.error('Error while getting user by access_token ', error);
     if (!refresh_token) {
-      throw new HTTPException(403, {message: 'No refresh token'});
+      throw new HTTPException(403, { message: 'No refresh token' });
     }
 
-    const {data: refreshed, error: refreshError} = await supabase.auth.refreshSession({
+    const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession({
       refresh_token,
     });
 
     if (refreshError) {
       console.error('Error while refreshing token', refreshError);
-      throw new HTTPException(403, {message: 'Error while refreshing token'});
+      throw new HTTPException(403, { message: 'Error while refreshing token' });
     }
 
     if (refreshed.user) {

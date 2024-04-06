@@ -7,6 +7,6 @@
     "lint": "supabase db lint && biome check --apply .",
     "lint:check": "supabase db lint && biome check .",
     "deploy": "supabase link --project-ref $SUPABASE_PROJECT_REF && supabase db push",
-    "generate:types": "supabase gen types typescript --local > supabase/types/db.ts "
+    "generate:types": "supabase gen types typescript --local > supabase/types/db.ts && biome check --apply ./supabase"
   }
 }

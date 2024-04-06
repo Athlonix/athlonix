@@ -9,7 +9,7 @@ importers:
   .:
     devDependencies:
       '@biomejs/biome':
-        specifier: ^1.6.4
+        specifier: 1.6.4
         version: 1.6.4
       '@repo/biome-config':
         specifier: workspace:*
@@ -129,7 +129,7 @@ importers:
   packages/biome-config:
     devDependencies:
       '@biomejs/biome':
-        specifier: ^1.6.4
+        specifier: 1.6.4
         version: 1.6.4
 
   packages/typescript-config: {}

@@ -11,7 +11,7 @@
     "lint:all": "biome check --apply ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.6.4",
+    "@biomejs/biome": "1.6.4",
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "turbo": "^1.13.2"

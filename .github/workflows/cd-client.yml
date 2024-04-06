@@ -27,7 +27,7 @@ permissions:
   packages: write
 
 jobs:
-  cd-client:
+  client:
     name: CD client
     runs-on: ubuntu-latest
     outputs:

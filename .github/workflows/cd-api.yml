@@ -27,7 +27,7 @@ permissions:
   packages: write
 
 jobs:
-  cd-api:
+  api:
     name: CD api
     runs-on: ubuntu-latest
     outputs:

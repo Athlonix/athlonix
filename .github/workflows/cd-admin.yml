@@ -1,5 +1,5 @@
 ---
-name: CD Admin
+name: CD admin
 
 on:
   push:
@@ -27,7 +27,7 @@ permissions:
   packages: write
 
 jobs:
-  cd-admin:
+  admin:
     name: CD Admin
     runs-on: ubuntu-latest
     outputs:

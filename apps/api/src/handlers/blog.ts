@@ -23,7 +23,7 @@ blog.get(
   zValidator(
     'param',
     z.object({
-      postId: z.string(),
+      postId: z.coerce.number().min(1),
     }),
   ),
   async (c) => {
@@ -69,13 +69,12 @@ blog.delete(
   zValidator(
     'param',
     z.object({
-      postId: z.string(),
+      postId: z.coerce.number().min(1),
     }),
   ),
 
   async (c) => {
     const { postId } = c.req.valid('param');
-
     const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', postId);
 
     if (error) {
@@ -95,7 +94,7 @@ blog.patch(
   zValidator(
     'param',
     z.object({
-      postId: z.string(),
+      postId: z.coerce.number().min(1),
     }),
   ),
   zValidator(
@@ -108,7 +107,6 @@ blog.patch(
   async (c) => {
     const { postId } = c.req.valid('param');
     const { title, content } = c.req.valid('json');
-
     const { data, error } = await supabase.from('POSTS').update({ title, content }).eq('id', postId).select().single();
 
     if (error) {

@@ -72,7 +72,7 @@ blog.get(
   ),
   async (c) => {
     const { postId } = c.req.valid('param');
-    const { data, error } = await supabase.from('POSTS').select('*').eq('id', postId);
+    const { data, error } = await supabase.from('POSTS').select('*').eq('id', postId).single();
 
     if (error) {
       throw new HTTPException(500, { message: error.message });

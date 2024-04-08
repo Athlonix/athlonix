@@ -51,14 +51,14 @@ const authRoutes = new Hono()
       }
 
       setCookie(c, 'access_token', data?.session.access_token, {
-        ...(data?.session.expires_at && { expires: new Date(data.session.expires_at) }),
+        maxAge: 604800, // 1 week
         httpOnly: true,
         path: '/',
         secure: true,
       });
 
       setCookie(c, 'refresh_token', data?.session.refresh_token, {
-        ...(data?.session.expires_at && { expires: new Date(data.session.expires_at) }),
+        maxAge: 31536000, // 1 year
         httpOnly: true,
         path: '/',
         secure: true,
@@ -87,7 +87,9 @@ const authRoutes = new Hono()
 
     if (data?.session) {
       setCookie(c, 'refresh_token', data.session.refresh_token, {
-        ...(data.session.expires_at && { expires: new Date(data.session.expires_at) }),
+        httpOnly: true,
+        path: '/',
+        secure: true,
       });
     }
 

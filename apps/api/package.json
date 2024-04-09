@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "clean": "git clean -xdf .turbo node_modules dist",
     "dev": "tsx watch src/index.ts",
     "build": "tsc --outDir dist",
     "start": "node dist/index.js",
@@ -25,8 +26,8 @@
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/swagger-ui-dist": "^3.30.4",
     "@types/node": "^20.12.6",
+    "@types/swagger-ui-dist": "^3.30.4",
     "supabase": "^1.153.4",
     "tsx": "^4.7.2",
     "typescript": "^5.4.4"

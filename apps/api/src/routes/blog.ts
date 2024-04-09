@@ -8,7 +8,6 @@ export const getAllPosts = createRoute({
   path: '/posts',
   summary: 'Get all posts',
   description: 'Get all posts',
-  security: [{ cookieAuth: [], cookieAuthRefresh: [] }],
   responses: {
     200: {
       description: 'Successful response',

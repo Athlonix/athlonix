@@ -4,7 +4,7 @@ import { badRequestSchema, serverErrorSchema } from '../validators/general.js';
 
 export const signupUser = createRoute({
   method: 'post',
-  path: '/auth/signup',
+  path: '/signup',
   summary: 'Signup a user',
   description: 'Signup a user',
   request: {
@@ -33,7 +33,7 @@ export const signupUser = createRoute({
 
 export const loginUser = createRoute({
   method: 'post',
-  path: '/auth/login',
+  path: '/login',
   summary: 'Login a user',
   description: 'Login a user',
   request: {
@@ -62,7 +62,7 @@ export const loginUser = createRoute({
 
 export const refreshTokens = createRoute({
   method: 'post',
-  path: '/auth/refresh',
+  path: '/refresh',
   summary: 'Refresh tokens',
   description: 'Refresh tokens',
   responses: {

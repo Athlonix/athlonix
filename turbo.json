@@ -26,6 +26,9 @@
       "inputs": ["**/*.ts", "**/*.tsx"],
       "dependsOn": ["^generate:types"],
       "outputs": []
+    },
+    "clean": {
+      "dependsOn": ["^clean"]
     }
   },
   "globalEnv": ["SUPABASE_URL", "SUPABASE_KEY", "SUPABASE_SERVICE_KEY"]

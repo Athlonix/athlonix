@@ -8,5 +8,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.6.4"
+  },
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules"
   }
 }

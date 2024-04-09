@@ -9,15 +9,16 @@ import { secureHeaders } from 'hono/secure-headers';
 import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
 import { health } from './handlers/health.js';
+import authMiddleware from './middlewares/auth.js';
 
 const app = new OpenAPIHono();
 
 if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
-  app.use(logger());
+  app.use('*', logger());
 }
-app.use(prettyJSON());
-app.use(secureHeaders());
-app.use(compress());
+app.use('*', prettyJSON());
+app.use('*', secureHeaders());
+app.use('*', compress());
 app.get('/', (c) => c.text('Athlonix API!', 200));
 
 app.onError((err, c) => {
@@ -28,8 +29,11 @@ app.onError((err, c) => {
 });
 
 app.route('/', health);
-app.route('/', auth);
-app.route('/blog', blog);
+app.route('/auth', auth);
+
+app.use('/api/*', authMiddleware);
+
+app.route('/api/blog', blog);
 
 app.doc('/doc', (c) => ({
   openapi: '3.0.0',
@@ -44,18 +48,6 @@ app.doc('/doc', (c) => ({
     },
   ],
 }));
-
-app.openAPIRegistry.registerComponent('securitySchemes', 'Cookies', {
-  type: 'apiKey',
-  in: 'cookie',
-  name: 'access_token',
-});
-
-app.openAPIRegistry.registerComponent('securitySchemes', 'Cookies', {
-  type: 'apiKey',
-  in: 'cookie',
-  name: 'refresh_token',
-});
 
 app.get('/ui', swaggerUI({ url: '/doc' }));
 

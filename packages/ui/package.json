@@ -10,6 +10,7 @@
     "./components/*": "./src/components/*.tsx"
   },
   "scripts": {
+    "clean": "git clean -xdf .turbo node_modules",
     "lint": "biome check --apply .",
     "lint:check": "biome check .",
     "generate:component": "turbo gen react-component",
@@ -19,8 +20,8 @@
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^1.13.2",
-    "@types/node": "^20.12.5",
-    "@types/react": "^18.2.74",
+    "@types/node": "^20.12.6",
+    "@types/react": "^18.2.75",
     "@types/react-dom": "^18.2.24",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",

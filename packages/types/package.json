@@ -6,7 +6,7 @@
   "types": "src/index.ts",
   "scripts": {
     "clean": "git clean -xdf .turbo node_modules",
-    "db:generate": "(cd ../../supabase/ && pnpm supabase gen types typescript --local > ../packages/types/src/database.ts) && biome check --apply .",
+    "generate:types": "(cd ../../supabase/ && pnpm supabase gen types typescript --local > ../packages/types/src/database.ts) && biome check --apply .",
     "lint": "biome check --apply .",
     "types:check": "tsc --pretty --noEmit"
   },

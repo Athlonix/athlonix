@@ -1,5 +1,4 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { HTTPException } from 'hono/http-exception';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import { createPost, deletePost, getAllPosts, getPost, updatePost } from '../routes/blog.js';
@@ -12,7 +11,7 @@ blog.openapi(getAllPosts, async (c) => {
   const { data, error } = await supabase.from('POSTS').select('*');
 
   if (error) {
-    throw new HTTPException(500, { message: error.message });
+    return c.json({ message: error.message }, 500);
   }
 
   return c.json(data, 200);
@@ -23,7 +22,7 @@ blog.openapi(getPost, async (c) => {
   const { data, error } = await supabase.from('POSTS').select('*').eq('id', id).single();
 
   if (error) {
-    throw new HTTPException(500, { message: error.message });
+    return c.json({ message: error.message }, 500);
   }
   if (!data) {
     return c.json({ message: 'Post not found' }, 404);
@@ -37,7 +36,7 @@ blog.openapi(createPost, async (c) => {
   const { data, error } = await supabase.from('POSTS').insert({ title, content }).select().single();
 
   if (error) {
-    throw new HTTPException(500, { message: error.message });
+    return c.json({ message: error.message }, 500);
   }
 
   return c.json(data, 201);
@@ -49,7 +48,7 @@ blog.openapi(updatePost, async (c) => {
   const { data, error } = await supabase.from('POSTS').update({ title, content }).eq('id', id).select().single();
 
   if (error) {
-    throw new HTTPException(500, { message: error.message });
+    return c.json({ message: error.message }, 500);
   }
   if (!data) {
     return c.json({ message: 'Post not found' }, 404);
@@ -63,7 +62,7 @@ blog.openapi(deletePost, async (c) => {
   const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
   if (error) {
-    throw new HTTPException(500, { message: error.message });
+    return c.json({ message: error.message }, 500);
   }
   if (count === 0) {
     return c.json({ message: 'Post not found' }, 404);

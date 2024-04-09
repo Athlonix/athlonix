@@ -4,6 +4,15 @@
   "private": true,
   "main": "db.ts",
   "types": "db.ts",
+  "scripts": {
+    "generate:types": "cd ../../ && supabase gen types typescript --local > packages/types/db.ts && biome check --apply .",
+    "start": "cd ../../ && supabase status || supabase start",
+    "reset": "cd ../../ && supabase db reset || supabase start",
+    "test": "cd ../../ && supabase db test",
+    "lint": "cd ../../ && supabase db lint && biome check --apply .",
+    "lint:check": "cd ../../ && supabase db lint && biome check .",
+    "deploy": "cd ../../ && supabase link --project-ref $SUPABASE_PROJECT_REF && supabase db push"
+  },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
     "@repo/biome-config": "workspace:*"

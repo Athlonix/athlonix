@@ -1,6 +1,6 @@
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
-import { inserPostSchema, postSchema, updatePostSchema } from '../validators/blog';
+import { insertPostSchema, postSchema, updatePostSchema } from '../validators/blog';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getAllPosts = createRoute({
@@ -14,7 +14,9 @@ export const getAllPosts = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: z.array(postSchema),
+          schema: {
+            data: z.array(postSchema),
+          },
         },
       },
     },
@@ -36,7 +38,9 @@ export const getPost = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: postSchema,
+          schema: {
+            data: postSchema,
+          },
         },
       },
     },
@@ -55,7 +59,7 @@ export const createPost = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: inserPostSchema,
+          schema: insertPostSchema,
         },
       },
     },
@@ -65,7 +69,9 @@ export const createPost = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: postSchema,
+          schema: {
+            data: postSchema,
+          },
         },
       },
     },
@@ -95,7 +101,9 @@ export const updatePost = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: postSchema,
+          schema: {
+            data: postSchema,
+          },
         },
       },
     },

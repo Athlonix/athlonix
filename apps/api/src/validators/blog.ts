@@ -6,7 +6,7 @@ export const postSchema = z.object({
   content: z.string(),
 });
 
-export const inserPostSchema = z.object({
+export const insertPostSchema = z.object({
   title: z.string(),
   content: z.string(),
 });

@@ -1,13 +1,4 @@
 {
   "name": "@repo/supabase",
-  "version": "0.0.0",
-  "scripts": {
-    "start": "supabase status || supabase start",
-    "reset": "supabase db reset || supabase start",
-    "test": "supabase db test",
-    "lint": "supabase db lint && biome check --apply .",
-    "lint:check": "supabase db lint && biome check .",
-    "deploy": "supabase link --project-ref $SUPABASE_PROJECT_REF && supabase db push",
-    "generate:types": "supabase gen types typescript --local > packages/types/db.ts && biome check --apply ."
-  }
+  "version": "0.0.0"
 }

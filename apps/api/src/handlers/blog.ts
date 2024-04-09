@@ -1,121 +1,72 @@
-import { zValidator } from '@hono/zod-validator';
-import { Hono } from 'hono';
-import { HTTPException } from 'hono/http-exception';
-import { z } from 'zod';
+import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
-import authMiddleware from '../middlewares/auth.js';
+import { zodErrorHook } from '../libs/zodError.js';
+import { createPost, deletePost, getAllPosts, getPost, updatePost } from '../routes/blog.js';
 
-export const blog = new Hono();
+export const blog = new OpenAPIHono({
+  defaultHook: zodErrorHook,
+});
 
-blog.get('/posts', authMiddleware, async (c) => {
+blog.openapi(getAllPosts, async (c) => {
   const { data, error } = await supabase.from('POSTS').select('*');
 
   if (error) {
-    throw new HTTPException(500, { message: error.message });
+    return c.json({ message: error.message }, 500);
   }
 
   return c.json(data, 200);
 });
 
-blog.get(
-  '/posts/:postId',
-  authMiddleware,
-  zValidator(
-    'param',
-    z.object({
-      postId: z.coerce.number().min(1),
-    }),
-  ),
-  async (c) => {
-    const { postId } = c.req.valid('param');
-    const { data, error } = await supabase.from('POSTS').select('*').eq('id', postId).single();
+blog.openapi(getPost, async (c) => {
+  const { id } = c.req.valid('param');
+  const { data, error } = await supabase.from('POSTS').select('*').eq('id', id).single();
 
-    if (error) {
-      throw new HTTPException(500, { message: error.message });
-    }
-    if (!data) {
-      return c.json({ message: 'Post not found' }, 404);
-    }
+  if (error) {
+    return c.json({ message: error.message }, 500);
+  }
+  if (!data) {
+    return c.json({ message: 'Post not found' }, 404);
+  }
 
-    return c.json(data, 200);
-  },
-);
+  return c.json(data, 200);
+});
 
-blog.post(
-  '/posts',
-  authMiddleware,
-  zValidator(
-    'json',
-    z.object({
-      title: z.string(),
-      content: z.string(),
-    }),
-  ),
-  async (c) => {
-    const { title, content } = c.req.valid('json');
-    const { data, error } = await supabase.from('POSTS').insert({ title, content }).select().single();
+blog.openapi(createPost, async (c) => {
+  const { title, content } = c.req.valid('json');
+  const { data, error } = await supabase.from('POSTS').insert({ title, content }).select().single();
 
-    if (error) {
-      throw new HTTPException(500, { message: error.message });
-    }
+  if (error) {
+    return c.json({ message: error.message }, 500);
+  }
 
-    return c.json(data, 201);
-  },
-);
+  return c.json(data, 201);
+});
 
-blog.delete(
-  '/posts/:postId',
-  authMiddleware,
-  zValidator(
-    'param',
-    z.object({
-      postId: z.coerce.number().min(1),
-    }),
-  ),
+blog.openapi(updatePost, async (c) => {
+  const { id } = c.req.valid('param');
+  const { title, content } = c.req.valid('json');
+  const { data, error } = await supabase.from('POSTS').update({ title, content }).eq('id', id).select().single();
 
-  async (c) => {
-    const { postId } = c.req.valid('param');
-    const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', postId);
+  if (error) {
+    return c.json({ message: error.message }, 500);
+  }
+  if (!data) {
+    return c.json({ message: 'Post not found' }, 404);
+  }
 
-    if (error) {
-      throw new HTTPException(500, { message: error.message });
-    }
-    if (count === 0) {
-      return c.json({ message: 'Post not found' }, 404);
-    }
+  return c.json(data, 200);
+});
 
-    return c.json({ message: 'Post deleted successfully' }, 200);
-  },
-);
+blog.openapi(deletePost, async (c) => {
+  const { id } = c.req.valid('param');
+  const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
-blog.patch(
-  '/posts/:postId',
-  authMiddleware,
-  zValidator(
-    'param',
-    z.object({
-      postId: z.coerce.number().min(1),
-    }),
-  ),
-  zValidator(
-    'json',
-    z.object({
-      title: z.string(),
-      content: z.string(),
-    }),
-  ),
-  async (c) => {
-    const { postId } = c.req.valid('param');
-    const { title, content } = c.req.valid('json');
-    const { data, error } = await supabase.from('POSTS').update({ title, content }).eq('id', postId).select().single();
+  if (error) {
+    return c.json({ message: error.message }, 500);
+  }
+  if (count === 0) {
+    return c.json({ message: 'Post not found' }, 404);
+  }
 
-    if (error) {
-      throw new HTTPException(500, { message: error.message });
-    }
-    if (!data) {
-      return c.json({ message: 'Post not found' }, 404);
-    }
-
-    return c.json(data, 200);
-  },
-);
+  return c.json({ message: 'Post deleted successfully' }, 200);
+});

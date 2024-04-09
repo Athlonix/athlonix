@@ -1,0 +1,17 @@
+{
+  "name": "@repo/types",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "clean": "git clean -xdf .turbo node_modules",
+    "generate:types": "(cd ../../supabase/ && pnpm supabase gen types typescript --local > ../packages/types/src/database.ts) && biome check --apply .",
+    "lint": "biome check --apply .",
+    "types:check": "tsc --pretty --noEmit"
+  },
+  "devDependencies": {
+    "@repo/biome-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*"
+  }
+}

@@ -12,16 +12,21 @@
     "lint:check": "biome check ."
   },
   "dependencies": {
+    "@repo/types": "workspace:*",
     "@hono/node-server": "^1.9.1",
+    "@hono/swagger-ui": "^0.2.1",
+    "@hono/zod-openapi": "^0.10.0",
     "@hono/zod-validator": "^0.2.1",
     "@supabase/supabase-js": "^2.42.0",
-    "hono": "^4.2.2",
-    "zod": "^3.22.4"
+    "@types/swagger-ui-dist": "^3.30.4",
+    "hono": "^4.2.3",
+    "zod": "^3.22.4",
+    "zod-validation-error": "^3.1.0"
   },
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^20.12.5",
+    "@types/node": "^20.12.6",
     "supabase": "^1.153.4",
     "tsx": "^4.7.2",
     "typescript": "^5.4.4"

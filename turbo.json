@@ -21,6 +21,11 @@
     "types:check": {
       "inputs": ["**/*.ts", "**/*.tsx"],
       "outputs": []
+    },
+    "generate:types": {
+      "inputs": ["**/*.ts", "**/*.tsx"],
+      "dependsOn": ["^generate:types"],
+      "outputs": []
     }
   },
   "globalEnv": ["SUPABASE_URL", "SUPABASE_KEY", "SUPABASE_SERVICE_KEY"]

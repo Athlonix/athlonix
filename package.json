@@ -8,7 +8,8 @@
     "lint:check": "turbo lint:check",
     "types:check": "turbo types:check",
     "biome:ci": "biome ci .",
-    "lint:all": "biome check --apply ."
+    "lint:all": "biome check --apply .",
+    "generate:types": "turbo run generate:types"
   },
   "devDependencies": {
     "@biomejs/biome": "1.6.4",

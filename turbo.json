@@ -22,11 +22,6 @@
       "inputs": ["**/*.ts", "**/*.tsx"],
       "outputs": []
     },
-    "generate:types": {
-      "inputs": ["**/*.ts", "**/*.tsx"],
-      "dependsOn": ["^generate:types"],
-      "outputs": []
-    },
     "clean": {
       "dependsOn": ["^clean"]
     }

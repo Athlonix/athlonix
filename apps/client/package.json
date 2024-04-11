@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "clean": "git clean -xdf .turbo node_modules dist",
-    "dev": "next dev --port 3102",
+    "dev": "next dev --port 3102 --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "biome check --apply .",
@@ -13,19 +13,19 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
-    "next": "^14.1.4",
+    "next": "^14.2.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^20.12.6",
-    "@types/react": "^18.2.75",
-    "@types/react-dom": "^18.2.24",
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.2.76",
+    "@types/react-dom": "^18.2.25",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
-    "typescript": "^5.4.4"
+    "typescript": "^5.4.5"
   }
 }

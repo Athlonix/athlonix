@@ -6,8 +6,6 @@ import { supabase } from '../libs/supabase.js';
 const authMiddleware: MiddlewareHandler = async (c, next) => {
   const refresh_token = getCookie(c, 'refresh_token');
   const access_token = getCookie(c, 'access_token');
-  console.log('c', c.req);
-  console.log('access_token', access_token);
   if (!access_token) throw new HTTPException(403, { message: 'No access token' });
   const { data, error } = await supabase.auth.getUser(access_token);
 

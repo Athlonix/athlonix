@@ -21,12 +21,12 @@ RUN turbo prune api --docker
 FROM base as deps
 WORKDIR /app
 
-COPY /apps/api/tsconfig.json .
+COPY tsconfig.json .
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 
-RUN pnpm fetch && \
-    pnpm install
+RUN pnpm fetch -F api && \
+    pnpm install -F api
 
 FROM deps AS builder
 WORKDIR /app

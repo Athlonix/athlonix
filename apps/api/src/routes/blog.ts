@@ -1,6 +1,6 @@
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
-import { insertPostSchema, postSchema, updatePostSchema } from '../validators/blog';
+import { insertPostSchema, postSchema, updatePostSchema } from '../validators/blog.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getAllPosts = createRoute({

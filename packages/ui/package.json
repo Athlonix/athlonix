@@ -21,7 +21,7 @@
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^1.13.2",
     "@types/node": "^20.12.7",
-    "@types/react": "^18.2.76",
+    "@types/react": "^18.2.77",
     "@types/react-dom": "^18.2.25",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
@@ -33,7 +33,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "lucide-react": "^0.367.0",
+    "lucide-react": "^0.368.0",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7"
   }

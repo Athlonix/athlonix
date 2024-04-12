@@ -11,12 +11,12 @@ importers:
       '@repo/biome-config':
         specifier: workspace:*
         version: link:packages/biome-config
+      '@repo/supabase':
+        specifier: workspace:*
+        version: link:supabase
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:packages/typescript-config
-      supabase:
-        specifier: ^1.153.4
-        version: 1.153.4
       turbo:
         specifier: ^1.13.2
         version: 1.13.2
@@ -46,8 +46,8 @@ importers:
         specifier: ^20.12.7
         version: 20.12.7
       '@types/react':
-        specifier: ^18.2.76
-        version: 18.2.76
+        specifier: ^18.2.77
+        version: 18.2.77
       '@types/react-dom':
         specifier: ^18.2.25
         version: 18.2.25
@@ -67,8 +67,8 @@ importers:
   apps/api:
     dependencies:
       '@hono/node-server':
-        specifier: ^1.9.1
-        version: 1.9.1
+        specifier: ^1.10.0
+        version: 1.10.0
       '@hono/swagger-ui':
         specifier: ^0.2.1
         version: 0.2.1(hono@4.2.3)
@@ -82,8 +82,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/types
       '@supabase/supabase-js':
-        specifier: ^2.42.1
-        version: 2.42.1
+        specifier: ^2.42.3
+        version: 2.42.3
       hono:
         specifier: ^4.2.3
         version: 4.2.3
@@ -141,8 +141,8 @@ importers:
         specifier: ^20.12.7
         version: 20.12.7
       '@types/react':
-        specifier: ^18.2.76
-        version: 18.2.76
+        specifier: ^18.2.77
+        version: 18.2.77
       '@types/react-dom':
         specifier: ^18.2.25
         version: 18.2.25
@@ -180,7 +180,7 @@ importers:
     dependencies:
       '@radix-ui/react-slot':
         specifier: ^1.0.2
-        version: 1.0.2(@types/react@18.2.76)(react@18.2.0)
+        version: 1.0.2(@types/react@18.2.77)(react@18.2.0)
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -188,8 +188,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
       lucide-react:
-        specifier: ^0.367.0
-        version: 0.367.0(react@18.2.0)
+        specifier: ^0.368.0
+        version: 0.368.0(react@18.2.0)
       tailwind-merge:
         specifier: ^2.2.2
         version: 2.2.2
@@ -210,8 +210,8 @@ importers:
         specifier: ^20.12.7
         version: 20.12.7
       '@types/react':
-        specifier: ^18.2.76
-        version: 18.2.76
+        specifier: ^18.2.77
+        version: 18.2.77
       '@types/react-dom':
         specifier: ^18.2.25
         version: 18.2.25
@@ -230,6 +230,18 @@ importers:
       typescript:
         specifier: ^5.4.5
         version: 5.4.5
+
+  supabase:
+    devDependencies:
+      '@repo/biome-config':
+        specifier: workspace:*
+        version: link:../packages/biome-config
+      '@repo/typescript-config':
+        specifier: workspace:*
+        version: link:../packages/typescript-config
+      supabase:
+        specifier: ^1.153.4
+        version: 1.153.4
 
 packages:
 
@@ -563,8 +575,8 @@ packages:
     dev: true
     optional: true
 
-  /@hono/node-server@1.9.1:
-    resolution: {integrity: sha512-XBru0xbtRlTZJyAiFJLn7XDKbCVXBaRhVQAQhB9TwND2gwj8jf9SDWIj/7VxVtNAjURJf7Ofcz58DRA6DPYiWA==}
+  /@hono/node-server@1.10.0:
+    resolution: {integrity: sha512-XXFmIT4swUm3gG9yPU/HMAqHAHTP/Wr2mqgJakOFQhbbWipomaLu7ys0h9KrgF9032j18efBYk2aHz2SfgDbTA==}
     engines: {node: '>=18.14.1'}
     dev: false
 
@@ -751,7 +763,7 @@ packages:
     requiresBuild: true
     optional: true
 
-  /@radix-ui/react-compose-refs@1.0.1(@types/react@18.2.76)(react@18.2.0):
+  /@radix-ui/react-compose-refs@1.0.1(@types/react@18.2.77)(react@18.2.0):
     resolution: {integrity: sha512-fDSBgd44FKHa1FRMU59qBMPFcl2PZE+2nmqunj+BWFyYYjnhIDWL2ItDs3rrbJDQOtzt5nIebLCQc4QRfz6LJw==}
     peerDependencies:
       '@types/react': '*'
@@ -761,11 +773,11 @@ packages:
         optional: true
     dependencies:
       '@babel/runtime': 7.24.4
-      '@types/react': 18.2.76
+      '@types/react': 18.2.77
       react: 18.2.0
     dev: false
 
-  /@radix-ui/react-slot@1.0.2(@types/react@18.2.76)(react@18.2.0):
+  /@radix-ui/react-slot@1.0.2(@types/react@18.2.77)(react@18.2.0):
     resolution: {integrity: sha512-YeTpuq4deV+6DusvVUW4ivBgnkHwECUu0BiN43L5UCDFgdhsRUWAghhTF5MbvNTPzmiFOx90asDSUjWuCNapwg==}
     peerDependencies:
       '@types/react': '*'
@@ -775,8 +787,8 @@ packages:
         optional: true
     dependencies:
       '@babel/runtime': 7.24.4
-      '@radix-ui/react-compose-refs': 1.0.1(@types/react@18.2.76)(react@18.2.0)
-      '@types/react': 18.2.76
+      '@radix-ui/react-compose-refs': 1.0.1(@types/react@18.2.77)(react@18.2.0)
+      '@types/react': 18.2.77
       react: 18.2.0
     dev: false
 
@@ -799,14 +811,14 @@ packages:
       whatwg-url: 5.0.0
     dev: false
 
-  /@supabase/postgrest-js@1.15.1:
-    resolution: {integrity: sha512-H/4PABAAgMrEIo7oewUZiZMy422Pgc19OLVjU8Vwopcvfr3GD7h8Re4VXtiaPPZqc/2z/k3PnyguFnoKIB7fkA==}
+  /@supabase/postgrest-js@1.15.2:
+    resolution: {integrity: sha512-9/7pUmXExvGuEK1yZhVYXPZnLEkDTwxgMQHXLrN5BwPZZm4iUCL1YEyep/Z2lIZah8d8M433mVAUEGsihUj5KQ==}
     dependencies:
       '@supabase/node-fetch': 2.6.15
     dev: false
 
-  /@supabase/realtime-js@2.9.3:
-    resolution: {integrity: sha512-lAp50s2n3FhGJFq+wTSXLNIDPw5Y0Wxrgt44eM5nLSA3jZNUUP3Oq2Ccd1CbZdVntPCWLZvJaU//pAd2NE+QnQ==}
+  /@supabase/realtime-js@2.9.4:
+    resolution: {integrity: sha512-wdq+2hZpgw0r2ldRs87d3U08Y8BrsO1bZxPNqbImpYshAEkusDz4vufR8KaqujKxqewmXS6YnUhuRVdvSEIKCA==}
     dependencies:
       '@supabase/node-fetch': 2.6.15
       '@types/phoenix': 1.6.4
@@ -823,14 +835,14 @@ packages:
       '@supabase/node-fetch': 2.6.15
     dev: false
 
-  /@supabase/supabase-js@2.42.1:
-    resolution: {integrity: sha512-y05XIC6wChApz8BWE2TLUo6SBGp9ttbjhQ9DcQXI897vI3RRPIjm3wZqUoZiexUco+kgt3Em53+m55nB8Um6Sg==}
+  /@supabase/supabase-js@2.42.3:
+    resolution: {integrity: sha512-/o52L/ngsGapcOUygWigvxzBo/bUVM4bubZMsUSZqZc+9sgjXZsgP/cwyggWUv3QOIqmbBrfSPgDLUh+Ofgi7Q==}
     dependencies:
       '@supabase/auth-js': 2.63.0
       '@supabase/functions-js': 2.2.2
       '@supabase/node-fetch': 2.6.15
-      '@supabase/postgrest-js': 1.15.1
-      '@supabase/realtime-js': 2.9.3
+      '@supabase/postgrest-js': 1.15.2
+      '@supabase/realtime-js': 2.9.4
       '@supabase/storage-js': 2.5.5
     transitivePeerDependencies:
       - bufferutil
@@ -942,11 +954,11 @@ packages:
   /@types/react-dom@18.2.25:
     resolution: {integrity: sha512-o/V48vf4MQh7juIKZU2QGDfli6p1+OOi5oXx36Hffpc9adsHeXjVp8rHuPkjd8VT8sOJ2Zp05HR7CdpGTIUFUA==}
     dependencies:
-      '@types/react': 18.2.76
+      '@types/react': 18.2.77
     dev: true
 
-  /@types/react@18.2.76:
-    resolution: {integrity: sha512-T6z/v7YxpswDM61Vq5KoSPTJqCkroJfsDIsvXCr4+qOY6gik5Ju4w0jf67cpC5z7ydOnp/E0V0W08pDRy8u9Xw==}
+  /@types/react@18.2.77:
+    resolution: {integrity: sha512-CUT9KUUF+HytDM7WiXKLF9qUSg4tGImwy4FXTlfEDPEkkNUzJ7rVFolYweJ9fS1ljoIaP7M7Rdjc5eUm/Yu5AA==}
     dependencies:
       '@types/prop-types': 15.7.12
       csstype: 3.1.3
@@ -1072,7 +1084,7 @@ packages:
       postcss: ^8.1.0
     dependencies:
       browserslist: 4.23.0
-      caniuse-lite: 1.0.30001608
+      caniuse-lite: 1.0.30001609
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.0.0
@@ -1137,8 +1149,8 @@ packages:
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001608
-      electron-to-chromium: 1.4.733
+      caniuse-lite: 1.0.30001609
+      electron-to-chromium: 1.4.735
       node-releases: 2.0.14
       update-browserslist-db: 1.0.13(browserslist@4.23.0)
     dev: true
@@ -1174,8 +1186,8 @@ packages:
     resolution: {integrity: sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA==}
     engines: {node: '>= 6'}
 
-  /caniuse-lite@1.0.30001608:
-    resolution: {integrity: sha512-cjUJTQkk9fQlJR2s4HMuPMvTiRggl0rAVMtthQuyOlDWuqHXqN8azLq+pi8B2TjwKJ32diHjUqRIKeFX4z1FoA==}
+  /caniuse-lite@1.0.30001609:
+    resolution: {integrity: sha512-JFPQs34lHKx1B5t1EpQpWH4c+29zIyn/haGsbpfq3suuV9v56enjFt23zqijxGTMwy1p/4H2tjnQMY+p1WoAyA==}
 
   /chalk@2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==}
@@ -1447,8 +1459,8 @@ packages:
   /eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  /electron-to-chromium@1.4.733:
-    resolution: {integrity: sha512-gUI9nhI2iBGF0OaYYLKOaOtliFMl+Bt1rY7VmEjwxOxqoYLub/D9xmduPEhbw2imE6gYkJKhIE5it+KE2ulVxQ==}
+  /electron-to-chromium@1.4.735:
+    resolution: {integrity: sha512-pkYpvwg8VyOTQAeBqZ7jsmpCjko1Qc6We1ZtZCjRyYbT5v4AIUKDy5cQTRotQlSSZmMr8jqpEt6JtOj5k7lR7A==}
     dev: true
 
   /emoji-regex@8.0.0:
@@ -2054,8 +2066,8 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
-  /lucide-react@0.367.0(react@18.2.0):
-    resolution: {integrity: sha512-3FWiBaJiqMrx5a1sjH3CVdPqWnw/Z/PTVeeTDmOeILSs+8Ah+VhCd4FQMeHo6Z0WxHcm9piIOtilQwvceiCCKQ==}
+  /lucide-react@0.368.0(react@18.2.0):
+    resolution: {integrity: sha512-soryVrCjheZs8rbXKdINw9B8iPi5OajBJZMJ1HORig89ljcOcEokKKAgGbg3QWxSXel7JwHOfDFUdDHAKyUAMw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
     dependencies:
@@ -2189,7 +2201,7 @@ packages:
       '@next/env': 14.2.0
       '@swc/helpers': 0.5.5
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001608
+      caniuse-lite: 1.0.30001609
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.2.0

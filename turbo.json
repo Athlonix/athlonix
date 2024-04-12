@@ -21,6 +21,9 @@
     "types:check": {
       "inputs": ["**/*.ts", "**/*.tsx"],
       "outputs": []
+    },
+    "clean": {
+      "dependsOn": ["^clean"]
     }
   },
   "globalEnv": ["SUPABASE_URL", "SUPABASE_KEY", "SUPABASE_SERVICE_KEY"]

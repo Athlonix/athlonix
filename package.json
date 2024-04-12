@@ -14,7 +14,7 @@
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "supabase": "^1.153.4",
+    "@repo/supabase": "workspace:*",
     "turbo": "^1.13.2"
   },
   "packageManager": "pnpm@8.15.6",

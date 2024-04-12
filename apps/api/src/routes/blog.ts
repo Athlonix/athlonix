@@ -1,5 +1,6 @@
 import { createRoute } from '@hono/zod-openapi';
 import { z } from 'zod';
+import authMiddleware from '../middlewares/auth.js';
 import { insertPostSchema, postSchema, updatePostSchema } from '../validators/blog.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
@@ -52,6 +53,7 @@ export const getPost = createRoute({
 export const createPost = createRoute({
   method: 'post',
   path: '/posts',
+  middleware: authMiddleware,
   summary: 'Create a post',
   description: 'Create a post',
   request: {
@@ -83,6 +85,7 @@ export const createPost = createRoute({
 export const updatePost = createRoute({
   method: 'patch',
   path: '/posts/{id}',
+  middleware: authMiddleware,
   summary: 'Update a post',
   description: 'Update a post',
   request: {
@@ -116,6 +119,7 @@ export const updatePost = createRoute({
 export const deletePost = createRoute({
   method: 'delete',
   path: '/posts/{id}',
+  middleware: authMiddleware,
   summary: 'Delete a post',
   description: 'Delete a post',
   request: {

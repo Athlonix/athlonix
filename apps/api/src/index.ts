@@ -30,9 +30,6 @@ app.onError((err, c) => {
 
 app.route('/', health);
 app.route('/auth', auth);
-
-app.use('/api/*', authMiddleware);
-
 app.route('/api/blog', blog);
 
 app.doc('/doc', (c) => ({

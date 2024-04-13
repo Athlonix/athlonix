@@ -5,10 +5,12 @@ import {
   commentOnPost,
   createPost,
   createResponse,
+  deleteComment,
   deletePost,
   getAllPosts,
   getComments,
   getPost,
+  updateComment,
   updatePost,
 } from '../routes/blog.js';
 
@@ -37,7 +39,7 @@ blog.openapi(getPost, async (c) => {
   const { data, error } = await supabase.from('POSTS').select('*').eq('id', id).single();
 
   if (error || !data) {
-    return c.json({ error: error?.message || 'Post not found' }, 404);
+    return c.json({ error: 'Post not found' }, 404);
   }
 
   return c.json(data, 200);
@@ -75,11 +77,8 @@ blog.openapi(updatePost, async (c) => {
   const { title, content } = c.req.valid('json');
   const { data, error } = await supabase.from('POSTS').update({ title, content }).eq('id', id).select().single();
 
-  if (error) {
-    return c.json({ error: error.message }, 500);
-  }
-  if (!data) {
-    return c.json({ message: 'Post not found' }, 404);
+  if (error || !data) {
+    return c.json({ error: 'Post not found' }, 404);
   }
 
   return c.json(data, 200);
@@ -89,10 +88,7 @@ blog.openapi(deletePost, async (c) => {
   const { id } = c.req.valid('param');
   const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
-  if (error) {
-    return c.json({ error: error.message }, 500);
-  }
-  if (count === 0) {
+  if (error || count === 0) {
     return c.json({ error: 'Post not found' }, 404);
   }
 
@@ -115,7 +111,7 @@ blog.openapi(commentOnPost, async (c) => {
     .single();
 
   if (error || !data) {
-    return c.json({ error: error.message || 'Failed to create comment' }, 500);
+    return c.json({ error: 'Failed to create comment' }, 400);
   }
 
   return c.json(data, 201);
@@ -133,7 +129,7 @@ blog.openapi(getComments, async (c) => {
 });
 
 blog.openapi(createResponse, async (c) => {
-  const { id, id_comment } = c.req.valid('param');
+  const { id_post, id_comment } = c.req.valid('param');
   const { content } = c.req.valid('json');
   const user = c.get('user')?.id;
 
@@ -143,13 +139,44 @@ blog.openapi(createResponse, async (c) => {
 
   const { data, error } = await supabase
     .from('COMMENTS')
-    .insert({ content, id_post: id, id_response: id_comment, id_user: user })
+    .insert({ content, id_post, id_response: id_comment, id_user: user })
     .select()
     .single();
 
   if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to create response' }, 500);
+    return c.json({ error: 'Failed to create response' }, 400);
   }
 
   return c.json(data, 201);
+});
+
+blog.openapi(updateComment, async (c) => {
+  const { id_post, id_comment } = c.req.valid('param');
+  const { content } = c.req.valid('json');
+  const { data, error } = await supabase
+    .from('COMMENTS')
+    .update({ content })
+    .eq('id, id_post', [id_comment, id_post])
+    .select()
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Comment not found' }, 404);
+  }
+
+  return c.json(data, 200);
+});
+
+blog.openapi(deleteComment, async (c) => {
+  const { id_post, id_comment } = c.req.valid('param');
+  const { error, count } = await supabase
+    .from('COMMENTS')
+    .delete({ count: 'exact' })
+    .eq('id, id_post', [id_comment, id_post]);
+
+  if (error || count === 0) {
+    return c.json({ error: 'Comment not found' }, 404);
+  }
+
+  return c.json({ message: 'Comment deleted successfully' }, 200);
 });

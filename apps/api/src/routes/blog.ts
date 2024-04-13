@@ -7,7 +7,6 @@ import {
   insertPostSchema,
   insertResponseSchema,
   postSchema,
-  responseSchema,
   updatePostSchema,
 } from '../validators/blog.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
@@ -206,14 +205,14 @@ export const getComments = createRoute({
 
 export const createResponse = createRoute({
   method: 'post',
-  path: '/posts/{id}/comments/{id_comment}/responses',
+  path: '/posts/{id_post}/comments/{id_comment}/responses',
   summary: 'Create a response',
   description: 'Create a response',
   middleware: authMiddleware,
   request: {
     params: z.object({
-      id: z.coerce.number(),
-      id_comment: z.coerce.number(),
+      id_post: z.coerce.number().min(1),
+      id_comment: z.coerce.number().min(1),
     }),
     body: {
       content: {
@@ -233,6 +232,63 @@ export const createResponse = createRoute({
       },
     },
     400: badRequestSchema,
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['blog'],
+});
+
+export const updateComment = createRoute({
+  method: 'patch',
+  path: '/posts/{id}/comments/{id_comment}',
+  middleware: authMiddleware,
+  summary: 'Update a comment',
+  description: 'Update a comment',
+  request: {
+    params: z.object({
+      id_post: z.coerce.number(),
+      id_comment: z.coerce.number(),
+    }),
+    body: {
+      content: {
+        'application/json': {
+          schema: insertCommentSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: insertCommentSchema,
+        },
+      },
+    },
+    400: badRequestSchema,
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['blog'],
+});
+
+export const deleteComment = createRoute({
+  method: 'delete',
+  path: '/posts/{id}/comments/{id_comment}',
+  middleware: authMiddleware,
+  summary: 'Delete a comment',
+  description: 'Delete a comment',
+  request: {
+    params: z.object({
+      id_post: z.coerce.number(),
+      id_comment: z.coerce.number(),
+    }),
+  },
+  responses: {
+    204: {
+      description: 'Successful response',
+    },
     500: serverErrorSchema,
     404: notFoundSchema,
   },

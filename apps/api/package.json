@@ -19,7 +19,7 @@
     "@hono/zod-validator": "^0.2.1",
     "@repo/types": "workspace:*",
     "@supabase/supabase-js": "^2.42.3",
-    "hono": "^4.2.3",
+    "hono": "^4.2.4",
     "zod": "^3.22.4",
     "zod-validation-error": "^3.1.0"
   },

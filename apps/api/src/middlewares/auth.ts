@@ -8,14 +8,19 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
   if (!access_token) throw new HTTPException(403, { message: 'No access token' });
   const { data, error } = await supabase.auth.getUser(access_token);
 
-  if (data.user) {
+  if (data?.user) {
+    const { data: idUser } = await supabase.from('USERS').select('id').eq('id_auth', data.user.id).single();
+
+    if (!idUser) throw new HTTPException(404, { message: 'User not found' });
+
     c.set('user', {
-      id: data.user.id,
+      id: idUser?.id,
       email: data.user.email,
-      created_at: data.user.created_at,
       updated_at: data.user.updated_at,
+      created_at: data.user.created_at,
     });
   }
+
   if (error) {
     const refresh_token = getCookie(c, 'refresh_token');
     if (!refresh_token) throw new HTTPException(403, { message: 'No refresh token' });
@@ -25,13 +30,18 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
     });
 
     if (refreshError) throw new HTTPException(403, { message: 'Error while refreshing token' });
+    if (!refreshed.user) throw new HTTPException(403, { message: 'No user found' });
+
+    const { data: idUser } = await supabase.from('USERS').select('id').eq('id_auth', refreshed.user.id).single();
+
+    if (!idUser) throw new HTTPException(404, { message: 'User not found' });
 
     if (refreshed.user) {
       c.set('user', {
-        id: refreshed.user.id,
+        id: idUser?.id,
         email: refreshed.user.email,
-        created_at: refreshed.user.created_at,
         updated_at: refreshed.user.updated_at,
+        created_at: refreshed.user.created_at,
       });
     }
   }

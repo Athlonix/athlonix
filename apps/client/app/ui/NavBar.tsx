@@ -15,7 +15,7 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
   const navBarElements = links.map((link) => {
     return (
       <li key={link.name}>
-        <Button className="w-28 font-semibold hover:bg-slate-200 hover:text-black" variant={'ghost'} asChild>
+        <Button className="font-semibold hover:bg-slate-200 hover:text-black text-lg" variant={'ghost'} asChild>
           <Link href={link.href}>{link.name}</Link>
         </Button>
       </li>
@@ -23,8 +23,8 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
   });
 
   return (
-    <nav className="flex items-center justify-center mb-24">
-      <div className="max-w-6xl w-full flex items-center justify-between">
+    <nav className="flex items-center justify-center mb-20">
+      <div className="w-full flex items-center justify-between">
         <ul className="flex gap-4">{navBarElements}</ul>
         <Button className="w-[120px]">Login</Button>
       </div>

@@ -626,8 +626,9 @@ export type Database = {
           email: string;
           first_name: string;
           id: number;
-          id_referer: number;
-          id_role: number | null;
+          id_auth: string | null;
+          id_referer: number | null;
+          id_role: number;
           last_name: string;
           username: string;
         };
@@ -635,8 +636,9 @@ export type Database = {
           email: string;
           first_name: string;
           id?: number;
-          id_referer: number;
-          id_role?: number | null;
+          id_auth?: string | null;
+          id_referer?: number | null;
+          id_role: number;
           last_name: string;
           username: string;
         };
@@ -644,12 +646,20 @@ export type Database = {
           email?: string;
           first_name?: string;
           id?: number;
-          id_referer?: number;
-          id_role?: number | null;
+          id_auth?: string | null;
+          id_referer?: number | null;
+          id_role?: number;
           last_name?: string;
           username?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'public_USERS_id_auth_fkey';
+            columns: ['id_auth'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'public_USERS_id_role_fkey';
             columns: ['id_role'];

@@ -11,7 +11,12 @@ export const auth = new OpenAPIHono({
 });
 
 auth.openapi(signupUser, async (c) => {
-  const { email, password } = c.req.valid('json');
+  const { email, password, first_name, last_name, username } = c.req.valid('json');
+
+  const { data: userExist } = await supabase.from('USERS').select('id').eq('email', email);
+  if (userExist && userExist.length > 0) {
+    return c.json({ message: 'Email already exists' }, 400);
+  }
 
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -23,7 +28,28 @@ auth.openapi(signupUser, async (c) => {
       cause: error,
     });
   }
-  return c.json({ message: 'User created successfully' });
+
+  const { data: user, error: insertError } = await supabase
+    .from('USERS')
+    .insert({
+      email: data.user.email,
+      username: username || '',
+      first_name: first_name || '',
+      last_name: last_name || '',
+      id_referer: null,
+      id_role: 1,
+      id_auth: data.user.id,
+    })
+    .select()
+    .single();
+
+  if (insertError) {
+    throw new Error('Error while creating user', {
+      cause: insertError,
+    });
+  }
+
+  return c.json(user, 200);
 });
 
 auth.openapi(loginUser, async (c) => {

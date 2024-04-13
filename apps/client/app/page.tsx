@@ -55,6 +55,13 @@ export default function Page(): JSX.Element {
       </section>
 
       <section className="w-full flex items-center justify-center gap-12">
+        <Image
+          className="w-[200px] scale-x-[-1]"
+          src="/badminton_ball.png"
+          alt="ping pong racket"
+          width={300}
+          height={300}
+        />
         <div className="flex flex-col gap-2 justify-center bg-secondary p-6 rounded-2xl w-72 h-44">
           <h1>42+</h1>
           <p className="font-normal text-xl">sports présents</p>
@@ -67,6 +74,7 @@ export default function Page(): JSX.Element {
           <h1>125+</h1>
           <p className="font-normal text-xl">evenements organises</p>
         </div>
+        <Image className="w-[200px] " src="/badminton_ball.png" alt="ping pong racket" width={300} height={300} />
       </section>
     </main>
   );

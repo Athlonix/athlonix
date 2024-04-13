@@ -12,9 +12,10 @@
     "pre-commit": "pnpm run lint:check && pnpm run types:check"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.6.4",
     "@repo/biome-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
     "@repo/supabase": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
     "turbo": "^1.13.2"
   },
   "packageManager": "pnpm@8.15.6",

@@ -28,55 +28,199 @@ export type Database = {
   };
   public: {
     Tables: {
-      COMMENTS: {
+      ACTIVITIES: {
         Row: {
-          content: string;
+          duration_minute: number;
           id: number;
-          id_comment: number | null;
+          id_sport: number | null;
+          max_participants: number;
+          name: string;
         };
         Insert: {
-          content: string;
-          id: number;
-          id_comment?: number | null;
+          duration_minute: number;
+          id?: number;
+          id_sport?: number | null;
+          max_participants: number;
+          name: string;
         };
         Update: {
-          content?: string;
+          duration_minute?: number;
           id?: number;
-          id_comment?: number | null;
+          id_sport?: number | null;
+          max_participants?: number;
+          name?: string;
         };
         Relationships: [
           {
-            foreignKeyName: 'comments_id_comment_fkey';
-            columns: ['id_comment'];
+            foreignKeyName: 'public_ACTIVITIES_id_sport_fkey';
+            columns: ['id_sport'];
             isOneToOne: false;
-            referencedRelation: 'COMMENTS';
+            referencedRelation: 'SPORTS';
             referencedColumns: ['id'];
           },
         ];
       };
-      COMMENTS_POSTS: {
+      ACTIVITIES_CATEGORIES: {
         Row: {
-          id_comment: number;
-          id_post: number;
+          id_activity: number;
+          id_category: number;
         };
         Insert: {
-          id_comment: number;
-          id_post: number;
+          id_activity: number;
+          id_category: number;
         };
         Update: {
-          id_comment?: number;
-          id_post?: number;
+          id_activity?: number;
+          id_category?: number;
         };
         Relationships: [
           {
-            foreignKeyName: 'public_COMMENTS_POSTS_id_comment_fkey';
-            columns: ['id_comment'];
+            foreignKeyName: 'public_ACTIVITIES_CATEGORIES_id_activity_fkey';
+            columns: ['id_activity'];
+            isOneToOne: false;
+            referencedRelation: 'ACTIVITIES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_ACTIVITIES_CATEGORIES_id_category_fkey';
+            columns: ['id_category'];
+            isOneToOne: false;
+            referencedRelation: 'CATEGORIES';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      ACTIVITIES_USERS: {
+        Row: {
+          created_at: string;
+          id_activity: number;
+          id_user: number;
+        };
+        Insert: {
+          created_at?: string;
+          id_activity: number;
+          id_user: number;
+        };
+        Update: {
+          created_at?: string;
+          id_activity?: number;
+          id_user?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_ACTIVITIES_USERS_id_activity_fkey';
+            columns: ['id_activity'];
+            isOneToOne: false;
+            referencedRelation: 'ACTIVITIES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_ACTIVITIES_USERS_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      APPLICATIONS: {
+        Row: {
+          created_at: string;
+          id: number;
+          id_user: number;
+          nature: string;
+          reason: string;
+          reply: number;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          id_user: number;
+          nature: string;
+          reason: string;
+          reply?: number;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          id_user?: number;
+          nature?: string;
+          reason?: string;
+          reply?: number;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_APPLICATIONS_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      CATEGORIES: {
+        Row: {
+          id: number;
+          name: string;
+        };
+        Insert: {
+          id?: number;
+          name: string;
+        };
+        Update: {
+          id?: number;
+          name?: string;
+        };
+        Relationships: [];
+      };
+      COMMENTS: {
+        Row: {
+          content: string;
+          created_at: string;
+          id: number;
+          id_activity: number | null;
+          id_post: number;
+          id_response: number | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          content: string;
+          created_at?: string;
+          id?: number;
+          id_activity?: number | null;
+          id_post: number;
+          id_response?: number | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          content?: string;
+          created_at?: string;
+          id?: number;
+          id_activity?: number | null;
+          id_post?: number;
+          id_response?: number | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'comments_id_comment_fkey';
+            columns: ['id_response'];
             isOneToOne: false;
             referencedRelation: 'COMMENTS';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'public_COMMENTS_POSTS_id_post_fkey';
+            foreignKeyName: 'public_COMMENTS_id_activity_fkey';
+            columns: ['id_activity'];
+            isOneToOne: false;
+            referencedRelation: 'ACTIVITIES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_COMMENTS_id_post_fkey';
             columns: ['id_post'];
             isOneToOne: false;
             referencedRelation: 'POSTS';
@@ -84,23 +228,368 @@ export type Database = {
           },
         ];
       };
-      POSTS: {
+      COMMENTS_REACTIONS: {
+        Row: {
+          id_comment: number;
+          id_user: number;
+          like: boolean | null;
+          reaction: string | null;
+        };
+        Insert: {
+          id_comment: number;
+          id_user?: number;
+          like?: boolean | null;
+          reaction?: string | null;
+        };
+        Update: {
+          id_comment?: number;
+          id_user?: number;
+          like?: boolean | null;
+          reaction?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_COMMENTS_LIKES_id_comment_fkey';
+            columns: ['id_comment'];
+            isOneToOne: false;
+            referencedRelation: 'COMMENTS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_COMMENTS_LIKES_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      DONATIONS: {
+        Row: {
+          created_at: string;
+          id: number;
+          id_user: number;
+          money: number | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          id_user: number;
+          money?: number | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          id_user?: number;
+          money?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_DONATIONS_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      EVENTS: {
+        Row: {
+          created_at: string;
+          id: number;
+          id_user: number;
+          name: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          id_user: number;
+          name: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          id_user?: number;
+          name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_EVENTS_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      MESSAGES: {
+        Row: {
+          created_at: string;
+          id: number;
+          id_receiver: number;
+          id_sender: number;
+          mesage: string | null;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          id_receiver: number;
+          id_sender: number;
+          mesage?: string | null;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          id_receiver?: number;
+          id_sender?: number;
+          mesage?: string | null;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_MESSAGES_id_receiver_fkey';
+            columns: ['id_receiver'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_MESSAGES_id_sender_fkey';
+            columns: ['id_sender'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      NEWS: {
         Row: {
           content: string;
+          created_at: string;
+          id: number;
+          id_user: number;
+          title: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          content: string;
+          created_at?: string;
+          id?: number;
+          id_user: number;
+          title: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          content?: string;
+          created_at?: string;
+          id?: number;
+          id_user?: number;
+          title?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_NEWS_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      POLLS: {
+        Row: {
+          content: string | null;
           id: number;
           title: string;
         };
         Insert: {
-          content: string;
+          content?: string | null;
           id?: number;
           title: string;
         };
         Update: {
-          content?: string;
+          content?: string | null;
           id?: number;
           title?: string;
         };
         Relationships: [];
+      };
+      POLLS_ANSWERS: {
+        Row: {
+          answer: string;
+          id: number;
+          id_poll: number;
+        };
+        Insert: {
+          answer: string;
+          id?: number;
+          id_poll: number;
+        };
+        Update: {
+          answer?: string;
+          id?: number;
+          id_poll?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_POLLS_ANSWERS_id_poll_fkey';
+            columns: ['id_poll'];
+            isOneToOne: false;
+            referencedRelation: 'POLLS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      POSTS: {
+        Row: {
+          content: string;
+          created_at: string;
+          id: number;
+          id_user: number;
+          title: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          content: string;
+          created_at?: string;
+          id?: number;
+          id_user: number;
+          title: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          content?: string;
+          created_at?: string;
+          id?: number;
+          id_user?: number;
+          title?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_POSTS_user_id_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      POSTS_REACTIONS: {
+        Row: {
+          id_post: number;
+          id_user: number;
+          like: boolean | null;
+          reaction: string | null;
+        };
+        Insert: {
+          id_post: number;
+          id_user?: number;
+          like?: boolean | null;
+          reaction?: string | null;
+        };
+        Update: {
+          id_post?: number;
+          id_user?: number;
+          like?: boolean | null;
+          reaction?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_POSTS_LIKES_id_post_fkey';
+            columns: ['id_post'];
+            isOneToOne: false;
+            referencedRelation: 'POSTS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_POSTS_LIKES_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      PRODUCTS: {
+        Row: {
+          created_at: string;
+          description: string;
+          id: number;
+          id_buyer: number | null;
+          id_seller: number;
+          name: string;
+          price: number;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          description: string;
+          id?: number;
+          id_buyer?: number | null;
+          id_seller: number;
+          name: string;
+          price: number;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          description?: string;
+          id?: number;
+          id_buyer?: number | null;
+          id_seller?: number;
+          name?: string;
+          price?: number;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_PRODUCTS_id_buyer_fkey';
+            columns: ['id_buyer'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_PRODUCTS_id_user_fkey';
+            columns: ['id_seller'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      PROPOSALS: {
+        Row: {
+          created_at: string;
+          id: number;
+          id_user: number;
+          proposal: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          id_user: number;
+          proposal: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          id_user?: number;
+          proposal?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_PROPOSALS_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       ROLES: {
         Row: {
@@ -108,7 +597,22 @@ export type Database = {
           name: string;
         };
         Insert: {
+          id?: number;
+          name: string;
+        };
+        Update: {
+          id?: number;
+          name?: string;
+        };
+        Relationships: [];
+      };
+      SPORTS: {
+        Row: {
           id: number;
+          name: string;
+        };
+        Insert: {
+          id?: number;
           name: string;
         };
         Update: {
@@ -130,7 +634,7 @@ export type Database = {
         Insert: {
           email: string;
           first_name: string;
-          id: number;
+          id?: number;
           id_referer: number;
           id_role?: number | null;
           last_name: string;
@@ -156,84 +660,6 @@ export type Database = {
           {
             foreignKeyName: 'users_id_referer_fkey';
             columns: ['id_referer'];
-            isOneToOne: false;
-            referencedRelation: 'USERS';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      USERS_COMMENTS: {
-        Row: {
-          created_at: string;
-          id: number;
-          id_comment: number | null;
-          id_user: number | null;
-          like: number | null;
-        };
-        Insert: {
-          created_at?: string;
-          id?: number;
-          id_comment?: number | null;
-          id_user?: number | null;
-          like?: number | null;
-        };
-        Update: {
-          created_at?: string;
-          id?: number;
-          id_comment?: number | null;
-          id_user?: number | null;
-          like?: number | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'public_USERS_COMMENTS_id_comment_fkey';
-            columns: ['id_comment'];
-            isOneToOne: false;
-            referencedRelation: 'COMMENTS';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'public_USERS_COMMENTS_id_user_fkey';
-            columns: ['id_user'];
-            isOneToOne: false;
-            referencedRelation: 'USERS';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      USERS_POSTS: {
-        Row: {
-          created_at: string;
-          id: number;
-          id_post: number;
-          id_user: number;
-          like: number | null;
-        };
-        Insert: {
-          created_at?: string;
-          id?: number;
-          id_post: number;
-          id_user: number;
-          like?: number | null;
-        };
-        Update: {
-          created_at?: string;
-          id?: number;
-          id_post?: number;
-          id_user?: number;
-          like?: number | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'public_USERS_POSTS_id_post_fkey';
-            columns: ['id_post'];
-            isOneToOne: false;
-            referencedRelation: 'POSTS';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'public_USERS_POSTS_id_user_fkey';
-            columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
             referencedColumns: ['id'];

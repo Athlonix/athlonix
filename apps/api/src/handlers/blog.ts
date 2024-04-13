@@ -32,8 +32,8 @@ blog.openapi(getPost, async (c) => {
 });
 
 blog.openapi(createPost, async (c) => {
-  const { title, content } = c.req.valid('json');
-  const { data, error } = await supabase.from('POSTS').insert({ title, content }).select().single();
+  const { title, content, id_user } = c.req.valid('json');
+  const { data, error } = await supabase.from('POSTS').insert({ title, content, id_user }).select().single();
 
   if (error) {
     return c.json({ message: error.message }, 500);

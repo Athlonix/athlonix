@@ -2,6 +2,8 @@ import '@repo/ui/globals.css';
 import { cn } from '@repo/ui/lib/utils';
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
+import { navLinks } from './lib/navlinks';
+import { NavBar } from './ui/NavBar';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -20,7 +22,17 @@ export default function RootLayout({
 }): JSX.Element {
   return (
     <html lang="en">
-      <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>{children}</body>
+      <body
+        className={cn(
+          'min-h-screen bg-background font-sans antialiased p-6 flex flex-col items-center',
+          fontSans.variable,
+        )}
+      >
+        <div className="max-w-7xl">
+          <NavBar links={navLinks} />
+          {children}
+        </div>
+      </body>
     </html>
   );
 }

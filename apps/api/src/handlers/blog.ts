@@ -12,7 +12,13 @@ import {
   updatePost,
 } from '../routes/blog.js';
 
-export const blog = new OpenAPIHono({
+type Variables = {
+  user: {
+    id: number;
+  };
+};
+
+export const blog = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
 });
 
@@ -39,11 +45,18 @@ blog.openapi(getPost, async (c) => {
 
 blog.openapi(createPost, async (c) => {
   const { title, content } = c.req.valid('json');
-  const user = c.get('id_auth');
+  const user = c.get('user')?.id;
+
+  if (!user) {
+    return c.json({ error: 'User not found' }, 404);
+  }
 
   const { data: idUser } = await supabase.from('USERS').select('id').eq('id_auth', user).single();
 
-  console.log(user, idUser);
+  if (!idUser) {
+    return c.json({ error: 'User not found' }, 404);
+  }
+
   const { data, error } = await supabase
     .from('POSTS')
     .insert({ title, content, id_user: idUser?.id })
@@ -89,13 +102,17 @@ blog.openapi(deletePost, async (c) => {
 blog.openapi(commentOnPost, async (c) => {
   const { id } = c.req.valid('param');
   const { content } = c.req.valid('json');
-  const { error: postError, count } = await supabase.from('POSTS').select('id').eq('id', id).single();
+  const user = c.get('user')?.id;
 
-  if (postError || !count) {
-    return c.json({ error: postError?.message || 'Post not found' }, 404);
+  if (!user) {
+    return c.json({ error: 'User not found' }, 404);
   }
 
-  const { data, error } = await supabase.from('COMMENTS').insert({ content, id_post: id }).select().single();
+  const { data, error } = await supabase
+    .from('COMMENTS')
+    .insert({ content, id_post: id, id_user: user })
+    .select()
+    .single();
 
   if (error || !data) {
     return c.json({ error: error.message || 'Failed to create comment' }, 500);
@@ -118,9 +135,15 @@ blog.openapi(getComments, async (c) => {
 blog.openapi(createResponse, async (c) => {
   const { id, id_comment } = c.req.valid('param');
   const { content } = c.req.valid('json');
+  const user = c.get('user')?.id;
+
+  if (!user) {
+    return c.json({ error: 'User not found' }, 404);
+  }
+
   const { data, error } = await supabase
     .from('COMMENTS')
-    .insert({ content, id_post: id, id_comment })
+    .insert({ content, id_post: id, id_comment, id_user: user })
     .select()
     .single();
 

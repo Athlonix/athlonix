@@ -182,8 +182,9 @@ export type Database = {
           created_at: string;
           id: number;
           id_activity: number | null;
-          id_post: number;
+          id_post: number | null;
           id_response: number | null;
+          id_user: number;
           updated_at: string | null;
         };
         Insert: {
@@ -191,8 +192,9 @@ export type Database = {
           created_at?: string;
           id?: number;
           id_activity?: number | null;
-          id_post: number;
+          id_post?: number | null;
           id_response?: number | null;
+          id_user: number;
           updated_at?: string | null;
         };
         Update: {
@@ -200,8 +202,9 @@ export type Database = {
           created_at?: string;
           id?: number;
           id_activity?: number | null;
-          id_post?: number;
+          id_post?: number | null;
           id_response?: number | null;
+          id_user?: number;
           updated_at?: string | null;
         };
         Relationships: [
@@ -224,6 +227,13 @@ export type Database = {
             columns: ['id_post'];
             isOneToOne: false;
             referencedRelation: 'POSTS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_COMMENTS_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
             referencedColumns: ['id'];
           },
         ];

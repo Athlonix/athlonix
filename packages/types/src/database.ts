@@ -448,30 +448,30 @@ export type Database = {
           content: string;
           created_at: string;
           id: number;
+          id_user: number;
           title: string;
           updated_at: string | null;
-          user_id: number;
         };
         Insert: {
           content: string;
           created_at?: string;
           id?: number;
+          id_user: number;
           title: string;
           updated_at?: string | null;
-          user_id: number;
         };
         Update: {
           content?: string;
           created_at?: string;
           id?: number;
+          id_user?: number;
           title?: string;
           updated_at?: string | null;
-          user_id?: number;
         };
         Relationships: [
           {
             foreignKeyName: 'public_POSTS_user_id_fkey';
-            columns: ['user_id'];
+            columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
             referencedColumns: ['id'];

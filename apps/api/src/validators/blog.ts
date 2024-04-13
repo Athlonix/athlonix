@@ -9,6 +9,7 @@ export const postSchema = z.object({
 export const insertPostSchema = z.object({
   title: z.string(),
   content: z.string(),
+  id_user: z.number(),
 });
 
 export const updatePostSchema = z.object({

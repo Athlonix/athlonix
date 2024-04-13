@@ -143,7 +143,7 @@ blog.openapi(createResponse, async (c) => {
 
   const { data, error } = await supabase
     .from('COMMENTS')
-    .insert({ content, id_post: id, id_comment, id_user: user })
+    .insert({ content, id_post: id, id_response: id_comment, id_user: user })
     .select()
     .single();
 

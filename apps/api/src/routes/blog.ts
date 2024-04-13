@@ -148,6 +148,7 @@ export const commentOnPost = createRoute({
   path: '/posts/{id}/comments',
   summary: 'Comment on a post',
   description: 'Comment on a post',
+  middleware: authMiddleware,
   request: {
     params: idParamValidator,
     body: {
@@ -208,10 +209,11 @@ export const createResponse = createRoute({
   path: '/posts/{id}/comments/{id_comment}/responses',
   summary: 'Create a response',
   description: 'Create a response',
+  middleware: authMiddleware,
   request: {
     params: z.object({
-      id: number(),
-      id_comment: number(),
+      id: z.coerce.number(),
+      id_comment: z.coerce.number(),
     }),
     body: {
       content: {

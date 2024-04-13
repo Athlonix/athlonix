@@ -8,35 +8,41 @@ export default function Page(): JSX.Element {
       <section className="flex flex-col max-w-7xl gap-y-4">
         <div className="flex gap-8 h-44 items-center justify-center">
           <h1 className="font-semibold text-[144px]">Athlonix</h1>
-          <Image
-            src="/running_track.jpg"
-            alt="running track"
-            width={720}
-            height={168}
-            className="object-cover max-h-[168px] max-w-[720px] rounded-tr-[96px]"
-          />
+          <div className="h-[168px] max-w-[720px]">
+            <Image
+              src="/running_track.jpg"
+              alt="running track"
+              width={720}
+              height={168}
+              className="object-cover h-full rounded-tr-[96px]"
+            />
+          </div>
         </div>
 
         <div className="flex gap-8 h-44 items-center justify-start flex-nowrap">
-          <Image
-            src="/ski.jpg"
-            alt="ski in mountains"
-            width={500}
-            height={168}
-            className="object-cover max-h-[168px] max-w-[492px] rounded-[96px]"
-          />
+          <div className="h-[168px] max-w-[492px]">
+            <Image
+              src="/ski.jpg"
+              alt="ski in mountains"
+              width={500}
+              height={168}
+              className="object-cover h-full rounded-[96px]"
+            />
+          </div>
           <h1 className="font-normal text-[144px] ">Association</h1>
         </div>
 
         <div className="flex gap-8 h-44 items-center justify-center">
           <h1 className="font-semibold text-[144px]">Multisport</h1>
-          <Image
-            src="/kayak.jpg"
-            alt="kayaks"
-            width={720}
-            height={168}
-            className="object-cover max-h-[168px] max-w-[545px] rounded-br-[96px]"
-          />
+          <div className="max-w-[545px] h-[168px]">
+            <Image
+              src="/kayak.jpg"
+              alt="kayaks"
+              width={720}
+              height={168}
+              className="object-cover h-full rounded-br-[96px]"
+            />
+          </div>
         </div>
       </section>
 
@@ -51,30 +57,24 @@ export default function Page(): JSX.Element {
             <Link href="/">Deviens membre !</Link>
           </Button>
         </div>
-        <Image className="flex-1 max-w-[496px]" src="/sport_balls.png" alt="sport balls" width={800} height={482} />
+        <div className="max-w-[496px] flex-1">
+          <Image className="w-full h-auto" src="/sport_balls.png" alt="sport balls" width={800} height={482} />
+        </div>
       </section>
 
       <section className="w-full flex items-center justify-center gap-12">
-        <Image
-          className="w-[200px] scale-x-[-1]"
-          src="/badminton_ball.png"
-          alt="ping pong racket"
-          width={300}
-          height={300}
-        />
-        <div className="flex flex-col gap-2 justify-center bg-secondary p-6 rounded-2xl w-72 h-44">
+        <div className="flex flex-col gap-2 justify-center bg-secondary p-6 rounded-2xl max-w-72 w-full h-44">
           <h1>42+</h1>
           <p className="font-normal text-xl">sports présents</p>
         </div>
-        <div className="flex flex-col gap-2 justify-center bg-secondary p-6 rounded-2xl w-72 h-44">
+        <div className="flex flex-col gap-2 justify-center bg-secondary p-6 rounded-2xl max-w-72 w-full h-44">
           <h1>10000+</h1>
           <p className="font-normal text-xl">adherents inscrits</p>
         </div>
-        <div className="flex flex-col gap-2 justify-center bg-secondary p-6 rounded-2xl w-72 h-44">
+        <div className="flex flex-col gap-2 justify-center bg-secondary p-6 rounded-2xl max-w-72 w-full h-44">
           <h1>125+</h1>
           <p className="font-normal text-xl">evenements organises</p>
         </div>
-        <Image className="w-[200px] " src="/badminton_ball.png" alt="ping pong racket" width={300} height={300} />
       </section>
     </main>
   );

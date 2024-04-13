@@ -92,7 +92,7 @@ export type Database = {
         };
         Insert: {
           content: string;
-          id: number;
+          id?: number;
           title: string;
         };
         Update: {

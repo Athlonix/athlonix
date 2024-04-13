@@ -1,3 +1,4 @@
+import type { Database } from '@repo/types';
 import { createClient } from '@supabase/supabase-js';
 
-export const supabase = createClient(process.env.SUPABASE_URL || '', process.env.SUPABASE_KEY || '');
+export const supabase = createClient<Database>(process.env.SUPABASE_URL || '', process.env.SUPABASE_KEY || '');

@@ -1,12 +1,19 @@
 {
   "name": "@repo/supabase",
+  "version": "0.0.0",
   "scripts": {
-    "start": "supabase status || supabase start",
-    "reset": "supabase db reset || supabase start",
-    "test": "supabase db test",
-    "lint": "supabase db lint && biome check --apply .",
-    "lint:check": "supabase db lint && biome check .",
-    "deploy": "supabase link --project-ref $SUPABASE_PROJECT_REF && supabase db push",
-    "generate:types": "supabase gen types typescript --local > supabase/types/db.ts && biome check --apply ./supabase"
+    "clean": "git clean -xdf .turbo node_modules .branches .temp",
+    "db:deploy": "supabase link --project-ref $SUPABASE_PROJECT_REF && supabase db push",
+    "db:lint": "supabase db lint",
+    "db:migration:new": "supabase migration new",
+    "db:reset": "supabase db reset || supabase start",
+    "db:start": "supabase status || supabase start",
+    "db:stop": "supabase stop",
+    "db:test": "supabase db test"
+  },
+  "devDependencies": {
+    "@repo/biome-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "supabase": "^1.153.4"
   }
 }

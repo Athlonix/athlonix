@@ -53,6 +53,21 @@ export default function Page(): JSX.Element {
         </div>
         <Image className="flex-1 max-w-[496px]" src="/sport_balls.png" alt="sport balls" width={800} height={482} />
       </section>
+
+      <section className="w-full flex items-center justify-center gap-12">
+        <div className="flex flex-col gap-2 justify-center bg-secondary p-6 rounded-2xl w-72 h-44">
+          <h1>42+</h1>
+          <p className="font-normal text-xl">sports présents</p>
+        </div>
+        <div className="flex flex-col gap-2 justify-center bg-secondary p-6 rounded-2xl w-72 h-44">
+          <h1>10000+</h1>
+          <p className="font-normal text-xl">adherents inscrits</p>
+        </div>
+        <div className="flex flex-col gap-2 justify-center bg-secondary p-6 rounded-2xl w-72 h-44">
+          <h1>125+</h1>
+          <p className="font-normal text-xl">evenements organises</p>
+        </div>
+      </section>
     </main>
   );
 }

@@ -1,7 +1,15 @@
 import { createRoute } from '@hono/zod-openapi';
-import { z } from 'zod';
+import { number, z } from 'zod';
 import authMiddleware from '../middlewares/auth.js';
-import { insertPostSchema, postSchema, updatePostSchema } from '../validators/blog.js';
+import {
+  commentSchema,
+  insertCommentSchema,
+  insertPostSchema,
+  insertResponseSchema,
+  postSchema,
+  responseSchema,
+  updatePostSchema,
+} from '../validators/blog.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getAllPosts = createRoute({
@@ -129,6 +137,100 @@ export const deletePost = createRoute({
     204: {
       description: 'Successful response',
     },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['blog'],
+});
+
+export const commentOnPost = createRoute({
+  method: 'post',
+  path: '/posts/{id}/comments',
+  summary: 'Comment on a post',
+  description: 'Comment on a post',
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: insertCommentSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            id: number().min(1),
+            content: z.string().max(255),
+            created_at: z.string(),
+          }),
+        },
+      },
+    },
+    400: badRequestSchema,
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['blog'],
+});
+
+export const getComments = createRoute({
+  method: 'get',
+  path: '/posts/{id}/comments',
+  summary: 'Get comments on a post',
+  description: 'Get comments on a post',
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: z.array(commentSchema),
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['blog'],
+});
+
+export const createResponse = createRoute({
+  method: 'post',
+  path: '/posts/{id}/comments/{id_comment}/responses',
+  summary: 'Create a response',
+  description: 'Create a response',
+  request: {
+    params: z.object({
+      id: number(),
+      id_comment: number(),
+    }),
+    body: {
+      content: {
+        'application/json': {
+          schema: insertResponseSchema,
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: insertResponseSchema,
+        },
+      },
+    },
+    400: badRequestSchema,
     500: serverErrorSchema,
     404: notFoundSchema,
   },

@@ -1,7 +1,16 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { createPost, deletePost, getAllPosts, getPost, updatePost } from '../routes/blog.js';
+import {
+  commentOnPost,
+  createPost,
+  createResponse,
+  deletePost,
+  getAllPosts,
+  getComments,
+  getPost,
+  updatePost,
+} from '../routes/blog.js';
 
 export const blog = new OpenAPIHono({
   defaultHook: zodErrorHook,
@@ -11,7 +20,7 @@ blog.openapi(getAllPosts, async (c) => {
   const { data, error } = await supabase.from('POSTS').select('*');
 
   if (error) {
-    return c.json({ message: error.message }, 500);
+    return c.json({ error: error.message }, 500);
   }
 
   return c.json(data, 200);
@@ -21,22 +30,28 @@ blog.openapi(getPost, async (c) => {
   const { id } = c.req.valid('param');
   const { data, error } = await supabase.from('POSTS').select('*').eq('id', id).single();
 
-  if (error) {
-    return c.json({ message: error.message }, 500);
-  }
-  if (!data) {
-    return c.json({ message: 'Post not found' }, 404);
+  if (error || !data) {
+    return c.json({ error: error?.message || 'Post not found' }, 404);
   }
 
   return c.json(data, 200);
 });
 
 blog.openapi(createPost, async (c) => {
-  const { title, content, id_user } = c.req.valid('json');
-  const { data, error } = await supabase.from('POSTS').insert({ title, content, id_user }).select().single();
+  const { title, content } = c.req.valid('json');
+  const user = c.get('id_auth');
 
-  if (error) {
-    return c.json({ message: error.message }, 500);
+  const { data: idUser } = await supabase.from('USERS').select('id').eq('id_auth', user).single();
+
+  console.log(user, idUser);
+  const { data, error } = await supabase
+    .from('POSTS')
+    .insert({ title, content, id_user: idUser?.id })
+    .select()
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: error?.message || 'Failed to create post' }, 500);
   }
 
   return c.json(data, 201);
@@ -48,7 +63,7 @@ blog.openapi(updatePost, async (c) => {
   const { data, error } = await supabase.from('POSTS').update({ title, content }).eq('id', id).select().single();
 
   if (error) {
-    return c.json({ message: error.message }, 500);
+    return c.json({ error: error.message }, 500);
   }
   if (!data) {
     return c.json({ message: 'Post not found' }, 404);
@@ -62,11 +77,56 @@ blog.openapi(deletePost, async (c) => {
   const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
   if (error) {
-    return c.json({ message: error.message }, 500);
+    return c.json({ error: error.message }, 500);
   }
   if (count === 0) {
-    return c.json({ message: 'Post not found' }, 404);
+    return c.json({ error: 'Post not found' }, 404);
   }
 
   return c.json({ message: 'Post deleted successfully' }, 200);
+});
+
+blog.openapi(commentOnPost, async (c) => {
+  const { id } = c.req.valid('param');
+  const { content } = c.req.valid('json');
+  const { error: postError, count } = await supabase.from('POSTS').select('id').eq('id', id).single();
+
+  if (postError || !count) {
+    return c.json({ error: postError?.message || 'Post not found' }, 404);
+  }
+
+  const { data, error } = await supabase.from('COMMENTS').insert({ content, id_post: id }).select().single();
+
+  if (error || !data) {
+    return c.json({ error: error.message || 'Failed to create comment' }, 500);
+  }
+
+  return c.json(data, 201);
+});
+
+blog.openapi(getComments, async (c) => {
+  const { id } = c.req.valid('param');
+  const { data, error } = await supabase.from('COMMENTS').select('*').eq('id_post', id);
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  return c.json(data, 200);
+});
+
+blog.openapi(createResponse, async (c) => {
+  const { id, id_comment } = c.req.valid('param');
+  const { content } = c.req.valid('json');
+  const { data, error } = await supabase
+    .from('COMMENTS')
+    .insert({ content, id_post: id, id_comment })
+    .select()
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: error?.message || 'Failed to create response' }, 500);
+  }
+
+  return c.json(data, 201);
 });

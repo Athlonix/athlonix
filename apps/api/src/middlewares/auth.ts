@@ -8,13 +8,8 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
   if (!access_token) throw new HTTPException(403, { message: 'No access token' });
   const { data, error } = await supabase.auth.getUser(access_token);
 
-  if (data.user) {
-    c.set('user', {
-      id: data.user.id,
-      email: data.user.email,
-      created_at: data.user.created_at,
-      updated_at: data.user.updated_at,
-    });
+  if (data?.user) {
+    c.set('id_auth', data.user.id);
   }
   if (error) {
     const refresh_token = getCookie(c, 'refresh_token');
@@ -27,12 +22,7 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
     if (refreshError) throw new HTTPException(403, { message: 'Error while refreshing token' });
 
     if (refreshed.user) {
-      c.set('user', {
-        id: refreshed.user.id,
-        email: refreshed.user.email,
-        created_at: refreshed.user.created_at,
-        updated_at: refreshed.user.updated_at,
-      });
+      c.set('id_auth', refreshed.user.id);
     }
   }
 

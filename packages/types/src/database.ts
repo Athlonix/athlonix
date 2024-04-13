@@ -656,7 +656,7 @@ export type Database = {
           {
             foreignKeyName: 'public_USERS_id_auth_fkey';
             columns: ['id_auth'];
-            isOneToOne: false;
+            isOneToOne: true;
             referencedRelation: 'users';
             referencedColumns: ['id'];
           },

@@ -3,7 +3,6 @@ import { getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import authMiddleware from '../middlewares/auth.js';
 import { loginUser, refreshTokens, signupUser } from '../routes/auth.js';
 
 export const auth = new OpenAPIHono({

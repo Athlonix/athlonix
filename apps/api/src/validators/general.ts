@@ -1,5 +1,14 @@
 import { z } from 'zod';
 
+export type Variables = {
+  user: {
+    id_auth: number;
+    email: string;
+    updated_at: string;
+    created_at: string;
+  };
+};
+
 export const serverErrorSchema = {
   description: 'Internal server error',
   content: {

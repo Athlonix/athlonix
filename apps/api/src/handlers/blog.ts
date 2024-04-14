@@ -13,12 +13,8 @@ import {
   updateComment,
   updatePost,
 } from '../routes/blog.js';
-
-type Variables = {
-  user: {
-    id: number;
-  };
-};
+import { getUserId } from '../utils/context.js';
+import type { Variables } from '../validators/general.js';
 
 export const blog = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
@@ -47,23 +43,9 @@ blog.openapi(getPost, async (c) => {
 
 blog.openapi(createPost, async (c) => {
   const { title, content } = c.req.valid('json');
-  const user = c.get('user')?.id;
+  const id_user = await getUserId(c);
 
-  if (!user) {
-    return c.json({ error: 'User not found' }, 404);
-  }
-
-  const { data: idUser } = await supabase.from('USERS').select('id').eq('id_auth', user).single();
-
-  if (!idUser) {
-    return c.json({ error: 'User not found' }, 404);
-  }
-
-  const { data, error } = await supabase
-    .from('POSTS')
-    .insert({ title, content, id_user: idUser?.id })
-    .select()
-    .single();
+  const { data, error } = await supabase.from('POSTS').insert({ title, content, id_user }).select().single();
 
   if (error || !data) {
     return c.json({ error: error?.message || 'Failed to create post' }, 500);
@@ -98,20 +80,12 @@ blog.openapi(deletePost, async (c) => {
 blog.openapi(commentOnPost, async (c) => {
   const { id } = c.req.valid('param');
   const { content } = c.req.valid('json');
-  const user = c.get('user')?.id;
+  const id_user = await getUserId(c);
 
-  if (!user) {
-    return c.json({ error: 'User not found' }, 404);
-  }
-
-  const { data, error } = await supabase
-    .from('COMMENTS')
-    .insert({ content, id_post: id, id_user: user })
-    .select()
-    .single();
+  const { data, error } = await supabase.from('COMMENTS').insert({ content, id_post: id, id_user }).select().single();
 
   if (error || !data) {
-    return c.json({ error: 'Failed to create comment' }, 400);
+    return c.json({ error: 'Post not found' }, 404);
   }
 
   return c.json(data, 201);
@@ -131,15 +105,11 @@ blog.openapi(getComments, async (c) => {
 blog.openapi(createResponse, async (c) => {
   const { id_post, id_comment } = c.req.valid('param');
   const { content } = c.req.valid('json');
-  const user = c.get('user')?.id;
-
-  if (!user) {
-    return c.json({ error: 'User not found' }, 404);
-  }
+  const id_user = await getUserId(c);
 
   const { data, error } = await supabase
     .from('COMMENTS')
-    .insert({ content, id_post, id_response: id_comment, id_user: user })
+    .insert({ content, id_post, id_response: id_comment, id_user })
     .select()
     .single();
 

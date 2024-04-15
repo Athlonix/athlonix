@@ -6,7 +6,6 @@ export const supabase = createClient<Database>(process.env.SUPABASE_URL || '', p
 
 if (!supabase) {
   console.error('Supabase client not created');
-  console.log(process.env);
   exit(1);
 }
 

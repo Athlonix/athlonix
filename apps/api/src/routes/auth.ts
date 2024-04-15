@@ -17,7 +17,7 @@ export const signupUser = createRoute({
     },
   },
   responses: {
-    200: {
+    201: {
       description: 'Successful response',
       content: {
         'application/json': {

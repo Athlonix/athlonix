@@ -5,6 +5,7 @@
     "clean": "turbo clean",
     "build": "turbo build",
     "dev": "turbo dev",
+    "test": "turbo test",
     "lint": "turbo lint && biome check --apply .",
     "lint:check": "turbo lint:check && biome ci .",
     "types:check": "turbo types:check",

@@ -24,9 +24,7 @@ jobs:
     timeout-minutes: 10
 
     env:
-        SUPABASE_URL: 'http://localhost:54321'
-        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        SUPABASE_URL: 'http://127.0.0.1:54321'
 
     steps:
         - name: Checkout Repository
@@ -46,8 +44,8 @@ jobs:
         - name: Install dependencies
           run: pnpm -F api install
 
-        - name: Start Supabase
-          run: pnpx supabase db start
+        - name: Start Supabase & export env variables
+          run: pnpx supabase db start  && output=$(pnpx supabase status -o env) && export ${output}
 
         - name: Run tests
           run: pnpm -F api test

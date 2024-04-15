@@ -14,6 +14,7 @@ describe('Auth tests', () => {
       body: JSON.stringify({
         first_name: 'John',
         last_name: 'Doe',
+        username: 'john_doe',
         email: 'john@gmail.com',
         password: 'password123456',
       }),
@@ -32,9 +33,6 @@ describe('Auth tests', () => {
       body: JSON.stringify({
         email: 'john@gmail.com',
         password: 'password123456',
-        fist_name: 'John',
-        last_name: 'Doe',
-        username: 'john_doe',
       }),
     });
     expect(res.status).toBe(200);

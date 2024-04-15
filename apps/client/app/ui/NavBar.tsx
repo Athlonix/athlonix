@@ -1,4 +1,4 @@
-import { Button } from '@repo/ui/components/button';
+import { Button } from '@repo/ui/components/ui/button';
 import Link from 'next/link';
 import type React from 'react';
 

@@ -1,0 +1,57 @@
+name: API TEST
+
+on:
+  push:
+    branches:
+      - main
+    paths: 
+      - 'apps/api/**'
+      - 'packages/types/**'
+    paths-ignore:
+      - '**/*.md'
+  pull_request:
+    branches:
+      - main
+    paths: 
+      - 'apps/api/**'
+      - 'packages/types/**'
+    paths-ignore:
+      - '**/*.md'
+
+permissions:
+    contents: read
+    pull-requests: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+        SUPABASE_URL: http://127.0.0.1:54321
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+
+    steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+
+        - name: Setup pnpm
+          uses: pnpm/action-setup@v3
+          with:
+            version: latest
+  
+        - name: Set up Node.js
+          uses: actions/setup-node@v4
+          with:
+            node-version: '21'
+            cache: 'pnpm'
+  
+        - name: Install dependencies
+          run: pnpm install -F api
+
+        - name: Start Supabase
+          run: supabase db start 
+
+        - name: Run tests
+          run: pnpm run test -F api

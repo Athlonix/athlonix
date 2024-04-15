@@ -64,16 +64,6 @@ blog.openapi(updatePost, async (c) => {
   const id_role = user.id_role;
   await checkRole(id_role, false, [Role.REDACTOR, Role.MODERATOR]);
 
-  if (id_role >= Role.MODERATOR) {
-    const { data, error } = await supabase.from('POSTS').update({ title, content }).eq('id', id).select().single();
-
-    if (error || !data) {
-      return c.json({ error: 'Post not found' }, 404);
-    }
-
-    return c.json(data, 200);
-  }
-
   const { data, error } = await supabase
     .from('POSTS')
     .update({ title, content })
@@ -166,21 +156,6 @@ blog.openapi(updateComment, async (c) => {
   const { content } = c.req.valid('json');
   const user = c.get('user');
   await checkRole(user.id_role, true);
-
-  if (user.id_role >= Role.MODERATOR) {
-    const { data, error } = await supabase
-      .from('COMMENTS')
-      .update({ content })
-      .eq('id, id_post', [id_comment, id_post])
-      .select()
-      .single();
-
-    if (error || !data) {
-      return c.json({ error: 'Comment not found' }, 404);
-    }
-
-    return c.json(data, 200);
-  }
 
   const { data, error } = await supabase
     .from('COMMENTS')

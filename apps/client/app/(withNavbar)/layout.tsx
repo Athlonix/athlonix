@@ -18,5 +18,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }): JSX.Element {
-  return <div className="flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>;
+  return <div className="flex-grow p-6 md:overflow-y-auto md:p-12 w-full max-w-7xl">{children}</div>;
 }

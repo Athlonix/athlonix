@@ -9,7 +9,7 @@ export default function Page(): JSX.Element {
     <>
       <NavBar links={navLinks} />
       <main className="flex flex-col items-center gap-y-8 py-6">
-        <section className="flex flex-col max-w-7xl gap-y-4">
+        <section className="flex flex-col gap-y-4">
           <div className="flex gap-8 h-44 items-center justify-center">
             <h1 className="font-semibold text-[144px]">Athlonix</h1>
             <div className="h-[168px] max-w-[720px]">

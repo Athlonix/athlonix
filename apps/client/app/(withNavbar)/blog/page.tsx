@@ -1,8 +1,6 @@
 import { navLinks } from '@/app/lib/navlinks';
 import { NavBar } from '@/app/ui/NavBar';
 import { Button } from '@repo/ui/components/ui/button';
-import Image from 'next/image';
-import Link from 'next/link';
 
 export default function Page(): JSX.Element {
   return (

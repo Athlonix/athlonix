@@ -22,6 +22,9 @@
       "inputs": ["**/*.ts", "**/*.tsx"],
       "outputs": []
     },
+    "test": {
+      "dependsOn": ["^test"]
+    },
     "clean": {
       "dependsOn": ["^clean"]
     }

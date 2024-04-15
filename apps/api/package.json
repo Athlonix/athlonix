@@ -10,7 +10,9 @@
     "start": "node dist/index.js",
     "types:check": "tsc --noEmit",
     "lint": "biome check --apply .",
-    "lint:check": "biome check ."
+    "lint:check": "biome check .",
+    "test": "vitest --run",
+    "test:dev": "vitest --watch"
   },
   "dependencies": {
     "@hono/node-server": "^1.10.0",
@@ -30,6 +32,7 @@
     "@types/swagger-ui-dist": "^3.30.4",
     "supabase": "^1.157.2",
     "tsx": "^4.7.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^1.5.0"
   }
 }

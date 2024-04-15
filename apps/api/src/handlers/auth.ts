@@ -48,7 +48,7 @@ auth.openapi(signupUser, async (c) => {
     });
   }
 
-  return c.json(user, 200);
+  return c.json(user, 201);
 });
 
 auth.openapi(loginUser, async (c) => {

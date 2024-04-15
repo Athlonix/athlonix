@@ -86,6 +86,16 @@ h1 {
   line-height: 48px;
 }
 
+h2 {
+  padding-bottom: 0.5rem;
+  border-bottom-width: 1px;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  scroll-margin: 5rem;
+}
+
 p {
   font-size: 16px;
   line-height: 32px;

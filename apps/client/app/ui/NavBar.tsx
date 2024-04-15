@@ -26,7 +26,10 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
     <nav className="flex items-center justify-center mb-20">
       <div className="w-full flex items-center justify-between">
         <ul className="flex gap-4">{navBarElements}</ul>
-        <Button className="w-[120px]">Login</Button>
+
+        <Button className="w-[120px]">
+          <Link href="login">Se connecter</Link>
+        </Button>
       </div>
     </nav>
   );

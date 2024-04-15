@@ -124,6 +124,9 @@ importers:
 
   apps/client:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.3.4
+        version: 3.3.4(react-hook-form@7.51.3)
       '@repo/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -136,9 +139,15 @@ importers:
       react-dom:
         specifier: ^18.2.0
         version: 18.2.0(react@18.2.0)
+      react-hook-form:
+        specifier: ^7.51.3
+        version: 7.51.3(react@18.2.0)
       sharp:
         specifier: ^0.33.3
         version: 0.33.3
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
     devDependencies:
       '@repo/biome-config':
         specifier: workspace:*

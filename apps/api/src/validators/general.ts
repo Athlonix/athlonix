@@ -2,12 +2,21 @@ import { z } from 'zod';
 
 export type Variables = {
   user: {
-    id_auth: number;
+    id: number;
+    id_role: number;
     email: string;
     updated_at: string;
     created_at: string;
   };
 };
+
+export enum Role {
+  CREATED = 1,
+  MEMBER = 2,
+  REDACTOR = 3,
+  MODERATOR = 4,
+  ADMIN = 5,
+}
 
 export const serverErrorSchema = {
   description: 'Internal server error',

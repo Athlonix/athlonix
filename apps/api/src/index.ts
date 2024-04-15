@@ -40,8 +40,12 @@ app.doc('/doc', (c) => ({
   },
   servers: [
     {
+      url: 'https://athlonix-api.jayllyz.fr',
+      description: 'Production server',
+    },
+    {
       url: new URL(c.req.url).origin,
-      description: 'Current environment',
+      description: 'Development server',
     },
   ],
 }));

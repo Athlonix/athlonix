@@ -37,6 +37,18 @@ describe('Auth tests', () => {
     expect(res.status).toBe(200);
   });
 
+  test('POST /auth/login with wrong password', async () => {
+    const res = await app.request(`${path}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'john@gmail.com',
+        password: 'password123456',
+      }),
+    });
+    expect(res.status).toBe(401);
+  });
+
   afterAll(async () => {
     const { error } = await supAdmin.from('USERS').delete().eq('id', id_user);
     const { error: errorAuth } = await supAdmin.auth.admin.deleteUser(id_auth);

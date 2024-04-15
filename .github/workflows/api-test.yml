@@ -44,11 +44,13 @@ jobs:
       - name: ⬆️ Install dependencies
         run: pnpm -F api install
 
-      - name: 🚀 Start Supabase & export env variables
-        run: |
-          pnpx supabase db start &&
-          output=$(pnpx supabase status -o env --override-name auth.anon_key=SUPABASE_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY) &&
-          export ${output}
+      - name: 🚀 Start Supabase
+        run: pnpx supabase db start
 
       - name: 🔍 Run tests
-        run: pnpm -F api test
+        run: 
+          |
+          output=$(pnpx supabase status -o env --override-name auth.anon_key=SUPABASE_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY) &&
+          export ${output}
+          env
+          pnpm -F api test

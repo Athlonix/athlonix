@@ -58,6 +58,14 @@ auth.openapi(loginUser, async (c) => {
 
   if (error) throw new HTTPException(401, { message: error.message });
 
+  const { data: user, error: userError } = await supabase
+    .from('USERS')
+    .select('*')
+    .eq('id_auth', data.user.id)
+    .single();
+
+  if (userError || !user) throw new HTTPException(404, { message: 'User not found' });
+
   setCookie(c, 'access_token', data?.session.access_token, {
     maxAge: 31536000, // 1 year
     httpOnly: true,
@@ -72,7 +80,7 @@ auth.openapi(loginUser, async (c) => {
     secure: true,
   });
 
-  return c.json({ message: 'User logged in' }, 200);
+  return c.json(user, 200);
 });
 
 auth.openapi(refreshTokens, async (c) => {

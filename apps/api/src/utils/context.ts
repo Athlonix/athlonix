@@ -1,13 +1,14 @@
-import type { Context } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { supabase } from '../libs/supabase.js';
+import { Role } from '../validators/general.js';
 
-export async function getUserId(c: Context): Promise<number> {
-  const id_auth = c.get('user')?.id_auth;
+export async function checkRole(user: number, member: boolean, role?: Role[]) {
+  if (!user) throw new HTTPException(403, { message: 'No user role found' });
 
-  const { data: user } = await supabase.from('USERS').select('id').eq('id_auth', id_auth).single();
+  if (member && user >= Role.MEMBER) return;
 
-  if (!user) throw new HTTPException(404, { message: 'User not found' });
+  if (user === Role.ADMIN) return;
 
-  return user.id;
+  if (role?.includes(user)) return;
+
+  throw new HTTPException(403, { message: 'Forbidden' });
 }

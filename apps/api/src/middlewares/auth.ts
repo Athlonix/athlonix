@@ -9,8 +9,17 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
   const { data, error } = await supabase.auth.getUser(access_token);
 
   if (data?.user) {
+    const { data: user, error: userError } = await supabase
+      .from('USERS')
+      .select('id,id_role')
+      .eq('id_auth', data.user.id)
+      .single();
+
+    if (userError || !user) throw new HTTPException(404, { message: 'User not found' });
+
     c.set('user', {
-      id_auth: data.user.id,
+      id: user.id,
+      id_role: user.id_role,
       email: data.user.email,
       updated_at: data.user.updated_at,
       created_at: data.user.created_at,
@@ -26,10 +35,20 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
     });
 
     if (refreshError) throw new HTTPException(403, { message: 'Error while refreshing token' });
+    if (!refreshed.user) throw new HTTPException(403, { message: 'No user found in refreshed session' });
+
+    const { data: user, error: userError } = await supabase
+      .from('USERS')
+      .select('id,id_role')
+      .eq('id_auth', refreshed.user.id)
+      .single();
+
+    if (userError || !user) throw new HTTPException(404, { message: 'User not found' });
 
     if (refreshed.user) {
       c.set('user', {
-        id_auth: refreshed.user.id,
+        id: user.id,
+        id_role: user.id_role,
         email: refreshed.user.email,
         updated_at: refreshed.user.updated_at,
         created_at: refreshed.user.created_at,

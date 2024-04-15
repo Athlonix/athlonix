@@ -1,14 +1,14 @@
 import { Button } from '@repo/ui/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { navLinks } from './lib/navlinks';
-import { NavBar } from './ui/NavBar';
+import { navLinks } from '../lib/navlinks';
+import { NavBar } from '../ui/NavBar';
 
 export default function Page(): JSX.Element {
   return (
     <>
       <NavBar links={navLinks} />
-      <main className="flex flex-col items-center gap-y-8">
+      <main className="flex flex-col items-center gap-y-8 py-6">
         <section className="flex flex-col max-w-7xl gap-y-4">
           <div className="flex gap-8 h-44 items-center justify-center">
             <h1 className="font-semibold text-[144px]">Athlonix</h1>

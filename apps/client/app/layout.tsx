@@ -21,12 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={cn(
-          'min-h-screen bg-background font-sans antialiased p-6 flex flex-col items-center',
-          fontSans.variable,
-        )}
+        className={cn('min-h-screen bg-background font-sans antialiased flex flex-col items-center', fontSans.variable)}
       >
-        <div className="max-w-7xl">{children}</div>
+        {children}
       </body>
     </html>
   );

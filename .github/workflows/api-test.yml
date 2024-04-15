@@ -1,4 +1,4 @@
-name: API TEST
+name: api test
 
 on:
   push:
@@ -19,14 +19,14 @@ permissions:
     pull-requests: read
 
 jobs:
-  ci:
+  api-test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     env:
         SUPABASE_URL: http://127.0.0.1:54321
         SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-        SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
 
     steps:
         - name: Checkout Repository
@@ -47,7 +47,7 @@ jobs:
           run: pnpm -F api install
 
         - name: Start Supabase
-          run: pnpx supabase db start 
+          run: pnpx supabase db start
 
         - name: Run tests
           run: pnpm -F api test

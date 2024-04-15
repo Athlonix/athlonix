@@ -10,6 +10,7 @@ categories:
   - title: '🐛 Bug Fixes'
     labels:
       - 'fix'
+      - 'bug'
   - title: '🔨 Refactor'
     labels:
       - 'refactor'
@@ -39,7 +40,22 @@ autolabeler:
   - label: 'enhancement'
     branch:
       - '/feat\/.+/'
+  - label: 'performance'
+    branch:
+      - '/perf\/.+/'
+  - label: 'refactor'
+    branch:
+      - '/refactor\/.+/'
+  - label: 'documentation'
+    branch:
+      - '/docs\/.+/'
+  - label: 'maintenance'
+    branch:
+      - '/chore\/.+/'
+      - '/ci\/.+/'
+      - '/deps\/.+/'
+
 template: |
-  ## Changelog 
+  ## Changelog - Athlonix 📝
 
   $CHANGES

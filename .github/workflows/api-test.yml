@@ -7,16 +7,12 @@ on:
     paths: 
       - 'apps/api/**'
       - 'packages/types/**'
-    paths-ignore:
-      - '**/*.md'
   pull_request:
     branches:
       - main
     paths: 
       - 'apps/api/**'
       - 'packages/types/**'
-    paths-ignore:
-      - '**/*.md'
 
 permissions:
     contents: read

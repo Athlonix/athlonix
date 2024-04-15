@@ -43,7 +43,7 @@ describe('Auth tests', () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         email: 'john@gmail.com',
-        password: 'password123456',
+        password: 'fake-super-password',
       }),
     });
     expect(res.status).toBe(401);

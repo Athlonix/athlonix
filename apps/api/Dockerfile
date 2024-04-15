@@ -57,4 +57,4 @@ COPY --from=builder --chown=node:node /app/out/node_modules/ ./node_modules
 COPY --from=builder --chown=node:node /app/apps/api/dist/ ./dist
 
 USER node
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/src/index.js"]

@@ -44,10 +44,10 @@ jobs:
             cache: 'pnpm'
   
         - name: Install dependencies
-          run: pnpm install -F api
+          run: pnpm -F api install
 
         - name: Start Supabase
-          run: supabase db start 
+          run: pnpx supabase db start 
 
         - name: Run tests
-          run: pnpm run test -F api
+          run: pnpm -F api test

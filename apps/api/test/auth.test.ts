@@ -14,6 +14,7 @@ describe('Auth tests', () => {
       body: JSON.stringify({
         first_name: 'John',
         last_name: 'Doe',
+        username: 'john_doe',
         email: 'john@gmail.com',
         password: 'password123456',
       }),

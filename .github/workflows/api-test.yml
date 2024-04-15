@@ -1,4 +1,4 @@
-name: api test
+name: 🧪 API Test
 
 on:
   push:
@@ -15,8 +15,8 @@ on:
       - 'packages/types/**'
 
 permissions:
-    contents: read
-    pull-requests: read
+  contents: read
+  pull-requests: read
 
 jobs:
   api-test:
@@ -24,28 +24,31 @@ jobs:
     timeout-minutes: 10
 
     env:
-        SUPABASE_URL: 'http://127.0.0.1:54321'
+      SUPABASE_URL: 'http://127.0.0.1:54321'
 
     steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
 
-        - name: Setup pnpm
-          uses: pnpm/action-setup@v3
-          with:
-            version: latest
+      - name: 🛠️ Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
   
-        - name: Set up Node.js
-          uses: actions/setup-node@v4
-          with:
-            node-version: '21'
-            cache: 'pnpm'
+      - name: 🛠️ Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21'
+          cache: 'pnpm'
   
-        - name: Install dependencies
-          run: pnpm -F api install
+      - name: ⬆️ Install dependencies
+        run: pnpm -F api install
 
-        - name: Start Supabase & export env variables
-          run: pnpx supabase db start  && output=$(pnpx supabase status -o env) && export ${output}
+      - name: 🚀 Start Supabase & export env variables
+        run: |
+          pnpx supabase db start &&
+          output=$(pnpx supabase status -o env --override-name auth.anon_key=SUPABASE_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY) &&
+          export ${output}
 
-        - name: Run tests
-          run: pnpm -F api test
+      - name: 🔍 Run tests
+        run: pnpm -F api test

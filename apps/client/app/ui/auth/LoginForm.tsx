@@ -25,7 +25,19 @@ export default function LoginForm(): JSX.Element {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    fetch('http://localhost:3101/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: values.email,
+        password: values.password,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+      .catch((error) => console.log(error));
   }
 
   return (
@@ -68,7 +80,7 @@ export default function LoginForm(): JSX.Element {
                       <FormItem>
                         <Label className="font-bold text-lg">Mot de passe</Label>
                         <FormControl>
-                          <Input placeholder="Votre mot de passe" {...field} />
+                          <Input placeholder="Votre mot de passe" type="password" {...field} />
                         </FormControl>
                         <FormDescription />
                         <FormMessage />

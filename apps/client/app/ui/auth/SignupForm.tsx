@@ -23,6 +23,7 @@ export default function SignupForm(): JSX.Element {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      username: '',
       firstName: '',
       lastName: '',
       email: '',
@@ -32,7 +33,22 @@ export default function SignupForm(): JSX.Element {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    fetch('http://localhost:3101/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: values.username,
+        first_name: values.firstName,
+        last_name: values.lastName,
+        email: values.email,
+        password: values.password,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => console.log(data))
+      .catch((error) => console.log(error));
   }
 
   return (
@@ -60,6 +76,22 @@ export default function SignupForm(): JSX.Element {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="grid gap-2">
+                <div className="grid gap-2 my-2">
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Label className="font-bold text-lg">Nom d'utilisateur</Label>
+                        <FormControl>
+                          <Input placeholder="Votre nom d'utilisateur" {...field} />
+                        </FormControl>
+                        <FormDescription />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <div className="grid gap-2 my-2">
                   <FormField
                     control={form.control}
@@ -95,22 +127,6 @@ export default function SignupForm(): JSX.Element {
                 <div className="grid gap-2 my-2">
                   <FormField
                     control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <Label className="font-bold text-lg">Nom d'utilisateur</Label>
-                        <FormControl>
-                          <Input placeholder="Votre nom d'utilisateur" {...field} />
-                        </FormControl>
-                        <FormDescription />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="grid gap-2 my-2">
-                  <FormField
-                    control={form.control}
                     name="email"
                     render={({ field }) => (
                       <FormItem>
@@ -132,7 +148,7 @@ export default function SignupForm(): JSX.Element {
                       <FormItem>
                         <Label className="font-bold text-lg">Mot de passe</Label>
                         <FormControl>
-                          <Input placeholder="Votre mot de passe" {...field} />
+                          <Input placeholder="Votre mot de passe" type="password" {...field} />
                         </FormControl>
                         <FormDescription>
                           <span>Le mot de passe doit comporter 8 caractères minimum</span>
@@ -145,12 +161,12 @@ export default function SignupForm(): JSX.Element {
                 <div className="grid gap-2 mb-5">
                   <FormField
                     control={form.control}
-                    name="password"
+                    name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
                         <Label className="font-bold text-lg">Confirmation mot de passe</Label>
                         <FormControl>
-                          <Input placeholder="Confirmer votre mot de passe" {...field} />
+                          <Input placeholder="Confirmer votre mot de passe" type="password" {...field} />
                         </FormControl>
                         <FormDescription />
                         <FormMessage />

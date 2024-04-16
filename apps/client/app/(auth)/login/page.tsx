@@ -1,10 +1,10 @@
-import LoginForm from '../../ui/LoginForm';
+import LoginForm from '../../ui/auth/LoginForm';
 
 function Login() {
   return (
-    <div>
+    <main>
       <LoginForm />
-    </div>
+    </main>
   );
 }
 

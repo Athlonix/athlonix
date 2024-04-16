@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server';
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { compress } from 'hono/compress';
+import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
@@ -9,7 +10,6 @@ import { secureHeaders } from 'hono/secure-headers';
 import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
 import { health } from './handlers/health.js';
-import authMiddleware from './middlewares/auth.js';
 
 const app = new OpenAPIHono();
 
@@ -19,6 +19,14 @@ if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
 app.use('*', prettyJSON());
 app.use('*', secureHeaders());
 app.use('*', compress());
+app.use(
+  '*',
+  cors({
+    origin: '*',
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  }),
+);
 app.get('/', (c) => c.text('Athlonix API!', 200));
 
 app.onError((err, c) => {

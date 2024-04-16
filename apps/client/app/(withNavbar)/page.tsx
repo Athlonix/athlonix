@@ -1,10 +1,29 @@
+'use client';
+
 import { Button } from '@repo/ui/components/ui/button';
+import { Toaster } from '@repo/ui/components/ui/toaster';
+import { useToast } from '@repo/ui/hooks/use-toast';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 import { navLinks } from '../lib/navlinks';
 import { NavBar } from '../ui/NavBar';
 
 export default function Page(): JSX.Element {
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
+
+  const search = searchParams.get('loggedIn');
+
+  useEffect(() => {
+    if (search === 'true') {
+      toast({
+        title: 'Bon retour !',
+        description: 'Vous êtes connecté !',
+      });
+    }
+  }, [search, toast]);
   return (
     <>
       <NavBar links={navLinks} />
@@ -22,6 +41,8 @@ export default function Page(): JSX.Element {
               />
             </div>
           </div>
+
+          <Toaster />
 
           <div className="flex gap-8 h-44 items-center justify-start flex-nowrap">
             <div className="h-[168px] max-w-[492px]">

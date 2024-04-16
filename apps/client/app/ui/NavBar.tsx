@@ -1,5 +1,8 @@
+'use client';
+
 import { Button } from '@repo/ui/components/ui/button';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import type React from 'react';
 
 interface LinkProp {
@@ -12,6 +15,13 @@ interface NavBarProps {
 }
 
 export const NavBar: React.FC<NavBarProps> = ({ links }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+    setIsAuthenticated(user !== null);
+  }, []);
+
   const navBarElements = links.map((link) => {
     return (
       <li key={link.name}>
@@ -26,10 +36,15 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
     <nav className="flex items-center justify-center mb-20">
       <div className="w-full flex items-center justify-between">
         <ul className="flex gap-4">{navBarElements}</ul>
-
-        <Button className="w-[120px]">
-          <Link href="login">Se connecter</Link>
-        </Button>
+        {!isAuthenticated ? (
+          <Button className="w-[120px]">
+            <Link href="login">Se connecter</Link>
+          </Button>
+        ) : (
+          <Button className="w-[120px]">
+            <Link href="logout">Se déconnecter</Link>
+          </Button>
+        )}
       </div>
     </nav>
   );

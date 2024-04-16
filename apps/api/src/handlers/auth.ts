@@ -22,8 +22,6 @@ auth.openapi(signupUser, async (c) => {
     password,
   });
 
-  console.log(data, error);
-
   if (error || !data?.user?.email) {
     throw new Error(error?.message || 'Error while signing up', {
       cause: error,

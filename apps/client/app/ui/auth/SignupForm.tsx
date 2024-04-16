@@ -7,10 +7,13 @@ import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 export default function SignupForm(): JSX.Element {
+  const router = useRouter();
+
   const formSchema = z.object({
     username: z.string().min(2, { message: "Veuillez saisir votre nom d'utilisateur" }),
     firstName: z.string().min(2, { message: 'Veuillez saisir votre prénom' }),
@@ -47,7 +50,9 @@ export default function SignupForm(): JSX.Element {
       }),
     })
       .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then(() => {
+        router.push('/login');
+      })
       .catch((error) => console.log(error));
   }
 

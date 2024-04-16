@@ -7,10 +7,13 @@ import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 export default function LoginForm(): JSX.Element {
+  const router = useRouter();
+
   const formSchema = z.object({
     email: z.string().email({ message: 'Email invalide' }),
     password: z.string().min(8, { message: 'Veuillez saisir votre mot de passe' }),
@@ -36,7 +39,10 @@ export default function LoginForm(): JSX.Element {
       }),
     })
       .then((response) => response.json())
-      .then((data) => console.log(data))
+      .then((data) => {
+        localStorage.setItem('user', JSON.stringify(data));
+        router.push('/?loggedIn=true');
+      })
       .catch((error) => console.log(error));
   }
 

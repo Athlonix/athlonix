@@ -7,10 +7,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { Suspense } from 'react';
 import { navLinks } from '../lib/navlinks';
 import { NavBar } from '../ui/NavBar';
 
-export default function Page(): JSX.Element {
+function ShowToast() {
   const searchParams = useSearchParams();
   const { toast } = useToast();
 
@@ -24,6 +25,11 @@ export default function Page(): JSX.Element {
       });
     }
   }, [search, toast]);
+
+  return <Toaster />;
+}
+
+export default function Page(): JSX.Element {
   return (
     <>
       <NavBar links={navLinks} />
@@ -100,7 +106,9 @@ export default function Page(): JSX.Element {
           </div>
         </section>
 
-        <Toaster />
+        <Suspense>
+          <ShowToast />
+        </Suspense>
       </main>
     </>
   );

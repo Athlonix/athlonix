@@ -10,7 +10,6 @@ import { secureHeaders } from 'hono/secure-headers';
 import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
 import { health } from './handlers/health.js';
-import authMiddleware from './middlewares/auth.js';
 
 const app = new OpenAPIHono();
 

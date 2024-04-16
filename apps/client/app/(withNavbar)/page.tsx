@@ -42,8 +42,6 @@ export default function Page(): JSX.Element {
             </div>
           </div>
 
-          <Toaster />
-
           <div className="flex gap-8 h-44 items-center justify-start flex-nowrap">
             <div className="h-[168px] max-w-[492px]">
               <Image
@@ -101,6 +99,8 @@ export default function Page(): JSX.Element {
             <p className="font-normal text-xl">evenements organises</p>
           </div>
         </section>
+
+        <Toaster />
       </main>
     </>
   );

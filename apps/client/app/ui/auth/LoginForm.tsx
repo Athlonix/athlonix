@@ -13,6 +13,7 @@ import { z } from 'zod';
 
 export default function LoginForm(): JSX.Element {
   const router = useRouter();
+  const urlApi = process.env.ATHLONIX_API_URL;
 
   const formSchema = z.object({
     email: z.string().email({ message: 'Email invalide' }),
@@ -28,7 +29,7 @@ export default function LoginForm(): JSX.Element {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    fetch('http://localhost:3101/auth/login', {
+    fetch(`${urlApi}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,7 +44,9 @@ export default function LoginForm(): JSX.Element {
         localStorage.setItem('user', JSON.stringify(data));
         router.push('/?loggedIn=true');
       })
-      .catch((error) => console.log(error));
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   return (
@@ -60,7 +63,7 @@ export default function LoginForm(): JSX.Element {
             <h1 className="text-4xl font-bold mb-4">Connexion</h1>
           </div>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
               <div className="grid gap-4">
                 <div className="grid gap-2 my-4">
                   <FormField

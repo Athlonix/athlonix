@@ -36,7 +36,8 @@ export default function SignupForm(): JSX.Element {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    fetch('http://localhost:3101/auth/signup', {
+    const urlApi = process.env.ATHLONIX_API_URL;
+    fetch(`${urlApi}/auth/signup`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -79,7 +80,7 @@ export default function SignupForm(): JSX.Element {
             <h1 className="text-4xl font-bold mb-4">Inscription</h1>
           </div>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={form.handleSubmit(onSubmit)} method="POST">
               <div className="grid gap-2">
                 <div className="grid gap-2 my-2">
                   <FormField

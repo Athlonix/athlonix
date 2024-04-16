@@ -78,3 +78,22 @@ export const refreshTokens = createRoute({
   },
   tags: ['auth'],
 });
+
+export const logoutUser = createRoute({
+  method: 'delete',
+  path: '/logout',
+  summary: 'Logout a user',
+  description: 'Logout a user',
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: { type: 'string' },
+        },
+      },
+    },
+    500: serverErrorSchema,
+  },
+  tags: ['auth'],
+});

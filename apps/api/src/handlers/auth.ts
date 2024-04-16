@@ -50,7 +50,7 @@ auth.openapi(signupUser, async (c) => {
     });
   }
 
-  return c.json(user, 200);
+  return c.json(user, 201);
 });
 
 auth.openapi(loginUser, async (c) => {
@@ -58,10 +58,15 @@ auth.openapi(loginUser, async (c) => {
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
-    console.error('Error while signing in', error);
-    throw new HTTPException(401, { message: error.message });
-  }
+  if (error) throw new HTTPException(401, { message: error.message });
+
+  const { data: user, error: userError } = await supabase
+    .from('USERS')
+    .select('*')
+    .eq('id_auth', data.user.id)
+    .single();
+
+  if (userError || !user) throw new HTTPException(404, { message: 'User not found' });
 
   setCookie(c, 'access_token', data?.session.access_token, {
     maxAge: 31536000, // 1 year
@@ -77,7 +82,7 @@ auth.openapi(loginUser, async (c) => {
     secure: true,
   });
 
-  return c.json({ message: 'User logged in' }, 200);
+  return c.json(user, 200);
 });
 
 auth.openapi(refreshTokens, async (c) => {
@@ -90,10 +95,7 @@ auth.openapi(refreshTokens, async (c) => {
     refresh_token,
   });
 
-  if (error) {
-    console.error('Error while refreshing token', error);
-    throw new HTTPException(403, { message: error.message });
-  }
+  if (error) throw new HTTPException(403, { message: error.message });
 
   if (data?.session) {
     setCookie(c, 'refresh_token', data.session.refresh_token, {

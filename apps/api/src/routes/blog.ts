@@ -1,6 +1,7 @@
 import { createRoute } from '@hono/zod-openapi';
 import { number, z } from 'zod';
 import authMiddleware from '../middlewares/auth.js';
+import { paginationSchema } from '../utils/pagnination.js';
 import {
   commentSchema,
   insertCommentSchema,
@@ -16,6 +17,9 @@ export const getAllPosts = createRoute({
   path: '/posts',
   summary: 'Get all posts',
   description: 'Get all posts',
+  request: {
+    query: paginationSchema,
+  },
   responses: {
     200: {
       description: 'Successful response',
@@ -185,6 +189,7 @@ export const getComments = createRoute({
   description: 'Get comments on a post',
   request: {
     params: idParamValidator,
+    query: paginationSchema,
   },
   responses: {
     200: {

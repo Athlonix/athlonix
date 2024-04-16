@@ -14,6 +14,7 @@ import {
   updatePost,
 } from '../routes/blog.js';
 import { checkRole } from '../utils/context.js';
+import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
 import { Role } from '../validators/general.js';
 
@@ -22,7 +23,9 @@ export const blog = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 blog.openapi(getAllPosts, async (c) => {
-  const { data, error } = await supabase.from('POSTS').select('*');
+  const { skip, take } = c.req.valid('query');
+  const { from, to } = getPagination(skip, take - 1);
+  const { data, error } = await supabase.from('POSTS').select('*').range(from, to);
 
   if (error) {
     return c.json({ error: error.message }, 500);
@@ -122,7 +125,9 @@ blog.openapi(commentOnPost, async (c) => {
 
 blog.openapi(getComments, async (c) => {
   const { id } = c.req.valid('param');
-  const { data, error } = await supabase.from('COMMENTS').select('*').eq('id_post', id);
+  const { skip, take } = c.req.valid('query');
+  const { from, to } = getPagination(skip, take - 1);
+  const { data, error } = await supabase.from('COMMENTS').select('*').eq('id_post', id).range(from, to);
 
   if (error) {
     return c.json({ error: error.message }, 500);

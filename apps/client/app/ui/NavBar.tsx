@@ -37,9 +37,14 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
       <div className="w-full flex items-center justify-between">
         <ul className="flex gap-4">{navBarElements}</ul>
         {!isAuthenticated ? (
-          <Button className="w-[120px]">
-            <Link href="login">Se connecter</Link>
-          </Button>
+          <div>
+            <Button className="w-[120px] mr-4">
+              <Link href="signup">S'inscrire</Link>
+            </Button>
+            <Button className="w-[120px]">
+              <Link href="login">Se connecter</Link>
+            </Button>
+          </div>
         ) : (
           <Button className="w-[120px]">
             <Link href="logout">Se déconnecter</Link>

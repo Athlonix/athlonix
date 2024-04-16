@@ -6,7 +6,8 @@ EXPOSE 3102
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache libc6-compat && \
-    npm install -g pnpm@latest turbo@latest
+    npm install -g turbo && \
+    corepack enable pnpm
 
 FROM base AS pruner
 WORKDIR /app

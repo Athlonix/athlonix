@@ -3,5 +3,4 @@ export const navLinks = [
   { name: 'Marketplace', href: '/marketplace' },
   { name: 'Evenements', href: '/blog' },
   { name: 'Sports', href: '/sports' },
-  { name: 'Quizz', href: '/quizz' },
 ];

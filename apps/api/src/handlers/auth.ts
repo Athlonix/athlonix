@@ -1,11 +1,12 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { getCookie, setCookie } from 'hono/cookie';
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { loginUser, refreshTokens, signupUser } from '../routes/auth.js';
+import { loginUser, logoutUser, refreshTokens, signupUser } from '../routes/auth.js';
+import type { Variables } from '../validators/general.js';
 
-export const auth = new OpenAPIHono({
+export const auth = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
 });
 
@@ -105,4 +106,13 @@ auth.openapi(refreshTokens, async (c) => {
   }
 
   return c.json({ message: 'Token refreshed' });
+});
+
+auth.openapi(logoutUser, async (c) => {
+  if (getCookie(c, 'refresh_token') && getCookie(c, 'access_token')) {
+    deleteCookie(c, 'refresh_token');
+    deleteCookie(c, 'access_token');
+  }
+
+  return c.json({ message: 'Logged out' });
 });

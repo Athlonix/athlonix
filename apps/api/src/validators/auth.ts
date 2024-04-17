@@ -27,3 +27,10 @@ export const loginSchema = z.object({
 export const refreshTokenSchema = z.object({
   refresh_token: z.string(),
 });
+
+export const updateUserSchema = z.object({
+  email: z.string().email(),
+  username: z.string().min(2),
+  first_name: z.string().min(2),
+  last_name: z.string().min(2),
+});

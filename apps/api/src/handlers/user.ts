@@ -94,10 +94,22 @@ user.openapi(deleteUser, async (c) => {
   const user = c.get('user');
   await checkRole(user.id_role, false, [Role.ADMIN]);
 
+  const { data: user_data, error: errorID } = await supabase.from('USERS').select('id_auth').eq('id', id).single();
+
+  if (errorID || !user_data) {
+    return c.json({ error: errorID?.message || 'Failed to fetch user data' }, 400);
+  }
+
   const { data, error } = await supabase.from('USERS').delete().eq('id', id).single();
 
   if (error || !data) {
     return c.json({ error: error?.message || 'Failed to delete user' }, 500);
+  }
+
+  const { error: errorAuth } = await supabase.auth.admin.deleteUser(user_data.id_auth ? user_data.id_auth : '');
+
+  if (errorAuth) {
+    return c.json({ error: errorAuth.message || 'Failed to delete user' }, 500);
   }
 
   return c.json(data, 200);

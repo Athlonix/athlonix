@@ -1,8 +1,8 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import authMiddleware from '../middlewares/auth';
-import { paginationSchema } from '../utils/pagnination';
-import { userSchema } from '../validators/auth';
-import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general';
+import authMiddleware from '../middlewares/auth.js';
+import { paginationSchema } from '../utils/pagnination.js';
+import { userSchema } from '../validators/auth.js';
+import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getAllUsers = createRoute({
   method: 'get',

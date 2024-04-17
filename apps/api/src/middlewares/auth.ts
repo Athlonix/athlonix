@@ -34,7 +34,10 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
       refresh_token,
     });
 
-    if (refreshError) throw new HTTPException(403, { message: 'Error while refreshing token' });
+    if (refreshError) {
+      console.error('Error while refreshing token', refreshError);
+      throw new HTTPException(403, { message: 'Error while refreshing token' });
+    }
     if (!refreshed.user) throw new HTTPException(403, { message: 'No user found in refreshed session' });
 
     const { data: user, error: userError } = await supabase

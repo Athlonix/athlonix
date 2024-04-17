@@ -10,6 +10,7 @@ import { secureHeaders } from 'hono/secure-headers';
 import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
 import { health } from './handlers/health.js';
+import { user } from './handlers/user.js';
 
 const app = new OpenAPIHono();
 
@@ -37,6 +38,7 @@ app.onError((err, c) => {
 });
 
 app.route('/', health);
+app.route('/', user);
 app.route('/auth', auth);
 app.route('/blog', blog);
 

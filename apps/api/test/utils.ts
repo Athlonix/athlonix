@@ -1,4 +1,5 @@
-import app from '../src/index.js';
+import { exit } from 'node:process';
+import type { Hono } from 'hono';
 import { supAdmin } from '../src/libs/supabase.js';
 import { Role } from '../src/validators/general';
 
@@ -10,7 +11,7 @@ export const testAdmin = {
   password: 'fulladminpassword123456',
 };
 
-export async function createAdmin() {
+export async function createAdmin(app: Hono) {
   const port = Number(process.env.PORT || 3101);
   const path = `http://localhost:${port}`;
   const res = await app.request(`${path}/auth/signup`, {
@@ -18,19 +19,17 @@ export async function createAdmin() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(testAdmin),
   });
-  console.error('HERE', res.status);
 
   const admin = await res.json();
-  console.log(admin);
-
   const { error } = await supAdmin.from('USERS').update({ id_role: Role.ADMIN }).eq('id', admin.id);
   if (error) {
-    throw new Error('Error while updating user');
+    console.error('Error while updating user');
+    exit(1);
   }
   return admin;
 }
 
-export async function loginAdmin() {
+export async function loginAdmin(app: Hono) {
   const port = Number(process.env.PORT || 3101);
   const path = `http://localhost:${port}`;
   const res = await app.request(`${path}/auth/login`, {
@@ -41,7 +40,8 @@ export async function loginAdmin() {
       password: 'fulladminpassword123456',
     }),
   });
-  return await res.json();
+  const admin = await res.json();
+  return admin;
 }
 
 export async function deleteAdmin(id: number, id_auth: string) {
@@ -63,7 +63,7 @@ export const testUser = {
   password: 'password123456',
 };
 
-export async function createTestUser(member = true) {
+export async function createTestUser(app: Hono, member = true) {
   const port = Number(process.env.PORT || 3101);
   const path = `http://localhost:${port}`;
   const res = await app.request(`${path}/auth/signup`, {
@@ -75,13 +75,14 @@ export async function createTestUser(member = true) {
   if (member) {
     const { error } = await supAdmin.from('USERS').update({ id_role: Role.MEMBER }).eq('id', user.id);
     if (error) {
-      throw new Error('Error while updating user');
+      console.error('Error while updating user');
+      exit(1);
     }
   }
   return user;
 }
 
-export async function loginTestUser() {
+export async function loginTestUser(app: Hono) {
   const port = Number(process.env.PORT || 3101);
   const path = `http://localhost:${port}`;
   const res = await app.request(`${path}/auth/login`, {

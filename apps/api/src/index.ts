@@ -38,9 +38,9 @@ app.onError((err, c) => {
 });
 
 app.route('/', health);
+app.route('/', user);
 app.route('/auth', auth);
 app.route('/blog', blog);
-app.route('/user', user);
 
 app.doc('/doc', (c) => ({
   openapi: '3.0.0',

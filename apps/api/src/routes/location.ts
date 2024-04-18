@@ -48,7 +48,6 @@ export const getAllAddresses = createRoute({
   path: '/addresses',
   summary: 'Get all addresses',
   description: 'Get all addresses',
-  middleware: authMiddleware,
   request: {
     query: paginationSchema,
   },
@@ -73,7 +72,6 @@ export const getOneAddress = createRoute({
   path: '/addresses/{id}',
   summary: 'Get a address',
   description: 'Get a address',
-  middleware: authMiddleware,
   request: {
     params: idParamValidator,
   },

@@ -12,7 +12,7 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
     const { data: user, error: userError } = await supabase
       .from('USERS')
       .select('id, USERS_ROLES(id_role)')
-      .eq('id_auth', data.user.id)
+      .eq('id_auth, id_role', data.user.id)
       .single();
 
     if (userError || !user) throw new HTTPException(404, { message: 'User not found' });

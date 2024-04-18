@@ -57,7 +57,8 @@ users.openapi(updateUser, async (c) => {
   const roles = c.get('user').roles || [];
   await checkRole(roles, true);
 
-  if (roles?.includes(Role.MODERATOR || Role.ADMIN || Role.DIRECTOR)) {
+  const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
+  if (roles?.some((role) => allowed.includes(role))) {
     const { data, error } = await supabase
       .from('USERS')
       .update({ first_name, last_name, username })

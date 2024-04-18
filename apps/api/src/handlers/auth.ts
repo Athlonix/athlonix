@@ -1,9 +1,10 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
-import { supabase } from '../libs/supabase.js';
+import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import { loginUser, logoutUser, refreshTokens, signupUser } from '../routes/auth.js';
+import { getToken } from '../utils/context.js';
 import type { Variables } from '../validators/general.js';
 
 export const auth = new OpenAPIHono<{ Variables: Variables }>({
@@ -12,6 +13,8 @@ export const auth = new OpenAPIHono<{ Variables: Variables }>({
 
 auth.openapi(signupUser, async (c) => {
   const { email, password, first_name, last_name, username } = c.req.valid('json');
+
+  console.log(email, password, first_name, last_name, username);
 
   const { data: userExist } = await supabase.from('USERS').select('id').eq('email', email);
   if (userExist && userExist.length > 0) {
@@ -80,7 +83,9 @@ auth.openapi(loginUser, async (c) => {
     secure: true,
   });
 
-  return c.json(user, 200);
+  const token = data.session.access_token;
+
+  return c.json({ user, token }, 200);
 });
 
 auth.openapi(refreshTokens, async (c) => {
@@ -108,9 +113,14 @@ auth.openapi(refreshTokens, async (c) => {
 });
 
 auth.openapi(logoutUser, async (c) => {
-  if (getCookie(c, 'refresh_token') && getCookie(c, 'access_token')) {
-    deleteCookie(c, 'refresh_token');
-    deleteCookie(c, 'access_token');
+  const token = getToken(c);
+  if (token) {
+    const token = getCookie(c, 'access_token') as string;
+    await supAdmin.auth.admin.signOut(token);
+    if (getCookie(c, 'refresh_token') && getCookie(c, 'access_token')) {
+      deleteCookie(c, 'refresh_token');
+      deleteCookie(c, 'access_token');
+    }
   }
 
   return c.json({ message: 'Logged out' });

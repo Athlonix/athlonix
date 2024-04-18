@@ -88,7 +88,8 @@ blog.openapi(deletePost, async (c) => {
   const id_user = user.id;
   await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
 
-  if (roles?.includes(Role.MODERATOR || Role.ADMIN || Role.DIRECTOR)) {
+  const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
+  if (roles?.some((role) => allowed.includes(role))) {
     const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
     if (error || count === 0) {
@@ -179,9 +180,11 @@ blog.openapi(updateComment, async (c) => {
 blog.openapi(deleteComment, async (c) => {
   const { id_post, id_comment } = c.req.valid('param');
   const user = c.get('user');
+  const roles = user.roles;
   await checkRole(user.roles, true);
 
-  if (user.roles?.includes(Role.MODERATOR || Role.ADMIN || Role.DIRECTOR)) {
+  const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
+  if (roles?.some((role) => allowed.includes(role))) {
     const { error, count } = await supabase
       .from('COMMENTS')
       .delete({ count: 'exact' })

@@ -9,6 +9,7 @@ export const getAllUsers = createRoute({
   path: '/users',
   summary: 'Get all users',
   description: 'Get all users',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     query: paginationSchema,
@@ -34,6 +35,7 @@ export const getOneUser = createRoute({
   path: '/users/{id}',
   summary: 'Get a user',
   description: 'Get a user',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -60,6 +62,7 @@ export const updateUser = createRoute({
   path: '/users/{id}',
   summary: 'Update a user',
   description: 'Update a user',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -93,6 +96,7 @@ export const deleteUser = createRoute({
   path: '/users/{id}',
   summary: 'Delete a user',
   description: 'Delete a user',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -119,6 +123,7 @@ export const addUserRole = createRoute({
   path: '/users/{id}/roles',
   summary: 'Add a role to a user',
   description: 'Add a role to a user',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -154,6 +159,7 @@ export const removeUserRole = createRoute({
   path: '/users/{id}/roles',
   summary: 'Remove a role from a user',
   description: 'Remove a role from a user',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,

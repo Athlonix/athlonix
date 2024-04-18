@@ -1,4 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
+import authMiddleware from '../middlewares/auth';
 import { paginationSchema } from '../utils/pagnination';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general';
 
@@ -65,6 +66,8 @@ export const createActivity = createRoute({
   path: '/activities',
   summary: 'Create a activity',
   description: 'Create a activity',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
   request: {
     body: {
       content: {
@@ -95,6 +98,8 @@ export const updateActivity = createRoute({
   path: '/activities/{id}',
   summary: 'Update a activity',
   description: 'Update a activity',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
   request: {
     params: idParamValidator,
     body: {
@@ -127,6 +132,8 @@ export const deleteActivity = createRoute({
   path: '/activities/{id}',
   summary: 'Delete a activity',
   description: 'Delete a activity',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
   request: {
     params: idParamValidator,
   },

@@ -19,8 +19,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+    runs-on: self-hosted
+    timeout-minutes: 10
     steps:
       - uses: release-drafter/release-drafter@v6
         env:

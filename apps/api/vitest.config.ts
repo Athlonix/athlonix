@@ -4,6 +4,6 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
   test: {
     globals: true,
-    dangerouslyIgnoreUnhandledErrors: true,
+    maxConcurrency: 1,
   },
 });

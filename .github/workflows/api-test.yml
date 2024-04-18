@@ -56,3 +56,6 @@ jobs:
       - name: 🔍 Run tests
         run: 
           pnpm -F api test
+      
+      - name: 🧹 Stop supabase
+        run: pnpx supabase stop --no-backup

@@ -52,7 +52,7 @@ activities.openapi(createActivity, async (c) => {
     .single();
 
   if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to create activity' }, 500);
+    return c.json({ error: 'Failed to create activity' }, 400);
   }
 
   return c.json(data, 201);
@@ -73,7 +73,7 @@ activities.openapi(updateActivity, async (c) => {
     .single();
 
   if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to update activity' }, 500);
+    return c.json({ error: 'Failed to update activity' }, 400);
   }
 
   return c.json(data, 200);

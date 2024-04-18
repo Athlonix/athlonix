@@ -7,7 +7,6 @@ import { NavBar } from '../ui/NavBar';
 export default function Page(): JSX.Element {
   return (
     <>
-      <NavBar links={navLinks} />
       <main className="flex flex-col items-center gap-y-8 py-6">
         <section className="flex flex-col gap-y-4">
           <div className="flex gap-8 h-44 items-center justify-center">

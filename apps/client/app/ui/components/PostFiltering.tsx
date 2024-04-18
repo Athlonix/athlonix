@@ -5,7 +5,7 @@ export const PostFiltering: React.FC = () => {
   return (
     <div className="flex items-center justify-normal gap-6">
       <Select>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-[148px]">
           <SelectValue placeholder="Light" />
         </SelectTrigger>
         <SelectContent>
@@ -16,7 +16,7 @@ export const PostFiltering: React.FC = () => {
       </Select>
 
       <Select>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-[148px]">
           <SelectValue placeholder="Theme" />
         </SelectTrigger>
         <SelectContent>
@@ -27,7 +27,7 @@ export const PostFiltering: React.FC = () => {
       </Select>
 
       <Select>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-[148px]">
           <SelectValue placeholder="Theme" />
         </SelectTrigger>
         <SelectContent>

@@ -85,18 +85,16 @@ export const AutoComplete = ({
 
   return (
     <CommandPrimitive onKeyDown={handleKeyDown}>
-      <div>
-        <CommandInput
-          ref={inputRef}
-          value={inputValue}
-          onValueChange={isLoading ? undefined : setInputValue}
-          onBlur={handleBlur}
-          onFocus={() => setOpen(true)}
-          placeholder={placeholder}
-          disabled={disabled}
-          className="text-base"
-        />
-      </div>
+      <CommandInput
+        ref={inputRef}
+        value={inputValue}
+        onValueChange={isLoading ? undefined : setInputValue}
+        onBlur={handleBlur}
+        onFocus={() => setOpen(true)}
+        placeholder={placeholder}
+        disabled={disabled}
+        className="text-bas"
+      />
       <div className="relative mt-1">
         {isOpen ? (
           <div className="animate-in fade-in-0 zoom-in-95 absolute top-0 z-10 w-full rounded-xl bg-stone-50 outline-none">

@@ -43,7 +43,6 @@ jobs:
       - name: 🚀 Start Supabase
         run: 
           |
-          pnpx supabase stop --no-backup
           pnpx supabase start -x imgproxy,studio,storage-api,realtime,inbucket,edge-runtime,logflare
           output=$(pnpx supabase status -o env --override-name api.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY) &&
           echo "$output" > .env.test

@@ -32,6 +32,7 @@ export type Database = {
         Row: {
           duration_minute: number;
           id: number;
+          id_address: number | null;
           id_sport: number | null;
           max_participants: number;
           name: string;
@@ -39,6 +40,7 @@ export type Database = {
         Insert: {
           duration_minute: number;
           id?: number;
+          id_address?: number | null;
           id_sport?: number | null;
           max_participants: number;
           name: string;
@@ -46,11 +48,19 @@ export type Database = {
         Update: {
           duration_minute?: number;
           id?: number;
+          id_address?: number | null;
           id_sport?: number | null;
           max_participants?: number;
           name?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'public_ACTIVITIES_id_address_fkey';
+            columns: ['id_address'];
+            isOneToOne: false;
+            referencedRelation: 'ADDRESSES';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'public_ACTIVITIES_id_sport_fkey';
             columns: ['id_sport'];

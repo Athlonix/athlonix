@@ -1,7 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { paginationSchema } from '../utils/pagnination.js';
-import { userSchema } from '../validators/auth.js';
+import { updateUserSchema, userSchema } from '../validators/auth.js';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getAllUsers = createRoute({
@@ -66,7 +66,7 @@ export const updateUser = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: userSchema,
+          schema: updateUserSchema,
         },
       },
     },

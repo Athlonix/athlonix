@@ -1,7 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { changeUserRole, deleteUser, getAllUsers, getOneUser, updateUser } from '../routes/user.js';
+import { addUserRole, deleteUser, getAllUsers, getOneUser, removeUserRole, updateUser } from '../routes/user.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
@@ -12,8 +12,8 @@ export const user = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 user.openapi(getAllUsers, async (c) => {
-  const id_role = c.get('user').id_role;
-  await checkRole(id_role, false, [Role.ADMIN]);
+  const roles = c.get('user').roles;
+  checkRole(roles, false, [Role.ADMIN]);
   const { skip, take } = c.req.valid('query');
   const { from, to } = getPagination(skip, take - 1);
   const { data, error } = await supabase.from('USERS').select('*').range(from, to);
@@ -26,8 +26,8 @@ user.openapi(getAllUsers, async (c) => {
 });
 
 user.openapi(getOneUser, async (c) => {
-  const id_role = c.get('user').id_role;
-  await checkRole(id_role, true);
+  const roles = c.get('user').roles || [];
+  await checkRole(roles, true);
   const { id } = c.req.valid('param');
   const { data, error } = await supabase.from('USERS').select('*').eq('id', id).single();
 
@@ -42,9 +42,10 @@ user.openapi(updateUser, async (c) => {
   const { id } = c.req.valid('param');
   const { first_name, last_name, username } = c.req.valid('json');
   const user = c.get('user');
-  await checkRole(user.id_role, true);
+  const roles = c.get('user').roles || [];
+  await checkRole(roles, true);
 
-  if (user.id_role <= Role.ADMIN) {
+  if (roles?.includes(Role.MODERATOR || Role.ADMIN || Role.DIRECTOR)) {
     const { data, error } = await supabase
       .from('USERS')
       .update({ first_name, last_name, username })
@@ -74,16 +75,31 @@ user.openapi(updateUser, async (c) => {
   return c.json(data, 200);
 });
 
-user.openapi(changeUserRole, async (c) => {
+user.openapi(addUserRole, async (c) => {
   const { id } = c.req.valid('param');
   const { id_role } = c.req.valid('json');
-  const user = c.get('user');
-  await checkRole(user.id_role, false, [Role.ADMIN]);
+  const roles = c.get('user').roles || [];
+  await checkRole(roles, false, [Role.ADMIN]);
 
-  const { data, error } = await supabase.from('USERS').update({ id_role }).eq('id', id).select().single();
+  const { data, error } = await supabase.from('USERS_ROLES').insert({ id_user: id, id_role }).single();
 
   if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to update user' }, 500);
+    return c.json({ error: error?.message || 'Failed to add role' }, 500);
+  }
+
+  return c.json(data, 200);
+});
+
+user.openapi(removeUserRole, async (c) => {
+  const { id } = c.req.valid('param');
+  const { id_role } = c.req.valid('json');
+  const roles = c.get('user').roles || [];
+  await checkRole(roles, false, [Role.ADMIN]);
+
+  const { data, error } = await supabase.from('USERS_ROLES').delete().eq('id_user, id_role', [id, id_role]).single();
+
+  if (error || !data) {
+    return c.json({ error: error?.message || 'Failed to remove role' }, 500);
   }
 
   return c.json(data, 200);
@@ -91,8 +107,8 @@ user.openapi(changeUserRole, async (c) => {
 
 user.openapi(deleteUser, async (c) => {
   const { id } = c.req.valid('param');
-  const user = c.get('user');
-  await checkRole(user.id_role, false, [Role.ADMIN]);
+  const roles = c.get('user').roles || [];
+  await checkRole(roles, false, [Role.ADMIN]);
 
   const { data: user_data, error: errorID } = await supabase.from('USERS').select('id_auth').eq('id', id).single();
 

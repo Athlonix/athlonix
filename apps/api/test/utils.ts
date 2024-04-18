@@ -21,7 +21,7 @@ export async function createAdmin(app: Hono) {
   });
 
   const admin = await res.json();
-  const { error } = await supAdmin.from('USERS').update({ id_role: Role.ADMIN }).eq('id', admin.id);
+  const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: admin.id, id_role: Role.ADMIN });
   if (error) {
     console.error('Error while updating user');
     exit(1);
@@ -73,7 +73,7 @@ export async function createTestUser(app: Hono, member = true) {
   });
   const user = await res.json();
   if (member) {
-    const { error } = await supAdmin.from('USERS').update({ id_role: Role.MEMBER }).eq('id', user.id);
+    const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.MEMBER });
     if (error) {
       console.error('Error while updating user');
       exit(1);

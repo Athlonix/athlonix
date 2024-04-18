@@ -114,11 +114,11 @@ export const deleteUser = createRoute({
   tags: ['user'],
 });
 
-export const changeUserRole = createRoute({
-  method: 'patch',
-  path: '/users/{id}/role',
-  summary: 'Change user role',
-  description: 'Change user role',
+export const addUserRole = createRoute({
+  method: 'post',
+  path: '/users/{id}/roles',
+  summary: 'Add a role to a user',
+  description: 'Add a role to a user',
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -126,7 +126,42 @@ export const changeUserRole = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            id_role: z.coerce.number().min(1),
+            id_role: z.number().min(1),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: userSchema,
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});
+
+export const removeUserRole = createRoute({
+  method: 'delete',
+  path: '/users/{id}/roles',
+  summary: 'Remove a role from a user',
+  description: 'Remove a role from a user',
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            id_role: z.number().min(1),
           }),
         },
       },

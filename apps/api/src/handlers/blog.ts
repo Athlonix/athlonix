@@ -49,7 +49,7 @@ blog.openapi(createPost, async (c) => {
   const { title, content } = c.req.valid('json');
   const user = c.get('user');
   const id_user = user.id;
-  await checkRole(user.id_role, false, [Role.REDACTOR, Role.MODERATOR]);
+  await checkRole(user.roles, false, [Role.REDACTOR, Role.MODERATOR]);
 
   const { data, error } = await supabase.from('POSTS').insert({ title, content, id_user }).select().single();
 
@@ -64,8 +64,8 @@ blog.openapi(updatePost, async (c) => {
   const { id } = c.req.valid('param');
   const { title, content } = c.req.valid('json');
   const user = c.get('user');
-  const id_role = user.id_role;
-  await checkRole(id_role, false, [Role.REDACTOR, Role.MODERATOR]);
+  const roles = user.roles;
+  await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
 
   const { data, error } = await supabase
     .from('POSTS')
@@ -84,11 +84,11 @@ blog.openapi(updatePost, async (c) => {
 blog.openapi(deletePost, async (c) => {
   const { id } = c.req.valid('param');
   const user = c.get('user');
-  const id_role = user.id_role;
+  const roles = user.roles;
   const id_user = user.id;
-  await checkRole(id_role, false, [Role.REDACTOR, Role.MODERATOR]);
+  await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
 
-  if (id_role >= Role.MODERATOR) {
+  if (roles?.includes(Role.MODERATOR || Role.ADMIN || Role.DIRECTOR)) {
     const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
     if (error || count === 0) {
@@ -112,7 +112,7 @@ blog.openapi(commentOnPost, async (c) => {
   const { content } = c.req.valid('json');
   const user = c.get('user');
   const id_user = user.id;
-  await checkRole(user.id_role, true);
+  await checkRole(user.roles, true);
 
   const { data, error } = await supabase.from('COMMENTS').insert({ content, id_post: id, id_user }).select().single();
 
@@ -141,7 +141,7 @@ blog.openapi(createResponse, async (c) => {
   const { content } = c.req.valid('json');
   const user = c.get('user');
   const id_user = user.id;
-  await checkRole(user.id_role, true);
+  await checkRole(user.roles, true);
 
   const { data, error } = await supabase
     .from('COMMENTS')
@@ -160,7 +160,7 @@ blog.openapi(updateComment, async (c) => {
   const { id_post, id_comment } = c.req.valid('param');
   const { content } = c.req.valid('json');
   const user = c.get('user');
-  await checkRole(user.id_role, true);
+  await checkRole(user.roles, true);
 
   const { data, error } = await supabase
     .from('COMMENTS')
@@ -179,9 +179,9 @@ blog.openapi(updateComment, async (c) => {
 blog.openapi(deleteComment, async (c) => {
   const { id_post, id_comment } = c.req.valid('param');
   const user = c.get('user');
-  await checkRole(user.id_role, true);
+  await checkRole(user.roles, true);
 
-  if (user.id_role >= Role.MODERATOR) {
+  if (user.roles?.includes(Role.MODERATOR || Role.ADMIN || Role.DIRECTOR)) {
     const { error, count } = await supabase
       .from('COMMENTS')
       .delete({ count: 'exact' })

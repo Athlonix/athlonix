@@ -3,7 +3,7 @@ import { z } from 'zod';
 export type Variables = {
   user: {
     id: number;
-    id_role: number;
+    roles: number[];
     email: string;
     updated_at: string;
     created_at: string;
@@ -11,11 +11,15 @@ export type Variables = {
 };
 
 export enum Role {
-  CREATED = 1,
+  BANNED = 1,
   MEMBER = 2,
   REDACTOR = 3,
   MODERATOR = 4,
   ADMIN = 5,
+  DIRECTOR = 6,
+  SECRATARY = 7,
+  TREASURER = 8,
+  PRESIDENT = 9,
 }
 
 export const serverErrorSchema = {

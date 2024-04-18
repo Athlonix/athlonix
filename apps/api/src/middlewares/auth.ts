@@ -11,15 +11,17 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
   if (data?.user) {
     const { data: user, error: userError } = await supabase
       .from('USERS')
-      .select('id,id_role')
+      .select('id, USERS_ROLES(id_role)')
       .eq('id_auth', data.user.id)
       .single();
 
     if (userError || !user) throw new HTTPException(404, { message: 'User not found' });
 
+    const roles = user.USERS_ROLES.map((role) => role.id_role);
+
     c.set('user', {
       id: user.id,
-      id_role: user.id_role,
+      roles: roles,
       email: data.user.email,
       updated_at: data.user.updated_at,
       created_at: data.user.created_at,
@@ -42,16 +44,18 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
 
     const { data: user, error: userError } = await supabase
       .from('USERS')
-      .select('id,id_role')
+      .select('id, USERS_ROLES(id_role)')
       .eq('id_auth', refreshed.user.id)
       .single();
 
     if (userError || !user) throw new HTTPException(404, { message: 'User not found' });
 
+    const roles = user.USERS_ROLES.map((role) => role.id_role);
+
     if (refreshed.user) {
       c.set('user', {
         id: user.id,
-        id_role: user.id_role,
+        roles: roles,
         email: refreshed.user.email,
         updated_at: refreshed.user.updated_at,
         created_at: refreshed.user.created_at,

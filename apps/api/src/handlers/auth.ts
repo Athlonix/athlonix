@@ -14,8 +14,6 @@ export const auth = new OpenAPIHono<{ Variables: Variables }>({
 auth.openapi(signupUser, async (c) => {
   const { email, password, first_name, last_name, username } = c.req.valid('json');
 
-  console.log(email, password, first_name, last_name, username);
-
   const { data: userExist } = await supabase.from('USERS').select('id').eq('email', email);
   if (userExist && userExist.length > 0) {
     return c.json({ message: 'Email already exists' }, 400);

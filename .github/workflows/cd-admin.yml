@@ -30,6 +30,7 @@ jobs:
   admin:
     name: CD Admin
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       image-tag: ${{ steps.image-tag.outputs.image-tag }}
 

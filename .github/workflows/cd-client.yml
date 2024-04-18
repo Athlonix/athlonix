@@ -30,6 +30,7 @@ jobs:
   client:
     name: CD client
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     outputs:
       image-tag: ${{ steps.image-tag.outputs.image-tag }}
 

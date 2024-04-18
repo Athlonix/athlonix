@@ -19,6 +19,7 @@ export const createAddress = createRoute({
   path: '/addresses',
   summary: 'Create a address',
   description: 'Create a address',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     body: {
@@ -97,6 +98,7 @@ export const updateAddress = createRoute({
   path: '/addresses/{id}',
   summary: 'Update a address',
   description: 'Update a address',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -128,6 +130,7 @@ export const deleteAddress = createRoute({
   path: '/addresses/{id}',
   summary: 'Delete a address',
   description: 'Delete a address',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,

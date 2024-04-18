@@ -20,8 +20,8 @@ permissions:
 
 jobs:
   api-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: self-hosted
+    timeout-minutes: 15
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4

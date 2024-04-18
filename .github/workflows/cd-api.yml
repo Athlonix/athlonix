@@ -29,7 +29,8 @@ permissions:
 jobs:
   api:
     name: CD api
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    timeout-minutes: 15
     outputs:
       image-tag: ${{ steps.image-tag.outputs.image-tag }}
 

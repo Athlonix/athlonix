@@ -20,6 +20,7 @@ jobs:
       contents: write
       pull-requests: write
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: release-drafter/release-drafter@v6
         env:

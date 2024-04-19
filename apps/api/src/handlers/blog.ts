@@ -46,15 +46,19 @@ blog.openapi(getPost, async (c) => {
 });
 
 blog.openapi(createPost, async (c) => {
-  const { title, content } = c.req.valid('json');
+  const { title, content, cover_image } = c.req.valid('json');
   const user = c.get('user');
   const id_user = user.id;
   await checkRole(user.roles, false, [Role.REDACTOR, Role.MODERATOR]);
 
-  const { data, error } = await supabase.from('POSTS').insert({ title, content, id_user }).select().single();
+  const { data, error } = await supabase
+    .from('POSTS')
+    .insert({ title, content, id_user, cover_image })
+    .select()
+    .single();
 
   if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to create post' }, 500);
+    return c.json({ error: 'Failed to create post' }, 400);
   }
 
   return c.json(data, 201);
@@ -62,13 +66,13 @@ blog.openapi(createPost, async (c) => {
 
 blog.openapi(updatePost, async (c) => {
   const { id } = c.req.valid('param');
-  const { title, content } = c.req.valid('json');
+  const { title, content, cover_image } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
   const { data, error } = await supabase
     .from('POSTS')
-    .update({ title, content })
+    .update({ title, content, cover_image, updated_at: new Date().toISOString() })
     .eq('id', id)
     .eq('id_user', user.id)
     .select()
@@ -98,7 +102,7 @@ blog.openapi(deletePost, async (c) => {
     return c.json({ message: 'Post deleted successfully' }, 200);
   }
 
-  const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id).eq('id_user', user.id);
+  const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id).eq('id_user', id_user);
 
   if (error || count === 0) {
     return c.json({ error: 'Post not found' }, 404);

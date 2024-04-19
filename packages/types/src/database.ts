@@ -632,6 +632,7 @@ export type Database = {
       POSTS: {
         Row: {
           content: string;
+          cover_image: string | null;
           created_at: string;
           id: number;
           id_user: number;
@@ -640,6 +641,7 @@ export type Database = {
         };
         Insert: {
           content: string;
+          cover_image?: string | null;
           created_at?: string;
           id?: number;
           id_user: number;
@@ -648,6 +650,7 @@ export type Database = {
         };
         Update: {
           content?: string;
+          cover_image?: string | null;
           created_at?: string;
           id?: number;
           id_user?: number;

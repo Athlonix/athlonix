@@ -2,6 +2,8 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
+  applyToActivity,
+  cancelApplication,
   createActivity,
   deleteActivity,
   getAllActivities,
@@ -40,14 +42,34 @@ activities.openapi(getOneActivity, async (c) => {
 });
 
 activities.openapi(createActivity, async (c) => {
-  const { name, max_participants, duration_minute, id_sport, id_address } = c.req.valid('json');
+  const {
+    name,
+    description,
+    max_participants,
+    min_participants,
+    id_sport,
+    id_address,
+    recurrence,
+    start_date,
+    end_date,
+  } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
   const { data, error } = await supabase
     .from('ACTIVITIES')
-    .insert({ name, max_participants, duration_minute, id_sport, id_address })
+    .insert({
+      name,
+      description,
+      max_participants,
+      min_participants,
+      id_sport,
+      id_address,
+      recurrence,
+      start_date,
+      end_date,
+    })
     .select()
     .single();
 
@@ -60,14 +82,34 @@ activities.openapi(createActivity, async (c) => {
 
 activities.openapi(updateActivity, async (c) => {
   const { id } = c.req.valid('param');
-  const { name, max_participants, duration_minute, id_sport, id_address } = c.req.valid('json');
+  const {
+    name,
+    description,
+    max_participants,
+    min_participants,
+    id_sport,
+    id_address,
+    recurrence,
+    start_date,
+    end_date,
+  } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
   const { data, error } = await supabase
     .from('ACTIVITIES')
-    .update({ name, max_participants, duration_minute, id_sport, id_address })
+    .update({
+      name,
+      description,
+      max_participants,
+      min_participants,
+      id_sport,
+      id_address,
+      recurrence,
+      start_date,
+      end_date,
+    })
     .eq('id', id)
     .select()
     .single();
@@ -92,4 +134,59 @@ activities.openapi(deleteActivity, async (c) => {
   }
 
   return c.json(data, 200);
+});
+
+activities.openapi(applyToActivity, async (c) => {
+  const user = c.get('user');
+  await checkRole(user.roles, true);
+
+  const { id } = c.req.valid('param');
+  const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
+
+  if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
+
+  const { data: activityUser, error: errorActivityUser } = await supabase
+    .from('ACTIVITIES_USERS')
+    .select('*')
+    .eq('id_activity', id)
+    .eq('id_user', user.id)
+    .single();
+
+  if (errorActivityUser) return c.json({ error: 'Failed to apply to activity' }, 400);
+  if (activityUser) return c.json({ error: 'User already applied to activity' }, 400);
+
+  const { data: participants, error: errorParticipants } = await supabase
+    .from('ACTIVITIES_USERS')
+    .select('id')
+    .eq('id_activity', id)
+    .eq('active', true);
+
+  if (errorParticipants) return c.json({ error: errorParticipants.message }, 500);
+  if (participants.length >= activity.max_participants) return c.json({ error: 'Activity is full' }, 400);
+
+  const { error: errorApply } = await supabase.from('ACTIVITIES_USERS').insert({ id_activity: id, id_user: user.id });
+
+  if (errorApply) return c.json({ error: 'Failed to apply to activity' }, 400);
+
+  return c.json({ message: `Applied to activity ${activity.name}` }, 201);
+});
+
+activities.openapi(cancelApplication, async (c) => {
+  const user = c.get('user');
+  await checkRole(user.roles, true);
+
+  const { id } = c.req.valid('param');
+  const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
+
+  if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
+
+  const { error: errorCancel } = await supabase
+    .from('ACTIVITIES_USERS')
+    .delete()
+    .eq('id_activity', id)
+    .eq('id_user', user.id);
+
+  if (errorCancel) return c.json({ error: 'Failed to cancel application' }, 400);
+
+  return c.json({ message: `Application to activity ${activity.name} canceled` }, 200);
 });

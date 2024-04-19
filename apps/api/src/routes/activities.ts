@@ -6,8 +6,12 @@ import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validato
 export const activitySchema = z.object({
   id: z.number(),
   max_participants: z.number().min(1),
-  name: z.string(),
-  duration_minute: z.number().min(1),
+  min_participants: z.number().min(1),
+  name: z.string().max(50),
+  description: z.string().max(255),
+  recurrence: z.enum(['weekly', 'monthly', 'annual']),
+  start_date: z.string(),
+  end_date: z.string(),
   id_sport: z.number().nullable(),
   id_address: z.number().nullable(),
 });
@@ -132,6 +136,60 @@ export const deleteActivity = createRoute({
   path: '/activities/{id}',
   summary: 'Delete a activity',
   description: 'Delete a activity',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: activitySchema,
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['activity'],
+});
+
+export const applyToActivity = createRoute({
+  method: 'post',
+  path: '/activities/{id}/apply',
+  summary: 'Apply to a activity',
+  description: 'Apply to a activity',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: activitySchema,
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['activity'],
+});
+
+export const cancelApplication = createRoute({
+  method: 'delete',
+  path: '/activities/{id}/apply',
+  summary: 'Cancel application to a activity',
+  description: 'Cancel application to a activity',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {

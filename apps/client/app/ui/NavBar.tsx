@@ -56,10 +56,10 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
         <ul className="flex gap-4">{navBarElements}</ul>
         {!isAuthenticated ? (
           <div>
-            <Button className="w-[120px] mr-4">
+            <Button asChild className="w-[120px] mr-4">
               <Link href="signup">S'inscrire</Link>
             </Button>
-            <Button className="w-[120px]">
+            <Button asChild className="w-[120px]">
               <Link href="login">Se connecter</Link>
             </Button>
           </div>

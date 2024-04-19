@@ -211,3 +211,30 @@ export const cancelApplication = createRoute({
   },
   tags: ['activity'],
 });
+
+export const validApplication = createRoute({
+  method: 'post',
+  path: '/activities/{id}/validApply',
+  summary: 'Valid application to a activity',
+  description: 'Valid application to a activity',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: activitySchema,
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['activity'],
+});

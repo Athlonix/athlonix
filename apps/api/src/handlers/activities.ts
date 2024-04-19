@@ -9,6 +9,7 @@ import {
   getAllActivities,
   getOneActivity,
   updateActivity,
+  validApplication,
 } from '../routes/activities.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
@@ -189,4 +190,33 @@ activities.openapi(cancelApplication, async (c) => {
   if (errorCancel) return c.json({ error: 'Failed to cancel application' }, 400);
 
   return c.json({ message: `Application to activity ${activity.name} canceled` }, 200);
+});
+
+activities.openapi(validApplication, async (c) => {
+  const user = c.get('user');
+  await checkRole(user.roles, true);
+
+  const { id } = c.req.valid('param');
+  const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
+
+  if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
+
+  const { data: activityUser, error: errorActivityUser } = await supabase
+    .from('ACTIVITIES_USERS')
+    .select('*')
+    .eq('id_activity', id)
+    .eq('id_user', user.id)
+    .single();
+
+  if (errorActivityUser || !activityUser) return c.json({ error: 'User not applied to activity' }, 400);
+
+  const { error: errorValid } = await supabase
+    .from('ACTIVITIES_USERS')
+    .update({ active: true })
+    .eq('id_activity', id)
+    .eq('id_user', user.id);
+
+  if (errorValid) return c.json({ error: 'Failed to validate application' }, 400);
+
+  return c.json({ message: `Application to activity ${activity.name} validated` }, 200);
 });

@@ -16,38 +16,26 @@ users.openapi(getAllUsers, async (c) => {
   await checkRole(roles, false, [Role.ADMIN]);
   const { skip, take } = c.req.valid('query');
   const { from, to } = getPagination(skip, take - 1);
-  const { data, error } = await supabase.from('USERS').select('*, roles:USERS_ROLES(id_role)').range(from, to);
+  const { data, error } = await supabase.from('USERS').select('*, roles:ROLES (id, name)').range(from, to);
 
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
-  const format = data.map((user) => {
-    return {
-      ...user,
-      roles: user.roles.map((role) => role.id_role),
-    };
-  });
-
-  return c.json(format, 200);
+  return c.json(data, 200);
 });
 
 users.openapi(getOneUser, async (c) => {
   const roles = c.get('user').roles || [];
   await checkRole(roles, true);
   const { id } = c.req.valid('param');
-  const { data, error } = await supabase.from('USERS').select('*, roles:USERS_ROLES(id_role)').eq('id', id).single();
+  const { data, error } = await supabase.from('USERS').select('*, roles:ROLES (id, name)').eq('id', id).single();
 
   if (error || !data) {
     return c.json({ error: 'User not found' }, 404);
   }
 
-  const format = {
-    ...data,
-    roles: data.roles.map((role: { id_role: number }) => role.id_role),
-  };
-
-  return c.json(format, 200);
+  return c.json(data, 200);
 });
 
 users.openapi(updateUser, async (c) => {

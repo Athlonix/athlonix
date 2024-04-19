@@ -39,7 +39,8 @@ export function LoginForm(): JSX.Element {
     })
       .then((response) => response.json())
       .then((data) => {
-        localStorage.setItem('user', JSON.stringify(data));
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('access_token', data.token);
         router.push('/dashboard');
       })
       .catch((error) => {

@@ -81,7 +81,6 @@ describe('Location tests', () => {
     expect(res.status).toBe(200);
   });
 
-
   test('Update address', async () => {
     const res = await app.request(`${path}/addresses/${id_location}`, {
       method: 'PATCH',
@@ -112,7 +111,6 @@ describe('Location tests', () => {
     });
     expect(res.status).toBe(200);
   });
-
 
   test('Delete admin', async () => {
     const { error } = await supAdmin.from('USERS').delete().eq('id', id_user);

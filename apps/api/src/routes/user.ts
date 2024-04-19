@@ -143,7 +143,7 @@ export const addUserRole = createRoute({
       content: {
         'application/json': {
           schema: {
-            data: {message: z.string()}
+            data: { message: z.string() },
           },
         },
       },
@@ -179,7 +179,7 @@ export const removeUserRole = createRoute({
       content: {
         'application/json': {
           schema: {
-            data: {message: z.string()}
+            data: { message: z.string() },
           },
         },
       },

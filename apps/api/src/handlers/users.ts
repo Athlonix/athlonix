@@ -82,7 +82,7 @@ users.openapi(updateUser, async (c) => {
     .single();
 
   if (error || !data) {
-    return c.json({ error: "Failed to update user" }, 400);
+    return c.json({ error: 'Failed to update user' }, 400);
   }
 
   return c.json(data, 200);

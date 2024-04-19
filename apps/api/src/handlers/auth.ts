@@ -38,6 +38,7 @@ auth.openapi(signupUser, async (c) => {
       first_name: first_name || '',
       last_name: last_name || '',
       id_referer: null,
+      date_validity: null,
       id_auth: data.user.id,
     })
     .select()

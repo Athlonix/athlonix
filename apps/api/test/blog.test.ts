@@ -60,6 +60,7 @@ describe('Blog tests', () => {
       body: JSON.stringify({
         title: 'Post test',
         content: 'Post test content',
+        cover_image: 'https://example.com/image.jpg',
       }),
     });
     expect(res.status).toBe(201);
@@ -129,7 +130,6 @@ describe('Blog tests', () => {
       },
     });
     expect(res.status).toBe(200);
-    const result = await res.json();
   });
 
   test('Delete post', async () => {

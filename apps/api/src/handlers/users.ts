@@ -67,7 +67,7 @@ users.openapi(updateUser, async (c) => {
       .single();
 
     if (error || !data) {
-      return c.json({ error: error?.message || 'Failed to update user' }, 500);
+      return c.json({ error: error?.message || 'Failed to update user' }, 400);
     }
 
     return c.json(data, 200);
@@ -82,7 +82,7 @@ users.openapi(updateUser, async (c) => {
     .single();
 
   if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to update user' }, 500);
+    return c.json({ error: "Failed to update user" }, 400);
   }
 
   return c.json(data, 200);
@@ -94,13 +94,13 @@ users.openapi(addUserRole, async (c) => {
   const roles = c.get('user').roles || [];
   await checkRole(roles, false, [Role.ADMIN]);
 
-  const { data, error } = await supabase.from('USERS_ROLES').insert({ id_user: id, id_role }).single();
+  const { error } = await supabase.from('USERS_ROLES').insert({ id_user: id, id_role });
 
-  if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to add role' }, 500);
+  if (error) {
+    return c.json({ error: 'Failed to add role' }, 400);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: 'Role added' }, 201);
 });
 
 users.openapi(removeUserRole, async (c) => {
@@ -109,13 +109,13 @@ users.openapi(removeUserRole, async (c) => {
   const roles = c.get('user').roles || [];
   await checkRole(roles, false, [Role.ADMIN]);
 
-  const { data, error } = await supabase.from('USERS_ROLES').delete().eq('id_user, id_role', [id, id_role]).single();
+  const { error } = await supabase.from('USERS_ROLES').delete().eq('id_user', id).eq('id_role', id_role);
 
-  if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to remove role' }, 500);
+  if (error) {
+    return c.json({ error: 'Failed to remove role' }, 400);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: 'Role removed' }, 200);
 });
 
 users.openapi(deleteUser, async (c) => {

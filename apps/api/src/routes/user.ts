@@ -138,12 +138,12 @@ export const addUserRole = createRoute({
     },
   },
   responses: {
-    200: {
+    201: {
       description: 'Successful response',
       content: {
         'application/json': {
           schema: {
-            data: userSchema,
+            data: {message: z.string()}
           },
         },
       },
@@ -167,7 +167,7 @@ export const removeUserRole = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            id_role: z.number().min(1),
+            id_role: z.coerce.number().min(1),
           }),
         },
       },
@@ -179,7 +179,7 @@ export const removeUserRole = createRoute({
       content: {
         'application/json': {
           schema: {
-            data: userSchema,
+            data: {message: z.string()}
           },
         },
       },

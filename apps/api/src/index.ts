@@ -2,14 +2,17 @@ import { serve } from '@hono/node-server';
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { compress } from 'hono/compress';
+import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { secureHeaders } from 'hono/secure-headers';
+import { activities } from './handlers/activities.js';
 import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
 import { health } from './handlers/health.js';
-import authMiddleware from './middlewares/auth.js';
+import { location } from './handlers/location.js';
+import { users } from './handlers/users.js';
 
 const app = new OpenAPIHono();
 
@@ -19,6 +22,14 @@ if (process.env.NODE_ENV === 'development' || !process.env.NODE_ENV) {
 app.use('*', prettyJSON());
 app.use('*', secureHeaders());
 app.use('*', compress());
+app.use(
+  '*',
+  cors({
+    origin: '*',
+    allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  }),
+);
 app.get('/', (c) => c.text('Athlonix API!', 200));
 
 app.onError((err, c) => {
@@ -29,6 +40,9 @@ app.onError((err, c) => {
 });
 
 app.route('/', health);
+app.route('/', users);
+app.route('/', activities);
+app.route('/', location);
 app.route('/auth', auth);
 app.route('/blog', blog);
 
@@ -40,11 +54,21 @@ app.doc('/doc', (c) => ({
   },
   servers: [
     {
+      url: 'https://athlonix-api.jayllyz.fr',
+      description: 'Production server',
+    },
+    {
       url: new URL(c.req.url).origin,
-      description: 'Current environment',
+      description: 'Development server',
     },
   ],
 }));
+
+app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
+  type: 'http',
+  scheme: 'bearer',
+  bearerFormat: 'JWT',
+});
 
 app.get('/ui', swaggerUI({ url: '/doc' }));
 
@@ -55,3 +79,5 @@ serve({
   fetch: app.fetch,
   port,
 });
+
+export default app;

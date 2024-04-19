@@ -10,7 +10,9 @@
     "start": "node dist/index.js",
     "types:check": "tsc --noEmit",
     "lint": "biome check --apply .",
-    "lint:check": "biome check ."
+    "lint:check": "biome check .",
+    "test": "vitest --run",
+    "test:dev": "vitest --watch"
   },
   "dependencies": {
     "@hono/node-server": "^1.10.0",
@@ -18,9 +20,9 @@
     "@hono/zod-openapi": "^0.11.0",
     "@hono/zod-validator": "^0.2.1",
     "@repo/types": "workspace:*",
-    "@supabase/supabase-js": "^2.42.4",
-    "hono": "^4.2.4",
-    "zod": "^3.22.4",
+    "@supabase/supabase-js": "^2.42.5",
+    "hono": "^4.2.5",
+    "zod": "^3.22.5",
     "zod-validation-error": "^3.1.0"
   },
   "devDependencies": {
@@ -28,8 +30,9 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^20.12.7",
     "@types/swagger-ui-dist": "^3.30.4",
-    "supabase": "^1.157.2",
+    "supabase": "^1.162.4",
     "tsx": "^4.7.2",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^1.5.0"
   }
 }

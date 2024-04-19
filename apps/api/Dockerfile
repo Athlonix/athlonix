@@ -6,7 +6,8 @@ EXPOSE 3101
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache libc6-compat && \
-    npm install -g pnpm@latest turbo@latest
+    npm install -g turbo && \
+    corepack enable pnpm
 
 HEALTHCHECK --interval=30s --timeout=5s \
     CMD wget --no-verbose --tries=1 --spider http://localhost:3101/health || exit 1
@@ -57,4 +58,4 @@ COPY --from=builder --chown=node:node /app/out/node_modules/ ./node_modules
 COPY --from=builder --chown=node:node /app/apps/api/dist/ ./dist
 
 USER node
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/src/index.js"]

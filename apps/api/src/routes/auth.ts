@@ -17,7 +17,7 @@ export const signupUser = createRoute({
     },
   },
   responses: {
-    200: {
+    201: {
       description: 'Successful response',
       content: {
         'application/json': {
@@ -65,6 +65,25 @@ export const refreshTokens = createRoute({
   path: '/refresh',
   summary: 'Refresh tokens',
   description: 'Refresh tokens',
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: { type: 'string' },
+        },
+      },
+    },
+    500: serverErrorSchema,
+  },
+  tags: ['auth'],
+});
+
+export const logoutUser = createRoute({
+  method: 'delete',
+  path: '/logout',
+  summary: 'Logout a user',
+  description: 'Logout a user',
   responses: {
     200: {
       description: 'Successful response',

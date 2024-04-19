@@ -1,0 +1,62 @@
+name: API Test
+
+on:
+  push:
+    branches:
+      - main
+    paths: 
+      - 'apps/api/**'
+      - 'packages/types/**'
+  pull_request:
+    branches:
+      - main
+    paths: 
+      - 'apps/api/**'
+      - 'packages/types/**'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  api-test:
+    runs-on: self-hosted
+    timeout-minutes: 15
+    steps:
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🛠️ Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+  
+      - name: 🛠️ Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '21'
+          cache: 'pnpm'
+  
+      - name: ⬆️ Install dependencies
+        run: pnpm -F api install
+
+      - name: 🚀 Start Supabase
+        run: 
+          |
+          pnpx supabase stop --no-backup
+          pnpx supabase start -x imgproxy,studio,storage-api,realtime,inbucket,edge-runtime,logflare
+          output=$(pnpx supabase status -o env --override-name api.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY) &&
+          echo "$output" > .env.test
+
+      - name: 🔐 Export environment variables
+        uses: cardinalby/export-env-action@v2
+        with:
+          envFile: .env.test
+          mask: true
+
+      - name: 🔍 Run tests
+        run: 
+          pnpm -F api test
+      
+      - name: 🧹 Stop supabase
+        run: pnpx supabase stop --no-backup

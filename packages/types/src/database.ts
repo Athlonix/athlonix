@@ -32,6 +32,7 @@ export type Database = {
         Row: {
           duration_minute: number;
           id: number;
+          id_address: number | null;
           id_sport: number | null;
           max_participants: number;
           name: string;
@@ -39,6 +40,7 @@ export type Database = {
         Insert: {
           duration_minute: number;
           id?: number;
+          id_address?: number | null;
           id_sport?: number | null;
           max_participants: number;
           name: string;
@@ -46,11 +48,19 @@ export type Database = {
         Update: {
           duration_minute?: number;
           id?: number;
+          id_address?: number | null;
           id_sport?: number | null;
           max_participants?: number;
           name?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'public_ACTIVITIES_id_address_fkey';
+            columns: ['id_address'];
+            isOneToOne: false;
+            referencedRelation: 'ADDRESSES';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'public_ACTIVITIES_id_sport_fkey';
             columns: ['id_sport'];
@@ -119,6 +129,80 @@ export type Database = {
             columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      ADDRESSES: {
+        Row: {
+          city: string;
+          complement: string | null;
+          id: number;
+          id_lease: number | null;
+          name: string | null;
+          number: number;
+          postal_code: string;
+          road: string;
+        };
+        Insert: {
+          city: string;
+          complement?: string | null;
+          id?: number;
+          id_lease?: number | null;
+          name?: string | null;
+          number: number;
+          postal_code: string;
+          road: string;
+        };
+        Update: {
+          city?: string;
+          complement?: string | null;
+          id?: number;
+          id_lease?: number | null;
+          name?: string | null;
+          number?: number;
+          postal_code?: string;
+          road?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_ADDRESS_id_lease_fkey';
+            columns: ['id_lease'];
+            isOneToOne: false;
+            referencedRelation: 'LEASE';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      ADDRESSES_MATERIALS: {
+        Row: {
+          id_address: number;
+          id_material: number;
+          quantity: number;
+        };
+        Insert: {
+          id_address: number;
+          id_material: number;
+          quantity: number;
+        };
+        Update: {
+          id_address?: number;
+          id_material?: number;
+          quantity?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_ADDRESSES_MATERIALS_id_address_fkey';
+            columns: ['id_address'];
+            isOneToOne: false;
+            referencedRelation: 'ADDRESSES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_ADDRESSES_MATERIALS_id_material_fkey';
+            columns: ['id_material'];
+            isOneToOne: false;
+            referencedRelation: 'MATERIALS';
             referencedColumns: ['id'];
           },
         ];
@@ -331,6 +415,98 @@ export type Database = {
             referencedColumns: ['id'];
           },
         ];
+      };
+      LANDLORD: {
+        Row: {
+          email: string;
+          first_name: string;
+          id: number;
+          last_name: string;
+          phone: string;
+        };
+        Insert: {
+          email: string;
+          first_name: string;
+          id?: number;
+          last_name: string;
+          phone: string;
+        };
+        Update: {
+          email?: string;
+          first_name?: string;
+          id?: number;
+          last_name?: string;
+          phone?: string;
+        };
+        Relationships: [];
+      };
+      LEASE: {
+        Row: {
+          end_lease: string;
+          id: number;
+          id_landlord: number;
+          payment_date: string;
+          rent: number;
+          start_lease: string;
+        };
+        Insert: {
+          end_lease: string;
+          id?: number;
+          id_landlord: number;
+          payment_date: string;
+          rent: number;
+          start_lease: string;
+        };
+        Update: {
+          end_lease?: string;
+          id?: number;
+          id_landlord?: number;
+          payment_date?: string;
+          rent?: number;
+          start_lease?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_LEASE_id_landlord_fkey';
+            columns: ['id_landlord'];
+            isOneToOne: false;
+            referencedRelation: 'LANDLORD';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      MATCHES: {
+        Row: {
+          end_time: string | null;
+          id: number;
+          start_time: string | null;
+        };
+        Insert: {
+          end_time?: string | null;
+          id?: number;
+          start_time?: string | null;
+        };
+        Update: {
+          end_time?: string | null;
+          id?: number;
+          start_time?: string | null;
+        };
+        Relationships: [];
+      };
+      MATERIALS: {
+        Row: {
+          id: number;
+          name: string;
+        };
+        Insert: {
+          id?: number;
+          name: string;
+        };
+        Update: {
+          id?: number;
+          name?: string;
+        };
+        Relationships: [];
       };
       MESSAGES: {
         Row: {
@@ -601,6 +777,58 @@ export type Database = {
           },
         ];
       };
+      RESERVED: {
+        Row: {
+          created_at: string;
+          date_reserved: string;
+          id: number;
+          id_activity: number | null;
+          id_material: number | null;
+          id_tournament: number | null;
+          quantity: number;
+        };
+        Insert: {
+          created_at?: string;
+          date_reserved: string;
+          id?: number;
+          id_activity?: number | null;
+          id_material?: number | null;
+          id_tournament?: number | null;
+          quantity: number;
+        };
+        Update: {
+          created_at?: string;
+          date_reserved?: string;
+          id?: number;
+          id_activity?: number | null;
+          id_material?: number | null;
+          id_tournament?: number | null;
+          quantity?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_RESERVED_id_activity_fkey';
+            columns: ['id_activity'];
+            isOneToOne: false;
+            referencedRelation: 'ACTIVITIES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_RESERVED_id_material_fkey';
+            columns: ['id_material'];
+            isOneToOne: false;
+            referencedRelation: 'MATERIALS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_RESERVED_id_tournament_fkey';
+            columns: ['id_tournament'];
+            isOneToOne: false;
+            referencedRelation: 'TOURNAMENTS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       ROLES: {
         Row: {
           id: number;
@@ -631,34 +859,173 @@ export type Database = {
         };
         Relationships: [];
       };
+      TEAMS: {
+        Row: {
+          created_at: string;
+          id: number;
+          id_tournament: number;
+          name: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          id_tournament: number;
+          name: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          id_tournament?: number;
+          name?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_TEAMS_id_tournament_fkey';
+            columns: ['id_tournament'];
+            isOneToOne: false;
+            referencedRelation: 'TOURNAMENTS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      TEAMS_MATCHES: {
+        Row: {
+          id_match: number;
+          id_team: number;
+          winner: boolean | null;
+        };
+        Insert: {
+          id_match: number;
+          id_team: number;
+          winner?: boolean | null;
+        };
+        Update: {
+          id_match?: number;
+          id_team?: number;
+          winner?: boolean | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_TEAMS_MATCHES_id_match_fkey';
+            columns: ['id_match'];
+            isOneToOne: false;
+            referencedRelation: 'MATCHES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_TEAMS_MATCHES_id_team_fkey';
+            columns: ['id_team'];
+            isOneToOne: false;
+            referencedRelation: 'TEAMS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      TOURNAMENTS: {
+        Row: {
+          created_at: string;
+          default_match_length: number | null;
+          id: number;
+          id_address: number | null;
+          max_participants: number;
+          name: string;
+          prize: string | null;
+          rules: string | null;
+          team_capacity: number;
+        };
+        Insert: {
+          created_at?: string;
+          default_match_length?: number | null;
+          id?: number;
+          id_address?: number | null;
+          max_participants: number;
+          name: string;
+          prize?: string | null;
+          rules?: string | null;
+          team_capacity: number;
+        };
+        Update: {
+          created_at?: string;
+          default_match_length?: number | null;
+          id?: number;
+          id_address?: number | null;
+          max_participants?: number;
+          name?: string;
+          prize?: string | null;
+          rules?: string | null;
+          team_capacity?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_TOURNAMENTS_id_address_fkey';
+            columns: ['id_address'];
+            isOneToOne: false;
+            referencedRelation: 'TOURNAMENTS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      TOURNAMENTS_MATCHES: {
+        Row: {
+          id_match: number;
+          id_tournament: number;
+          round: number;
+        };
+        Insert: {
+          id_match: number;
+          id_tournament: number;
+          round: number;
+        };
+        Update: {
+          id_match?: number;
+          id_tournament?: number;
+          round?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_TOURNAMENTS_MATCHES_id_match_fkey';
+            columns: ['id_match'];
+            isOneToOne: false;
+            referencedRelation: 'MATCHES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_TOURNAMENTS_MATCHES_id_tournament_fkey';
+            columns: ['id_tournament'];
+            isOneToOne: false;
+            referencedRelation: 'TOURNAMENTS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       USERS: {
         Row: {
+          date_validity: string | null;
           email: string;
           first_name: string;
           id: number;
           id_auth: string | null;
           id_referer: number | null;
-          id_role: number;
           last_name: string;
           username: string;
         };
         Insert: {
+          date_validity?: string | null;
           email: string;
           first_name: string;
           id?: number;
           id_auth?: string | null;
           id_referer?: number | null;
-          id_role: number;
           last_name: string;
           username: string;
         };
         Update: {
+          date_validity?: string | null;
           email?: string;
           first_name?: string;
           id?: number;
           id_auth?: string | null;
           id_referer?: number | null;
-          id_role?: number;
           last_name?: string;
           username?: string;
         };
@@ -671,15 +1038,74 @@ export type Database = {
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'public_USERS_id_role_fkey';
+            foreignKeyName: 'users_id_referer_fkey';
+            columns: ['id_referer'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      USERS_ROLES: {
+        Row: {
+          id_role: number;
+          id_user: number;
+        };
+        Insert: {
+          id_role: number;
+          id_user: number;
+        };
+        Update: {
+          id_role?: number;
+          id_user?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_USERS_ROLES_id_role_fkey';
             columns: ['id_role'];
             isOneToOne: false;
             referencedRelation: 'ROLES';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'users_id_referer_fkey';
-            columns: ['id_referer'];
+            foreignKeyName: 'public_USERS_ROLES_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      USERS_TEAMS: {
+        Row: {
+          id_team: number;
+          id_user: number;
+          information: string | null;
+          position: string | null;
+        };
+        Insert: {
+          id_team: number;
+          id_user: number;
+          information?: string | null;
+          position?: string | null;
+        };
+        Update: {
+          id_team?: number;
+          id_user?: number;
+          information?: string | null;
+          position?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_USERS_TEAMS_id_team_fkey';
+            columns: ['id_team'];
+            isOneToOne: false;
+            referencedRelation: 'TEAMS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_USERS_TEAMS_id_user_fkey';
+            columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
             referencedColumns: ['id'];
@@ -812,6 +1238,101 @@ export type Database = {
           },
         ];
       };
+      s3_multipart_uploads: {
+        Row: {
+          bucket_id: string;
+          created_at: string;
+          id: string;
+          in_progress_size: number;
+          key: string;
+          owner_id: string | null;
+          upload_signature: string;
+          version: string;
+        };
+        Insert: {
+          bucket_id: string;
+          created_at?: string;
+          id: string;
+          in_progress_size?: number;
+          key: string;
+          owner_id?: string | null;
+          upload_signature: string;
+          version: string;
+        };
+        Update: {
+          bucket_id?: string;
+          created_at?: string;
+          id?: string;
+          in_progress_size?: number;
+          key?: string;
+          owner_id?: string | null;
+          upload_signature?: string;
+          version?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 's3_multipart_uploads_bucket_id_fkey';
+            columns: ['bucket_id'];
+            isOneToOne: false;
+            referencedRelation: 'buckets';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      s3_multipart_uploads_parts: {
+        Row: {
+          bucket_id: string;
+          created_at: string;
+          etag: string;
+          id: string;
+          key: string;
+          owner_id: string | null;
+          part_number: number;
+          size: number;
+          upload_id: string;
+          version: string;
+        };
+        Insert: {
+          bucket_id: string;
+          created_at?: string;
+          etag: string;
+          id?: string;
+          key: string;
+          owner_id?: string | null;
+          part_number: number;
+          size?: number;
+          upload_id: string;
+          version: string;
+        };
+        Update: {
+          bucket_id?: string;
+          created_at?: string;
+          etag?: string;
+          id?: string;
+          key?: string;
+          owner_id?: string | null;
+          part_number?: number;
+          size?: number;
+          upload_id?: string;
+          version?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 's3_multipart_uploads_parts_bucket_id_fkey';
+            columns: ['bucket_id'];
+            isOneToOne: false;
+            referencedRelation: 'buckets';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 's3_multipart_uploads_parts_upload_id_fkey';
+            columns: ['upload_id'];
+            isOneToOne: false;
+            referencedRelation: 's3_multipart_uploads';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -849,6 +1370,37 @@ export type Database = {
         Returns: {
           size: number;
           bucket_id: string;
+        }[];
+      };
+      list_multipart_uploads_with_delimiter: {
+        Args: {
+          bucket_id: string;
+          prefix_param: string;
+          delimiter_param: string;
+          max_keys?: number;
+          next_key_token?: string;
+          next_upload_token?: string;
+        };
+        Returns: {
+          key: string;
+          id: string;
+          created_at: string;
+        }[];
+      };
+      list_objects_with_delimiter: {
+        Args: {
+          bucket_id: string;
+          prefix_param: string;
+          delimiter_param: string;
+          max_keys?: number;
+          start_after?: string;
+          next_token?: string;
+        };
+        Returns: {
+          name: string;
+          id: string;
+          metadata: Json;
+          updated_at: string;
         }[];
       };
       search: {

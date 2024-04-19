@@ -5,6 +5,7 @@
     "clean": "turbo clean",
     "build": "turbo build",
     "dev": "turbo dev",
+    "test": "turbo test",
     "lint": "turbo lint && biome check --apply .",
     "lint:check": "turbo lint:check && biome ci .",
     "types:check": "turbo types:check",
@@ -18,7 +19,7 @@
     "@repo/typescript-config": "workspace:*",
     "turbo": "^1.13.2"
   },
-  "packageManager": "pnpm@8.15.7",
+  "packageManager": "pnpm@9.0.2",
   "engines": {
     "node": ">=20"
   }

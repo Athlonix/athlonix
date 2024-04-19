@@ -1,11 +1,13 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { getCookie, setCookie } from 'hono/cookie';
+import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
-import { supabase } from '../libs/supabase.js';
+import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { loginUser, refreshTokens, signupUser } from '../routes/auth.js';
+import { loginUser, logoutUser, refreshTokens, signupUser } from '../routes/auth.js';
+import { getToken } from '../utils/context.js';
+import type { Variables } from '../validators/general.js';
 
-export const auth = new OpenAPIHono({
+export const auth = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
 });
 
@@ -36,7 +38,6 @@ auth.openapi(signupUser, async (c) => {
       first_name: first_name || '',
       last_name: last_name || '',
       id_referer: null,
-      id_role: 1,
       id_auth: data.user.id,
     })
     .select()
@@ -48,7 +49,7 @@ auth.openapi(signupUser, async (c) => {
     });
   }
 
-  return c.json(user, 200);
+  return c.json(user, 201);
 });
 
 auth.openapi(loginUser, async (c) => {
@@ -56,10 +57,15 @@ auth.openapi(loginUser, async (c) => {
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
-    console.error('Error while signing in', error);
-    throw new HTTPException(401, { message: error.message });
-  }
+  if (error) throw new HTTPException(401, { message: error.message });
+
+  const { data: user, error: userError } = await supabase
+    .from('USERS')
+    .select('*')
+    .eq('id_auth', data.user.id)
+    .single();
+
+  if (userError || !user) throw new HTTPException(404, { message: 'User not found' });
 
   setCookie(c, 'access_token', data?.session.access_token, {
     maxAge: 31536000, // 1 year
@@ -75,7 +81,9 @@ auth.openapi(loginUser, async (c) => {
     secure: true,
   });
 
-  return c.json({ message: 'User logged in' }, 200);
+  const token = data.session.access_token;
+
+  return c.json({ user, token }, 200);
 });
 
 auth.openapi(refreshTokens, async (c) => {
@@ -88,10 +96,7 @@ auth.openapi(refreshTokens, async (c) => {
     refresh_token,
   });
 
-  if (error) {
-    console.error('Error while refreshing token', error);
-    throw new HTTPException(403, { message: error.message });
-  }
+  if (error) throw new HTTPException(403, { message: error.message });
 
   if (data?.session) {
     setCookie(c, 'refresh_token', data.session.refresh_token, {
@@ -103,4 +108,18 @@ auth.openapi(refreshTokens, async (c) => {
   }
 
   return c.json({ message: 'Token refreshed' });
+});
+
+auth.openapi(logoutUser, async (c) => {
+  const token = getToken(c);
+  if (token) {
+    const token = getCookie(c, 'access_token') as string;
+    await supAdmin.auth.admin.signOut(token);
+    if (getCookie(c, 'refresh_token') && getCookie(c, 'access_token')) {
+      deleteCookie(c, 'refresh_token');
+      deleteCookie(c, 'access_token');
+    }
+  }
+
+  return c.json({ message: 'Logged out' });
 });

@@ -8,6 +8,7 @@ import {
   insertPostSchema,
   insertResponseSchema,
   postSchema,
+  responseSchema,
   updatePostSchema,
 } from '../validators/blog.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
@@ -64,6 +65,7 @@ export const getPost = createRoute({
 export const createPost = createRoute({
   method: 'post',
   path: '/posts',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Create a post',
   description: 'Create a post',
@@ -96,6 +98,7 @@ export const createPost = createRoute({
 export const updatePost = createRoute({
   method: 'patch',
   path: '/posts/{id}',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Update a post',
   description: 'Update a post',
@@ -130,6 +133,7 @@ export const updatePost = createRoute({
 export const deletePost = createRoute({
   method: 'delete',
   path: '/posts/{id}',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Delete a post',
   description: 'Delete a post',
@@ -137,7 +141,7 @@ export const deletePost = createRoute({
     params: idParamValidator,
   },
   responses: {
-    204: {
+    200: {
       description: 'Successful response',
     },
     500: serverErrorSchema,
@@ -151,6 +155,7 @@ export const commentOnPost = createRoute({
   path: '/posts/{id}/comments',
   summary: 'Comment on a post',
   description: 'Comment on a post',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -213,6 +218,7 @@ export const createResponse = createRoute({
   path: '/posts/{id_post}/comments/{id_comment}/responses',
   summary: 'Create a response',
   description: 'Create a response',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: z.object({
@@ -232,7 +238,7 @@ export const createResponse = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: insertResponseSchema,
+          schema: responseSchema,
         },
       },
     },
@@ -245,7 +251,8 @@ export const createResponse = createRoute({
 
 export const updateComment = createRoute({
   method: 'patch',
-  path: '/posts/{id}/comments/{id_comment}',
+  path: '/posts/{id_post}/comments/{id_comment}',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Update a comment',
   description: 'Update a comment',
@@ -267,7 +274,7 @@ export const updateComment = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: insertCommentSchema,
+          schema: commentSchema,
         },
       },
     },
@@ -280,7 +287,8 @@ export const updateComment = createRoute({
 
 export const deleteComment = createRoute({
   method: 'delete',
-  path: '/posts/{id}/comments/{id_comment}',
+  path: '/posts/{id_post}/comments/{id_comment}',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Delete a comment',
   description: 'Delete a comment',
@@ -291,7 +299,7 @@ export const deleteComment = createRoute({
     }),
   },
   responses: {
-    204: {
+    200: {
       description: 'Successful response',
     },
     500: serverErrorSchema,

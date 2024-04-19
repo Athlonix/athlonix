@@ -1,5 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { supabase } from '../libs/supabase.js';
+import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import { addUserRole, deleteUser, getAllUsers, getOneUser, removeUserRole, updateUser } from '../routes/user.js';
 import { checkRole } from '../utils/context.js';
@@ -7,45 +7,58 @@ import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
 import { Role } from '../validators/general.js';
 
-export const user = new OpenAPIHono<{ Variables: Variables }>({
+export const users = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
 });
 
-user.openapi(getAllUsers, async (c) => {
+users.openapi(getAllUsers, async (c) => {
   const roles = c.get('user').roles;
-  checkRole(roles, false, [Role.ADMIN]);
+  await checkRole(roles, false, [Role.ADMIN]);
   const { skip, take } = c.req.valid('query');
   const { from, to } = getPagination(skip, take - 1);
-  const { data, error } = await supabase.from('USERS').select('*').range(from, to);
+  const { data, error } = await supabase.from('USERS').select('*, roles:USERS_ROLES(id_role)').range(from, to);
 
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json(data, 200);
+  const format = data.map((user) => {
+    return {
+      ...user,
+      roles: user.roles.map((role) => role.id_role),
+    };
+  });
+
+  return c.json(format, 200);
 });
 
-user.openapi(getOneUser, async (c) => {
+users.openapi(getOneUser, async (c) => {
   const roles = c.get('user').roles || [];
   await checkRole(roles, true);
   const { id } = c.req.valid('param');
-  const { data, error } = await supabase.from('USERS').select('*').eq('id', id).single();
+  const { data, error } = await supabase.from('USERS').select('*, roles:USERS_ROLES(id_role)').eq('id', id).single();
 
   if (error || !data) {
     return c.json({ error: 'User not found' }, 404);
   }
 
-  return c.json(data, 200);
+  const format = {
+    ...data,
+    roles: data.roles.map((role: { id_role: number }) => role.id_role),
+  };
+
+  return c.json(format, 200);
 });
 
-user.openapi(updateUser, async (c) => {
+users.openapi(updateUser, async (c) => {
   const { id } = c.req.valid('param');
   const { first_name, last_name, username } = c.req.valid('json');
   const user = c.get('user');
   const roles = c.get('user').roles || [];
   await checkRole(roles, true);
 
-  if (roles?.includes(Role.MODERATOR || Role.ADMIN || Role.DIRECTOR)) {
+  const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
+  if (roles?.some((role) => allowed.includes(role))) {
     const { data, error } = await supabase
       .from('USERS')
       .update({ first_name, last_name, username })
@@ -54,7 +67,7 @@ user.openapi(updateUser, async (c) => {
       .single();
 
     if (error || !data) {
-      return c.json({ error: error?.message || 'Failed to update user' }, 500);
+      return c.json({ error: error?.message || 'Failed to update user' }, 400);
     }
 
     return c.json(data, 200);
@@ -69,43 +82,43 @@ user.openapi(updateUser, async (c) => {
     .single();
 
   if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to update user' }, 500);
+    return c.json({ error: 'Failed to update user' }, 400);
   }
 
   return c.json(data, 200);
 });
 
-user.openapi(addUserRole, async (c) => {
+users.openapi(addUserRole, async (c) => {
   const { id } = c.req.valid('param');
   const { id_role } = c.req.valid('json');
   const roles = c.get('user').roles || [];
   await checkRole(roles, false, [Role.ADMIN]);
 
-  const { data, error } = await supabase.from('USERS_ROLES').insert({ id_user: id, id_role }).single();
+  const { error } = await supabase.from('USERS_ROLES').insert({ id_user: id, id_role });
 
-  if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to add role' }, 500);
+  if (error) {
+    return c.json({ error: 'Failed to add role' }, 400);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: 'Role added' }, 201);
 });
 
-user.openapi(removeUserRole, async (c) => {
+users.openapi(removeUserRole, async (c) => {
   const { id } = c.req.valid('param');
   const { id_role } = c.req.valid('json');
   const roles = c.get('user').roles || [];
   await checkRole(roles, false, [Role.ADMIN]);
 
-  const { data, error } = await supabase.from('USERS_ROLES').delete().eq('id_user, id_role', [id, id_role]).single();
+  const { error } = await supabase.from('USERS_ROLES').delete().eq('id_user', id).eq('id_role', id_role);
 
-  if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to remove role' }, 500);
+  if (error) {
+    return c.json({ error: 'Failed to remove role' }, 400);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: 'Role removed' }, 200);
 });
 
-user.openapi(deleteUser, async (c) => {
+users.openapi(deleteUser, async (c) => {
   const { id } = c.req.valid('param');
   const roles = c.get('user').roles || [];
   await checkRole(roles, false, [Role.ADMIN]);
@@ -113,20 +126,19 @@ user.openapi(deleteUser, async (c) => {
   const { data: user_data, error: errorID } = await supabase.from('USERS').select('id_auth').eq('id', id).single();
 
   if (errorID || !user_data) {
-    return c.json({ error: errorID?.message || 'Failed to fetch user data' }, 400);
+    return c.json({ error: 'User not found' }, 404);
   }
 
-  const { data, error } = await supabase.from('USERS').delete().eq('id', id).single();
+  const { error } = await supabase.from('USERS').delete().eq('id', id);
 
-  if (error || !data) {
-    return c.json({ error: error?.message || 'Failed to delete user' }, 500);
+  if (error) {
+    return c.json({ error: 'Failed to delete user' }, 500);
   }
 
-  const { error: errorAuth } = await supabase.auth.admin.deleteUser(user_data.id_auth ? user_data.id_auth : '');
-
+  const { error: errorAuth } = await supAdmin.auth.admin.deleteUser(user_data.id_auth ? user_data.id_auth : '');
   if (errorAuth) {
-    return c.json({ error: errorAuth.message || 'Failed to delete user' }, 500);
+    return c.json({ error: 'Failed to delete user' }, 500);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: 'User deleted' }, 200);
 });

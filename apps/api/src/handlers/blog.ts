@@ -66,14 +66,13 @@ blog.openapi(updatePost, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
-
   const { data, error } = await supabase
     .from('POSTS')
     .update({ title, content })
-    .eq('id, id_user', [id, user.id])
+    .eq('id', id)
+    .eq('id_user', user.id)
     .select()
     .single();
-
   if (error || !data) {
     return c.json({ error: 'Post not found' }, 404);
   }
@@ -88,7 +87,8 @@ blog.openapi(deletePost, async (c) => {
   const id_user = user.id;
   await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
 
-  if (roles?.includes(Role.MODERATOR || Role.ADMIN || Role.DIRECTOR)) {
+  const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
+  if (roles?.some((role) => allowed.includes(role))) {
     const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
     if (error || count === 0) {
@@ -98,7 +98,7 @@ blog.openapi(deletePost, async (c) => {
     return c.json({ message: 'Post deleted successfully' }, 200);
   }
 
-  const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id, id_user', [id, id_user]);
+  const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id).eq('id_user', user.id);
 
   if (error || count === 0) {
     return c.json({ error: 'Post not found' }, 404);
@@ -165,7 +165,9 @@ blog.openapi(updateComment, async (c) => {
   const { data, error } = await supabase
     .from('COMMENTS')
     .update({ content })
-    .eq('id, id_post, id_user', [id_comment, id_post, user.id])
+    .eq('id', id_comment)
+    .eq('id_post', id_post)
+    .eq('id_user', user.id)
     .select()
     .single();
 
@@ -179,13 +181,16 @@ blog.openapi(updateComment, async (c) => {
 blog.openapi(deleteComment, async (c) => {
   const { id_post, id_comment } = c.req.valid('param');
   const user = c.get('user');
+  const roles = user.roles;
   await checkRole(user.roles, true);
 
-  if (user.roles?.includes(Role.MODERATOR || Role.ADMIN || Role.DIRECTOR)) {
+  const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
+  if (roles?.some((role) => allowed.includes(role))) {
     const { error, count } = await supabase
       .from('COMMENTS')
       .delete({ count: 'exact' })
-      .eq('id, id_post', [id_comment, id_post]);
+      .eq('id', id_comment)
+      .eq('id_post', id_post);
 
     if (error || count === 0) {
       return c.json({ error: 'Comment not found' }, 404);
@@ -197,7 +202,9 @@ blog.openapi(deleteComment, async (c) => {
   const { error, count } = await supabase
     .from('COMMENTS')
     .delete({ count: 'exact' })
-    .eq('id, id_post, id_user', [id_comment, id_post, user.id]);
+    .eq('id', id_comment)
+    .eq('id_post', id_post)
+    .eq('id_user', user.id);
 
   if (error || count === 0) {
     return c.json({ error: 'Comment not found' }, 404);

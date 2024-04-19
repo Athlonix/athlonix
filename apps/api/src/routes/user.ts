@@ -1,7 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { paginationSchema } from '../utils/pagnination.js';
-import { userSchema } from '../validators/auth.js';
+import { updateUserSchema, userSchema } from '../validators/auth.js';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getAllUsers = createRoute({
@@ -9,6 +9,7 @@ export const getAllUsers = createRoute({
   path: '/users',
   summary: 'Get all users',
   description: 'Get all users',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     query: paginationSchema,
@@ -34,6 +35,7 @@ export const getOneUser = createRoute({
   path: '/users/{id}',
   summary: 'Get a user',
   description: 'Get a user',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -60,13 +62,14 @@ export const updateUser = createRoute({
   path: '/users/{id}',
   summary: 'Update a user',
   description: 'Update a user',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
     body: {
       content: {
         'application/json': {
-          schema: userSchema,
+          schema: updateUserSchema,
         },
       },
     },
@@ -93,6 +96,7 @@ export const deleteUser = createRoute({
   path: '/users/{id}',
   summary: 'Delete a user',
   description: 'Delete a user',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -119,6 +123,7 @@ export const addUserRole = createRoute({
   path: '/users/{id}/roles',
   summary: 'Add a role to a user',
   description: 'Add a role to a user',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -133,12 +138,12 @@ export const addUserRole = createRoute({
     },
   },
   responses: {
-    200: {
+    201: {
       description: 'Successful response',
       content: {
         'application/json': {
           schema: {
-            data: userSchema,
+            data: { message: z.string() },
           },
         },
       },
@@ -154,6 +159,7 @@ export const removeUserRole = createRoute({
   path: '/users/{id}/roles',
   summary: 'Remove a role from a user',
   description: 'Remove a role from a user',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -161,7 +167,7 @@ export const removeUserRole = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            id_role: z.number().min(1),
+            id_role: z.coerce.number().min(1),
           }),
         },
       },
@@ -173,7 +179,7 @@ export const removeUserRole = createRoute({
       content: {
         'application/json': {
           schema: {
-            data: userSchema,
+            data: { message: z.string() },
           },
         },
       },

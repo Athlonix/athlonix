@@ -8,6 +8,21 @@ export const signUpSchema = z.object({
   username: z.string().min(2),
 });
 
+export type selectUser = {
+  id: number;
+  email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  id_referer: number;
+  id_auth: number;
+  roles:
+    | {
+        id_role: number;
+      }[]
+    | null;
+};
+
 export const userSchema = z.object({
   id: z.number(),
   email: z.string().email(),
@@ -15,8 +30,8 @@ export const userSchema = z.object({
   first_name: z.string().min(2),
   last_name: z.string().min(2),
   id_referer: z.number(),
-  id_role: z.number(),
   id_auth: z.number(),
+  roles: z.array(z.number().min(1)).nullable(),
 });
 
 export const loginSchema = z.object({
@@ -29,7 +44,6 @@ export const refreshTokenSchema = z.object({
 });
 
 export const updateUserSchema = z.object({
-  email: z.string().email(),
   username: z.string().min(2),
   first_name: z.string().min(2),
   last_name: z.string().min(2),

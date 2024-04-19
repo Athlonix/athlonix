@@ -7,10 +7,12 @@ import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { secureHeaders } from 'hono/secure-headers';
+import { activities } from './handlers/activities.js';
 import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
 import { health } from './handlers/health.js';
-import { user } from './handlers/user.js';
+import { location } from './handlers/location.js';
+import { users } from './handlers/users.js';
 
 const app = new OpenAPIHono();
 
@@ -25,7 +27,7 @@ app.use(
   cors({
     origin: '*',
     allowHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   }),
 );
 app.get('/', (c) => c.text('Athlonix API!', 200));
@@ -38,7 +40,9 @@ app.onError((err, c) => {
 });
 
 app.route('/', health);
-app.route('/', user);
+app.route('/', users);
+app.route('/', activities);
+app.route('/', location);
 app.route('/auth', auth);
 app.route('/blog', blog);
 
@@ -59,6 +63,12 @@ app.doc('/doc', (c) => ({
     },
   ],
 }));
+
+app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
+  type: 'http',
+  scheme: 'bearer',
+  bearerFormat: 'JWT',
+});
 
 app.get('/ui', swaggerUI({ url: '/doc' }));
 

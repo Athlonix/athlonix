@@ -9,6 +9,7 @@ let id_user: number;
 let id_auth: string;
 let jwt: string;
 let id_post: number;
+let id_comment: number;
 
 describe('Blog tests', () => {
   test('Create redactor', async () => {
@@ -28,7 +29,8 @@ describe('Blog tests', () => {
     id_auth = user.id_auth;
     id_user = user.id;
     const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.REDACTOR });
-    if (error) {
+    const { error: errorAuth } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.MEMBER });
+    if (error || errorAuth) {
       console.error('Error while updating user');
       exit(1);
     }
@@ -90,6 +92,44 @@ describe('Blog tests', () => {
       }),
     });
     expect(res.status).toBe(200);
+  });
+
+  test('Comment the post', async () => {
+    const res = await app.request(`${path}/blog/posts/${id_post}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        content: 'Comment test',
+      }),
+    });
+    expect(res.status).toBe(201);
+    const comment = await res.json();
+    id_comment = comment.id;
+  });
+
+  test('Get comments', async () => {
+    const res = await app.request(`${path}/blog/posts/${id_post}/comments`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Delete comment', async () => {
+    const res = await app.request(`${path}/blog/posts/${id_post}/comments/${id_comment}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+    const result = await res.json();
   });
 
   test('Delete post', async () => {

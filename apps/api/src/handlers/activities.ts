@@ -152,7 +152,7 @@ activities.openapi(applyToActivity, async (c) => {
     .eq('id_user', user.id)
     .single();
 
-  if (errorActivityUser) return c.json({ error: 'Failed to apply to activity' }, 400);
+  if (errorActivityUser) return c.json({ error: errorActivityUser.message }, 500);
   if (activityUser) return c.json({ error: 'User already applied to activity' }, 400);
 
   const { data: participants, error: errorParticipants } = await supabase

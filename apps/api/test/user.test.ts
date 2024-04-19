@@ -97,6 +97,24 @@ describe('User tests', () => {
     expect(res.status).toBe(200);
   });
 
+  test('Add role to user', async () => {
+    const res = await app.request(`${path}/users/${id_user}/roles`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ id_role: Role.MODERATOR }),
+    });
+    expect(res.status).toBe(201);
+  });
+
+  test('Remove role from user', async () => {
+    const res = await app.request(`${path}/users/${id_user}/roles`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ id_role: Role.MODERATOR }),
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('DELETE user /users/{id}', async () => {
     const res = await app.request(`${path}/users/${id_user}`, {
       method: 'DELETE',

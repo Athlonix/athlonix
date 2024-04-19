@@ -27,6 +27,6 @@
   },
   "files": {
     "include": ["**/*.js", "**/*.ts", "**/*.tsx", "**/*.jsx", "**/*.json", "**/*.css", "**/*.scss"],
-    "ignore": ["node_modules/**", "dist/**", ".next/**", "build/**"]
+    "ignore": ["node_modules/**", "dist/**", ".next/**", "build/**", "./supabase/**"]
   }
 }

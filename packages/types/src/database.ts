@@ -30,28 +30,46 @@ export type Database = {
     Tables: {
       ACTIVITIES: {
         Row: {
-          duration_minute: number;
+          days: Database['public']['Enums']['days'][];
+          description: string | null;
+          end_date: string;
           id: number;
           id_address: number | null;
           id_sport: number | null;
+          interval: number;
           max_participants: number;
+          min_participants: number;
           name: string;
+          recurrence: Database['public']['Enums']['recurrence'];
+          start_date: string;
         };
         Insert: {
-          duration_minute: number;
+          days: Database['public']['Enums']['days'][];
+          description?: string | null;
+          end_date: string;
           id?: number;
           id_address?: number | null;
           id_sport?: number | null;
+          interval?: number;
           max_participants: number;
+          min_participants: number;
           name: string;
+          recurrence: Database['public']['Enums']['recurrence'];
+          start_date: string;
         };
         Update: {
-          duration_minute?: number;
+          days?: Database['public']['Enums']['days'][];
+          description?: string | null;
+          end_date?: string;
           id?: number;
           id_address?: number | null;
           id_sport?: number | null;
+          interval?: number;
           max_participants?: number;
+          min_participants?: number;
           name?: string;
+          recurrence?: Database['public']['Enums']['recurrence'];
+          start_date?: string;
         };
         Relationships: [
           {
@@ -102,16 +120,19 @@ export type Database = {
       };
       ACTIVITIES_USERS: {
         Row: {
+          active: boolean;
           created_at: string;
           id_activity: number;
           id_user: number;
         };
         Insert: {
+          active?: boolean;
           created_at?: string;
           id_activity: number;
           id_user: number;
         };
         Update: {
+          active?: boolean;
           created_at?: string;
           id_activity?: number;
           id_user?: number;
@@ -849,15 +870,27 @@ export type Database = {
       };
       SPORTS: {
         Row: {
+          description: string | null;
           id: number;
+          image: string | null;
+          max_players: number | null;
+          min_players: number;
           name: string;
         };
         Insert: {
+          description?: string | null;
           id?: number;
+          image?: string | null;
+          max_players?: number | null;
+          min_players?: number;
           name: string;
         };
         Update: {
+          description?: string | null;
           id?: number;
+          image?: string | null;
+          max_players?: number | null;
+          min_players?: number;
           name?: string;
         };
         Relationships: [];
@@ -1003,6 +1036,7 @@ export type Database = {
       };
       USERS: {
         Row: {
+          created_at: string;
           date_validity: string | null;
           email: string;
           first_name: string;
@@ -1013,6 +1047,7 @@ export type Database = {
           username: string;
         };
         Insert: {
+          created_at: string;
           date_validity?: string | null;
           email: string;
           first_name: string;
@@ -1023,6 +1058,7 @@ export type Database = {
           username: string;
         };
         Update: {
+          created_at?: string;
           date_validity?: string | null;
           email?: string;
           first_name?: string;
@@ -1123,7 +1159,8 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      days: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+      recurrence: 'weekly' | 'monthly' | 'annual';
     };
     CompositeTypes: {
       [_ in never]: never;

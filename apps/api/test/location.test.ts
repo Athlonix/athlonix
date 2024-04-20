@@ -1,7 +1,7 @@
 import { exit } from 'node:process';
 import app from '../src/index.js';
 import { supAdmin } from '../src/libs/supabase.js';
-import { Role } from '../src/validators/general';
+import { Role } from '../src/validators/general.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
@@ -16,10 +16,10 @@ describe('Location tests', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        first_name: 'user',
-        last_name: 'user',
-        username: 'user',
-        email: 'user@gmail.com',
+        first_name: 'location',
+        last_name: 'location',
+        username: 'location',
+        email: 'location@gmail.com',
         password: 'password123456',
       }),
     });
@@ -39,7 +39,7 @@ describe('Location tests', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'user@gmail.com',
+        email: 'location@gmail.com',
         password: 'password123456',
       }),
     });

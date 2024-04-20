@@ -1,13 +1,13 @@
+import { dummyPosts } from '@/app/lib/dummy_posts';
+import { BlogPost } from '@/app/ui/components/BlogPost';
 import { PostFiltering } from '@/app/ui/components/PostFiltering';
-import LikeIcon from '@/app/ui/svg/LikeIcon';
-import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
-import { BookOpenCheck, Ellipsis, Eye, MessageSquare, Plus, Search } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
+import { Plus, Search } from 'lucide-react';
 
 export default function Page(): JSX.Element {
+  const postsElements = dummyPosts.map((post) => <BlogPost key={post.id} {...post} />);
+
   return (
     <>
       <main className="flex flex-col items-center gap-y-8 py-4">
@@ -32,69 +32,7 @@ export default function Page(): JSX.Element {
             Ecrire un article
           </Button>
         </div>
-        <section className="w-full">
-          <div className="h-44 p-4 shadow-lg">
-            <div className="flex gap-6">
-              <Image className="w-64 h-36 cursor-pointer" src="/kayak.jpg" width={600} height={500} alt="kayak" />
-              <div className="h-full max-w-[624px]">
-                <h2 className="truncate cursor-pointer hover:text-slate-400">
-                  Pourquoi doit-on courir dans les escaliers ?
-                </h2>
-                <div className="flex items-center gap-6">
-                  <p>
-                    Par{' '}
-                    <Link
-                      href="simon"
-                      className="font-medium text-accent underline underline-offset-2 max-w-32 truncate"
-                    >
-                      Simon Pang
-                    </Link>
-                    , <span>Mar 14 fevrier</span>
-                  </p>
-                  <div className="flex items-center gap-3">
-                    <Badge className="w-16 flex items-center justify-center">course</Badge>
-                    <Badge className="w-16 text-center items-center justify-center">santé</Badge>
-                    <Badge className="w-16 text-center items-center justify-center">habitude</Badge>
-                  </div>
-                </div>
-                <p className="font-extralight text-slate-950 leading-5 text-ellipsis overflow-hidden">
-                  Courir dans les escaliers c’est cool parce que blabalab machin oui et aussi parce que je sais pas quoi
-                  dire oui oui ok cool asoefijc a efcijsa cfjas fcoasijfc oaisjf coisjafc oiajsfoicjas ofcijas oficj
-                  as...
-                </p>
-              </div>
-              <div className="w-full flex flex-col justify-between">
-                <div className="flex justify-end w-full">
-                  <Link href="/">
-                    <Ellipsis />
-                  </Link>
-                </div>
-                <div className="w-full flex justify-end items-center gap-4">
-                  <div className="flex items-center gap-1 font-medium text-sm">
-                    <span>124</span>
-                    <div>
-                      <LikeIcon />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1 font-medium text-sm">
-                    <span>44</span>
-                    <div>
-                      <MessageSquare />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-1 font-medium text-sm">
-                    <span>5325</span>
-                    <div>
-                      <BookOpenCheck />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <section className="w-full flex flex-col gap-y-6">{postsElements}</section>
       </main>
     </>
   );

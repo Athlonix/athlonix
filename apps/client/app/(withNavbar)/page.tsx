@@ -8,8 +8,6 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { Suspense } from 'react';
-import { navLinks } from '../lib/navlinks';
-import { NavBar } from '../ui/NavBar';
 
 function ShowToast() {
   const searchParams = useSearchParams();

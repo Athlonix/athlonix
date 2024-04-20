@@ -27,7 +27,7 @@ sports.openapi(getOneSport, async (c) => {
   const { data, error } = await supabase.from('SPORTS').select('*').eq('id', id).single();
 
   if (error || !data) {
-    return c.json({ error: 'Activity not found' }, 404);
+    return c.json({ error: 'Sport not found' }, 404);
   }
 
   return c.json(data, 200);
@@ -46,7 +46,7 @@ sports.openapi(createSport, async (c) => {
     .single();
 
   if (error || !data) {
-    return c.json({ error: 'Failed to create activity' }, 400);
+    return c.json({ error: 'Failed to create sport' }, 400);
   }
 
   return c.json(data, 201);
@@ -67,7 +67,7 @@ sports.openapi(updateSport, async (c) => {
     .single();
 
   if (error || !data) {
-    return c.json({ error: 'Failed to update activity' }, 400);
+    return c.json({ error: 'Failed to update sport' }, 400);
   }
 
   return c.json(data, 200);
@@ -79,10 +79,10 @@ sports.openapi(deleteSport, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error } = await supabase.from('SPORTS').delete().eq('id', id).single();
+  const { data, error } = await supabase.from('SPORTS').delete().eq('id', id);
 
   if (error || !data) {
-    return c.json({ error: 'Activity not found' }, 404);
+    return c.json({ error: 'Sport not found' }, 404);
   }
 
   return c.json(data, 200);

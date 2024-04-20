@@ -105,7 +105,7 @@ export const updateSport = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: sportSchema.omit({ id: true }),
+          schema: sportSchema.omit({ id: true }).partial(),
         },
       },
     },

@@ -105,7 +105,7 @@ export const updateAddress = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: addressSchema.omit({ id: true }),
+          schema: addressSchema.omit({ id: true }).partial(),
         },
       },
     },

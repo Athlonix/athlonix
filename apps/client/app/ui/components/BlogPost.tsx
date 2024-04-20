@@ -5,8 +5,6 @@ import { Badge } from '@repo/ui/components/ui/badge';
 import { BookOpenCheck, Ellipsis, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
-import { boolean } from 'zod';
 
 export interface PostProps {
   id: number;
@@ -20,6 +18,7 @@ export interface PostProps {
   comments: number;
   createdDate: Date;
   badges: string[];
+  handleLikeButton: (id: number) => void;
 }
 
 export const BlogPost: React.FC<PostProps> = ({
@@ -34,14 +33,8 @@ export const BlogPost: React.FC<PostProps> = ({
   userLiked,
   createdDate,
   badges,
+  handleLikeButton,
 }: PostProps) => {
-  function handleLike() {
-    console.log('hello like');
-
-    // setIsLiked((prevLike) => !prevLike);
-  }
-
-  const [isLiked, setIsLiked] = useState<boolean>(userLiked);
   const coverImageName: string = coverImage.split('.')[0] || '';
 
   const badgesElements = badges.map((badge) => (
@@ -84,9 +77,16 @@ export const BlogPost: React.FC<PostProps> = ({
           <div className="w-full flex justify-end items-center gap-4">
             <div className="flex items-center gap-1 font-medium text-sm">
               <span>{like}</span>
-              <div className="cursor-pointer" onClick={handleLike}>
-                <LikeIcon isClicked={isLiked} />
-              </div>
+              <button
+                type="button"
+                className="cursor-pointer"
+                onClick={() => {
+                  console.log('testttt');
+                  handleLikeButton(id);
+                }}
+              >
+                <LikeIcon isClicked={userLiked} />
+              </button>
             </div>
 
             <div className="flex items-center gap-1 font-medium text-sm">

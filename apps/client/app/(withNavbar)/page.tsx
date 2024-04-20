@@ -1,33 +1,24 @@
 'use client';
 
 import { Button } from '@repo/ui/components/ui/button';
-import { Toaster } from '@repo/ui/components/ui/toaster';
-import { useToast } from '@repo/ui/hooks/use-toast';
+import { toast } from '@repo/ui/components/ui/sonner';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { Suspense } from 'react';
 
-function ShowToast() {
+export default function Page(): JSX.Element {
   const searchParams = useSearchParams();
-  const { toast } = useToast();
-
-  const search = searchParams.get('loggedIn');
+  const loggedIn = searchParams.get('loggedIn');
 
   useEffect(() => {
-    if (search === 'true') {
-      toast({
-        title: 'Bon retour !',
+    if (loggedIn) {
+      toast('Bon retour !', {
         description: 'Vous êtes connecté !',
       });
     }
-  }, [search, toast]);
+  }, [loggedIn]);
 
-  return <Toaster />;
-}
-
-export default function Page(): JSX.Element {
   return (
     <>
       <main className="flex flex-col items-center gap-y-8 py-6">
@@ -102,10 +93,6 @@ export default function Page(): JSX.Element {
             <p className="font-normal text-xl">événements organisés</p>
           </div>
         </section>
-
-        <Suspense>
-          <ShowToast />
-        </Suspense>
       </main>
     </>
   );

@@ -1,12 +1,39 @@
-import { dummyPosts } from '@/app/lib/dummy_posts';
+'use client';
+
+import { type Post, dummyPosts } from '@/app/lib/dummy_posts';
 import { BlogPost } from '@/app/ui/components/BlogPost';
 import { PostFiltering } from '@/app/ui/components/PostFiltering';
 import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { Plus, Search } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Page(): JSX.Element {
-  const postsElements = dummyPosts.map((post) => <BlogPost key={post.id} {...post} />);
+  function handleLikeButton(id: number) {
+    setPosts((prevPosts) => {
+      return prevPosts.map((post) => {
+        if (post.id !== id) {
+          return post;
+        }
+
+        if (post.userLiked) {
+          toast.info('Post retiré des likes', { duration: 2000 });
+        } else {
+          toast.success('Post ajouté aux likes', { duration: 2000 });
+        }
+
+        return {
+          ...post,
+          userLiked: !post.userLiked,
+        };
+      }) as Post[];
+    });
+  }
+
+  const [posts, setPosts] = useState<Post[]>(dummyPosts);
+
+  const postsElements = posts.map((post) => <BlogPost key={post.id} {...post} handleLikeButton={handleLikeButton} />);
 
   return (
     <>

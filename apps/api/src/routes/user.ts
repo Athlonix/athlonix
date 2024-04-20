@@ -189,3 +189,31 @@ export const removeUserRole = createRoute({
   },
   tags: ['user'],
 });
+
+export const getUsersActivities = createRoute({
+  method: 'get',
+  path: '/users/{id}/activities',
+  summary: 'Get all activities of a user',
+  description: 'Get all activities of a user',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    query: paginationSchema,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: userSchema,
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});

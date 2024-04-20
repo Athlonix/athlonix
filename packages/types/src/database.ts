@@ -31,6 +31,7 @@ export type Database = {
       ACTIVITIES: {
         Row: {
           days: Database['public']['Enums']['days'][];
+          description: string | null;
           end_date: string;
           id: number;
           id_address: number | null;
@@ -44,6 +45,7 @@ export type Database = {
         };
         Insert: {
           days: Database['public']['Enums']['days'][];
+          description?: string | null;
           end_date: string;
           id?: number;
           id_address?: number | null;
@@ -57,6 +59,7 @@ export type Database = {
         };
         Update: {
           days?: Database['public']['Enums']['days'][];
+          description?: string | null;
           end_date?: string;
           id?: number;
           id_address?: number | null;

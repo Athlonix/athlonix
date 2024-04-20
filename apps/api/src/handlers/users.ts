@@ -1,7 +1,15 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { addUserRole, deleteUser, getAllUsers, getOneUser, removeUserRole, updateUser } from '../routes/user.js';
+import {
+  addUserRole,
+  deleteUser,
+  getAllUsers,
+  getOneUser,
+  getUsersActivities,
+  removeUserRole,
+  updateUser,
+} from '../routes/user.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
@@ -141,4 +149,24 @@ users.openapi(deleteUser, async (c) => {
   }
 
   return c.json({ message: 'User deleted' }, 200);
+});
+
+users.openapi(getUsersActivities, async (c) => {
+  const roles = c.get('user').roles || [];
+  await checkRole(roles, true);
+  const user = c.get('user');
+  const { skip, take } = c.req.valid('query');
+  const { from, to } = getPagination(skip, take - 1);
+
+  const { data, error } = await supabase
+    .from('ACTIVITIES_USERS')
+    .select('*, activity:ACTIVITIES(*)')
+    .eq('id_user', user.id)
+    .range(from, to);
+
+  if (error) {
+    return c.json({ error: 'User not found' }, 404);
+  }
+
+  return c.json(data, 200);
 });

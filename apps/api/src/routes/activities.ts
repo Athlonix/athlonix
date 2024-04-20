@@ -4,18 +4,18 @@ import { paginationSchema } from '../utils/pagnination.js';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const activitySchema = z.object({
-  id: z.number(),
+  id: z.coerce.number(),
   name: z.string().max(50),
-  description: z.string().max(255),
-  max_participants: z.number().min(1),
-  min_participants: z.number().min(1),
+  description: z.string().max(255).nullable(),
+  max_participants: z.coerce.number().min(1),
+  min_participants: z.coerce.number().min(1),
   days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])),
   recurrence: z.enum(['weekly', 'monthly', 'annual']),
-  interval: z.number().min(1),
+  interval: z.coerce.number().min(1),
   start_date: z.string(),
   end_date: z.string(),
-  id_sport: z.number().nullable(),
-  id_address: z.number().nullable(),
+  id_sport: z.coerce.number().nullable(),
+  id_address: z.coerce.number().nullable(),
 });
 
 export const getAllActivities = createRoute({

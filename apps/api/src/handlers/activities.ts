@@ -13,7 +13,7 @@ import {
 } from '../routes/activities.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
-import type { Variables } from '../validators/general.js';
+import { Role, type Variables } from '../validators/general.js';
 
 export const activities = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
@@ -51,6 +51,8 @@ activities.openapi(createActivity, async (c) => {
     id_sport,
     id_address,
     recurrence,
+    interval,
+    days,
     start_date,
     end_date,
   } = c.req.valid('json');
@@ -68,6 +70,8 @@ activities.openapi(createActivity, async (c) => {
       id_sport,
       id_address,
       recurrence,
+      interval,
+      days,
       start_date,
       end_date,
     })
@@ -91,6 +95,8 @@ activities.openapi(updateActivity, async (c) => {
     id_sport,
     id_address,
     recurrence,
+    interval,
+    days,
     start_date,
     end_date,
   } = c.req.valid('json');
@@ -108,6 +114,8 @@ activities.openapi(updateActivity, async (c) => {
       id_sport,
       id_address,
       recurrence,
+      interval,
+      days,
       start_date,
       end_date,
     })
@@ -145,6 +153,7 @@ activities.openapi(applyToActivity, async (c) => {
   const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
+  if (new Date(activity.end_date) < new Date()) return c.json({ error: 'Activity has already ended' }, 400);
 
   const { data: activityUser, error: errorActivityUser } = await supabase
     .from('ACTIVITIES_USERS')
@@ -194,18 +203,20 @@ activities.openapi(cancelApplication, async (c) => {
 
 activities.openapi(validApplication, async (c) => {
   const user = c.get('user');
-  await checkRole(user.roles, true);
+  await checkRole(user.roles, false, [Role.ADMIN, Role.MODERATOR]);
 
   const { id } = c.req.valid('param');
+  const { id_user } = c.req.valid('json');
   const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
+  if (new Date(activity.end_date) < new Date()) return c.json({ error: 'Activity has already ended' }, 400);
 
   const { data: activityUser, error: errorActivityUser } = await supabase
     .from('ACTIVITIES_USERS')
     .select('*')
     .eq('id_activity', id)
-    .eq('id_user', user.id)
+    .eq('id_user', id_user)
     .single();
 
   if (errorActivityUser || !activityUser) return c.json({ error: 'User not applied to activity' }, 400);
@@ -214,7 +225,7 @@ activities.openapi(validApplication, async (c) => {
     .from('ACTIVITIES_USERS')
     .update({ active: true })
     .eq('id_activity', id)
-    .eq('id_user', user.id);
+    .eq('id_user', id_user);
 
   if (errorValid) return c.json({ error: 'Failed to validate application' }, 400);
 

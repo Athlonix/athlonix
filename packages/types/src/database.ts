@@ -30,10 +30,12 @@ export type Database = {
     Tables: {
       ACTIVITIES: {
         Row: {
+          days: Database['public']['Enums']['days'][];
           end_date: string;
           id: number;
           id_address: number | null;
           id_sport: number | null;
+          interval: number;
           max_participants: number;
           min_participants: number;
           name: string;
@@ -41,10 +43,12 @@ export type Database = {
           start_date: string;
         };
         Insert: {
+          days: Database['public']['Enums']['days'][];
           end_date: string;
           id?: number;
           id_address?: number | null;
           id_sport?: number | null;
+          interval?: number;
           max_participants: number;
           min_participants: number;
           name: string;
@@ -52,10 +56,12 @@ export type Database = {
           start_date: string;
         };
         Update: {
+          days?: Database['public']['Enums']['days'][];
           end_date?: string;
           id?: number;
           id_address?: number | null;
           id_sport?: number | null;
+          interval?: number;
           max_participants?: number;
           min_participants?: number;
           name?: string;
@@ -1150,6 +1156,7 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
+      days: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
       recurrence: 'weekly' | 'monthly' | 'annual';
     };
     CompositeTypes: {

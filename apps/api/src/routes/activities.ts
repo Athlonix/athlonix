@@ -5,11 +5,13 @@ import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validato
 
 export const activitySchema = z.object({
   id: z.number(),
-  max_participants: z.number().min(1),
-  min_participants: z.number().min(1),
   name: z.string().max(50),
   description: z.string().max(255),
+  max_participants: z.number().min(1),
+  min_participants: z.number().min(1),
+  days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])),
   recurrence: z.enum(['weekly', 'monthly', 'annual']),
+  interval: z.number().min(1),
   start_date: z.string(),
   end_date: z.string(),
   id_sport: z.number().nullable(),
@@ -194,6 +196,15 @@ export const cancelApplication = createRoute({
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            id_user: z.coerce.number().min(1),
+          }),
+        },
+      },
+    },
   },
   responses: {
     200: {
@@ -221,6 +232,15 @@ export const validApplication = createRoute({
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            id_user: z.coerce.number().min(1),
+          }),
+        },
+      },
+    },
   },
   responses: {
     200: {

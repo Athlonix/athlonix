@@ -3,8 +3,15 @@ import crypto from 'node:crypto';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { createPoll, deletePoll, getAllPolls, getOnePoll, updatePoll, voteToPoll } from '../routes/votes.js';
-import type { POLLS_ARRAY } from '../routes/votes.js';
+import {
+  createPoll,
+  deletePoll,
+  getAllPolls,
+  getOnePoll,
+  getPollResults,
+  updatePoll,
+  voteToPoll,
+} from '../routes/votes.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import { Role, type Variables } from '../validators/general.js';
@@ -17,11 +24,7 @@ polls.openapi(getAllPolls, async (c) => {
   const { skip, take } = c.req.valid('query');
   const { from, to } = getPagination(skip, take - 1);
 
-  const { data, error } = await supabase
-    .from('POLLS')
-    .select('*, results:POLLS_VOTES(*)')
-    .returns<POLLS_ARRAY>()
-    .range(from, to);
+  const { data, error } = await supabase.from('POLLS').select('*, results:POLLS_VOTES(*)').range(from, to);
 
   if (error) {
     return c.json({ error: error.message }, 500);
@@ -170,4 +173,35 @@ polls.openapi(voteToPoll, async (c) => {
   }
 
   return c.json({ message: 'Vote registered' }, 201);
+});
+
+type Results = {
+  id: number;
+  title: string;
+  results: { id: number; content: string; votes: number }[];
+};
+
+polls.openapi(getPollResults, async (c) => {
+  const { id } = c.req.valid('param');
+  const { data, error } = await supabase
+    .from('POLLS')
+    .select('*, results:POLLS_VOTES(*), options:POLLS_OPTIONS(*)')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Poll not found' }, 404);
+  }
+
+  const results: Results = {
+    id: data.id,
+    title: data.title,
+    results: data.options.map((option: { id: number; content: string }) => ({
+      id: option.id,
+      content: option.content,
+      votes: data.results.filter((vote: { id_option: number }) => vote.id_option === option.id).length,
+    })),
+  };
+
+  return c.json(results, 200);
 });

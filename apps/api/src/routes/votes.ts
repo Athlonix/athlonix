@@ -1,3 +1,4 @@
+import { title } from 'node:process';
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { paginationSchema } from '../utils/pagnination.js';
@@ -13,10 +14,6 @@ export const pollsSchema = z.object({
   id_user: z.number(),
   results: z.array(z.object({ id: z.number(), id_option: z.number() })).optional(),
 });
-
-export type POLLS = z.infer<typeof pollsSchema>;
-export const POLLS_ARRAY = z.array(pollsSchema);
-export type POLLS_ARRAY = z.infer<typeof POLLS_ARRAY>;
 
 export const createPollSchema = z.object({
   title: z.string().max(50),
@@ -43,6 +40,12 @@ export const userVotedSchema = z.object({
   id: z.number(),
   user: z.string(),
   id_poll: z.number(),
+});
+
+export const pollResultSchema = z.object({
+  id: z.number(),
+  title: z.string().max(50),
+  results: z.array(z.object({ id: z.number(), content: z.string(), votes: z.number() })),
 });
 
 export const createPoll = createRoute({
@@ -204,6 +207,31 @@ export const voteToPoll = createRoute({
       content: {
         'application/json': {
           schema: { type: 'string' },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['poll'],
+});
+
+export const getPollResults = createRoute({
+  method: 'get',
+  path: '/polls/{id}/results',
+  summary: 'Get poll results',
+  description: 'Get poll results',
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: pollResultSchema,
+          },
         },
       },
     },

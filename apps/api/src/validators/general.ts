@@ -4,6 +4,7 @@ export type Variables = {
   user: {
     id: number;
     roles: number[];
+    date_validity: string;
     email: string;
     updated_at: string;
     created_at: string;

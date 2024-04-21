@@ -4,6 +4,7 @@ export const postSchema = z.object({
   id: z.number().min(1),
   title: z.string(),
   content: z.string(),
+  cover_image: z.string().nullable(),
 });
 
 export const postSchemaResponse = z.object({
@@ -21,7 +22,11 @@ export const postSchemaResponse = z.object({
 
 export const insertPostSchema = postSchema.omit({ id: true });
 
-export const updatePostSchema = postSchema.omit({ id: true });
+export const updatePostSchema = z.object({
+  title: z.string().optional(),
+  content: z.string().optional(),
+  cover_image: z.string().nullable().optional(),
+});
 
 export const responseSchema = z.object({
   id: z.number().min(1),

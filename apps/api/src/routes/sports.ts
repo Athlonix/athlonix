@@ -3,52 +3,20 @@ import authMiddleware from '../middlewares/auth.js';
 import { paginationSchema } from '../utils/pagnination.js';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
-export const addressSchema = z.object({
+export const sportSchema = z.object({
   id: z.number(),
-  road: z.string(),
-  postal_code: z.string(),
-  complement: z.string().nullable(),
-  city: z.string(),
-  number: z.number(),
-  name: z.string().nullable(),
-  id_lease: z.number().nullable(),
+  name: z.string().max(50),
+  description: z.string().max(255),
+  min_players: z.number().min(1),
+  max_players: z.number().min(1).nullable(),
+  image: z.string().nullable(),
 });
 
-export const createAddress = createRoute({
-  method: 'post',
-  path: '/addresses',
-  summary: 'Create a address',
-  description: 'Create a address',
-  security: [{ Bearer: [] }],
-  middleware: authMiddleware,
-  request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: addressSchema.omit({ id: true }),
-        },
-      },
-    },
-  },
-  responses: {
-    201: {
-      description: 'Successful response',
-      content: {
-        'application/json': {
-          schema: { type: 'string' },
-        },
-      },
-    },
-    500: serverErrorSchema,
-  },
-  tags: ['location'],
-});
-
-export const getAllAddresses = createRoute({
+export const getAllSports = createRoute({
   method: 'get',
-  path: '/addresses',
-  summary: 'Get all addresses',
-  description: 'Get all addresses',
+  path: '/sports',
+  summary: 'Get all sports',
+  description: 'Get all sports',
   request: {
     query: paginationSchema,
   },
@@ -58,21 +26,21 @@ export const getAllAddresses = createRoute({
       content: {
         'application/json': {
           schema: {
-            data: addressSchema,
+            data: z.array(sportSchema),
           },
         },
       },
     },
     500: serverErrorSchema,
   },
-  tags: ['location'],
+  tags: ['sport'],
 });
 
-export const getOneAddress = createRoute({
+export const getOneSport = createRoute({
   method: 'get',
-  path: '/addresses/{id}',
-  summary: 'Get a address',
-  description: 'Get a address',
+  path: '/sports/{id}',
+  summary: 'Get a sport',
+  description: 'Get a sport',
   request: {
     params: idParamValidator,
   },
@@ -82,7 +50,7 @@ export const getOneAddress = createRoute({
       content: {
         'application/json': {
           schema: {
-            data: addressSchema,
+            data: sportSchema,
           },
         },
       },
@@ -90,14 +58,46 @@ export const getOneAddress = createRoute({
     500: serverErrorSchema,
     404: notFoundSchema,
   },
-  tags: ['location'],
+  tags: ['sport'],
 });
 
-export const updateAddress = createRoute({
+export const createSport = createRoute({
+  method: 'post',
+  path: '/sports',
+  summary: 'Create a sport',
+  description: 'Create a sport',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: sportSchema.omit({ id: true }),
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: sportSchema,
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+  },
+  tags: ['sport'],
+});
+
+export const updateSport = createRoute({
   method: 'patch',
-  path: '/addresses/{id}',
-  summary: 'Update a address',
-  description: 'Update a address',
+  path: '/sports/{id}',
+  summary: 'Update a sport',
+  description: 'Update a sport',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
@@ -105,7 +105,7 @@ export const updateAddress = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: addressSchema.omit({ id: true }).partial(),
+          schema: sportSchema.omit({ id: true }).partial(),
         },
       },
     },
@@ -115,21 +115,23 @@ export const updateAddress = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: {
+            data: sportSchema,
+          },
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
   },
-  tags: ['location'],
+  tags: ['sport'],
 });
 
-export const deleteAddress = createRoute({
+export const deleteSport = createRoute({
   method: 'delete',
-  path: '/addresses/{id}',
-  summary: 'Delete a address',
-  description: 'Delete a address',
+  path: '/sports/{id}',
+  summary: 'Delete a sport',
+  description: 'Delete a sport',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
@@ -140,12 +142,14 @@ export const deleteAddress = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: {
+            data: sportSchema,
+          },
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
   },
-  tags: ['location'],
+  tags: ['sport'],
 });

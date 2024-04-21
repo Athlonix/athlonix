@@ -14,6 +14,7 @@ import { health } from './handlers/health.js';
 import { location } from './handlers/location.js';
 import { sports } from './handlers/sports.js';
 import { users } from './handlers/users.js';
+import { polls } from './handlers/votes.js';
 
 const app = new OpenAPIHono();
 
@@ -45,6 +46,7 @@ app.route('/', users);
 app.route('/', activities);
 app.route('/', sports);
 app.route('/', location);
+app.route('/', polls);
 app.route('/auth', auth);
 app.route('/blog', blog);
 

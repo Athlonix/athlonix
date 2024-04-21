@@ -1,7 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { createAddress, deleteAddress, getAllAddresses, getOneAddress, updateAddress } from '../routes/location.js';
+import { createAddress, deleteAddress, getAllAddresses, getOneAddress, updateAddress } from '../routes/locations.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
@@ -10,7 +10,7 @@ export const location = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
 });
 
-export const address = location.openapi(getAllAddresses, async (c) => {
+location.openapi(getAllAddresses, async (c) => {
   const { skip, take } = c.req.valid('query');
   const { from, to } = getPagination(skip, take - 1);
   const { data, error } = await supabase.from('ADDRESSES').select('*').range(from, to);

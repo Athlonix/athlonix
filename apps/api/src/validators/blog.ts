@@ -6,6 +6,19 @@ export const postSchema = z.object({
   content: z.string(),
 });
 
+export const postSchemaResponse = z.object({
+  id: z.number().min(1),
+  title: z.string(),
+  content: z.string(),
+  createdAt: z.string(),
+  coverImage: z.string(),
+  author: z.string(),
+  categories: z.string().array(),
+  likesNumber: z.number(),
+  commentsNumber: z.number(),
+  viewsNumber: z.number(),
+});
+
 export const insertPostSchema = postSchema.omit({ id: true });
 
 export const updatePostSchema = postSchema.omit({ id: true });

@@ -7,7 +7,8 @@ import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { Plus, Search } from 'lucide-react';
-import { useState } from 'react';
+import next from 'next';
+import { useEffect, useState } from 'react';
 
 export default function Page(): JSX.Element {
   function handleLikeButton(id: number) {
@@ -32,6 +33,22 @@ export default function Page(): JSX.Element {
   }
 
   const [posts, setPosts] = useState<Post[]>(dummyPosts);
+
+  useEffect(() => {
+    const API_URL = 'http://localhost:3101';
+    console.log(API_URL);
+
+    fetch(`${API_URL}/blog/posts`)
+      .then((r) => {
+        console.log('hey');
+        return r.json();
+      })
+      .then((r) => {
+        console.log('fin');
+
+        console.log(r);
+      });
+  }, []);
 
   const postsElements = posts.map((post) => <BlogPost key={post.id} {...post} handleLikeButton={handleLikeButton} />);
 

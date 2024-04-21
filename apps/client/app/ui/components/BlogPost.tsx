@@ -47,15 +47,19 @@ export const BlogPost: React.FC<PostProps> = ({
     <div className="h-44 p-4 shadow-lg">
       <div className="flex gap-6">
         <div className="relative w-64 h-36">
-          <Image
-            className="absolute object-cover top-0 left-0"
-            src={`https://wkpdfodfnkbdvyjuuttd.supabase.co/storage/v1/object/public/images/blog_posts/${coverImage}`}
-            layout="fill"
-            alt={coverImageName}
-          />
+          <Link href="/simon">
+            <Image
+              className="absolute object-cover top-0 left-0"
+              src={`https://wkpdfodfnkbdvyjuuttd.supabase.co/storage/v1/object/public/images/blog_posts/${coverImage}`}
+              layout="fill"
+              alt={coverImageName}
+            />
+          </Link>
         </div>
         <div className="h-full max-w-[624px]">
-          <h2 className="truncate cursor-pointer hover:text-slate-400">{title}</h2>
+          <h2 className="truncate cursor-pointer hover:text-slate-400" title={title}>
+            {title}
+          </h2>
           <div className="flex items-center gap-6">
             <p>
               Par{' '}

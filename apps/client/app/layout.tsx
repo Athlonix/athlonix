@@ -25,7 +25,7 @@ export default function RootLayout({
         className={cn('min-h-screen bg-background font-sans antialiased flex flex-col items-center', fontSans.variable)}
       >
         {children}
-        <Toaster richColors closeButton />
+        <Toaster richColors closeButton visibleToasts={1} />
       </body>
     </html>
   );

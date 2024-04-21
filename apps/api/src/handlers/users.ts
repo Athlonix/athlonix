@@ -9,7 +9,7 @@ import {
   getUsersActivities,
   removeUserRole,
   updateUser,
-} from '../routes/user.js';
+} from '../routes/users.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';

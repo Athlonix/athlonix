@@ -608,41 +608,94 @@ export type Database = {
       };
       POLLS: {
         Row: {
-          content: string | null;
+          description: string | null;
+          end_at: string | null;
           id: number;
+          id_user: number;
+          max_choices: number;
+          start_at: string | null;
           title: string;
         };
         Insert: {
-          content?: string | null;
+          description?: string | null;
+          end_at?: string | null;
           id?: number;
+          id_user: number;
+          max_choices?: number;
+          start_at?: string | null;
           title: string;
         };
         Update: {
-          content?: string | null;
+          description?: string | null;
+          end_at?: string | null;
           id?: number;
+          id_user?: number;
+          max_choices?: number;
+          start_at?: string | null;
           title?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'public_POLLS_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
       };
-      POLLS_ANSWERS: {
+      POLLS_OPTIONS: {
         Row: {
-          answer: string;
+          content: string;
           id: number;
           id_poll: number;
         };
         Insert: {
-          answer: string;
+          content: string;
           id?: number;
           id_poll: number;
         };
         Update: {
-          answer?: string;
+          content?: string;
           id?: number;
           id_poll?: number;
         };
         Relationships: [
           {
-            foreignKeyName: 'public_POLLS_ANSWERS_id_poll_fkey';
+            foreignKeyName: 'public_POLLS_OPTIONS_id_poll_fkey';
+            columns: ['id_poll'];
+            isOneToOne: false;
+            referencedRelation: 'POLLS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      POLLS_VOTES: {
+        Row: {
+          id: number;
+          id_option: number;
+          id_poll: number;
+        };
+        Insert: {
+          id?: number;
+          id_option: number;
+          id_poll: number;
+        };
+        Update: {
+          id?: number;
+          id_option?: number;
+          id_poll?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_POLLS_VOTES_id_option_fkey';
+            columns: ['id_option'];
+            isOneToOne: false;
+            referencedRelation: 'POLLS_OPTIONS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_POLLS_VOTES_id_poll_fkey';
             columns: ['id_poll'];
             isOneToOne: false;
             referencedRelation: 'POLLS';
@@ -1147,6 +1200,32 @@ export type Database = {
             columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      USERS_VOTES: {
+        Row: {
+          id: number;
+          id_poll: number;
+          user: string;
+        };
+        Insert: {
+          id?: number;
+          id_poll: number;
+          user: string;
+        };
+        Update: {
+          id?: number;
+          id_poll?: number;
+          user?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_USERS_VOTES_id_poll_fkey';
+            columns: ['id_poll'];
+            isOneToOne: false;
+            referencedRelation: 'POLLS';
             referencedColumns: ['id'];
           },
         ];

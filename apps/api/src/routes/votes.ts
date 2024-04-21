@@ -85,6 +85,8 @@ export const getAllPolls = createRoute({
   path: '/polls',
   summary: 'Get all polls',
   description: 'Get all polls',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
   request: {
     query: paginationSchema,
   },
@@ -109,6 +111,8 @@ export const getOnePoll = createRoute({
   path: '/polls/{id}',
   summary: 'Get a poll',
   description: 'Get a poll',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
   request: {
     params: idParamValidator,
   },
@@ -221,6 +225,8 @@ export const getPollResults = createRoute({
   path: '/polls/{id}/results',
   summary: 'Get poll results',
   description: 'Get poll results',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
   request: {
     params: idParamValidator,
   },

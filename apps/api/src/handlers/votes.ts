@@ -21,6 +21,9 @@ export const polls = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 polls.openapi(getAllPolls, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true);
   const { skip, take } = c.req.valid('query');
   const { from, to } = getPagination(skip, take - 1);
 
@@ -34,6 +37,9 @@ polls.openapi(getAllPolls, async (c) => {
 });
 
 polls.openapi(getOnePoll, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true);
   const { id } = c.req.valid('param');
   const { data, error } = await supabase.from('POLLS').select('*, results:POLLS_VOTES(*)').eq('id', id).single();
 
@@ -182,6 +188,9 @@ type Results = {
 };
 
 polls.openapi(getPollResults, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true);
   const { id } = c.req.valid('param');
   const { data, error } = await supabase
     .from('POLLS')

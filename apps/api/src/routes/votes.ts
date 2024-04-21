@@ -36,12 +36,6 @@ export const voteSchema = z.object({
   id_poll: z.number(),
 });
 
-export const userVotedSchema = z.object({
-  id: z.number(),
-  user: z.string(),
-  id_poll: z.number(),
-});
-
 export const pollResultSchema = z.object({
   id: z.number(),
   title: z.string().max(50),

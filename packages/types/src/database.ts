@@ -662,7 +662,7 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_POLLS_ANSWERS_id_poll_fkey';
+            foreignKeyName: 'public_POLLS_OPTIONS_id_poll_fkey';
             columns: ['id_poll'];
             isOneToOne: false;
             referencedRelation: 'POLLS';

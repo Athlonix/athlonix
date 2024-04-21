@@ -32,7 +32,7 @@ export const pollsOptionSchema = z.object({
 
 export const voteSchema = z.object({
   id: z.number(),
-  id_option: z.number(),
+  options: z.array(z.number().min(1)),
   id_poll: z.number(),
 });
 

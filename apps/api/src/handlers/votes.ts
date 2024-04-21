@@ -125,13 +125,13 @@ polls.openapi(deletePoll, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false, [Role.ADMIN]);
   const { id } = c.req.valid('param');
-  const { data, error } = await supabase.from('POLLS').delete().eq('id', id).single();
+  const { error } = await supabase.from('POLLS').delete().eq('id', id);
 
-  if (error || !data) {
+  if (error) {
     return c.json({ error: 'Failed to delete poll' }, 400);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: 'Poll deleted' }, 200);
 });
 
 polls.openapi(voteToPoll, async (c) => {
@@ -139,7 +139,12 @@ polls.openapi(voteToPoll, async (c) => {
   const roles = user.roles;
   await checkRole(roles, true);
   const { id } = c.req.valid('param');
-  const { id_option } = c.req.valid('json');
+  const { options } = c.req.valid('json');
+
+  const duplicates = options.filter((value: number, index: number) => options.indexOf(value) !== index);
+  if (duplicates.length > 0) {
+    return c.json({ error: 'Duplicated votes' }, 400);
+  }
 
   const secret = process.env.SUPABASE_KEY || 'supabase';
   const toHash = `${user.id}-${id}`;
@@ -156,11 +161,14 @@ polls.openapi(voteToPoll, async (c) => {
     return c.json({ error: 'Failed to retrieve votes' }, 400);
   }
 
-  if (votes && votes.USERS_VOTES.length >= votes.max_choices) {
-    return c.json({ error: 'No votes available' }, 400);
+  if (votes && votes.USERS_VOTES.length > 0) {
+    return c.json({ error: 'User already voted' }, 400);
   }
 
-  const { data, error } = await supabase.from('POLLS_VOTES').insert({ id_poll: id, id_option }).select().single();
+  const { data, error } = await supabase
+    .from('POLLS_VOTES')
+    .insert(options.map((id_option: number) => ({ id_poll: id, id_option })))
+    .select();
 
   if (error || !data) {
     return c.json({ error: 'Failed to vote' }, 400);

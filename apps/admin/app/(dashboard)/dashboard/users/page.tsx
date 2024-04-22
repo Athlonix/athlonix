@@ -13,6 +13,7 @@ import {
 import { Input } from '@repo/ui/components/ui/input';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
+import { Toaster } from '@repo/ui/components/ui/toaster';
 
 export default function Page(): JSX.Element {
   return (
@@ -90,6 +91,7 @@ export default function Page(): JSX.Element {
           </div>
         </div>
       </div>
+      <Toaster />
     </main>
   );
 }

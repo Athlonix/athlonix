@@ -1,7 +1,15 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { addUserRole, deleteUser, getAllUsers, getOneUser, removeUserRole, updateUser } from '../routes/user.js';
+import {
+  addUserRole,
+  deleteUser,
+  getAllUsers,
+  getOneUser,
+  removeUserRole,
+  updateUser,
+  updateUserRole,
+} from '../routes/user.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
@@ -129,4 +137,30 @@ users.openapi(deleteUser, async (c) => {
   }
 
   return c.json({ message: 'User deleted' }, 200);
+});
+
+users.openapi(updateUserRole, async (c) => {
+  const { id } = c.req.valid('param');
+  const { roles } = c.req.valid('json');
+  const userRoles = c.get('user').roles || [];
+  await checkRole(userRoles, false, [Role.ADMIN]);
+
+  const { error } = await supabase.from('USERS_ROLES').delete().eq('id_user', id);
+
+  if (error) {
+    return c.json({ error: 'Failed to update roles' }, 400);
+  }
+
+  if (!roles || roles.length === 0) {
+    return c.json({ message: 'Roles updated' }, 200);
+  }
+
+  const insert = roles.map((id_role) => ({ id_user: id, id_role }));
+  const { error: errorInsert } = await supabase.from('USERS_ROLES').insert(insert);
+
+  if (errorInsert) {
+    return c.json({ error: 'Failed to update roles' }, 400);
+  }
+
+  return c.json({ message: 'Roles updated' }, 200);
 });

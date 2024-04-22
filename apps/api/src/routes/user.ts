@@ -189,3 +189,38 @@ export const removeUserRole = createRoute({
   },
   tags: ['user'],
 });
+
+export const updateUserRole = createRoute({
+  method: 'put',
+  path: '/users/{id}/roles',
+  summary: 'Update a user roles',
+  description: 'Update a user roles',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            roles: z.array(z.number()).nullable(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: { message: z.string() },
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+});

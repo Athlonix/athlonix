@@ -1,7 +1,16 @@
 'use client';
 
+import EditForm from '@/app/ui/dashboard/users/EditForm';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@repo/ui/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +20,7 @@ import {
 } from '@repo/ui/components/ui/dropdown-menu';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
+import { useState } from 'react';
 
 interface UserProps {
   id: number;
@@ -36,23 +46,31 @@ const RoleBadge: Record<number, string> = {
 };
 
 export function UserRow(user: UserProps) {
-  console.log(user.roles);
+  const [open, setOpen] = useState(false);
+
+  const [username, setUsername] = useState(user.username);
+  const [firstName, setFirstName] = useState(user.first_name);
+  const [lastName, setLastName] = useState(user.last_name);
+  const [roles, setRoles] = useState(user.roles);
+
+  const setter = { username: setUsername, firstName: setFirstName, lastName: setLastName, roles: setRoles };
+
   return (
     <TableRow key={user.id}>
-      <TableCell className="font-medium">{user.username}</TableCell>
-      <TableCell>{user.first_name}</TableCell>
-      <TableCell>{user.last_name}</TableCell>
+      <TableCell className="font-medium">{username}</TableCell>
+      <TableCell>{firstName}</TableCell>
+      <TableCell>{lastName}</TableCell>
       <TableCell>{user.email}</TableCell>
       <TableCell>TODO</TableCell>
       <TableCell>
-        {user.roles && user.roles.length > 0 ? (
-          user.roles.map((role) => (
+        {roles && roles.length > 0 ? (
+          roles.map((role) => (
             <Badge
               className="m-[2px]"
               key={role.id}
               variant={RoleBadge[role.id] as 'destructive' | 'secondary' | 'success' | 'info'}
             >
-              {role.name.toLowerCase()}
+              {role.name.charAt(0) + role.name.slice(1).toLowerCase()}
             </Badge>
           ))
         ) : (
@@ -71,7 +89,27 @@ export function UserRow(user: UserProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edition de l'utilisateur {user.id}</DialogTitle>
+                    <DialogDescription>
+                      <EditForm
+                        id={user.id}
+                        username={username}
+                        firstName={firstName}
+                        lastName={lastName}
+                        roles={roles.map((role) => role.id)}
+                        closeDialog={() => setOpen(false)}
+                        setter={setter}
+                      />
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+            </Button>
             <DropdownMenuItem>Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

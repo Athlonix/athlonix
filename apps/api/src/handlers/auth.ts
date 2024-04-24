@@ -40,7 +40,7 @@ auth.openapi(signupUser, async (c) => {
       id_referer: null,
       date_validity: null,
       id_auth: data.user.id,
-      created_at: new Date(),
+      created_at: new Date().toISOString(),
     })
     .select()
     .single();

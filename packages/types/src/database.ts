@@ -1003,7 +1003,9 @@ export type Database = {
       };
       USERS: {
         Row: {
+          created_at: string;
           date_validity: string | null;
+          deleted_at: string | null;
           email: string;
           first_name: string;
           id: number;
@@ -1013,7 +1015,9 @@ export type Database = {
           username: string;
         };
         Insert: {
+          created_at: string;
           date_validity?: string | null;
+          deleted_at?: string | null;
           email: string;
           first_name: string;
           id?: number;
@@ -1023,7 +1027,9 @@ export type Database = {
           username: string;
         };
         Update: {
+          created_at?: string;
           date_validity?: string | null;
+          deleted_at?: string | null;
           email?: string;
           first_name?: string;
           id?: number;

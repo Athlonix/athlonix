@@ -14,11 +14,11 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@repo/ui/components/ui/dropdown-menu';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
+import { useToast } from '@repo/ui/hooks/use-toast';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
@@ -46,7 +46,9 @@ const RoleBadge: Record<number, string> = {
 };
 
 function UserRow(user: UserProps) {
-  const [open, setOpen] = useState(false);
+  const { toast } = useToast();
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
   const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(user.first_name);
@@ -54,6 +56,26 @@ function UserRow(user: UserProps) {
   const [roles, setRoles] = useState(user.roles);
 
   const setter = { username: setUsername, firstName: setFirstName, lastName: setLastName, roles: setRoles };
+
+  async function deleteUser() {
+    const urlApi = process.env.ATHLONIX_API_URL;
+    fetch(`${urlApi}/users/${user.id}/soft`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => response.json())
+      .then(() => {
+        toast({ title: 'Succès', description: "L'utilisateur a été supprimé avec succès" });
+      })
+      .catch((error) => {
+        toast({ title: 'Erreur', description: error });
+      });
+
+    setOpenDelete(false);
+  }
 
   return (
     <TableRow key={user.id}>
@@ -90,7 +112,7 @@ function UserRow(user: UserProps) {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <Button variant="ghost" className="w-full p-0 font-normal pl-2">
-              <Dialog open={open} onOpenChange={setOpen}>
+              <Dialog open={openEdit} onOpenChange={setOpenEdit}>
                 <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -102,7 +124,7 @@ function UserRow(user: UserProps) {
                         firstName={firstName}
                         lastName={lastName}
                         roles={roles.map((role) => role.id)}
-                        closeDialog={() => setOpen(false)}
+                        closeDialog={() => setOpenEdit(false)}
                         setter={setter}
                       />
                     </DialogDescription>
@@ -110,7 +132,27 @@ function UserRow(user: UserProps) {
                 </DialogContent>
               </Dialog>
             </Button>
-            <DropdownMenuItem>Delete</DropdownMenuItem>
+            <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+              <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+                <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Edition de l'utilisateur {user.id}</DialogTitle>
+                    <DialogDescription>
+                      <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet utilisateur ?</div>
+                      <div className="flex w-full justify-end gap-4">
+                        <Button variant="destructive" onClick={deleteUser}>
+                          Supprimer
+                        </Button>
+                        <Button variant="secondary" onClick={() => setOpenDelete(false)}>
+                          Annuler
+                        </Button>
+                      </div>
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+            </Button>
           </DropdownMenuContent>
         </DropdownMenu>
       </TableCell>

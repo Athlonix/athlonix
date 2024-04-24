@@ -225,3 +225,30 @@ export const updateUserRole = createRoute({
   },
   tags: ['user'],
 });
+
+export const softDeleteUser = createRoute({
+  method: 'delete',
+  path: '/users/{id}/soft',
+  summary: 'Soft delete a user',
+  description: 'Soft delete a user',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: { message: z.string() },
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});

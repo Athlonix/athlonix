@@ -223,4 +223,5 @@ export const updateUserRole = createRoute({
     500: serverErrorSchema,
     404: notFoundSchema,
   },
+  tags: ['user'],
 });

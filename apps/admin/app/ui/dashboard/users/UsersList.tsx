@@ -1,7 +1,6 @@
 'use client';
 
-import { UserRow } from '@/app/ui/dashboard/users/UserRow';
-import { useEffect, useState } from 'react';
+import UserRow from '@/app/ui/dashboard/users/UserRow';
 
 type User = {
   id: number;
@@ -14,28 +13,7 @@ type User = {
   roles: { id: number; name: string }[];
 };
 
-export function UsersList() {
-  const [users, setUsers] = useState<User[]>([]);
-
-  useEffect(() => {
-    const urlApi = process.env.ATHLONIX_API_URL;
-    fetch(`${urlApi}/users`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setUsers(data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, []);
-
+function UsersList({ users }: { users: User[] }) {
   return (
     <>
       {users.map((user: User) => (
@@ -44,3 +22,5 @@ export function UsersList() {
     </>
   );
 }
+
+export default UsersList;

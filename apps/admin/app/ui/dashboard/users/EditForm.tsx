@@ -34,7 +34,7 @@ interface EditFormProps {
   setter: Setter;
 }
 
-export default function EditForm(props: EditFormProps): JSX.Element {
+function EditForm(props: EditFormProps): JSX.Element {
   const roles = [
     {
       id: 1,
@@ -244,3 +244,5 @@ export default function EditForm(props: EditFormProps): JSX.Element {
     </Form>
   );
 }
+
+export default EditForm;

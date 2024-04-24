@@ -45,7 +45,7 @@ const RoleBadge: Record<number, string> = {
   9: 'info',
 };
 
-export function UserRow(user: UserProps) {
+function UserRow(user: UserProps) {
   const [open, setOpen] = useState(false);
 
   const [username, setUsername] = useState(user.username);
@@ -117,3 +117,5 @@ export function UserRow(user: UserProps) {
     </TableRow>
   );
 }
+
+export default UserRow;

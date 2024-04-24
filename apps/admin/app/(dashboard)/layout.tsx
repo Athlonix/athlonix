@@ -1,12 +1,9 @@
 import '@repo/ui/globals.css';
 import { cn } from '@repo/ui/lib/utils';
-import { Bell, Home, LineChart, Package, Package2, ShoppingCart, Users } from 'lucide-react';
+import { Home, LineChart, Package, Package2, ShoppingCart, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import Link from 'next/link';
-
-import { Badge } from '@repo/ui/components/ui/badge';
-import { Button } from '@repo/ui/components/ui/button';
 
 const fontSans = FontSans({
   subsets: ['latin'],

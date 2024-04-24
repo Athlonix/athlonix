@@ -1,6 +1,7 @@
-import { ListFilter, PlusCircle } from 'lucide-react';
+'use client';
 
-import { UsersList } from '@/app/ui/dashboard/users/UsersList';
+import AddUser from '@/app/ui/dashboard/users/AddUser';
+import UsersList from '@/app/ui/dashboard/users/UsersList';
 import { Button } from '@repo/ui/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import {
@@ -14,8 +15,42 @@ import { Input } from '@repo/ui/components/ui/input';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
 import { Toaster } from '@repo/ui/components/ui/toaster';
+import { ListFilter } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+type User = {
+  id: number;
+  email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  id_referer: number;
+  date_validity: string;
+  roles: { id: number; name: string }[];
+};
 
 export default function Page(): JSX.Element {
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    const urlApi = process.env.ATHLONIX_API_URL;
+    fetch(`${urlApi}/users`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setUsers(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, []);
+
   return (
     <main>
       <div className="flex flex-col h-full">
@@ -44,10 +79,7 @@ export default function Page(): JSX.Element {
                             <DropdownMenuCheckboxItem>Modérateur</DropdownMenuCheckboxItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                        <Button size="sm" className="h-8 gap-1">
-                          <PlusCircle className="h-3.5 w-3.5" />
-                          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Ajouter un utilisateur</span>
-                        </Button>
+                        <AddUser users={users} />
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -75,7 +107,7 @@ export default function Page(): JSX.Element {
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          <UsersList />
+                          <UsersList users={users} />
                         </TableBody>
                       </Table>
                     </CardContent>

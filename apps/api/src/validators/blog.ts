@@ -7,18 +7,20 @@ export const postSchema = z.object({
   cover_image: z.string().nullable(),
 });
 
-export const postSchemaResponse = z.object({
+export const postCardSchemaResponse = z.object({
   id: z.number().min(1),
   title: z.string(),
-  content: z.string(),
-  createdAt: z.string(),
-  coverImage: z.string(),
-  author: z.string(),
-  categories: z.string().array(),
-  likesNumber: z.number(),
-  commentsNumber: z.number(),
-  viewsNumber: z.number(),
+  created_at: z.string(),
+  cover_image: z.string(),
+  description: z.string(),
+  author: z.object({ id: z.number(), username: z.string() }),
+  categories: z.object({ id: z.number(), name: z.string() }).array(),
+  comments_number: z.number(),
+  views_number: z.number(),
+  likes_number: z.number(),
 });
+
+export const postCardListSchemaResponse = z.array(postCardSchemaResponse);
 
 export const insertPostSchema = postSchema.omit({ id: true });
 

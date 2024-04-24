@@ -1,3 +1,4 @@
+import { equal } from 'node:assert';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
@@ -15,6 +16,7 @@ import {
 } from '../routes/blog.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
+import { postCardListSchemaResponse } from '../validators/blog.js';
 import type { Variables } from '../validators/general.js';
 import { Role } from '../validators/general.js';
 
@@ -25,13 +27,38 @@ export const blog = new OpenAPIHono<{ Variables: Variables }>({
 blog.openapi(getAllPosts, async (c) => {
   const { skip, take } = c.req.valid('query');
   const { from, to } = getPagination(skip, take - 1);
-  const { data, error } = await supabase.from('POSTS').select('*').range(from, to);
+  const { data, error } = await supabase
+    .from('POSTS')
+    .select(
+      `id,title,created_at,cover_image,description,
+      author:USERS!public_POSTS_user_id_fkey(id,username),
+      categories:POSTS_CATEGORIES(CATEGORIES(id,name)),
+      comments_number:COMMENTS(count),
+      views_number:POSTS_VIEWS(count),
+      likes_number:POSTS_REACTIONS(count)`,
+    )
+    .range(from, to);
 
-  if (error) {
+  console.log(data);
+
+  if (error || !data) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json(data, 200);
+  const finalData = data.map((row) => {
+    return {
+      ...row,
+      categories: row.categories.map((cat) => ({
+        id: cat.CATEGORIES?.id,
+        name: cat.CATEGORIES?.name,
+      })),
+      comments_number: row.comments_number[0].count,
+      views_number: row.views_number[0].count,
+      likes_number: row.likes_number[0].count,
+    };
+  });
+
+  return c.json(finalData, 200);
 });
 
 blog.openapi(getPost, async (c) => {

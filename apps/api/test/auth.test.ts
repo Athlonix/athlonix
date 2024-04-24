@@ -12,16 +12,16 @@ describe('Auth tests', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        first_name: 'John',
-        last_name: 'Doe',
-        username: 'john_doe',
-        email: 'john@gmail.com',
+        first_name: 'auth_test',
+        last_name: 'auth_test',
+        username: 'auth_test',
+        email: 'auth_test@gmail.com',
         password: 'password123456',
       }),
     });
     expect(res.status).toBe(201);
     const users = await res.json();
-    expect(users).toMatchObject({ first_name: 'John' });
+    expect(users).toMatchObject({ first_name: 'auth_test' });
     id_auth = users.id_auth;
     id_user = users.id;
   });
@@ -31,7 +31,7 @@ describe('Auth tests', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'john@gmail.com',
+        email: 'auth_test@gmail.com',
         password: 'password123456',
       }),
     });
@@ -43,7 +43,7 @@ describe('Auth tests', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'john@gmail.com',
+        email: 'auth_test@gmail.com',
         password: 'fake-super-password',
       }),
     });

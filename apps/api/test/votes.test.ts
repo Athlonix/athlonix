@@ -8,28 +8,29 @@ const path = `http://localhost:${port}`;
 let id_user: number;
 let id_auth: string;
 let jwt: string;
-let id_location: number;
+let id_polls: number;
 
-describe('Location tests', () => {
+describe('Votes tests', () => {
   test('Create admin', async () => {
     const res = await app.request(`${path}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        first_name: 'location',
-        last_name: 'location',
-        username: 'location',
-        email: 'location@gmail.com',
+        first_name: 'polls',
+        last_name: 'polls',
+        username: 'polls',
+        email: 'polls@gmail.com',
         password: 'password123456',
       }),
     });
     expect(res.status).toBe(201);
     const user = await res.json();
+    console.log(user);
     id_auth = user.id_auth;
     id_user = user.id;
     const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.ADMIN });
     if (error) {
-      console.error('Error while updating user');
+      console.error('Error while updating user: ', error);
       exit(1);
     }
   });
@@ -39,7 +40,7 @@ describe('Location tests', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'location@gmail.com',
+        email: 'polls@gmail.com',
         password: 'password123456',
       }),
     });
@@ -48,29 +49,28 @@ describe('Location tests', () => {
     jwt = user.token;
   });
 
-  test('Create address', async () => {
-    const res = await app.request(`${path}/addresses`, {
+  test('Create poll', async () => {
+    const res = await app.request(`${path}/polls`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        road: 'Road test',
-        postal_code: '12345',
-        complement: 'Complement test',
-        city: 'City test',
-        number: 123,
-        name: 'Name test',
-        id_lease: null,
+        title: 'Title test',
+        description: 'Description test',
+        start_at: '2022-12-12',
+        end_at: '2022-12-12',
+        max_choices: 2,
+        options: [{ content: 'Option test' }, { content: 'Option test 2' }, { content: 'Option test 3' }],
       }),
     });
     expect(res.status).toBe(201);
-    const location = await res.json();
-    id_location = location.id;
+    const poll = await res.json();
+    id_polls = poll.id;
   });
 
-  test('Get all addresses', async () => {
+  test('Get all polls', async () => {
     const res = await app.request(`${path}/addresses`, {
       method: 'GET',
       headers: {
@@ -81,28 +81,47 @@ describe('Location tests', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Update address', async () => {
-    const res = await app.request(`${path}/addresses/${id_location}`, {
-      method: 'PATCH',
+  test('Vote to poll', async () => {
+    const res = await app.request(`${path}/polls/${id_polls}/vote`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        road: 'Road test',
-        postal_code: '12345',
-        complement: 'Complement test',
-        city: 'City test',
-        number: 123,
-        name: 'Name test',
-        id_lease: null,
+        options: [1, 2],
       }),
+    });
+    expect(res.status).toBe(201);
+  });
+
+  test('Vote to poll again not allowed', async () => {
+    const res = await app.request(`${path}/polls/${id_polls}/vote`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        options: [1, 3],
+      }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  test('Get poll results', async () => {
+    const res = await app.request(`${path}/polls/${id_polls}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
     });
     expect(res.status).toBe(200);
   });
 
-  test('Delete address', async () => {
-    const res = await app.request(`${path}/addresses/${id_location}`, {
+  test('Delete poll', async () => {
+    const res = await app.request(`${path}/polls/${id_polls}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

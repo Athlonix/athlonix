@@ -1,7 +1,7 @@
 import { exit } from 'node:process';
 import app from '../src/index.js';
 import { supAdmin } from '../src/libs/supabase.js';
-import { Role } from '../src/validators/general';
+import { Role } from '../src/validators/general.js';
 import { deleteAdmin } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
@@ -77,11 +77,11 @@ describe('User tests', () => {
   });
 
   test('GET user /users/{id} with wrong id', async () => {
-    const res = await app.request(`${path}/users/0`, {
+    const res = await app.request(`${path}/users/20000`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     });
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(404);
   });
 
   test('PATCH user /users/{id}', async () => {

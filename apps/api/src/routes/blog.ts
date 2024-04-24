@@ -190,8 +190,8 @@ export const commentOnPost = createRoute({
 export const getComments = createRoute({
   method: 'get',
   path: '/posts/{id}/comments',
-  summary: 'Get comments on a post',
-  description: 'Get comments on a post',
+  summary: 'Get comments and responses on a post',
+  description: 'Get comments and responses on a post',
   request: {
     params: idParamValidator,
     query: paginationSchema,
@@ -254,8 +254,8 @@ export const updateComment = createRoute({
   path: '/posts/{id_post}/comments/{id_comment}',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
-  summary: 'Update a comment',
-  description: 'Update a comment',
+  summary: 'Update a comment or a response',
+  description: 'Update a comment or a response',
   request: {
     params: z.object({
       id_post: z.coerce.number(),
@@ -290,8 +290,8 @@ export const deleteComment = createRoute({
   path: '/posts/{id_post}/comments/{id_comment}',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
-  summary: 'Delete a comment',
-  description: 'Delete a comment',
+  summary: 'Delete a comment or a response',
+  description: 'Delete a comment or a response',
   request: {
     params: z.object({
       id_post: z.coerce.number(),

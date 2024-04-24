@@ -12,10 +12,19 @@ import {
   DropdownMenuTrigger,
 } from '@repo/ui/components/ui/dropdown-menu';
 import { Input } from '@repo/ui/components/ui/input';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@repo/ui/components/ui/pagination';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
 import { Toaster } from '@repo/ui/components/ui/toaster';
 import { ListFilter } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 type User = {
@@ -30,11 +39,22 @@ type User = {
 };
 
 export default function Page(): JSX.Element {
+  const searchParams = useSearchParams();
+  let page = searchParams.get('page') || 1;
+  if (typeof page === 'string') {
+    page = Number.parseInt(page);
+  }
+  const [maxPage, setMaxPage] = useState<number>(1);
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
     const urlApi = process.env.ATHLONIX_API_URL;
-    fetch(`${urlApi}/users`, {
+    const queryParams = new URLSearchParams({
+      skip: `${page - 1}`,
+      take: '10',
+    });
+    console.log(`${urlApi}/users?${queryParams}`);
+    fetch(`${urlApi}/users?${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -43,13 +63,29 @@ export default function Page(): JSX.Element {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setUsers(data);
       })
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+
+    fetch(`${urlApi}/users/count`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setMaxPage(Math.ceil(data.count / 10));
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [page]);
+
+  console.log(maxPage, page);
 
   return (
     <main>
@@ -112,9 +148,45 @@ export default function Page(): JSX.Element {
                       </Table>
                     </CardContent>
                     <CardFooter>
-                      <div className="text-xs text-muted-foreground">
-                        Showing <strong>1-10</strong> of <strong>32</strong> products
-                      </div>
+                      <Pagination>
+                        <PaginationContent>
+                          {page > 1 && (
+                            <PaginationItem>
+                              <PaginationPrevious href={`/dashboard/users?page=${page - 1}`} />
+                            </PaginationItem>
+                          )}
+                          {page > 3 && (
+                            <PaginationItem>
+                              <PaginationLink href={`/dashboard/users?page=${page - 2}`}>{page - 2}</PaginationLink>
+                            </PaginationItem>
+                          )}
+                          {page > 2 && (
+                            <PaginationItem>
+                              <PaginationLink href={`/dashboard/users?page=${page - 1}`}>{page - 1}</PaginationLink>
+                            </PaginationItem>
+                          )}
+                          <PaginationItem>
+                            <PaginationLink href={`/dashboard/users?page=${page}`} isActive>
+                              {page}
+                            </PaginationLink>
+                          </PaginationItem>
+                          {page < maxPage && (
+                            <PaginationItem>
+                              <PaginationLink href={`/dashboard/users?page=${page + 1}`}>{page + 1}</PaginationLink>
+                            </PaginationItem>
+                          )}
+                          {page < maxPage - 1 && (
+                            <PaginationItem>
+                              <PaginationLink href={`/dashboard/users?page=${page + 2}`}>{page + 2}</PaginationLink>
+                            </PaginationItem>
+                          )}
+                          {page < maxPage && (
+                            <PaginationItem>
+                              <PaginationNext href={`/dashboard/users?page=${page + 1}`} />
+                            </PaginationItem>
+                          )}
+                        </PaginationContent>
+                      </Pagination>
                     </CardFooter>
                   </Card>
                 </TabsContent>

@@ -6,9 +6,8 @@ export const paginationSchema = z.object({
 });
 
 export const getPagination = (page: number, size: number): { from: number; to: number } => {
-  const limit = size ? size : 10;
-  const from = page ? page * limit : 0;
-  const to = page ? from + size : size;
+  const from = size * page;
+  const to = from + size - 1;
 
   return { from, to };
 };

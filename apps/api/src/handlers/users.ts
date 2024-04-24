@@ -6,6 +6,7 @@ import {
   deleteUser,
   getAllUsers,
   getOneUser,
+  getUsersCount,
   removeUserRole,
   softDeleteUser,
   updateUser,
@@ -24,7 +25,7 @@ users.openapi(getAllUsers, async (c) => {
   const roles = c.get('user').roles;
   await checkRole(roles, false, [Role.ADMIN]);
   const { skip, take } = c.req.valid('query');
-  const { from, to } = getPagination(skip, take - 1);
+  const { from, to } = getPagination(skip, take);
   const { data, error } = await supabase
     .from('USERS')
     .select('*, roles:ROLES (id, name)')
@@ -37,6 +38,18 @@ users.openapi(getAllUsers, async (c) => {
   }
 
   return c.json(data, 200);
+});
+
+users.openapi(getUsersCount, async (c) => {
+  const roles = c.get('user').roles || [];
+  await checkRole(roles, false, [Role.ADMIN]);
+  const { data, error } = await supabase.from('USERS').select('id').filter('deleted_at', 'is', null);
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  return c.json({ count: data?.length }, 200);
 });
 
 users.openapi(getOneUser, async (c) => {

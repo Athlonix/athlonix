@@ -26,7 +26,7 @@ jobs:
 
       - uses: 🛠️ actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: latest
 
       - name: 🛠️ Setup Biome
         uses: biomejs/setup-biome@v2

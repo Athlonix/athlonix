@@ -1,7 +1,7 @@
 FROM node:21-alpine AS base
 WORKDIR /app
 
-ENV NEXT_PUBLIC_API_URL ${NEXT_PUBLIC_API_URL}
+ARG ${PORT}
 ENV PORT ${PORT}
 EXPOSE ${PORT}
 
@@ -19,6 +19,9 @@ RUN turbo prune client --docker
 
 FROM base as deps
 WORKDIR /app
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL ${NEXT_PUBLIC_API_URL}
 
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml

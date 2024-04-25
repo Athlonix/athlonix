@@ -1,6 +1,7 @@
 FROM node:21-alpine AS base
 WORKDIR /app
 
+ARG ${PORT}
 ENV PORT ${PORT}
 EXPOSE ${PORT}
 
@@ -40,7 +41,7 @@ RUN pnpm turbo run build --filter api && \
 
 FROM base AS dev
 WORKDIR /app
-ENV NODE_ENV=development
+ENV NODE_ENV development
 
 COPY --from=pruner --chown=node:node /app/out/full/ ./
 COPY --from=deps --chown=node:node /app/ ./
@@ -51,7 +52,7 @@ CMD ["pnpm", "run", "dev"]
 
 FROM base AS prod
 WORKDIR /app
-ENV NODE_ENV=production
+ENV NODE_ENV production
 
 COPY --from=builder --chown=node:node /app/out/package.json .
 COPY --from=builder --chown=node:node /app/out/node_modules/ ./node_modules

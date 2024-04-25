@@ -82,6 +82,9 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
           provenance: true
           sbom: true
+          build-args:
+            |
+            PORT=3101
 
       - name: 💬 Set output
         id: image-tag

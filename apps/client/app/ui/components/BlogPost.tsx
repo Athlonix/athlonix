@@ -38,9 +38,11 @@ export const BlogPost: React.FC<PostProps> = ({
         <div className="relative w-64 h-36">
           <Link href="/simon">
             <Image
-              className="absolute object-cover top-0 left-0"
+              className="object-cover"
+              width={256}
+              height={144}
               src={`${process.env.ATHLONIX_STORAGE_URL}/image/blog_posts/${cover_image}`}
-              layout="fill"
+              style={{ width: '256px', height: '144px' }} // optional
               alt={coverImageName}
             />
           </Link>

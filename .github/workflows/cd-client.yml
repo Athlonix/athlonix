@@ -85,7 +85,7 @@ jobs:
           build-args:
             |
             PORT=3102
-            NEXT_PUBLIC_API_URL=http://athlonix-api:3101
+            NEXT_PUBLIC_API_URL=https://athlonix-api.jayllyz.fr
 
       - name: 💬 Set output
         id: image-tag

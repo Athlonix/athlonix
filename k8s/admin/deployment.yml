@@ -27,7 +27,7 @@ spec:
           - name: PORT
             value: "3100"
           - name: NEXT_PUBLIC_API_URL
-            value: "http://athlonix-api:3101"
+            value: "https://athlonix-api.jayllyz.fr"
         resources:
           limits:
             memory: "2Gi"

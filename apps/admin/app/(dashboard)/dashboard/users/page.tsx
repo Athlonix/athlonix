@@ -41,7 +41,7 @@ function ShowContent() {
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
-    const urlApi = process.env.ATHLONIX_API_URL;
+    const urlApi = process.env.NEXT_PUBLIC_ATHLONIX_API_URL;
 
     const timer = setTimeout(() => {
       const queryParams = new URLSearchParams({

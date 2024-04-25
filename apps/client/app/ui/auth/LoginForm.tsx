@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 export default function LoginForm(): JSX.Element {
   const router = useRouter();
-  const urlApi = process.env.ATHLONIX_API_URL;
+  const urlApi = process.env.NEXT_PUBLIC_ATHLONIX_API_URL;
 
   const formSchema = z.object({
     email: z.string().email({ message: 'Email invalide' }),

@@ -15,7 +15,7 @@ interface NavBarProps {
 }
 
 function LogoutUser() {
-  const urlApi = process.env.ATHLONIX_API_URL;
+  const urlApi = process.env.NEXT_PUBLIC_ATHLONIX_API_URL;
   fetch(`${urlApi}/auth/logout`, {
     method: 'DELETE',
     headers: {

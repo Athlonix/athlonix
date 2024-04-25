@@ -2,15 +2,7 @@
 
 import AddUser from '@/app/ui/dashboard/users/AddUser';
 import UsersList from '@/app/ui/dashboard/users/UsersList';
-import { Button } from '@repo/ui/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@repo/ui/components/ui/dropdown-menu';
 import { Input } from '@repo/ui/components/ui/input';
 import {
   Pagination,
@@ -23,7 +15,6 @@ import {
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
 import { Toaster } from '@repo/ui/components/ui/toaster';
-import { ListFilter } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
@@ -47,44 +38,55 @@ function ShowContent() {
 
   const [maxPage, setMaxPage] = useState<number>(1);
   const [users, setUsers] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const urlApi = process.env.ATHLONIX_API_URL;
-    const queryParams = new URLSearchParams({
-      skip: `${page - 1}`,
-      take: '10',
-    });
-    console.log(`${urlApi}/users?${queryParams}`);
-    fetch(`${urlApi}/users?${queryParams}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setUsers(data);
-      })
-      .catch((error) => {
-        console.log(error);
+
+    const timer = setTimeout(() => {
+      const queryParams = new URLSearchParams({
+        skip: `${page - 1}`,
+        take: '10',
+        search: searchTerm,
       });
 
-    fetch(`${urlApi}/users/count`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setMaxPage(Math.ceil(data.count / 10));
+      fetch(`${urlApi}/users?${queryParams}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
       })
-      .catch((error) => {
-        console.log(error);
-      });
-  }, [page]);
+        .then((response) => response.json())
+        .then((data) => {
+          setUsers(data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      fetch(`${urlApi}/users/count?search=${searchTerm}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setMaxPage(Math.ceil(data.count / 10));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [page, searchTerm]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
   return (
     <TabsContent value="all">
@@ -92,22 +94,6 @@ function ShowContent() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Utilisateurs</CardTitle>
           <div className="flex gap-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 gap-1">
-                  <ListFilter className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Rôles</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuCheckboxItem>Retirer</DropdownMenuCheckboxItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem>Banni</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem checked>Utilisateur</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Rédacteur</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Modérateur</DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <AddUser users={users} />
           </div>
         </CardHeader>
@@ -115,8 +101,10 @@ function ShowContent() {
           <div className="ml-auto flex items-center gap-2">
             <Input
               type="search"
-              placeholder="Search..."
+              placeholder="Rechercher..."
               className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+              onChange={handleSearch}
+              value={searchTerm}
             />
           </div>
           <Table>

@@ -25,14 +25,17 @@ export const users = new OpenAPIHono<{ Variables: Variables }>({
 users.openapi(getAllUsers, async (c) => {
   const roles = c.get('user').roles;
   await checkRole(roles, false, [Role.ADMIN]);
-  const { skip, take } = c.req.valid('query');
+  const { search, skip, take } = c.req.valid('query');
+  const searchTerm = search !== undefined ? search : '';
+
   const { from, to } = getPagination(skip, take);
   const { data, error } = await supabase
     .from('USERS')
     .select('*, roles:ROLES (id, name)')
     .range(from, to)
     .order('created_at', { ascending: true })
-    .filter('deleted_at', 'is', null);
+    .filter('deleted_at', 'is', null)
+    .like('username', `%${searchTerm}%`);
 
   if (error) {
     return c.json({ error: error.message }, 500);
@@ -44,7 +47,13 @@ users.openapi(getAllUsers, async (c) => {
 users.openapi(getUsersCount, async (c) => {
   const roles = c.get('user').roles || [];
   await checkRole(roles, false, [Role.ADMIN]);
-  const { data, error } = await supabase.from('USERS').select('id').filter('deleted_at', 'is', null);
+  const { search } = c.req.valid('query');
+  const searchTerm = search !== undefined ? search : '';
+  const { data, error } = await supabase
+    .from('USERS')
+    .select('id')
+    .filter('deleted_at', 'is', null)
+    .like('username', `%${searchTerm}%`);
 
   if (error) {
     return c.json({ error: error.message }, 500);

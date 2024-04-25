@@ -12,7 +12,10 @@ export const getAllUsers = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    query: paginationSchema,
+    query: z.object({
+      search: z.string().optional(),
+      ...paginationSchema.shape,
+    }),
   },
   responses: {
     200: {
@@ -260,6 +263,11 @@ export const getUsersCount = createRoute({
   description: 'Get users count',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
+  request: {
+    query: z.object({
+      search: z.string().optional(),
+    }),
+  },
   responses: {
     200: {
       description: 'Successful response',

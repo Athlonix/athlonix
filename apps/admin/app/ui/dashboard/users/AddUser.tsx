@@ -54,7 +54,7 @@ function AddUser({ users }: { users: User[] }) {
   });
 
   async function submitEdit(values: z.infer<typeof formSchema>) {
-    const urlApi = process.env.ATHLONIX_API_URL;
+    const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
     fetch(`${urlApi}/auth/signup`, {
       method: 'POST',

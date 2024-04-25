@@ -1,8 +1,8 @@
 FROM node:21-alpine AS base
 WORKDIR /app
 
-ENV PORT 3101
-EXPOSE 3101
+ENV PORT ${PORT}
+EXPOSE ${PORT}
 
 # hadolint ignore=DL3018
 RUN apk add --no-cache libc6-compat && \

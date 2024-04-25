@@ -82,6 +82,10 @@ jobs:
           labels: ${{ steps.docker_meta.outputs.labels }}
           provenance: true
           sbom: true
+          build-args:
+            |
+            PORT=3102
+            NEXT_PUBLIC_API_URL=http://athlonix-api:3101
 
       - name: 💬 Set output
         id: image-tag

@@ -1,7 +1,7 @@
 FROM node:21-alpine AS base
 WORKDIR /app
 
-ENV NEXT_PUBLIC_API_URL ${NEXT_PUBLIC_API_URL}
+ARG PORT
 ENV PORT ${PORT}
 EXPOSE ${PORT}
 
@@ -20,6 +20,9 @@ RUN turbo prune admin --docker
 FROM base as deps
 WORKDIR /app
 
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL ${NEXT_PUBLIC_API_URL}
+
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 
@@ -36,7 +39,7 @@ RUN pnpm turbo run build --filter admin && \
 
 FROM base AS dev
 WORKDIR /app
-ENV NODE_ENV=development
+ENV NODE_ENV development
 
 COPY --from=pruner --chown=node:node /app/out/full/ ./
 COPY --from=deps --chown=node:node /app/ ./

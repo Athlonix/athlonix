@@ -7,6 +7,6 @@ module.exports = {
     formats: ['image/avif', 'image/webp'],
   },
   env: {
-    NEXT_PUBLIC_ATHLONIX_API_URL: process.env.NEXT_PUBLIC_ATHLONIX_API_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
 };

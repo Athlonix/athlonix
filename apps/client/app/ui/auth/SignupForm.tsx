@@ -36,7 +36,7 @@ export default function SignupForm(): JSX.Element {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const urlApi = process.env.NEXT_PUBLIC_ATHLONIX_API_URL;
+    const urlApi = process.env.NEXT_PUBLIC_API_URL;
     fetch(`${urlApi}/auth/signup`, {
       method: 'POST',
       headers: {

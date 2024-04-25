@@ -58,7 +58,7 @@ function UserRow(user: UserProps) {
   const setter = { username: setUsername, firstName: setFirstName, lastName: setLastName, roles: setRoles };
 
   async function deleteUser() {
-    const urlApi = process.env.NEXT_PUBLIC_ATHLONIX_API_URL;
+    const urlApi = process.env.NEXT_PUBLIC_API_URL;
     fetch(`${urlApi}/users/${user.id}/soft`, {
       method: 'DELETE',
       headers: {

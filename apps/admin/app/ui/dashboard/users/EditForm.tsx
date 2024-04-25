@@ -94,7 +94,7 @@ function EditForm(props: EditFormProps): JSX.Element {
   const { toast } = useToast();
 
   async function submitEdit(values: z.infer<typeof formSchema>) {
-    const urlApi = process.env.NEXT_PUBLIC_ATHLONIX_API_URL;
+    const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
     fetch(`${urlApi}/users/${props.id}`, {
       method: 'PATCH',

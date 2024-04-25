@@ -1091,6 +1091,7 @@ export type Database = {
         Row: {
           created_at: string;
           date_validity: string | null;
+          deleted_at: string | null;
           email: string;
           first_name: string;
           id: number;
@@ -1102,6 +1103,7 @@ export type Database = {
         Insert: {
           created_at: string;
           date_validity?: string | null;
+          deleted_at?: string | null;
           email: string;
           first_name: string;
           id?: number;
@@ -1113,6 +1115,7 @@ export type Database = {
         Update: {
           created_at?: string;
           date_validity?: string | null;
+          deleted_at?: string | null;
           email?: string;
           first_name?: string;
           id?: number;

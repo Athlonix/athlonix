@@ -12,7 +12,10 @@ export const getAllUsers = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    query: paginationSchema,
+    query: z.object({
+      search: z.string().optional(),
+      ...paginationSchema.shape,
+    }),
   },
   responses: {
     200: {
@@ -186,6 +189,99 @@ export const removeUserRole = createRoute({
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+  },
+  tags: ['user'],
+});
+
+export const updateUserRole = createRoute({
+  method: 'put',
+  path: '/users/{id}/roles',
+  summary: 'Update a user roles',
+  description: 'Update a user roles',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            roles: z.array(z.number()).nullable(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: { message: z.string() },
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});
+
+export const softDeleteUser = createRoute({
+  method: 'delete',
+  path: '/users/{id}/soft',
+  summary: 'Soft delete a user',
+  description: 'Soft delete a user',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: { message: z.string() },
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});
+
+export const getUsersCount = createRoute({
+  method: 'get',
+  path: '/users/count',
+  summary: 'Get users count',
+  description: 'Get users count',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    query: z.object({
+      search: z.string().optional(),
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: z.object({
+              count: z.number(),
+            }),
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
   },
   tags: ['user'],
 });

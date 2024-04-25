@@ -15,24 +15,24 @@
     "test:dev": "vitest --watch"
   },
   "dependencies": {
-    "@hono/node-server": "^1.10.0",
+    "@hono/node-server": "^1.11.0",
     "@hono/swagger-ui": "^0.2.1",
     "@hono/zod-openapi": "^0.11.0",
     "@hono/zod-validator": "^0.2.1",
     "@repo/types": "workspace:*",
     "@supabase/supabase-js": "^2.42.5",
-    "hono": "^4.2.5",
-    "zod": "^3.22.5",
-    "zod-validation-error": "^3.1.0"
+    "hono": "^4.2.7",
+    "zod": "^3.23.4",
+    "zod-validation-error": "^3.2.0"
   },
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^20.12.7",
     "@types/swagger-ui-dist": "^3.30.4",
-    "supabase": "^1.162.4",
+    "supabase": "^1.163.2",
     "tsx": "^4.7.2",
     "typescript": "^5.4.5",
-    "vitest": "^1.5.0"
+    "vitest": "^1.5.1"
   }
 }

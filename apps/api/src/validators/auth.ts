@@ -21,6 +21,7 @@ export type selectUser = {
   roles:
     | {
         id_role: number;
+        name: string;
       }[]
     | null;
 };

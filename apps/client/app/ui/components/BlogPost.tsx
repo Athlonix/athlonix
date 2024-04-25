@@ -1,56 +1,45 @@
 'use client';
 
+import type { Post } from '@/app/lib/type/Post';
 import LikeIcon from '@/app/ui/svg/LikeIcon';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { BookOpenCheck, Ellipsis, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export interface PostProps {
-  id: number;
-  content: string;
-  coverImage: string;
-  title: string;
-  userName: string;
-  like: number;
-  userLiked: boolean;
-  views: number;
-  comments: number;
-  createdDate: Date;
-  badges: string[];
+type PostProps = Post & {
   handleLikeButton: (id: number) => void;
-}
+};
 
 export const BlogPost: React.FC<PostProps> = ({
   id,
-  content,
-  coverImage,
+  description,
+  cover_image,
+  createdAt,
   title,
-  userName,
-  like,
-  views,
-  comments,
-  userLiked,
-  createdDate,
-  badges,
+  author,
+  likes_number,
+  views_number,
+  comments_number,
+  categories,
   handleLikeButton,
 }: PostProps) => {
-  const coverImageName: string = coverImage.split('.')[0] || '';
+  const coverImageName: string = cover_image.split('.')[0] || '';
 
-  const badgesElements = badges.map((badge) => (
-    <Badge key={badge} className="w-16 flex items-center justify-center">
-      {badge}
+  const badgesElements = categories.map((badge) => (
+    <Badge key={badge.id} className="min-w-16 flex items-center justify-center">
+      {badge.name}
     </Badge>
   ));
 
   return (
     <div className="h-44 p-4 shadow-lg">
-      <div className="flex gap-6">
+      <div className="flex gap-6 h-full">
         <div className="relative w-64 h-36">
           <Link href="/simon">
             <Image
               className="absolute object-cover top-0 left-0"
-              src={`https://wkpdfodfnkbdvyjuuttd.supabase.co/storage/v1/object/public/images/blog_posts/${coverImage}`}
+              src={`${process.env.ATHLONIX_STORAGE_URL}/image/blog_posts/${cover_image}`}
               layout="fill"
               alt={coverImageName}
             />
@@ -64,13 +53,15 @@ export const BlogPost: React.FC<PostProps> = ({
             <p>
               Par{' '}
               <Link href="simon" className="font-medium text-accent underline underline-offset-2 max-w-32 truncate">
-                {userName}
+                {author.username}
               </Link>
-              , <span>{createdDate.toDateString()}</span>
+              {/* , <span>{createdAt.toString()}</span> */}
             </p>
             <div className="flex items-center gap-3">{badgesElements}</div>
           </div>
-          <p className="font-extralight text-slate-950 leading-5 text-ellipsis overflow-hidden">{content}</p>
+          <div>
+            <p className="font-extralight text-slate-950 leading-5 h-full line-clamp-3 text-ellipsis">{description}</p>
+          </div>
         </div>
         <div className=" flex flex-col justify-between ml-auto">
           <div className="flex justify-end w-full">
@@ -80,7 +71,7 @@ export const BlogPost: React.FC<PostProps> = ({
           </div>
           <div className="w-full flex justify-end items-center gap-4">
             <div className="flex items-center gap-1 font-medium text-sm">
-              <span>{like}</span>
+              <span>{likes_number}</span>
               <button
                 type="button"
                 className="cursor-pointer"
@@ -89,19 +80,19 @@ export const BlogPost: React.FC<PostProps> = ({
                   handleLikeButton(id);
                 }}
               >
-                <LikeIcon isClicked={userLiked} />
+                <LikeIcon isClicked={true} />
               </button>
             </div>
 
             <div className="flex items-center gap-1 font-medium text-sm">
-              <span>{comments}</span>
+              <span>{comments_number}</span>
               <div>
                 <MessageSquare />
               </div>
             </div>
 
             <div className="flex items-center gap-1 font-medium text-sm">
-              <span>{views}</span>
+              <span>{views_number}</span>
               <div>
                 <BookOpenCheck />
               </div>

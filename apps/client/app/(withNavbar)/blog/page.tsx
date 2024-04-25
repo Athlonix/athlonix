@@ -32,21 +32,15 @@ export default function Page(): JSX.Element {
     });
   }
 
-  const [posts, setPosts] = useState<Post[]>(dummyPosts);
+  const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    const API_URL = 'http://localhost:3101';
-    console.log(API_URL);
-
-    fetch(`${API_URL}/blog/posts`)
+    fetch(`${process.env.ATHLONIX_API_URL}/blog/posts?skip=0&take=10`)
       .then((r) => {
-        console.log('hey');
         return r.json();
       })
-      .then((r) => {
-        console.log('fin');
-
-        console.log(r);
+      .then((postsData) => {
+        setPosts(postsData);
       });
   }, []);
 

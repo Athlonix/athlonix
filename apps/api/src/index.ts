@@ -1,6 +1,7 @@
 import { serve } from '@hono/node-server';
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
+import type { Context } from 'hono';
 import { compress } from 'hono/compress';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
@@ -50,7 +51,7 @@ app.route('/', polls);
 app.route('/auth', auth);
 app.route('/blog', blog);
 
-app.doc('/doc', (c) => ({
+app.doc('/doc', (c: Context) => ({
   openapi: '3.0.0',
   info: {
     version: '1.0.0',

@@ -20,7 +20,7 @@ describe('Auth tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const users = await res.json();
+    const users: { id: number; id_auth: string; first_name: string } = await res.json();
     expect(users).toMatchObject({ first_name: 'auth_test' });
     id_auth = users.id_auth;
     id_user = users.id;

@@ -58,10 +58,10 @@ function ShowContent() {
         },
       })
         .then((response) => response.json())
-        .then((data) => {
+        .then((data: User[]) => {
           setUsers(data);
         })
-        .catch((error) => {
+        .catch((error: Error) => {
           console.log(error);
         });
 
@@ -73,10 +73,10 @@ function ShowContent() {
         },
       })
         .then((response) => response.json())
-        .then((data) => {
+        .then((data: { count: number }) => {
           setMaxPage(Math.ceil(data.count / 10));
         })
-        .catch((error) => {
+        .catch((error: Error) => {
           console.log(error);
         });
     }, 500);

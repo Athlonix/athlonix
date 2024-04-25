@@ -26,7 +26,7 @@ describe('User tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const admin = await res.json();
+    const admin: { id: number; id_auth: string } = await res.json();
     auth_admin = admin.id_auth;
     id_admin = admin.id;
     const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: admin.id, id_role: Role.ADMIN });
@@ -46,7 +46,7 @@ describe('User tests', () => {
       }),
     });
     expect(res.status).toBe(200);
-    const admin = await res.json();
+    const admin: { token: string } = await res.json();
     jwt = admin.token;
   });
 
@@ -63,7 +63,7 @@ describe('User tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const user = await res.json();
+    const user: { id: number; id_auth: string } = await res.json();
     id_user = user.id;
     id_auth = user.id_auth;
   });

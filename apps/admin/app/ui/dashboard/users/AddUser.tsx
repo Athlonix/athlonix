@@ -70,7 +70,7 @@ function AddUser({ users }: { users: User[] }) {
       }),
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then((data: { id: number }) => {
         toast({ title: 'Utilisateur créé', description: "L'utilisateur a été créé avec succès" });
         users.push({
           id: data.id,
@@ -83,8 +83,8 @@ function AddUser({ users }: { users: User[] }) {
           roles: [],
         });
       })
-      .catch((error) => {
-        toast({ title: 'Erreur', description: error });
+      .catch((error: Error) => {
+        toast({ title: 'Erreur', description: error?.message });
       });
 
     setOpen(false);

@@ -24,8 +24,7 @@ describe('Votes tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const user = await res.json();
-    console.log(user);
+    const user: { id: number; id_auth: string } = await res.json();
     id_auth = user.id_auth;
     id_user = user.id;
     const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.ADMIN });
@@ -45,7 +44,7 @@ describe('Votes tests', () => {
       }),
     });
     expect(res.status).toBe(200);
-    const user = await res.json();
+    const user: { token: string } = await res.json();
     jwt = user.token;
   });
 
@@ -66,7 +65,7 @@ describe('Votes tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const poll = await res.json();
+    const poll: { id: number } = await res.json();
     id_polls = poll.id;
   });
 

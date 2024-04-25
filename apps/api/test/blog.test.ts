@@ -25,7 +25,7 @@ describe('Blog tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const user = await res.json();
+    const user: { id: number; id_auth: string } = await res.json();
     id_auth = user.id_auth;
     id_user = user.id;
     const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.REDACTOR });
@@ -46,7 +46,7 @@ describe('Blog tests', () => {
       }),
     });
     expect(res.status).toBe(200);
-    const user = await res.json();
+    const user: { token: string } = await res.json();
     jwt = user.token;
   });
 
@@ -64,7 +64,7 @@ describe('Blog tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const post = await res.json();
+    const post: { id: number } = await res.json();
     id_post = post.id;
   });
 
@@ -76,7 +76,7 @@ describe('Blog tests', () => {
       },
     });
     expect(res.status).toBe(200);
-    const post = await res.json();
+    const post: { title: string } = await res.json();
     expect(post).toMatchObject({ title: 'Post test' });
   });
 
@@ -107,7 +107,7 @@ describe('Blog tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const comment = await res.json();
+    const comment: { id: number } = await res.json();
     id_comment = comment.id;
   });
 

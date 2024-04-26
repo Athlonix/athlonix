@@ -58,8 +58,8 @@ describe('Votes tests', () => {
       body: JSON.stringify({
         title: 'Title test',
         description: 'Description test',
-        start_at: '2022-12-12',
-        end_at: '2022-12-12',
+        start_at: '2022-12-12T00:00:00Z',
+        end_at: '2022-12-12T00:00:00Z',
         max_choices: 2,
         options: [{ content: 'Option test' }, { content: 'Option test 2' }, { content: 'Option test 3' }],
       }),

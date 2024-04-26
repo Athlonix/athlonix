@@ -36,6 +36,9 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      - name: ⬆️ Install dependencies
+        run: pnpm install
+
       - name: 🚀 Run Biome
         run: pnpm run lint:check
 

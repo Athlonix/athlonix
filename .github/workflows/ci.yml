@@ -37,4 +37,7 @@ jobs:
         run: biome ci .
 
       - name: 🧪 Check type coverage
-        run: npx type-coverage --detail --at-least 90 -p tsconfig.json
+        run: 
+          |
+          npm install -g type-coverage typescript
+          npx type-coverage --detail --at-least 90 -p tsconfig.json

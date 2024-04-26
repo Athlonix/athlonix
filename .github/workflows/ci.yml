@@ -1,3 +1,4 @@
+---
 name: Continuous Integration
 
 on:
@@ -26,7 +27,7 @@ jobs:
 
       - uses: 🛠️ actions/setup-node@v4
         with:
-          node-version: latest
+          node-version: 22
 
       - name: 🛠️ Setup Biome
         uses: biomejs/setup-biome@v2
@@ -35,4 +36,4 @@ jobs:
         run: biome ci .
 
       - name: 🧪 Check type coverage
-        run: npx type-coverage --detail --threshold 90
+        run: npx type-coverage --detail --at-least 90

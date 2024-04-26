@@ -1,6 +1,5 @@
 import type { MiddlewareHandler } from 'hono';
 import { HTTPException } from 'hono/http-exception';
-import { date } from 'zod';
 import { supabase } from '../libs/supabase.js';
 import { getToken } from '../utils/context.js';
 
@@ -19,14 +18,12 @@ const authMiddleware: MiddlewareHandler = async (c, next) => {
     if (user.date_validity !== null && new Date(user.date_validity) < new Date())
       throw new HTTPException(403, { message: 'User validity expired' });
 
-    const roles = user.USERS_ROLES.map((role) => role.id_role);
-
     c.set('user', {
       id: user.id,
-      roles: roles,
-      email: data.user.email,
-      updated_at: data.user.updated_at,
-      created_at: data.user.created_at,
+      roles: user.USERS_ROLES.map((role) => role.id_role),
+      email: data.user?.email,
+      updated_at: data.user?.updated_at,
+      created_at: data.user?.created_at,
     });
   }
 

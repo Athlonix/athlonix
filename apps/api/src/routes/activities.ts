@@ -12,8 +12,8 @@ export const activitySchema = z.object({
   days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])),
   recurrence: z.enum(['weekly', 'monthly', 'annual']),
   interval: z.coerce.number().min(1),
-  start_date: z.string(),
-  end_date: z.string(),
+  start_date: z.string().datetime(),
+  end_date: z.string().datetime(),
   id_sport: z.coerce.number().nullable(),
   id_address: z.coerce.number().nullable(),
 });

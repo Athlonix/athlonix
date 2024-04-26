@@ -16,7 +16,7 @@ export type selectUser = {
   last_name: string;
   id_referer: number;
   id_auth: number;
-  date_validity: string;
+  date_validity: string | null;
   created_at: string;
   roles:
     | {
@@ -34,8 +34,8 @@ export const userSchema = z.object({
   last_name: z.string().min(2),
   id_referer: z.number(),
   id_auth: z.number(),
-  date_validity: z.string(),
-  created_at: z.string(),
+  date_validity: z.string().datetime().nullable(),
+  created_at: z.string().datetime(),
   roles: z.array(z.number().min(1)).nullable(),
 });
 

@@ -59,12 +59,12 @@ app.doc('/doc', (c: Context) => ({
   },
   servers: [
     {
-      url: 'https://athlonix-api.jayllyz.fr',
-      description: 'Production server',
-    },
-    {
       url: new URL(c.req.url).origin,
       description: 'Development server',
+    },
+    {
+      url: 'https://athlonix-api.jayllyz.fr',
+      description: 'Production server',
     },
   ],
 }));
@@ -78,7 +78,7 @@ app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
 app.get('/ui', swaggerUI({ url: '/doc' }));
 
 const port = Number(process.env.PORT || 3101);
-console.log(`Server is running on port ${port}`);
+console.info(`Server is running on port ${port}`);
 
 serve({
   fetch: app.fetch,

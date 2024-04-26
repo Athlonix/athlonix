@@ -1,3 +1,4 @@
+---
 name: API Test
 
 on:
@@ -29,12 +30,12 @@ jobs:
       - name: 🛠️ Setup pnpm
         uses: pnpm/action-setup@v3
         with:
-          version: latest
+          version: 9
   
       - name: 🛠️ Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: latest
+          node-version: 22
           cache: pnpm
   
       - name: ⬆️ Install dependencies

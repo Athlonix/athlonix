@@ -165,6 +165,14 @@ polls.openapi(voteToPoll, async (c) => {
     return c.json({ error: 'User already voted' }, 400);
   }
 
+  if (votes && new Date(votes?.start_at) > new Date()) {
+    return c.json({ error: 'Poll not started' }, 400);
+  }
+
+  if (votes && new Date(votes?.end_at) < new Date()) {
+    return c.json({ error: 'Poll already ended' }, 400);
+  }
+
   const { data, error } = await supabase
     .from('POLLS_VOTES')
     .insert(options.map((id_option: number) => ({ id_poll: id, id_option })))

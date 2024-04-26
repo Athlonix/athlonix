@@ -609,29 +609,29 @@ export type Database = {
       POLLS: {
         Row: {
           description: string | null;
-          end_at: string | null;
+          end_at: string;
           id: number;
           id_user: number;
           max_choices: number;
-          start_at: string | null;
+          start_at: string;
           title: string;
         };
         Insert: {
           description?: string | null;
-          end_at?: string | null;
+          end_at: string;
           id?: number;
           id_user: number;
           max_choices?: number;
-          start_at?: string | null;
+          start_at: string;
           title: string;
         };
         Update: {
           description?: string | null;
-          end_at?: string | null;
+          end_at?: string;
           id?: number;
           id_user?: number;
           max_choices?: number;
-          start_at?: string | null;
+          start_at?: string;
           title?: string;
         };
         Relationships: [

@@ -8,8 +8,8 @@ export const pollsSchema = z.object({
   id: z.number(),
   title: z.string().max(50),
   description: z.string().max(255).nullable(),
-  start_at: z.string(),
-  end_at: z.string(),
+  start_at: z.string().datetime(),
+  end_at: z.string().datetime(),
   max_choices: z.number().min(1),
   id_user: z.number(),
   results: z.array(z.object({ id: z.number(), id_option: z.number() })).optional(),
@@ -18,8 +18,8 @@ export const pollsSchema = z.object({
 export const createPollSchema = z.object({
   title: z.string().max(50),
   description: z.string().max(255).nullable(),
-  start_at: z.string(),
-  end_at: z.string(),
+  start_at: z.string().datetime(),
+  end_at: z.string().datetime(),
   max_choices: z.number().min(1),
   options: z.array(z.object({ content: z.string() })),
 });

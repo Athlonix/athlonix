@@ -70,8 +70,8 @@ function UserRow(user: UserProps) {
       .then(() => {
         toast({ title: 'Succès', description: "L'utilisateur a été supprimé avec succès" });
       })
-      .catch((error) => {
-        toast({ title: 'Erreur', description: error });
+      .catch((error: Error) => {
+        toast({ title: 'Erreur', description: error?.message });
       });
 
     setOpenDelete(false);

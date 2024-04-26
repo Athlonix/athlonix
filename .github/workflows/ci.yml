@@ -1,3 +1,4 @@
+---
 name: Continuous Integration
 
 on:
@@ -23,10 +24,23 @@ jobs:
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
-        
-      - name: 🛠️ Setup Biome
-        uses: biomejs/setup-biome@v2
+
+      - name: 🛠️ Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+  
+      - name: 🛠️ Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: ⬆️ Install dependencies
+        run: pnpm install
 
       - name: 🚀 Run Biome
-        id: biome
-        run: biome ci .
+        run: pnpm run lint:check
+
+      - name: 🧪 Check type coverage
+        run: npx type-coverage --detail --at-least 90 -p tsconfig.json

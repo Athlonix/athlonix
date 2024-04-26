@@ -107,8 +107,8 @@ function EditForm(props: EditFormProps): JSX.Element {
         first_name: values.firstName,
         last_name: values.lastName,
       }),
-    }).catch((error) => {
-      toast({ title: 'Erreur', description: error });
+    }).catch((error: Error) => {
+      toast({ title: 'Erreur', description: error?.message });
     });
 
     fetch(`${urlApi}/users/${props.id}/roles`, {
@@ -120,8 +120,8 @@ function EditForm(props: EditFormProps): JSX.Element {
       body: JSON.stringify({
         roles: values.roles,
       }),
-    }).catch((error) => {
-      toast({ title: 'Erreur', description: error });
+    }).catch((error: Error) => {
+      toast({ title: 'Erreur', description: error?.message });
     });
 
     props.setter.username(values.username);

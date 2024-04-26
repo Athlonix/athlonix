@@ -1,4 +1,4 @@
-FROM node:21-alpine AS base
+FROM node:22-alpine AS base
 WORKDIR /app
 
 ARG PORT
@@ -6,8 +6,9 @@ ENV PORT ${PORT}
 EXPOSE ${PORT}
 
 # hadolint ignore=DL3018
-RUN apk add --no-cache libc6-compat && \
+RUN apk add --no-cache gcompat && \
     npm install -g turbo && \
+    npm cache clean -f && \
     corepack enable pnpm
 
 FROM base AS pruner
@@ -20,9 +21,6 @@ RUN turbo prune admin --docker
 FROM base as deps
 WORKDIR /app
 
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL ${NEXT_PUBLIC_API_URL}
-
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 
@@ -31,6 +29,9 @@ RUN pnpm fetch && \
 
 FROM deps AS builder
 WORKDIR /app
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL ${NEXT_PUBLIC_API_URL}
 
 COPY --from=pruner --chown=node:node /app/out/full/ ./
 
@@ -45,7 +46,7 @@ COPY --from=pruner --chown=node:node /app/out/full/ ./
 COPY --from=deps --chown=node:node /app/ ./
 
 USER node
-CMD ["pnpm", "run", "dev"]
+CMD ["node" "--run", "dev"]
 
 
 FROM base AS prod

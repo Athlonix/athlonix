@@ -24,8 +24,7 @@ describe('Votes tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const user = await res.json();
-    console.log(user);
+    const user: { id: number; id_auth: string } = await res.json();
     id_auth = user.id_auth;
     id_user = user.id;
     const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.ADMIN });
@@ -45,7 +44,7 @@ describe('Votes tests', () => {
       }),
     });
     expect(res.status).toBe(200);
-    const user = await res.json();
+    const user: { token: string } = await res.json();
     jwt = user.token;
   });
 
@@ -59,14 +58,14 @@ describe('Votes tests', () => {
       body: JSON.stringify({
         title: 'Title test',
         description: 'Description test',
-        start_at: '2022-12-12',
-        end_at: '2022-12-12',
+        start_at: new Date().toISOString(),
+        end_at: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
         max_choices: 2,
         options: [{ content: 'Option test' }, { content: 'Option test 2' }, { content: 'Option test 3' }],
       }),
     });
     expect(res.status).toBe(201);
-    const poll = await res.json();
+    const poll: { id: number } = await res.json();
     id_polls = poll.id;
   });
 

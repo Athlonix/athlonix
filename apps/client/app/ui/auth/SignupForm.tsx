@@ -54,7 +54,7 @@ export default function SignupForm(): JSX.Element {
       .then(() => {
         router.push('/login');
       })
-      .catch((error) => console.log(error));
+      .catch((error: Error) => console.log(error));
   }
 
   return (

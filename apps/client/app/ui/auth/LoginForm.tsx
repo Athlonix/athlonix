@@ -40,11 +40,11 @@ export default function LoginForm(): JSX.Element {
       }),
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then((data: { user: Record<string, unknown>; token: string }) => {
         localStorage.setItem('user', JSON.stringify(data));
         router.push('/?loggedIn=true');
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.log(error);
       });
   }

@@ -31,7 +31,7 @@ describe('Activity tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const user = await res.json();
+    const user: { id: number; id_auth: string } = await res.json();
     id_auth = user.id_auth;
     id_admin = user.id;
     const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.ADMIN });
@@ -52,7 +52,7 @@ describe('Activity tests', () => {
       }),
     });
     expect(res.status).toBe(200);
-    const admin = await res.json();
+    const admin: { token: string } = await res.json();
     jwt = admin.token;
   });
 
@@ -80,7 +80,7 @@ describe('Activity tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const activity = await res.json();
+    const activity: { id: number } = await res.json();
     activity_id = activity.id;
   });
 
@@ -97,7 +97,7 @@ describe('Activity tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const user = await res.json();
+    const user: { id: number; id_auth: string } = await res.json();
     id_user = user.id;
     id_auth = user.id_auth;
 
@@ -118,7 +118,7 @@ describe('Activity tests', () => {
       }),
     });
     expect(res.status).toBe(200);
-    const user = await res.json();
+    const user: { token: string } = await res.json();
     jwt_user = user.token;
   });
 

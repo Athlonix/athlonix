@@ -58,8 +58,8 @@ describe('Votes tests', () => {
       body: JSON.stringify({
         title: 'Title test',
         description: 'Description test',
-        start_at: '2022-12-12T00:00:00Z',
-        end_at: '2022-12-12T00:00:00Z',
+        start_at: new Date().toISOString(),
+        end_at: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
         max_choices: 2,
         options: [{ content: 'Option test' }, { content: 'Option test 2' }, { content: 'Option test 3' }],
       }),

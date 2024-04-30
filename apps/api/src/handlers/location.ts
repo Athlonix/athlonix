@@ -11,9 +11,9 @@ export const location = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 location.openapi(getAllAddresses, async (c) => {
-  const { skip, take } = c.req.valid('query');
+  const { search, skip, take } = c.req.valid('query');
   const { from, to } = getPagination(skip, take - 1);
-  const { data, error } = await supabase.from('ADDRESSES').select('*').range(from, to);
+  const { data, error } = await supabase.from('ADDRESSES').select('*').range(from, to).like('road', `%${search}%`);
 
   if (error) {
     return c.json({ error: error.message }, 500);

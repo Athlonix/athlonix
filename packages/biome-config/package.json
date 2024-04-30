@@ -7,7 +7,7 @@
     "./biome": "./biome.json"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.7.1"
+    "@biomejs/biome": "1.7.2"
   },
   "scripts": {
     "clean": "rm -rf node_modules"

@@ -40,13 +40,7 @@ pnpm dev
 
 ### Format and Lint
 
-To format all apps and packages, run the following command:
-
-```sh
-pnpm format
-```
-
-To lint all apps and packages, run the following command:
+To lint & format all apps and packages, run the following command:
 
 ```sh
 pnpm lint

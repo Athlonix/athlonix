@@ -1,12 +1,12 @@
 FROM node:22-alpine AS base
 WORKDIR /app
 
-ARG ${PORT}
+ARG PORT
 ENV PORT ${PORT}
 EXPOSE ${PORT}
 
-# hadolint ignore=DL3018
-RUN apk add --no-cache gcompat && \ 
+# hadolint ignore=DL3018,DL3016
+RUN apk add --no-cache gcompat && \
     npm install -g turbo && \
     npm cache clean -f && \
     corepack enable pnpm
@@ -48,7 +48,7 @@ COPY --from=pruner --chown=node:node /app/out/full/ ./
 COPY --from=deps --chown=node:node /app/ ./
 
 USER node
-CMD ["node" "--run", "dev"]
+CMD ["node", "--run", "dev"]
 
 
 FROM base AS prod

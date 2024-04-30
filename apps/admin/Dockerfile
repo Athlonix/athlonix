@@ -5,7 +5,7 @@ ARG PORT
 ENV PORT ${PORT}
 EXPOSE ${PORT}
 
-# hadolint ignore=DL3018
+# hadolint ignore=DL3018,DL3016
 RUN apk add --no-cache gcompat && \
     npm install -g turbo && \
     npm cache clean -f && \
@@ -46,14 +46,13 @@ COPY --from=pruner --chown=node:node /app/out/full/ ./
 COPY --from=deps --chown=node:node /app/ ./
 
 USER node
-CMD ["node" "--run", "dev"]
+CMD ["node", "--run", "dev"]
 
 
 FROM base AS prod
 WORKDIR /app
 
 ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLED 1
 
 COPY --from=builder --chown=node:node /app/apps/admin/next.config.js .
 COPY --from=builder --chown=node:node /app/apps/admin/package.json .

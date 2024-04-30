@@ -6,6 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { useToast } from '@repo/ui/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 import type { Dispatch, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -92,6 +93,7 @@ function EditForm(props: EditFormProps): JSX.Element {
   });
 
   const { toast } = useToast();
+  const router = useRouter();
 
   async function submitEdit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
@@ -107,9 +109,16 @@ function EditForm(props: EditFormProps): JSX.Element {
         first_name: values.firstName,
         last_name: values.lastName,
       }),
-    }).catch((error: Error) => {
-      toast({ title: 'Erreur', description: error?.message });
-    });
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
+      .catch((error: Error) => {
+        toast({ title: 'Erreur', description: error?.message });
+      });
 
     fetch(`${urlApi}/users/${props.id}/roles`, {
       method: 'PUT',
@@ -120,9 +129,16 @@ function EditForm(props: EditFormProps): JSX.Element {
       body: JSON.stringify({
         roles: values.roles,
       }),
-    }).catch((error: Error) => {
-      toast({ title: 'Erreur', description: error?.message });
-    });
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
+      .catch((error: Error) => {
+        toast({ title: 'Erreur', description: error?.message });
+      });
 
     props.setter.username(values.username);
     props.setter.firstName(values.firstName);

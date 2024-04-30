@@ -15,6 +15,7 @@ import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { useToast } from '@repo/ui/hooks/use-toast';
 import { PlusCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -33,6 +34,7 @@ type User = {
 function AddUser({ users }: { users: User[] }) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
+  const router = useRouter();
 
   const formSchema = z.object({
     email: z.string().email({ message: 'Email invalide' }),
@@ -69,7 +71,12 @@ function AddUser({ users }: { users: User[] }) {
         last_name: values.lastName,
       }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
       .then((data: { id: number }) => {
         toast({ title: 'Utilisateur créé', description: "L'utilisateur a été créé avec succès" });
         users.push({

@@ -1,7 +1,6 @@
 'use client';
 
 import EditForm from '@/app/ui/dashboard/users/EditForm';
-import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
 import {
   Dialog,
@@ -20,62 +19,52 @@ import {
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
 import { useToast } from '@repo/ui/hooks/use-toast';
 import { MoreHorizontal } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-interface UserProps {
+interface AddressProps {
   id: number;
-  email: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  id_referer: number;
-  date_validity: string;
-  roles: { id: number; name: string }[];
+  road: string;
+  postal_code: string;
+  complement: string;
+  city: string;
+  number: number;
+  name: string;
+  id_lease: number;
 }
 
-const RoleBadge: Record<number, string> = {
-  1: 'destructive',
-  2: 'secondary',
-  3: 'success',
-  4: 'success',
-  5: 'info',
-  6: 'info',
-  7: 'info',
-  8: 'info',
-  9: 'info',
-};
-
-function UserRow(user: UserProps) {
+function AddressRow(address: AddressProps) {
   const { toast } = useToast();
-  const router = useRouter();
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
-  const [username, setUsername] = useState(user.username);
-  const [firstName, setFirstName] = useState(user.first_name);
-  const [lastName, setLastName] = useState(user.last_name);
-  const [roles, setRoles] = useState(user.roles);
+  const [road, setRoad] = useState(address.road);
+  const [complement, setComplement] = useState(address.complement);
+  const [postalCode, setPostalCode] = useState(address.postal_code);
+  const [city, setCity] = useState(address.city);
+  const [number, setNumber] = useState(address.number);
+  const [name, setName] = useState(address.name);
 
-  const setter = { username: setUsername, firstName: setFirstName, lastName: setLastName, roles: setRoles };
+  const setter = {
+    road: setRoad,
+    complement: setComplement,
+    postalCode: setPostalCode,
+    city: setCity,
+    number: setNumber,
+    name: setName,
+  };
 
-  async function deleteUser() {
+  async function deleteAddress() {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
-    fetch(`${urlApi}/users/${user.id}/soft`, {
+    fetch(`${urlApi}/addresses/${address.id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       },
     })
-      .then((response) => {
-        if (response.status === 403) {
-          router.push('/');
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then(() => {
-        toast({ title: 'Succès', description: "L'utilisateur a été supprimé avec succès" });
+        toast({ title: 'Succès', description: "L'adresse a été supprimé avec succès" });
       })
       .catch((error: Error) => {
         toast({ title: 'Erreur', description: error?.message });
@@ -85,29 +74,14 @@ function UserRow(user: UserProps) {
   }
 
   return (
-    <TableRow key={user.id}>
-      <TableCell className="font-medium">{username}</TableCell>
-      <TableCell>{firstName}</TableCell>
-      <TableCell>{lastName}</TableCell>
-      <TableCell>{user.email}</TableCell>
-      <TableCell>TODO</TableCell>
+    <TableRow key={address.id}>
+      <TableCell className="font-medium">{name}</TableCell>
       <TableCell>
-        {roles && roles.length > 0 ? (
-          roles.map((role) => (
-            <Badge
-              className="m-[2px]"
-              key={role.id}
-              variant={RoleBadge[role.id] as 'destructive' | 'secondary' | 'success' | 'info'}
-            >
-              {role.name.charAt(0) + role.name.slice(1).toLowerCase()}
-            </Badge>
-          ))
-        ) : (
-          <Badge className="m-[2px]">Utilisateur</Badge>
-        )}
+        {number} {road}
+        {complement && `, ${complement}`}
       </TableCell>
-      <TableCell>{user.date_validity}</TableCell>
-      <TableCell>2023-07-12 10:42</TableCell>
+      <TableCell>{city}</TableCell>
+      <TableCell>{postalCode}</TableCell>
       <TableCell>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -123,8 +97,8 @@ function UserRow(user: UserProps) {
                 <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Edition de l'utilisateur {user.id}</DialogTitle>
-                    <DialogDescription>
+                    <DialogTitle>Edition de l'adresse {address.id}</DialogTitle>
+                    {/* <DialogDescription>
                       <EditForm
                         id={user.id}
                         username={username}
@@ -134,7 +108,7 @@ function UserRow(user: UserProps) {
                         closeDialog={() => setOpenEdit(false)}
                         setter={setter}
                       />
-                    </DialogDescription>
+                    </DialogDescription> */}
                   </DialogHeader>
                 </DialogContent>
               </Dialog>
@@ -144,11 +118,11 @@ function UserRow(user: UserProps) {
                 <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Edition de l'utilisateur {user.id}</DialogTitle>
+                    <DialogTitle>Edition de l'adresse {address.id}</DialogTitle>
                     <DialogDescription>
-                      <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet utilisateur ?</div>
+                      <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet adresse ?</div>
                       <div className="flex w-full justify-end gap-4">
-                        <Button variant="destructive" onClick={deleteUser}>
+                        <Button variant="destructive" onClick={deleteAddress}>
                           Supprimer
                         </Button>
                         <Button variant="secondary" onClick={() => setOpenDelete(false)}>
@@ -167,4 +141,4 @@ function UserRow(user: UserProps) {
   );
 }
 
-export default UserRow;
+export default AddressRow;

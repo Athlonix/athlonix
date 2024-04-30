@@ -9,6 +9,17 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+type User = {
+  id: number;
+  email: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  id_referer: number | null;
+  date_validity: string | null;
+  roles: { id: number; name: string }[];
+};
+
 export function LoginForm(): JSX.Element {
   const router = useRouter();
   const urlApi = process.env.NEXT_PUBLIC_API_URL;
@@ -38,10 +49,14 @@ export function LoginForm(): JSX.Element {
       }),
     })
       .then((response) => response.json())
-      .then((data: { user: Record<string, unknown>; token: string }) => {
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('access_token', data.token);
-        router.push('/dashboard');
+      .then((data: { user: User; token: string }) => {
+        const roles = data.user.roles;
+
+        if (roles.some((role: { id: number }) => role.id === 5)) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('access_token', data.token);
+          router.push('/dashboard');
+        }
       })
       .catch((error: Error) => {
         console.log(error);

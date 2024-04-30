@@ -1,7 +1,7 @@
 'use client';
 
+import AddressesList from '@/app/ui/dashboard/addresses/AddressesList';
 import AddUser from '@/app/ui/dashboard/users/AddUser';
-import UsersList from '@/app/ui/dashboard/users/UsersList';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
 import {
@@ -19,28 +19,28 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-type User = {
+type Address = {
   id: number;
-  email: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  id_referer: number;
-  date_validity: string;
-  roles: { id: number; name: string }[];
+  road: string;
+  postal_code: string;
+  complement: string;
+  city: string;
+  number: number;
+  name: string;
+  id_lease: number;
 };
 
 function ShowContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   let page = searchParams.get('page') || 1;
   if (typeof page === 'string') {
     page = Number.parseInt(page);
   }
 
   const [maxPage, setMaxPage] = useState<number>(1);
-  const [users, setUsers] = useState<User[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const router = useRouter();
 
   useEffect(() => {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
@@ -52,21 +52,16 @@ function ShowContent() {
         search: searchTerm,
       });
 
-      fetch(`${urlApi}/users?${queryParams}`, {
+      fetch(`${urlApi}/addresses?${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       })
-        .then((response) => {
-          if (response.status === 403) {
-            router.push('/');
-          }
-          return response.json();
-        })
-        .then((data: User[]) => {
-          setUsers(data);
+        .then((response) => response.json())
+        .then((data: Address[]) => {
+          setAddresses(data);
         })
         .catch((error: Error) => {
           console.log(error);
@@ -79,7 +74,12 @@ function ShowContent() {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.status === 403) {
+            router.push('/');
+          }
+          return response.json();
+        })
         .then((data: { count: number }) => {
           setMaxPage(Math.ceil(data.count / 10));
         })
@@ -100,9 +100,7 @@ function ShowContent() {
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Utilisateurs</CardTitle>
-          <div className="flex gap-4">
-            <AddUser users={users} />
-          </div>
+          <div className="flex gap-4">Add address</div>
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">
@@ -117,21 +115,17 @@ function ShowContent() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nom d'utilisateur</TableHead>
-                <TableHead>Prénom</TableHead>
-                <TableHead>Nom</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Référant</TableHead>
-                <TableHead>Rôle</TableHead>
-                <TableHead>Date d'éxpiration</TableHead>
-                <TableHead>Date de création</TableHead>
+                <TableHead>Nom de l'adresse</TableHead>
+                <TableHead>Adresse</TableHead>
+                <TableHead>Ville</TableHead>
+                <TableHead>Code postal</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <UsersList users={users} />
+              <AddressesList addresses={addresses} />
             </TableBody>
           </Table>
         </CardContent>

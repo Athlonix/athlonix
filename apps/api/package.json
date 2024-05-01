@@ -20,7 +20,7 @@
     "@hono/zod-openapi": "^0.11.0",
     "@hono/zod-validator": "^0.2.1",
     "@repo/types": "workspace:*",
-    "@supabase/supabase-js": "^2.42.7",
+    "@supabase/supabase-js": "^2.43.0",
     "hono": "^4.2.9",
     "zod": "^3.23.5",
     "zod-validation-error": "^3.2.0"
@@ -31,7 +31,7 @@
     "@types/node": "^20.12.7",
     "@types/swagger-ui-dist": "^3.30.4",
     "supabase": "^1.164.1",
-    "tsx": "^4.7.3",
+    "tsx": "^4.8.2",
     "typescript": "^5.4.5",
     "vitest": "^1.5.3"
   }

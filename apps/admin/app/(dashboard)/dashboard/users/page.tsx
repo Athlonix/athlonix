@@ -25,8 +25,8 @@ type User = {
   username: string;
   first_name: string;
   last_name: string;
-  id_referer: number;
-  date_validity: string;
+  id_referer: number | null;
+  date_validity: string | null;
   roles: { id: number; name: string }[];
 };
 
@@ -93,7 +93,7 @@ function ShowContent() {
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Utilisateurs</CardTitle>
           <div className="flex gap-4">
-            <AddUser users={users} />
+            <AddUser users={users} setUsers={setUsers} />
           </div>
         </CardHeader>
         <CardContent>

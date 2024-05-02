@@ -25,11 +25,11 @@ interface AddressProps {
   id: number;
   road: string;
   postal_code: string;
-  complement: string;
+  complement: string | null;
   city: string;
   number: number;
-  name: string;
-  id_lease: number;
+  name: string | null;
+  id_lease: number | null;
 }
 
 function AddressRow(address: AddressProps) {

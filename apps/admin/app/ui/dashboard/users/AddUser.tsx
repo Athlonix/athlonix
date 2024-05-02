@@ -16,7 +16,8 @@ import { Label } from '@repo/ui/components/ui/label';
 import { useToast } from '@repo/ui/hooks/use-toast';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -31,7 +32,12 @@ type User = {
   roles: { id: number; name: string }[];
 };
 
-function AddUser({ users }: { users: User[] }) {
+interface Props {
+  users: User[];
+  setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+}
+
+function AddUser({ users, setUsers }: Props) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -79,7 +85,7 @@ function AddUser({ users }: { users: User[] }) {
       })
       .then((data: { id: number }) => {
         toast({ title: 'Utilisateur créé', description: "L'utilisateur a été créé avec succès" });
-        users.push({
+        const newUser = {
           id: data.id,
           email: values.email,
           username: values.username,
@@ -88,7 +94,10 @@ function AddUser({ users }: { users: User[] }) {
           id_referer: null,
           date_validity: null,
           roles: [],
-        });
+        };
+        if (users.length < 10) {
+          setUsers([...users, newUser]);
+        }
       })
       .catch((error: Error) => {
         toast({ title: 'Erreur', description: error?.message });

@@ -1,7 +1,7 @@
 'use client';
 
+import AddAddress from '@/app/ui/dashboard/addresses/AddAddress';
 import AddressesList from '@/app/ui/dashboard/addresses/AddressesList';
-import AddUser from '@/app/ui/dashboard/users/AddUser';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
 import {
@@ -28,6 +28,11 @@ type Address = {
   number: number;
   name: string;
   id_lease: number;
+};
+
+type AddressData = {
+  data: Address[];
+  count: number;
 };
 
 function ShowContent() {
@@ -59,28 +64,14 @@ function ShowContent() {
           Authorization: `Bearer ${localStorage.getItem('access_token')}`,
         },
       })
-        .then((response) => response.json())
-        .then((data: Address[]) => {
-          setAddresses(data);
-        })
-        .catch((error: Error) => {
-          console.log(error);
-        });
-
-      fetch(`${urlApi}/users/count?search=${searchTerm}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      })
         .then((response) => {
           if (response.status === 403) {
             router.push('/');
           }
           return response.json();
         })
-        .then((data: { count: number }) => {
+        .then((data: AddressData) => {
+          setAddresses(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })
         .catch((error: Error) => {
@@ -99,8 +90,8 @@ function ShowContent() {
     <TabsContent value="all">
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Utilisateurs</CardTitle>
-          <div className="flex gap-4">Add address</div>
+          <CardTitle>Adresses</CardTitle>
+          <AddAddress addresses={addresses} />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">
@@ -115,7 +106,7 @@ function ShowContent() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nom de l'adresse</TableHead>
+                <TableHead>Alias</TableHead>
                 <TableHead>Adresse</TableHead>
                 <TableHead>Ville</TableHead>
                 <TableHead>Code postal</TableHead>

@@ -30,6 +30,11 @@ type User = {
   roles: { id: number; name: string }[];
 };
 
+type UserData = {
+  data: User[];
+  count: number;
+};
+
 function ShowContent() {
   const searchParams = useSearchParams();
   let page = searchParams.get('page') || 1;
@@ -65,22 +70,9 @@ function ShowContent() {
           }
           return response.json();
         })
-        .then((data: User[]) => {
-          setUsers(data);
-        })
-        .catch((error: Error) => {
-          console.log(error);
-        });
-
-      fetch(`${urlApi}/users/count?search=${searchTerm}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      })
-        .then((response) => response.json())
-        .then((data: { count: number }) => {
+        .then((data: UserData) => {
+          console.log(data);
+          setUsers(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })
         .catch((error: Error) => {

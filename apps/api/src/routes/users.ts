@@ -256,36 +256,6 @@ export const softDeleteUser = createRoute({
   tags: ['user'],
 });
 
-export const getUsersCount = createRoute({
-  method: 'get',
-  path: '/users/count',
-  summary: 'Get users count',
-  description: 'Get users count',
-  security: [{ Bearer: [] }],
-  middleware: authMiddleware,
-  request: {
-    query: z.object({
-      search: z.string().optional(),
-    }),
-  },
-  responses: {
-    200: {
-      description: 'Successful response',
-      content: {
-        'application/json': {
-          schema: {
-            data: z.object({
-              count: z.number(),
-            }),
-          },
-        },
-      },
-    },
-    500: serverErrorSchema,
-  },
-  tags: ['user'],
-});
-
 export const getUsersActivities = createRoute({
   method: 'get',
   path: '/users/{id}/activities',

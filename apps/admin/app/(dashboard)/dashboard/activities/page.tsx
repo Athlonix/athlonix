@@ -19,7 +19,7 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-type Address = {
+type Activity = {
   id: number;
   road: string;
   postal_code: string;
@@ -30,8 +30,8 @@ type Address = {
   id_lease: number | null;
 };
 
-type AddressData = {
-  data: Address[];
+type ActivityData = {
+  data: Activity[];
   count: number;
 };
 
@@ -44,7 +44,7 @@ function ShowContent() {
   }
 
   const [maxPage, setMaxPage] = useState<number>(1);
-  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [activity, setActivity] = useState<Activity[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
@@ -57,7 +57,7 @@ function ShowContent() {
         search: searchTerm,
       });
 
-      fetch(`${urlApi}/addresses?${queryParams}`, {
+      fetch(`${urlApi}/activities?${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -70,8 +70,8 @@ function ShowContent() {
           }
           return response.json();
         })
-        .then((data: AddressData) => {
-          setAddresses(data.data);
+        .then((data: ActivityData) => {
+          setActivity(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })
         .catch((error: Error) => {
@@ -91,7 +91,7 @@ function ShowContent() {
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Adresses</CardTitle>
-          <AddAddress addresses={addresses} setAddresses={setAddresses} />
+          <AddAddress addresses={activity} setAddresses={setActivity} />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">
@@ -116,7 +116,7 @@ function ShowContent() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <AddressesList addresses={addresses} />
+              <AddressesList addresses={activity} />
             </TableBody>
           </Table>
         </CardContent>
@@ -125,37 +125,37 @@ function ShowContent() {
             <PaginationContent>
               {page > 1 && (
                 <PaginationItem>
-                  <PaginationPrevious href={`/dashboard/addresses?page=${page - 1}`} />
+                  <PaginationPrevious href={`/dashboard/activities?page=${page - 1}`} />
                 </PaginationItem>
               )}
               {page > 3 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page - 2}`}>{page - 2}</PaginationLink>
+                  <PaginationLink href={`/dashboard/activities?page=${page - 2}`}>{page - 2}</PaginationLink>
                 </PaginationItem>
               )}
               {page > 2 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page - 1}`}>{page - 1}</PaginationLink>
+                  <PaginationLink href={`/dashboard/activities?page=${page - 1}`}>{page - 1}</PaginationLink>
                 </PaginationItem>
               )}
               <PaginationItem>
-                <PaginationLink href={`/dashboard/addresses?page=${page}`} isActive>
+                <PaginationLink href={`/dashboard/activities?page=${page}`} isActive>
                   {page}
                 </PaginationLink>
               </PaginationItem>
               {page < maxPage && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page + 1}`}>{page + 1}</PaginationLink>
+                  <PaginationLink href={`/dashboard/activities?page=${page + 1}`}>{page + 1}</PaginationLink>
                 </PaginationItem>
               )}
               {page < maxPage - 1 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page + 2}`}>{page + 2}</PaginationLink>
+                  <PaginationLink href={`/dashboard/activities?page=${page + 2}`}>{page + 2}</PaginationLink>
                 </PaginationItem>
               )}
               {page < maxPage && (
                 <PaginationItem>
-                  <PaginationNext href={`/dashboard/addresses?page=${page + 1}`} />
+                  <PaginationNext href={`/dashboard/activities?page=${page + 1}`} />
                 </PaginationItem>
               )}
             </PaginationContent>

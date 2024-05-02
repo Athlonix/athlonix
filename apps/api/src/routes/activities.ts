@@ -24,7 +24,10 @@ export const getAllActivities = createRoute({
   summary: 'Get all activities',
   description: 'Get all activities',
   request: {
-    query: paginationSchema,
+    query: z.object({
+      search: z.string().optional(),
+      ...paginationSchema.shape,
+    }),
   },
   responses: {
     200: {

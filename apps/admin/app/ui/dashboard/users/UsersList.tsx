@@ -8,8 +8,8 @@ type User = {
   username: string;
   first_name: string;
   last_name: string;
-  id_referer: number;
-  date_validity: string;
+  id_referer: number | null;
+  date_validity: string | null;
   roles: { id: number; name: string }[];
 };
 

@@ -16,7 +16,8 @@ import { Label } from '@repo/ui/components/ui/label';
 import { useToast } from '@repo/ui/hooks/use-toast';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -31,7 +32,12 @@ type Address = {
   id_lease: number | null;
 };
 
-function addAddress({ addresses }: { addresses: Address[] }) {
+interface Props {
+  addresses: Address[];
+  setAddresses: React.Dispatch<React.SetStateAction<Address[]>>;
+}
+
+function addAddress({ addresses, setAddresses }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -92,16 +98,19 @@ function addAddress({ addresses }: { addresses: Address[] }) {
       })
       .then((data: { id: number }) => {
         toast({ title: 'Adresse ajouté', description: "L'adresse a été ajouté avec succès" });
-        addresses.push({
+        const newAddress: Address = {
           id: data.id,
           road: values.road,
           postal_code: values.postal_code,
-          complement: values.complement ?? null,
+          complement: values.complement || '',
           city: values.city,
           number: values.number,
-          name: values.name ?? null,
+          name: values.name || '',
           id_lease: null,
-        });
+        };
+        if (addresses.length < 10) {
+          setAddresses([...addresses, newAddress]);
+        }
       })
       .catch((error: Error) => {
         toast({ title: 'Erreur', description: error?.message });
@@ -148,7 +157,7 @@ function addAddress({ addresses }: { addresses: Address[] }) {
                         <FormItem>
                           <Label className="font-bold">Numéro</Label>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} type="number" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

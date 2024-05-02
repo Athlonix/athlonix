@@ -11,11 +11,11 @@ import { z } from 'zod';
 
 interface Setter {
   road: Dispatch<SetStateAction<string>>;
-  complement: Dispatch<SetStateAction<string>>;
+  complement: Dispatch<SetStateAction<string | null>>;
   postalCode: Dispatch<SetStateAction<string>>;
   city: Dispatch<SetStateAction<string>>;
   number: Dispatch<SetStateAction<number>>;
-  name: Dispatch<SetStateAction<string>>;
+  name: Dispatch<SetStateAction<string | null>>;
 }
 
 interface EditFormProps {
@@ -39,10 +39,7 @@ function EditForm(props: EditFormProps): JSX.Element {
       .min(5, { message: 'Le code postal doit contenir 5 chiffres' }),
     complement: z.string().optional(),
     city: z.string().min(1, { message: 'Le champ est requis' }),
-    number: z.coerce
-      .number({ message: 'Le numéro doit être un nombre' })
-      .int()
-      .min(1, { message: 'Le champ est requis' }),
+    number: z.number({ message: 'Le numéro doit être un nombre' }).int().min(1, { message: 'Le champ est requis' }),
     name: z.string().optional(),
   });
 
@@ -128,7 +125,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 <FormItem>
                   <Label className="font-bold">Numéro</Label>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} type="number" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -23,11 +23,11 @@ type Address = {
   id: number;
   road: string;
   postal_code: string;
-  complement: string;
+  complement: string | null;
   city: string;
   number: number;
-  name: string;
-  id_lease: number;
+  name: string | null;
+  id_lease: number | null;
 };
 
 type AddressData = {
@@ -91,7 +91,7 @@ function ShowContent() {
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Adresses</CardTitle>
-          <AddAddress addresses={addresses} />
+          <AddAddress addresses={addresses} setAddresses={setAddresses} />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">

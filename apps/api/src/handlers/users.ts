@@ -7,7 +7,6 @@ import {
   getAllUsers,
   getOneUser,
   getUsersActivities,
-  getUsersCount,
   removeUserRole,
   softDeleteUser,
   updateUser,
@@ -29,37 +28,24 @@ users.openapi(getAllUsers, async (c) => {
   const searchTerm = search !== undefined ? search : '';
 
   const { from, to } = getPagination(skip, take);
-  const { data, error } = await supabase
+  const { data, error, count } = await supabase
     .from('USERS')
-    .select('*, roles:ROLES (id, name)')
+    .select('*, roles:ROLES (id, name)', { count: 'exact' })
     .range(from, to)
     .order('created_at', { ascending: true })
     .filter('deleted_at', 'is', null)
-    .like('username', `%${searchTerm}%`);
+    .ilike('username', `%${searchTerm}%`);
 
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json(data, 200);
-});
+  const responseData = {
+    data: data || [],
+    count: count || 0,
+  };
 
-users.openapi(getUsersCount, async (c) => {
-  const roles = c.get('user').roles || [];
-  await checkRole(roles, false, [Role.ADMIN]);
-  const { search } = c.req.valid('query');
-  const searchTerm = search !== undefined ? search : '';
-  const { data, error } = await supabase
-    .from('USERS')
-    .select('id')
-    .filter('deleted_at', 'is', null)
-    .like('username', `%${searchTerm}%`);
-
-  if (error) {
-    return c.json({ error: error.message }, 500);
-  }
-
-  return c.json({ count: data?.length }, 200);
+  return c.json(responseData, 200);
 });
 
 users.openapi(getOneUser, async (c) => {

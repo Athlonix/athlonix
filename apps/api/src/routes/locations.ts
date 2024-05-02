@@ -50,7 +50,10 @@ export const getAllAddresses = createRoute({
   summary: 'Get all addresses',
   description: 'Get all addresses',
   request: {
-    query: paginationSchema,
+    query: z.object({
+      search: z.string().optional(),
+      ...paginationSchema.shape,
+    }),
   },
   responses: {
     200: {

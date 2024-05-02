@@ -90,6 +90,13 @@ export default function RootLayout({
                     <LineChart className="h-4 w-4" />
                     Statistique
                   </Link>
+                  <Link
+                    href="/dashboard/addresses"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  >
+                    <LineChart className="h-4 w-4" />
+                    Gestion des adresses
+                  </Link>
                 </nav>
               </div>
             </div>

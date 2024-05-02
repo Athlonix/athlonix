@@ -29,8 +29,6 @@ services:
       context: .
       dockerfile: ./apps/api/Dockerfile
       target: prod
-    tty: true
-    stdin_open: true
     env_file:
       - .env
     restart: unless-stopped

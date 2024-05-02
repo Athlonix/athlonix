@@ -17,6 +17,7 @@ location.openapi(getAllAddresses, async (c) => {
     .from('ADDRESSES')
     .select('*', { count: 'exact' })
     .range(from, to)
+    .order('id', { ascending: true })
     .ilike('road', `%${search}%`);
 
   if (error) {

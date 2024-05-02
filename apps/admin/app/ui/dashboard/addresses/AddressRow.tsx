@@ -1,6 +1,6 @@
 'use client';
 
-import EditForm from '@/app/ui/dashboard/users/EditForm';
+import EditForm from '@/app/ui/dashboard/addresses/EditForm';
 import { Button } from '@repo/ui/components/ui/button';
 import {
   Dialog,
@@ -98,17 +98,19 @@ function AddressRow(address: AddressProps) {
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Edition de l'adresse {address.id}</DialogTitle>
-                    {/* <DialogDescription>
+                    <DialogDescription>
                       <EditForm
-                        id={user.id}
-                        username={username}
-                        firstName={firstName}
-                        lastName={lastName}
-                        roles={roles.map((role) => role.id)}
+                        id={address.id}
+                        road={road}
+                        postal_code={postalCode}
+                        complement={complement}
+                        city={city}
+                        number={number}
+                        name={name}
                         closeDialog={() => setOpenEdit(false)}
                         setter={setter}
                       />
-                    </DialogDescription> */}
+                    </DialogDescription>
                   </DialogHeader>
                 </DialogContent>
               </Dialog>

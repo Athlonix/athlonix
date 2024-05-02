@@ -59,7 +59,7 @@ auth.openapi(loginUser, async (c) => {
 
   const { data: user, error: userError } = await supabase
     .from('USERS')
-    .select('*')
+    .select('*, roles:ROLES (id, name)')
     .eq('id_auth', data.user.id)
     .single();
 

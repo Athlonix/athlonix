@@ -20,74 +20,87 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-type User = {
+type Address = {
   id: number;
-  email: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  id_referer: number | null;
-  date_validity: string | null;
-  roles: { id: number; name: string }[];
+  road: string;
+  postal_code: string;
+  complement: string | null;
+  city: string;
+  number: number;
+  name: string | null;
+  id_lease: number | null;
 };
 
-function AddUser({ users }: { users: User[] }) {
+function addAddress({ addresses }: { addresses: Address[] }) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
   const formSchema = z.object({
-    email: z.string().email({ message: 'Email invalide' }),
-    password: z.string().min(8, { message: 'Le mot de passe doit contenir au moins 8 caractères' }),
-    username: z.string().min(2, { message: "Le nom d'utilisateur doit contenir au moins 2 caractères" }),
-    firstName: z.string().min(2, { message: 'Le prénom doit contenir au moins 2 caractères' }),
-    lastName: z.string().min(2, { message: 'Le nom doit contenir au moins 2 caractères' }),
+    road: z.string().min(1, { message: 'Le champ est requis' }),
+    postal_code: z
+      .string({ message: 'Le champ est requis' })
+      .max(5, { message: 'Le code postal doit contenir 5 chiffres' })
+      .min(5, { message: 'Le code postal doit contenir 5 chiffres' }),
+    complement: z.string().optional(),
+    city: z.string().min(1, { message: 'Le champ est requis' }),
+    number: z.coerce
+      .number({ message: 'Le numéro doit être un nombre' })
+      .int()
+      .min(1, { message: 'Le champ est requis' }),
+    name: z.string().optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
-      password: '',
-      username: '',
-      firstName: '',
-      lastName: '',
+      road: '',
+      postal_code: '',
+      complement: '',
+      city: '',
+      number: undefined,
+      name: '',
     },
   });
 
   async function submitEdit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    fetch(`${urlApi}/auth/signup`, {
+    fetch(`${urlApi}/addresses`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       },
       body: JSON.stringify({
-        email: values.email,
-        password: values.password,
-        username: values.username,
-        first_name: values.firstName,
-        last_name: values.lastName,
+        road: values.road,
+        postal_code: values.postal_code,
+        complement: values.complement,
+        city: values.city,
+        number: values.number,
+        name: values.name,
+        id_lease: null,
       }),
     })
       .then((response) => {
         if (response.status === 403) {
           router.push('/');
+        } else if (response.status === 400) {
+          console.log(response);
         }
         return response.json();
       })
       .then((data: { id: number }) => {
-        toast({ title: 'Utilisateur créé', description: "L'utilisateur a été créé avec succès" });
-        users.push({
+        toast({ title: 'Adresse ajouté', description: "L'adresse a été ajouté avec succès" });
+        addresses.push({
           id: data.id,
-          email: values.email,
-          username: values.username,
-          first_name: values.firstName,
-          last_name: values.lastName,
-          id_referer: null,
-          date_validity: null,
-          roles: [],
+          road: values.road,
+          postal_code: values.postal_code,
+          complement: values.complement ?? null,
+          city: values.city,
+          number: values.number,
+          name: values.name ?? null,
+          id_lease: null,
         });
       })
       .catch((error: Error) => {
@@ -102,12 +115,12 @@ function AddUser({ users }: { users: User[] }) {
       <DialogTrigger asChild>
         <Button size="sm" className="h-8 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Ajouter un utilisateur</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Ajouter une adresse</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Création d'utilisateur</DialogTitle>
+          <DialogTitle>Ajout d'adresse</DialogTitle>
           <DialogDescription>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(submitEdit)} method="POST">
@@ -115,10 +128,10 @@ function AddUser({ users }: { users: User[] }) {
                   <div className="grid">
                     <FormField
                       control={form.control}
-                      name="username"
+                      name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <Label className="font-bold">Nom d'utilisateur</Label>
+                          <Label className="font-bold">Alias de l'adresse</Label>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -130,10 +143,10 @@ function AddUser({ users }: { users: User[] }) {
                   <div className="grid">
                     <FormField
                       control={form.control}
-                      name="firstName"
+                      name="number"
                       render={({ field }) => (
                         <FormItem>
-                          <Label className="font-bold">Prénom</Label>
+                          <Label className="font-bold">Numéro</Label>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -145,10 +158,10 @@ function AddUser({ users }: { users: User[] }) {
                   <div className="grid">
                     <FormField
                       control={form.control}
-                      name="lastName"
+                      name="road"
                       render={({ field }) => (
                         <FormItem>
-                          <Label className="font-bold">Nom</Label>
+                          <Label className="font-bold">Adresse</Label>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -160,10 +173,10 @@ function AddUser({ users }: { users: User[] }) {
                   <div className="grid">
                     <FormField
                       control={form.control}
-                      name="email"
+                      name="complement"
                       render={({ field }) => (
                         <FormItem>
-                          <Label className="font-bold">Email</Label>
+                          <Label className="font-bold">Complément d'adresse</Label>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -175,12 +188,27 @@ function AddUser({ users }: { users: User[] }) {
                   <div className="grid">
                     <FormField
                       control={form.control}
-                      name="password"
+                      name="city"
                       render={({ field }) => (
                         <FormItem>
-                          <Label className="font-bold">Mot de passe</Label>
+                          <Label className="font-bold">Ville</Label>
                           <FormControl>
-                            <Input type="password" {...field} />
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid">
+                    <FormField
+                      control={form.control}
+                      name="postal_code"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label className="font-bold">Code postal</Label>
+                          <FormControl>
+                            <Input {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -205,4 +233,4 @@ function AddUser({ users }: { users: User[] }) {
   );
 }
 
-export default AddUser;
+export default addAddress;

@@ -25,7 +25,7 @@ users.openapi(getAllUsers, async (c) => {
   const roles = c.get('user').roles;
   await checkRole(roles, false, [Role.ADMIN]);
   const { search, skip, take } = c.req.valid('query');
-  const searchTerm = search !== undefined ? search : '';
+  const searchTerm = search || '';
 
   const { from, to } = getPagination(skip, take);
   const { data, error, count } = await supabase

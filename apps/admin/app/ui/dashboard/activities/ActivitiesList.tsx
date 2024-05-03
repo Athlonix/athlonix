@@ -9,7 +9,7 @@ type Activity = {
   name: string;
   id_sport: number | null;
   id_address: number | null;
-  days: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+  days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
   end_date: string;
   start_date: string;
   description: string | null;
@@ -17,14 +17,35 @@ type Activity = {
   interval: number;
 };
 
-function UsersList({ activities }: { activities: Activity[] }) {
+type Sport = {
+  id: number;
+  name: string;
+  max_participants: number | null;
+  min_participants: number;
+};
+
+type Address = {
+  id: number;
+  road: string;
+  number: number;
+  complement: string | null;
+  name: string | null;
+};
+
+interface Props {
+  activities: Activity[];
+  sports: Sport[];
+  addresses: Address[];
+}
+
+function ActivitiesList({ activities, sports, addresses }: Props) {
   return (
     <>
       {activities.map((activity: Activity) => (
-        <ActivityRow key={activity.id} {...activity} />
+        <ActivityRow key={activity.id} {...activity} sports={sports} addresses={addresses} />
       ))}
     </>
   );
 }
 
-export default UsersList;
+export default ActivitiesList;

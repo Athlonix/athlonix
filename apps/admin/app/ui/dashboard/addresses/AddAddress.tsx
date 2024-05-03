@@ -91,8 +91,6 @@ function addAddress({ addresses, setAddresses }: Props): JSX.Element {
       .then((response) => {
         if (response.status === 403) {
           router.push('/');
-        } else if (response.status === 400) {
-          console.log(response);
         }
         return response.json();
       })

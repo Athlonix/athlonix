@@ -13,7 +13,7 @@ type Address = {
   id_lease: number | null;
 };
 
-function UsersList({ addresses }: { addresses: Address[] }) {
+function AddressesList({ addresses }: { addresses: Address[] }) {
   return (
     <>
       {addresses.map((address: Address) => (
@@ -23,4 +23,4 @@ function UsersList({ addresses }: { addresses: Address[] }) {
   );
 }
 
-export default UsersList;
+export default AddressesList;

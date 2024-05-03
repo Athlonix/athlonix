@@ -120,7 +120,7 @@ function AddressRow(address: AddressProps) {
                 <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Edition de l'adresse {address.id}</DialogTitle>
+                    <DialogTitle>Suppression de l'adresse {address.id}</DialogTitle>
                     <DialogDescription>
                       <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet adresse ?</div>
                       <div className="flex w-full justify-end gap-4">

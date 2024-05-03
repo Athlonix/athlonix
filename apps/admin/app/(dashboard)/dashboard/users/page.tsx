@@ -71,7 +71,6 @@ function ShowContent() {
           return response.json();
         })
         .then((data: UserData) => {
-          console.log(data);
           setUsers(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })

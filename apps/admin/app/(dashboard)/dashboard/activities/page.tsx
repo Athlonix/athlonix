@@ -1,7 +1,7 @@
 'use client';
 
 import ActivitiesList from '@/app/ui/dashboard/activities/ActivitiesList';
-import AddAddress from '@/app/ui/dashboard/addresses/AddAddress';
+import AddActivity from '@/app/ui/dashboard/activities/AddActivity';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
 import {
@@ -73,7 +73,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
   }
 
   const [maxPage, setMaxPage] = useState<number>(1);
-  const [activity, setActivity] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
@@ -100,7 +100,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
           return response.json();
         })
         .then((data: ActivityData) => {
-          setActivity(data.data);
+          setActivities(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })
         .catch((error: Error) => {
@@ -120,7 +120,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Activités</CardTitle>
-          {/* <AddAddress addresses={activity} setAddresses={setActivity} /> */}
+          <AddActivity activities={activities} setActivities={setActivities} />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">
@@ -148,7 +148,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
               </TableRow>
             </TableHeader>
             <TableBody>
-              <ActivitiesList activities={activity} sports={sports} addresses={addresses} />
+              <ActivitiesList activities={activities} sports={sports} addresses={addresses} />
             </TableBody>
           </Table>
         </CardContent>

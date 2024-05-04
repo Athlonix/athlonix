@@ -10,9 +10,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@repo/ui/components/ui/form';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@repo/ui/components/ui/radio-group';
 import { useToast } from '@repo/ui/hooks/use-toast';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -41,7 +42,7 @@ interface Props {
   setActivities: React.Dispatch<React.SetStateAction<Activity[]>>;
 }
 
-function addAddress({ activities, setActivities }: Props): JSX.Element {
+function AddActivity({ activities, setActivities }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -52,16 +53,15 @@ function addAddress({ activities, setActivities }: Props): JSX.Element {
     max_participants: z.number().int().min(1, { message: 'Le champ est requis' }),
     id_sport: z.number().int().min(1).optional(),
     id_address: z.number().int().min(1).optional(),
-    recurrence: z.string().regex(/^(weekly|monthly|annual)$/),
-    days: z.array(z.string().regex(/^(monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/)).refine(
-      (days) => {
-        if (days.length === 0 && formSchema.safeParse(days).success && formSchema.parse(days).recurrence === 'weekly') {
+    recurrence: z.enum(['weekly', 'monthly', 'annual']),
+    days: z
+      .array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']))
+      .refine((days) => {
+        if (formSchema.parse(days).recurrence === 'weekly' && days.length === 0) {
           return false;
         }
         return true;
-      },
-      { message: 'Le champ est requis lorsque la récurrence est hebdomadaire' },
-    ),
+      }),
     start_date: z.string().date(),
     end_date: z.string().date(),
     interval: z.number().int().min(1),
@@ -76,7 +76,7 @@ function addAddress({ activities, setActivities }: Props): JSX.Element {
       max_participants: undefined,
       id_sport: undefined,
       id_address: undefined,
-      recurrence: 'weekly',
+      recurrence: undefined,
       days: [],
       start_date: '',
       end_date: '',
@@ -84,51 +84,62 @@ function addAddress({ activities, setActivities }: Props): JSX.Element {
     },
   });
 
-  async function submitEdit(values: z.infer<typeof formSchema>) {
+  async function submit(values: z.infer<typeof formSchema>) {
+    console.log('Submit function called');
+    console.log(form.formState.isValid);
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    fetch(`${urlApi}/addresses`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-      body: JSON.stringify({
-        name: values.name,
-        description: values.description,
-        min_participants: values.min_participants,
-        max_participants: values.max_participants,
-        days: values.days,
-        recurrence: values.recurrence,
-        interval: values.interval,
-        start_date: values.start_date,
-        end_date: values.end_date,
-        id_sport: values.id_sport,
-        id_address: values.id_address,
-      }),
-    })
-      .then((response) => {
-        if (response.status === 403) {
-          router.push('/');
-        }
-        return response.json();
-      })
-      .then((data: { id: number }) => {
-        toast({ title: 'Adresse ajouté', description: "L'adresse a été ajouté avec succès" });
-        const newActivity: Activity = {
-          id: data.id,
-          name: values.name,
-          min_participants: values.min_participants,
-          max_participants: values.max_participants,
-          id_sport: values.id_sport || null,
-        };
-        if (activities.length < 10) {
-          setActivities([...activities, newActivity]);
-        }
-      })
-      .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
-      });
+    console.log(values);
+
+    // fetch(`${urlApi}/addresses`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+    //   },
+    //   body: JSON.stringify({
+    //     name: values.name,
+    //     description: values.description,
+    //     min_participants: values.min_participants,
+    //     max_participants: values.max_participants,
+    //     days: values.days,
+    //     recurrence: values.recurrence,
+    //     interval: values.interval,
+    //     start_date: values.start_date,
+    //     end_date: values.end_date,
+    //     id_sport: values.id_sport,
+    //     id_address: values.id_address,
+    //   }),
+    // })
+    //   .then((response) => {
+    //     if (response.status === 403) {
+    //       router.push('/');
+    //     }
+    //     return response.json();
+    //   })
+    //   .then((data: { id: number }) => {
+    //     toast({ title: 'Adresse ajouté', description: "L'adresse a été ajouté avec succès" });
+    //     const newActivity: Activity = {
+    //       id: data.id,
+    //       name: values.name,
+    //       min_participants: values.min_participants,
+    //       max_participants: values.max_participants,
+    //       id_sport: values.id_sport || null,
+    //       id_address: values.id_address || null,
+    //       days: values.days,
+    //       end_date: values.end_date,
+    //       start_date: values.start_date,
+    //       description: values.description || null,
+    //       recurrence: values.recurrence,
+    //       interval: values.interval,
+    //     };
+    //     if (activities.length < 10) {
+    //       setActivities([...activities, newActivity]);
+    //     }
+    //   })
+    //   .catch((error: Error) => {
+    //     toast({ title: 'Erreur', description: error?.message });
+    //   });
 
     setOpen(false);
   }
@@ -138,16 +149,16 @@ function addAddress({ activities, setActivities }: Props): JSX.Element {
       <DialogTrigger asChild>
         <Button size="sm" className="h-8 gap-1">
           <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Ajouter une adresse</span>
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Ajouter une activité</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Ajout d'adresse</DialogTitle>
+          <DialogTitle>Ajout d'une activité</DialogTitle>
           <DialogDescription>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(submitEdit)} method="POST">
-                <div className="grid gap-2">
+              <form onSubmit={form.handleSubmit(submit)}>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="grid">
                     <FormField
                       control={form.control}
@@ -155,6 +166,21 @@ function addAddress({ activities, setActivities }: Props): JSX.Element {
                       render={({ field }) => (
                         <FormItem>
                           <Label className="font-bold">Nom de l'activité</Label>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid">
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label className="font-bold">Description</Label>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -226,36 +252,6 @@ function addAddress({ activities, setActivities }: Props): JSX.Element {
                   <div className="grid">
                     <FormField
                       control={form.control}
-                      name="recurrence"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Fréquence</Label>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Description</Label>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
                       name="start_date"
                       render={({ field }) => (
                         <FormItem>
@@ -277,6 +273,44 @@ function addAddress({ activities, setActivities }: Props): JSX.Element {
                           <Label className="font-bold">Date/Heure de fin</Label>
                           <FormControl>
                             <Input {...field} type="date" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid">
+                    <FormField
+                      control={form.control}
+                      name="recurrence"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label className="font-bold">Récurrence</Label>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="flex flex-col space-y-1"
+                            >
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="weekly" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Hébdomadaire</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="monthly" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Mensuelle</FormLabel>
+                              </FormItem>
+                              <FormItem className="flex items-center space-x-3 space-y-0">
+                                <FormControl>
+                                  <RadioGroupItem value="annual" />
+                                </FormControl>
+                                <FormLabel className="font-normal">Annuelle</FormLabel>
+                              </FormItem>
+                            </RadioGroup>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -316,4 +350,4 @@ function addAddress({ activities, setActivities }: Props): JSX.Element {
   );
 }
 
-export default addAddress;
+export default AddActivity;

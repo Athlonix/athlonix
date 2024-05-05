@@ -14,6 +14,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
+import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { useToast } from '@repo/ui/hooks/use-toast';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -106,135 +107,137 @@ function AddVote({ votes, setVotes }: Props) {
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Création d'un vote</DialogTitle>
-          <DialogDescription>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(callApi)} method="POST">
-                <div className="grid gap-2">
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="title"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Titre</Label>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+        <ScrollArea className="max-h-[80vh] p-4">
+          <DialogHeader>
+            <DialogTitle>Création d'un vote</DialogTitle>
+            <DialogDescription>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(callApi)} method="POST">
+                  <div className="grid gap-2">
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="title"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Titre</Label>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Description</Label>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="start_at"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Date de début</Label>
+                            <FormControl>
+                              <Input {...field} type="datetime-local" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="end_at"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Date de fin</Label>
+                            <FormControl>
+                              <Input {...field} type="datetime-local" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="max_choices"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Choix maximum</Label>
+                            <FormControl>
+                              <Input {...field} type="number" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      {fields.map((field, index) => (
+                        <div key={field.id} className="grid gap-2">
+                          <FormField
+                            control={form.control}
+                            name={`options.${index}.content`}
+                            render={({ field }) => (
+                              <FormItem>
+                                <Label className="font-bold">Choix {index + 1}</Label>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          <Button
+                            type="button"
+                            onClick={() => {
+                              remove(index);
+                            }}
+                          >
+                            Supprimer
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        append({ content: '' });
+                      }}
+                    >
+                      Ajouter un choix
+                    </Button>
                   </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Description</Label>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <div className="flex gap-4 mt-4">
+                    <Button type="submit" className="w-full">
+                      Créer
+                    </Button>
+                    <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">
+                      Annuler
+                    </Button>
                   </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="start_at"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Date de début</Label>
-                          <FormControl>
-                            <Input {...field} type="datetime-local" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="end_at"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Date de fin</Label>
-                          <FormControl>
-                            <Input {...field} type="datetime-local" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="max_choices"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Choix maximum</Label>
-                          <FormControl>
-                            <Input {...field} type="number" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    {fields.map((field, index) => (
-                      <div key={field.id} className="grid gap-2">
-                        <FormField
-                          control={form.control}
-                          name={`options.${index}.content`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <Label className="font-bold">Choix {index + 1}</Label>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <Button
-                          type="button"
-                          onClick={() => {
-                            remove(index);
-                          }}
-                        >
-                          Supprimer
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      append({ content: '' });
-                    }}
-                  >
-                    Ajouter un choix
-                  </Button>
-                </div>
-                <div className="flex gap-4 mt-4">
-                  <Button type="submit" className="w-full">
-                    Créer
-                  </Button>
-                  <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">
-                    Annuler
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogDescription>
-        </DialogHeader>
+                </form>
+              </Form>
+            </DialogDescription>
+          </DialogHeader>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

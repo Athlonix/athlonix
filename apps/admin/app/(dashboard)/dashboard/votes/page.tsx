@@ -1,8 +1,9 @@
 'use client';
 
+import AddVote from '@/app/ui/dashboard/votes/addVotes';
 import { Button } from '@repo/ui/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
-import { Suspense, useEffect, useState } from 'react';
+import { SetStateAction, Suspense, useEffect, useState } from 'react';
 
 type Vote = {
   id: number;
@@ -92,7 +93,9 @@ export default function Votes() {
         <div className="p-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-semibold">Votes</h1>
-            <Button className="mt-4">Créer un vote</Button>
+            <div className="flex gap-4">
+              <AddVote />
+            </div>
           </div>
           <Suspense fallback={<div>Chargement...</div>}>
             <VotesList />

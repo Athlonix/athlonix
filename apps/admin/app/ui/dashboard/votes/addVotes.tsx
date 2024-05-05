@@ -84,7 +84,7 @@ function AddVote({ votes, setVotes }: Props) {
         }
         return response.json();
       })
-      .then((data) => {
+      .then((data: Vote) => {
         if (data) {
           toast({ title: 'Vote créé', description: 'Le vote a été créé avec succès' });
           setVotes([...votes, data]);

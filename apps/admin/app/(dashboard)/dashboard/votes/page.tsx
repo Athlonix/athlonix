@@ -4,6 +4,7 @@ import AddVote from '@/app/ui/dashboard/votes/addVotes';
 import { Button } from '@repo/ui/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Toaster } from '@repo/ui/components/ui/toaster';
+import { toast, useToast } from '@repo/ui/hooks/use-toast';
 import { Suspense, useEffect, useState } from 'react';
 
 export type Vote = {
@@ -16,6 +17,30 @@ export type Vote = {
   end_at: string;
   results: { id_choice: number; count: number }[];
 };
+
+function deleteVote(id: number, votes: Vote[], setVotes: React.Dispatch<React.SetStateAction<Vote[]>>) {
+  const api = process.env.NEXT_PUBLIC_API_URL;
+
+  fetch(`${api}/polls/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+    },
+  })
+    .then(async (response) => {
+      return await response.json();
+    })
+    .then(() => {
+      setVotes(votes.filter((vote) => vote.id !== id));
+      toast({ title: 'Vote supprimé', description: 'Le vote a bien été supprimé' });
+    })
+    .catch((error: Error) => {
+      console.error(error);
+      toast({ title: 'Erreur', description: 'Une erreur est survenue lors de la suppression du vote' });
+    });
+}
+
 function VotesList({ page = 1 }: { page?: number }) {
   const api = process.env.NEXT_PUBLIC_API_URL;
 
@@ -78,7 +103,9 @@ function VotesList({ page = 1 }: { page?: number }) {
                     <TableCell>
                       <Button>Détails</Button>
                       <Button className="ml-2">Modifier</Button>
-                      <Button className="ml-2">Supprimer</Button>
+                      <Button className="ml-2" onClick={() => deleteVote(vote.id, votes, setVotes)}>
+                        Supprimer
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

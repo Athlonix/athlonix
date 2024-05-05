@@ -139,7 +139,7 @@ export const updatePoll = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: createPollSchema.partial(),
+          schema: createPollSchema.omit({ options: true }).partial(),
         },
       },
     },

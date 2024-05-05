@@ -93,11 +93,7 @@ polls.openapi(updatePoll, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false, [Role.ADMIN]);
   const { id } = c.req.valid('param');
-  const { title, description, start_at, end_at, max_choices, options } = c.req.valid('json');
-
-  if (!options || options.length < 2) {
-    return c.json({ error: 'Poll must have at least 2 options' }, 400);
-  }
+  const { title, description, start_at, end_at, max_choices } = c.req.valid('json');
 
   const { data, error } = await supabase
     .from('POLLS')
@@ -108,22 +104,6 @@ polls.openapi(updatePoll, async (c) => {
 
   if (error || !data) {
     return c.json({ error: 'Failed to update poll' }, 400);
-  }
-
-  if (options) {
-    const { data: optionsData, error: optionsError } = await supabase
-      .from('POLLS_OPTIONS')
-      .insert(
-        options.map((option: { content: string }) => ({
-          content: option.content,
-          id_poll: id,
-        })),
-      )
-      .select();
-
-    if (optionsError || !optionsData) {
-      return c.json({ error: 'Failed to create options' }, 400);
-    }
   }
 
   return c.json(data, 200);

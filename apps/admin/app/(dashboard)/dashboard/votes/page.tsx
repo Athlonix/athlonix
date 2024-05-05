@@ -1,10 +1,12 @@
 'use client';
 
 import AddVote from '@/app/ui/dashboard/votes/addVotes';
+import EditVote from '@/app/ui/dashboard/votes/editVotes';
 import { Button } from '@repo/ui/components/ui/button';
+import { Dialog, DialogContent } from '@repo/ui/components/ui/dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Toaster } from '@repo/ui/components/ui/toaster';
-import { toast, useToast } from '@repo/ui/hooks/use-toast';
+import { toast } from '@repo/ui/hooks/use-toast';
 import { Suspense, useEffect, useState } from 'react';
 
 export type Vote = {
@@ -15,6 +17,7 @@ export type Vote = {
   max_choices: number;
   start_at: string;
   end_at: string;
+  options: { id: number; content: string }[];
   results: { id_choice: number; count: number }[];
 };
 
@@ -46,6 +49,7 @@ function VotesList({ page = 1 }: { page?: number }) {
 
   const [votes, setVotes] = useState<Vote[]>([]);
   const [maxPage, setMaxPage] = useState<number>(1);
+  const [editingVote, setEditingVote] = useState<number | null>(null);
 
   useEffect(() => {
     const queryParams = new URLSearchParams({
@@ -102,7 +106,9 @@ function VotesList({ page = 1 }: { page?: number }) {
                     <TableCell>{vote.max_choices}</TableCell>
                     <TableCell>
                       <Button>Détails</Button>
-                      <Button className="ml-2">Modifier</Button>
+                      <Button className="ml-2" onClick={() => setEditingVote(vote.id)}>
+                        Modifier
+                      </Button>
                       <Button className="ml-2" onClick={() => deleteVote(vote.id, votes, setVotes)}>
                         Supprimer
                       </Button>
@@ -113,6 +119,13 @@ function VotesList({ page = 1 }: { page?: number }) {
             </Table>
           )}
         </div>
+        {editingVote !== null && (
+          <Dialog open={editingVote !== null} onOpenChange={() => setEditingVote(null)}>
+            <DialogContent>
+              <EditVote id={editingVote} votes={votes} setVotes={setVotes} setEditingVote={setEditingVote} />
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     </div>
   );

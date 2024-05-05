@@ -49,7 +49,7 @@ function VotesList({ page = 1 }: { page?: number }) {
   return (
     <div className="p-4">
       <div className="border rounded-lg overflow-hidden">
-        {votes?.length === 0 && <div className="p-4 text-center text-muted-foreground">No votes found</div>}
+        {votes?.length === 0 && <div className="p-4 text-center text-muted-foreground">Aucun vote</div>}
         {votes?.length > 0 && (
           <Table>
             <TableHeader>
@@ -71,7 +71,9 @@ function VotesList({ page = 1 }: { page?: number }) {
                   <TableCell>{new Date(vote.end_at).toLocaleDateString()}</TableCell>
                   <TableCell>{vote.max_choices}</TableCell>
                   <TableCell>
-                    <Button>Details</Button>
+                    <Button>Détails</Button>
+                    <Button className="ml-2">Modifier</Button>
+                    <Button className="ml-2">Supprimer</Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -88,8 +90,11 @@ export default function Votes() {
     <div className="p-4">
       <div className="border rounded-lg overflow-hidden">
         <div className="p-4">
-          <h1 className="text-2xl font-semibold">Votes</h1>
-          <Suspense fallback={<div>Loading...</div>}>
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold">Votes</h1>
+            <Button className="mt-4">Créer un vote</Button>
+          </div>
+          <Suspense fallback={<div>Chargement...</div>}>
             <VotesList />
           </Suspense>
         </div>

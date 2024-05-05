@@ -1,5 +1,6 @@
 'use client';
 
+import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -21,17 +22,12 @@ import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-type Vote = {
-  id: number;
-  title: string;
-  description: string;
-  max_choices: number;
-  start_at: string;
-  end_at: string;
-  options: { content: string }[];
-};
+interface Props {
+  votes: Vote[];
+  setVotes: React.Dispatch<React.SetStateAction<Vote[]>>;
+}
 
-function AddVote() {
+function AddVote({ votes, setVotes }: Props) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -64,7 +60,7 @@ function AddVote() {
     name: 'options',
   });
 
-  async function addVote(values: z.infer<typeof formSchema>) {
+  async function callApi(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
     fetch(`${urlApi}/polls`, {
@@ -82,14 +78,19 @@ function AddVote() {
         options: values.options,
       }),
     })
-      .then(async (response) => {
-        return await response.json();
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
       })
       .then((data) => {
-        console.log(data);
-        toast({ title: 'Vote créé', description: 'Le vote a été créé avec succès' });
+        if (data) {
+          toast({ title: 'Vote créé', description: 'Le vote a été créé avec succès' });
+          setVotes([...votes, data]);
+        }
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         toast({ title: 'Erreur', description: 'Une erreur est survenue' });
       });
 
@@ -109,7 +110,7 @@ function AddVote() {
           <DialogTitle>Création d'un vote</DialogTitle>
           <DialogDescription>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(addVote)} method="POST">
+              <form onSubmit={form.handleSubmit(callApi)} method="POST">
                 <div className="grid gap-2">
                   <div className="grid">
                     <FormField

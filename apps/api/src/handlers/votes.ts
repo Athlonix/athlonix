@@ -27,13 +27,37 @@ polls.openapi(getAllPolls, async (c) => {
   const { skip, take } = c.req.valid('query');
   const { from, to } = getPagination(skip, take - 1);
 
-  const { data, error } = await supabase.from('POLLS').select('*, results:POLLS_VOTES(*)').range(from, to);
+  const { data, error } = await supabase
+    .from('POLLS')
+    .select(
+      `
+    id,
+    title,
+    description,
+    start_at,
+    end_at,
+    max_choices,
+    id_user,
+    results: POLLS_OPTIONS (
+      id,
+      content,
+      votes: POLLS_VOTES (id_option)
+    )
+  `,
+      { count: 'exact' },
+    )
+    .range(from, to);
 
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json(data, 200);
+  const format = data.map((poll) => ({
+    ...poll,
+    results: poll.results.map((option) => ({ ...option, votes: option.votes.length })),
+  }));
+
+  return c.json(format, 200);
 });
 
 polls.openapi(getOnePoll, async (c) => {
@@ -41,13 +65,36 @@ polls.openapi(getOnePoll, async (c) => {
   const roles = user.roles;
   await checkRole(roles, true);
   const { id } = c.req.valid('param');
-  const { data, error } = await supabase.from('POLLS').select('*, results:POLLS_VOTES(*)').eq('id', id).single();
+
+  const { data, error } = await supabase
+    .from('POLLS')
+    .select(
+      `
+      id,
+      title,
+      description,
+      start_at,
+      end_at,
+      max_choices,
+      id_user,
+      results: POLLS_OPTIONS (
+        id,
+        content,
+        votes: POLLS_VOTES (id_option)
+      )
+    `,
+      { count: 'exact' },
+    )
+    .eq('id', id)
+    .single();
 
   if (error || !data) {
     return c.json({ error: 'Poll not found' }, 404);
   }
 
-  return c.json(data, 200);
+  const format = data.results.map((option) => ({ ...option, votes: option.votes.length }));
+
+  return c.json({ ...data, results: format }, 200);
 });
 
 polls.openapi(createPoll, async (c) => {

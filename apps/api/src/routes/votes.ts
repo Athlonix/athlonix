@@ -5,14 +5,14 @@ import { paginationSchema } from '../utils/pagnination.js';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const pollsSchema = z.object({
-  id: z.number(),
+  id: z.number().positive(),
   title: z.string().max(50),
   description: z.string().max(255).nullable(),
   start_at: z.string().datetime(),
   end_at: z.string().datetime(),
   max_choices: z.number().min(1),
-  id_user: z.number(),
-  results: z.array(z.object({ id: z.number(), id_option: z.number() })).optional(),
+  id_user: z.number().positive(),
+  results: z.array(z.object({ id_option: z.number().positive(), votes: z.number().positive(), content: z.string() })),
 });
 
 export const createPollSchema = z.object({

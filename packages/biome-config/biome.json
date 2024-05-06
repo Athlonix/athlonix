@@ -22,10 +22,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
-      "suspicious": {
-        "noRedeclare": "off"
-      }
+      "recommended": true
     }
   },
   "files": {

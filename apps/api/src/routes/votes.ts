@@ -1,4 +1,3 @@
-import { title } from 'node:process';
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { paginationSchema } from '../utils/pagnination.js';

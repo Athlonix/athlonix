@@ -28,7 +28,7 @@
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^20.12.8",
+    "@types/node": "^20.12.10",
     "@types/swagger-ui-dist": "^3.30.4",
     "supabase": "^1.165.0",
     "tsx": "^4.9.3",

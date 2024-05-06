@@ -110,11 +110,11 @@ sports.openapi(deleteSport, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error } = await supabase.from('SPORTS').delete().eq('id', id);
+  const { error } = await supabase.from('SPORTS').delete().eq('id', id);
 
-  if (error || !data) {
+  if (error) {
     return c.json({ error: 'Sport not found' }, 404);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: `Sport with id ${id} deleted` }, 200);
 });

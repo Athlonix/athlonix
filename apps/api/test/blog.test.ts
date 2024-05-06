@@ -1,18 +1,18 @@
-import { exit } from 'node:process';
 import app from '../src/index.js';
 import { supAdmin } from '../src/libs/supabase.js';
 import { Role } from '../src/validators/general.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
-let id_user: number;
-let id_auth: string;
-let jwt: string;
-let id_post: number;
-let id_comment: number;
 
 describe('Blog tests', () => {
-  test('Create redactor', async () => {
+  let id_user: number;
+  let id_auth: string;
+  let jwt: string;
+  let id_post: number;
+  let id_comment: number;
+
+  beforeAll(async () => {
     const res = await app.request(`${path}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -30,14 +30,9 @@ describe('Blog tests', () => {
     id_user = user.id;
     const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.REDACTOR });
     const { error: errorAuth } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.MEMBER });
-    if (error || errorAuth) {
-      console.error('Error while updating user');
-      exit(1);
-    }
-  });
+    if (error || errorAuth) throw new Error('Error while updating user');
 
-  test('Login redactor', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const loginRes = await app.request(`${path}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -45,9 +40,9 @@ describe('Blog tests', () => {
         password: 'password123456',
       }),
     });
-    expect(res.status).toBe(200);
-    const user: { token: string } = await res.json();
-    jwt = user.token;
+    expect(loginRes.status).toBe(200);
+    const loginUser: { token: string } = await loginRes.json();
+    jwt = loginUser.token;
   });
 
   test('Create post', async () => {
@@ -143,7 +138,7 @@ describe('Blog tests', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Delete redactor', async () => {
+  afterAll(async () => {
     const { error } = await supAdmin.from('USERS').delete().eq('id', id_user);
     const { error: errorAuth } = await supAdmin.auth.admin.deleteUser(id_auth);
     expect(error).toBeNull();

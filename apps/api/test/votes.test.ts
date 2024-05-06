@@ -1,17 +1,17 @@
-import { exit } from 'node:process';
 import app from '../src/index.js';
 import { supAdmin } from '../src/libs/supabase.js';
 import { Role } from '../src/validators/general.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
-let id_user: number;
-let id_auth: string;
-let jwt: string;
-let id_polls: number;
 
 describe('Votes tests', () => {
-  test('Create admin', async () => {
+  let id_user: number;
+  let id_auth: string;
+  let jwt: string;
+  let id_polls: number;
+
+  beforeAll(async () => {
     const res = await app.request(`${path}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -28,14 +28,9 @@ describe('Votes tests', () => {
     id_auth = user.id_auth;
     id_user = user.id;
     const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.ADMIN });
-    if (error) {
-      console.error('Error while updating user: ', error);
-      exit(1);
-    }
-  });
+    if (error) throw new Error('Error while updating user');
 
-  test('Login admin', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const loginRes = await app.request(`${path}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -43,9 +38,9 @@ describe('Votes tests', () => {
         password: 'password123456',
       }),
     });
-    expect(res.status).toBe(200);
-    const user: { token: string } = await res.json();
-    jwt = user.token;
+    expect(loginRes.status).toBe(200);
+    const loginUser: { token: string } = await loginRes.json();
+    jwt = loginUser.token;
   });
 
   test('Create poll', async () => {
@@ -130,7 +125,7 @@ describe('Votes tests', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Delete admin', async () => {
+  afterAll(async () => {
     const { error } = await supAdmin.from('USERS').delete().eq('id', id_user);
     const { error: errorAuth } = await supAdmin.auth.admin.deleteUser(id_auth);
     expect(error).toBeNull();

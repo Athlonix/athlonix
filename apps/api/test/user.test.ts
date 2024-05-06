@@ -1,4 +1,3 @@
-import { exit } from 'node:process';
 import app from '../src/index.js';
 import { supAdmin } from '../src/libs/supabase.js';
 import { Role } from '../src/validators/general.js';
@@ -6,14 +5,15 @@ import { deleteAdmin } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
-let id_user: number;
-let id_auth: string;
-let id_admin: number;
-let auth_admin: string;
-let jwt: string;
 
 describe('User tests', () => {
-  test('Create admin', async () => {
+  let id_user: number;
+  let id_auth: string;
+  let id_admin: number;
+  let auth_admin: string;
+  let jwt: string;
+
+  beforeAll(async () => {
     const res = await app.request(`${path}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -26,18 +26,13 @@ describe('User tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const admin: { id: number; id_auth: string } = await res.json();
+    const admin = await res.json();
     auth_admin = admin.id_auth;
     id_admin = admin.id;
     const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: admin.id, id_role: Role.ADMIN });
-    if (error) {
-      console.error('Error while updating user');
-      exit(1);
-    }
-  });
+    if (error) throw new Error('Error while updating user');
 
-  test('Login admin', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const loginRes = await app.request(`${path}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -45,9 +40,9 @@ describe('User tests', () => {
         password: 'password123456',
       }),
     });
-    expect(res.status).toBe(200);
-    const admin: { token: string } = await res.json();
-    jwt = admin.token;
+    expect(loginRes.status).toBe(200);
+    const loginAdmin: { token: string } = await loginRes.json();
+    jwt = loginAdmin.token;
   });
 
   test('Create user', async () => {

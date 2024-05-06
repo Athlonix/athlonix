@@ -1,6 +1,6 @@
 'use client';
 
-import EditForm from '@/app/ui/dashboard/addresses/EditForm';
+import EditForm from '@/app/ui/dashboard/activities/EditForm';
 import { Button } from '@repo/ui/components/ui/button';
 import {
   Dialog,
@@ -36,7 +36,7 @@ type Address = {
   name: string | null;
 };
 
-interface ActivityProps {
+type Activity = {
   id: number;
   min_participants: number;
   max_participants: number;
@@ -49,6 +49,10 @@ interface ActivityProps {
   description: string | null;
   recurrence: 'weekly' | 'monthly' | 'annual';
   interval: number;
+};
+
+interface ActivityRowProps {
+  activity: Activity;
   sports: Sport[];
   addresses: Address[];
 }
@@ -75,28 +79,27 @@ const FrenchDays: Record<string, string> = {
   sunday: 'Dimanche',
 };
 
-function ActivityRow(activities: ActivityProps) {
-  console.log(activities.sports);
+function ActivityRow(props: ActivityRowProps) {
   const { toast } = useToast();
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
-  const [minParticipants, setMinParticipants] = useState(activities.min_participants);
-  const [maxParticipants, setMaxParticipants] = useState(activities.max_participants);
-  const [name, setName] = useState(activities.name);
-  const [idSport, setIdSport] = useState(activities.id_sport);
-  const [idAddress, setIdAddress] = useState(activities.id_address);
-  const [days, setDays] = useState(activities.days);
-  const [endDate, setEndDate] = useState(activities.end_date);
-  const [startDate, setStartDate] = useState(activities.start_date);
-  const [description, setDescription] = useState(activities.description);
-  const [recurrence, setRecurrence] = useState(activities.recurrence);
-  const [interval, setInterval] = useState(activities.interval);
+  const [minParticipants, setMinParticipants] = useState(props.activity.min_participants);
+  const [maxParticipants, setMaxParticipants] = useState(props.activity.max_participants);
+  const [name, setName] = useState(props.activity.name);
+  const [idSport, setIdSport] = useState(props.activity.id_sport);
+  const [idAddress, setIdAddress] = useState(props.activity.id_address);
+  const [days, setDays] = useState(props.activity.days);
+  const [endDate, setEndDate] = useState(props.activity.end_date);
+  const [startDate, setStartDate] = useState(props.activity.start_date);
+  const [description, setDescription] = useState(props.activity.description);
+  const [recurrence, setRecurrence] = useState(props.activity.recurrence);
+  const [interval, setInterval] = useState(props.activity.interval);
 
   const setter = {
+    name: setName,
     minParticipants: setMinParticipants,
     maxParticipants: setMaxParticipants,
-    name: setName,
     idSport: setIdSport,
     idAddress: setIdAddress,
     days: setDays,
@@ -109,7 +112,7 @@ function ActivityRow(activities: ActivityProps) {
 
   async function deleteActivity() {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
-    fetch(`${urlApi}/activity/${activities.id}`, {
+    fetch(`${urlApi}/activities/${props.activity.id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -128,17 +131,17 @@ function ActivityRow(activities: ActivityProps) {
   }
 
   return (
-    <TableRow key={activities.id}>
+    <TableRow key={props.activity.id}>
       <TableCell className="font-medium">{name}</TableCell>
       <TableCell>
         {minParticipants} - {maxParticipants}
       </TableCell>
       <TableCell>
-        {activities.id_sport && activities.sports
-          ? Object.keys(activities.sports)
+        {idSport && props.sports
+          ? Object.keys(props.sports)
               .map((sportId) => {
-                const sport = activities.sports[Number(sportId)];
-                if (sport && sport.id === activities.id_sport) {
+                const sport = props.sports[Number(sportId)];
+                if (sport && sport.id === idSport) {
                   return sport.name;
                 }
                 return null;
@@ -147,11 +150,11 @@ function ActivityRow(activities: ActivityProps) {
           : ''}
       </TableCell>
       <TableCell>
-        {activities.id_address && activities.addresses
-          ? Object.keys(activities.addresses)
+        {idAddress && props.addresses
+          ? Object.keys(props.addresses)
               .map((addressId) => {
-                const address = activities.addresses[Number(addressId)];
-                if (address && address.id === activities.id_address) {
+                const address = props.addresses[Number(addressId)];
+                if (address && address.id === idAddress) {
                   if (address.name) return address.name;
                   if (address.complement) return `${address.road} ${address.number}, ${address.complement}`;
                   return `${address.road} ${address.number}`;
@@ -161,54 +164,46 @@ function ActivityRow(activities: ActivityProps) {
               .filter((addressName) => addressName !== null)[0] || ''
           : ''}
       </TableCell>
-      <TableCell>{FrenchRecurrence[activities.recurrence]}</TableCell>
-      {activities.recurrence === 'weekly' && (
+      <TableCell>{FrenchRecurrence[recurrence]}</TableCell>
+      {recurrence === 'weekly' && (
         <TableCell>
-          {activities.days.map((day) => FrenchDays[day]).join(', ')} de{' '}
-          {`${new Date(activities.start_date).getHours().toString().padStart(2, '0')}:${new Date(activities.start_date)
+          {days.map((day) => FrenchDays[day]).join(', ')} de{' '}
+          {`${new Date(startDate).getHours().toString().padStart(2, '0')}:${new Date(startDate)
             .getMinutes()
             .toString()
-            .padStart(2, '0')} - ${new Date(activities.end_date).getHours().toString().padStart(2, '0')}:${new Date(
-            activities.end_date,
-          )
+            .padStart(2, '0')} - ${new Date(endDate).getHours().toString().padStart(2, '0')}:${new Date(endDate)
             .getMinutes()
             .toString()
             .padStart(2, '0')}`}
         </TableCell>
       )}
-      {activities.recurrence === 'monthly' && (
+      {recurrence === 'monthly' && (
         <TableCell>
-          {`Le ${new Date(activities.start_date).getDate()} de ${new Date(activities.start_date)
+          {`Le ${new Date(startDate).getDate()} de ${new Date(startDate)
             .getHours()
             .toString()
-            .padStart(2, '0')}:${new Date(activities.start_date).getMinutes().toString().padStart(2, '0')} - ${new Date(
-            activities.end_date,
-          )
+            .padStart(2, '0')}:${new Date(startDate).getMinutes().toString().padStart(2, '0')} - ${new Date(endDate)
             .getHours()
             .toString()
-            .padStart(2, '0')}:${new Date(activities.end_date).getMinutes().toString().padStart(2, '0')}`}
+            .padStart(2, '0')}:${new Date(endDate).getMinutes().toString().padStart(2, '0')}`}
         </TableCell>
       )}
-      {activities.recurrence === 'annual' && (
+      {recurrence === 'annual' && (
         <TableCell>
-          {`${new Date(activities.start_date).getDate()} ${new Date(activities.start_date).toLocaleString('default', {
+          {`${new Date(startDate).getDate()} ${new Date(startDate).toLocaleString('default', {
             month: 'long',
-          })} de ${new Date(activities.start_date).getHours().toString().padStart(2, '0')}:${new Date(
-            activities.start_date,
-          )
+          })} de ${new Date(startDate).getHours().toString().padStart(2, '0')}:${new Date(startDate)
             .getMinutes()
             .toString()
-            .padStart(2, '0')} - ${new Date(activities.end_date).getHours().toString().padStart(2, '0')}:${new Date(
-            activities.end_date,
-          )
+            .padStart(2, '0')} - ${new Date(endDate).getHours().toString().padStart(2, '0')}:${new Date(endDate)
             .getMinutes()
             .toString()
             .padStart(2, '0')}`}
         </TableCell>
       )}
       <TableCell>
-        {activities.interval} {FrenchReccurenceNoun[activities.recurrence]}
-        {activities.interval > 1 && activities.recurrence !== 'monthly' ? 's' : ''}
+        {interval} {FrenchReccurenceNoun[recurrence]}
+        {interval > 1 && recurrence !== 'monthly' ? 's' : ''}
       </TableCell>
       <TableCell>
         <DropdownMenu>
@@ -225,20 +220,16 @@ function ActivityRow(activities: ActivityProps) {
                 <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Edition de l'adresse {activities.id}</DialogTitle>
-                    {/* <DialogDescription>
+                    <DialogTitle>Edition de l'adresse {props.activity.id}</DialogTitle>
+                    <DialogDescription>
                       <EditForm
-                        id={address.id}
-                        road={road}
-                        postal_code={postalCode}
-                        complement={complement}
-                        city={city}
-                        number={number}
-                        name={name}
-                        closeDialog={() => setOpenEdit(false)}
+                        activity={props.activity}
                         setter={setter}
+                        addresses={props.addresses}
+                        sports={props.sports}
+                        closeDialog={() => setOpenEdit(false)}
                       />
-                    </DialogDescription> */}
+                    </DialogDescription>
                   </DialogHeader>
                 </DialogContent>
               </Dialog>
@@ -248,7 +239,7 @@ function ActivityRow(activities: ActivityProps) {
                 <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Suppression de l'adresse {activities.id}</DialogTitle>
+                    <DialogTitle>Suppression de l'adresse {props.activity.id}</DialogTitle>
                     <DialogDescription>
                       <div className="mb-4">Êtes-vous sûr de vouloir supprimer cette activité ?</div>
                       <div className="flex w-full justify-end gap-4">

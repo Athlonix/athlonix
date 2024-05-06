@@ -355,55 +355,19 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                               >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                   <FormControl>
-                                    <RadioGroupItem
-                                      value="weekly"
-                                      onClick={() => {
-                                        const daysItem = document.getElementById('daysItem');
-                                        const dateItem = document.getElementById('dateItem');
-                                        if (dateItem) {
-                                          dateItem.hidden = true;
-                                        }
-                                        if (daysItem) {
-                                          daysItem.hidden = false;
-                                        }
-                                      }}
-                                    />
+                                    <RadioGroupItem value="weekly" />
                                   </FormControl>
                                   <FormLabel className="font-normal">Hébdomadaire</FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                   <FormControl>
-                                    <RadioGroupItem
-                                      value="monthly"
-                                      onClick={() => {
-                                        const daysItem = document.getElementById('daysItem');
-                                        const dateItem = document.getElementById('dateItem');
-                                        if (dateItem) {
-                                          dateItem.hidden = false;
-                                        }
-                                        if (daysItem) {
-                                          daysItem.hidden = true;
-                                        }
-                                      }}
-                                    />
+                                    <RadioGroupItem value="monthly" />
                                   </FormControl>
                                   <FormLabel className="font-normal">Mensuelle</FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                   <FormControl>
-                                    <RadioGroupItem
-                                      value="annual"
-                                      onClick={() => {
-                                        const daysItem = document.getElementById('daysItem');
-                                        const dateItem = document.getElementById('dateItem');
-                                        if (dateItem) {
-                                          dateItem.hidden = false;
-                                        }
-                                        if (daysItem) {
-                                          daysItem.hidden = true;
-                                        }
-                                      }}
-                                    />
+                                    <RadioGroupItem value="annual" />
                                   </FormControl>
                                   <FormLabel className="font-normal">Annuelle</FormLabel>
                                 </FormItem>
@@ -419,7 +383,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                         control={form.control}
                         name="date"
                         render={({ field }) => (
-                          <FormItem id="dateItem" hidden>
+                          <FormItem id="dateItem" {...(form.watch('recurrence') === 'weekly' ? { hidden: true } : {})}>
                             <Label className="font-bold">Date</Label>
                             <br />
                             <Popover>
@@ -543,7 +507,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                         control={form.control}
                         name="days"
                         render={() => (
-                          <FormItem id="daysItem" hidden>
+                          <FormItem id="daysItem" {...(form.watch('recurrence') !== 'weekly' ? { hidden: true } : {})}>
                             <Accordion type="single" collapsible className="w-full">
                               <AccordionItem value="role">
                                 <AccordionTrigger className="font-bold">Jours</AccordionTrigger>

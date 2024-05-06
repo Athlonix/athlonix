@@ -42,7 +42,7 @@ function ActivitiesList({ activities, sports, addresses }: Props) {
   return (
     <>
       {activities.map((activity: Activity) => (
-        <ActivityRow key={activity.id} {...activity} sports={sports} addresses={addresses} />
+        <ActivityRow key={activity.id} activity={activity} sports={sports} addresses={addresses} />
       ))}
     </>
   );

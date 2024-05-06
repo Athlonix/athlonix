@@ -52,6 +52,7 @@ export const getAllAddresses = createRoute({
   request: {
     query: z.object({
       search: z.string().optional(),
+      all: z.coerce.boolean().optional(),
       ...paginationSchema.shape,
     }),
   },

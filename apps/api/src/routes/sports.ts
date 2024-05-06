@@ -18,7 +18,11 @@ export const getAllSports = createRoute({
   summary: 'Get all sports',
   description: 'Get all sports',
   request: {
-    query: paginationSchema,
+    query: z.object({
+      search: z.string().optional(),
+      all: z.coerce.boolean().optional(),
+      ...paginationSchema.shape,
+    }),
   },
   responses: {
     200: {

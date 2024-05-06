@@ -31,6 +31,7 @@ interface UserProps {
   last_name: string;
   id_referer: number | null;
   date_validity: string | null;
+  created_at: string;
   roles: { id: number; name: string }[];
 }
 
@@ -76,6 +77,11 @@ function UserRow(user: UserProps) {
       })
       .then(() => {
         toast({ title: 'Succès', description: "L'utilisateur a été supprimé avec succès" });
+
+        setUsername('Supprimé');
+        setFirstName('');
+        setLastName('');
+        setRoles([]);
       })
       .catch((error: Error) => {
         toast({ title: 'Erreur', description: error?.message });
@@ -106,63 +112,79 @@ function UserRow(user: UserProps) {
           <Badge className="m-[2px]">Utilisateur</Badge>
         )}
       </TableCell>
-      <TableCell>{user.date_validity}</TableCell>
-      <TableCell>2023-07-12 10:42</TableCell>
       <TableCell>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button aria-haspopup="true" size="icon" variant="ghost">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <Button variant="ghost" className="w-full p-0 font-normal pl-2">
-              <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-                <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Edition de l'utilisateur {user.id}</DialogTitle>
-                    <DialogDescription>
-                      <EditForm
-                        id={user.id}
-                        username={username}
-                        firstName={firstName}
-                        lastName={lastName}
-                        roles={roles.map((role) => role.id)}
-                        closeDialog={() => setOpenEdit(false)}
-                        setter={setter}
-                      />
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            </Button>
-            <Button variant="ghost" className="w-full p-0 font-normal pl-2">
-              <Dialog open={openDelete} onOpenChange={setOpenDelete}>
-                <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Edition de l'utilisateur {user.id}</DialogTitle>
-                    <DialogDescription>
-                      <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet utilisateur ?</div>
-                      <div className="flex w-full justify-end gap-4">
-                        <Button variant="destructive" onClick={deleteUser}>
-                          Supprimer
-                        </Button>
-                        <Button variant="secondary" onClick={() => setOpenDelete(false)}>
-                          Annuler
-                        </Button>
-                      </div>
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            </Button>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {user.date_validity !== null
+          ? `${new Date(user.date_validity).getDate()} ${new Date(user.date_validity).toLocaleString('default', {
+              month: 'long',
+            })}, ${new Date(user.date_validity).getHours().toString().padStart(2, '0')}:${new Date(user.date_validity)
+              .getMinutes()
+              .toString()
+              .padStart(2, '0')}`
+          : ''}
       </TableCell>
+      <TableCell>{`${new Date(user.created_at).getDate()} ${new Date(user.created_at).toLocaleString('default', {
+        month: 'long',
+      })}, ${new Date(user.created_at).getHours().toString().padStart(2, '0')}:${new Date(user.created_at)
+        .getMinutes()
+        .toString()
+        .padStart(2, '0')}`}</TableCell>
+      {username !== 'Supprimé' && (
+        <TableCell>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button aria-haspopup="true" size="icon" variant="ghost">
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+                <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+                  <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edition de l'utilisateur {user.id}</DialogTitle>
+                      <DialogDescription>
+                        <EditForm
+                          id={user.id}
+                          username={username}
+                          firstName={firstName}
+                          lastName={lastName}
+                          roles={roles.map((role) => role.id)}
+                          closeDialog={() => setOpenEdit(false)}
+                          setter={setter}
+                        />
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+              </Button>
+              <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+                <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+                  <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edition de l'utilisateur {user.id}</DialogTitle>
+                      <DialogDescription>
+                        <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet utilisateur ?</div>
+                        <div className="flex w-full justify-end gap-4">
+                          <Button variant="destructive" onClick={deleteUser}>
+                            Supprimer
+                          </Button>
+                          <Button variant="secondary" onClick={() => setOpenDelete(false)}>
+                            Annuler
+                          </Button>
+                        </div>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+              </Button>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      )}
     </TableRow>
   );
 }

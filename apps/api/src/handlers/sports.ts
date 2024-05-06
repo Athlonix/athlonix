@@ -11,15 +11,46 @@ export const sports = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 sports.openapi(getAllSports, async (c) => {
-  const { skip, take } = c.req.valid('query');
+  const { search, all, skip, take } = c.req.valid('query');
+  const searchTerm = search || '';
+
+  if (all) {
+    const { data, error, count } = await supabase
+      .from('SPORTS')
+      .select('*', { count: 'exact' })
+      .order('id', { ascending: true })
+      .ilike('name', `%${searchTerm}%`);
+
+    if (error) {
+      return c.json({ error: error.message }, 500);
+    }
+
+    const responseData = {
+      data: data || [],
+      count: count || 0,
+    };
+
+    return c.json(responseData, 200);
+  }
+
   const { from, to } = getPagination(skip, take - 1);
-  const { data, error } = await supabase.from('SPORTS').select('*').range(from, to);
+  const { data, error, count } = await supabase
+    .from('SPORTS')
+    .select('*', { count: 'exact' })
+    .range(from, to)
+    .order('id', { ascending: true })
+    .ilike('name', `%${searchTerm}%`);
 
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json(data, 200);
+  const responseData = {
+    data: data || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
 });
 
 sports.openapi(getOneSport, async (c) => {

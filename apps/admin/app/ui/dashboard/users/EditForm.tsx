@@ -37,42 +37,15 @@ interface EditFormProps {
 
 function EditForm(props: EditFormProps): JSX.Element {
   const roles = [
-    {
-      id: 1,
-      label: 'Banni',
-    },
-    {
-      id: 2,
-      label: 'Membre',
-    },
-    {
-      id: 3,
-      label: 'Rédacteur',
-    },
-    {
-      id: 4,
-      label: 'Modérateur',
-    },
-    {
-      id: 5,
-      label: 'Administrateur',
-    },
-    {
-      id: 6,
-      label: 'Directeur',
-    },
-    {
-      id: 7,
-      label: 'Secrétaire',
-    },
-    {
-      id: 8,
-      label: 'Trésorier',
-    },
-    {
-      id: 9,
-      label: 'Président',
-    },
+    { id: 1, label: 'Banni' },
+    { id: 2, label: 'Membre' },
+    { id: 3, label: 'Rédacteur' },
+    { id: 4, label: 'Modérateur' },
+    { id: 5, label: 'Administrateur' },
+    { id: 6, label: 'Directeur' },
+    { id: 7, label: 'Secrétaire' },
+    { id: 8, label: 'Trésorier' },
+    { id: 9, label: 'Président' },
   ];
 
   const formSchema = z.object({

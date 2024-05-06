@@ -29,6 +29,7 @@ type User = {
   last_name: string;
   id_referer: number | null;
   date_validity: string | null;
+  created_at: string;
   roles: { id: number; name: string }[];
 };
 
@@ -61,7 +62,7 @@ function AddUser({ users, setUsers }: Props) {
     },
   });
 
-  async function submitEdit(values: z.infer<typeof formSchema>) {
+  async function submit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
     fetch(`${urlApi}/auth/signup`, {
@@ -93,6 +94,7 @@ function AddUser({ users, setUsers }: Props) {
           last_name: values.lastName,
           id_referer: null,
           date_validity: null,
+          created_at: new Date().toISOString(),
           roles: [],
         };
         if (users.length < 10) {
@@ -119,7 +121,7 @@ function AddUser({ users, setUsers }: Props) {
           <DialogTitle>Création d'utilisateur</DialogTitle>
           <DialogDescription>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(submitEdit)} method="POST">
+              <form onSubmit={form.handleSubmit(submit)} method="POST">
                 <div className="grid gap-2">
                   <div className="grid">
                     <FormField

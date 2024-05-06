@@ -69,7 +69,7 @@ function addAddress({ addresses, setAddresses }: Props): JSX.Element {
     },
   });
 
-  async function submitEdit(values: z.infer<typeof formSchema>) {
+  async function submit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
     fetch(`${urlApi}/addresses`, {
@@ -91,8 +91,6 @@ function addAddress({ addresses, setAddresses }: Props): JSX.Element {
       .then((response) => {
         if (response.status === 403) {
           router.push('/');
-        } else if (response.status === 400) {
-          console.log(response);
         }
         return response.json();
       })
@@ -132,7 +130,7 @@ function addAddress({ addresses, setAddresses }: Props): JSX.Element {
           <DialogTitle>Ajout d'adresse</DialogTitle>
           <DialogDescription>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(submitEdit)} method="POST">
+              <form onSubmit={form.handleSubmit(submit)} method="POST">
                 <div className="grid gap-2">
                   <div className="grid">
                     <FormField

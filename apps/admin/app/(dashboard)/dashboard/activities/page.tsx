@@ -1,7 +1,7 @@
 'use client';
 
-import AddAddress from '@/app/ui/dashboard/addresses/AddAddress';
-import AddressesList from '@/app/ui/dashboard/addresses/AddressesList';
+import ActivitiesList from '@/app/ui/dashboard/activities/ActivitiesList';
+import AddActivity from '@/app/ui/dashboard/activities/AddActivity';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
 import {
@@ -19,15 +19,44 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
+type Activity = {
+  id: number;
+  min_participants: number;
+  max_participants: number;
+  name: string;
+  id_sport: number | null;
+  id_address: number | null;
+  days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
+  end_date: string;
+  start_date: string;
+  description: string | null;
+  recurrence: 'weekly' | 'monthly' | 'annual';
+  interval: number;
+};
+
+type ActivityData = {
+  data: Activity[];
+  count: number;
+};
+
+type Sport = {
+  id: number;
+  name: string;
+  max_participants: number | null;
+  min_participants: number;
+};
+
 type Address = {
   id: number;
   road: string;
-  postal_code: string;
-  complement: string | null;
-  city: string;
   number: number;
+  complement: string | null;
   name: string | null;
-  id_lease: number | null;
+};
+
+type SportData = {
+  data: Sport[];
+  count: number;
 };
 
 type AddressData = {
@@ -35,7 +64,7 @@ type AddressData = {
   count: number;
 };
 
-function ShowContent() {
+function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Address[] }): JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
   let page = searchParams.get('page') || 1;
@@ -44,7 +73,7 @@ function ShowContent() {
   }
 
   const [maxPage, setMaxPage] = useState<number>(1);
-  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
@@ -57,7 +86,7 @@ function ShowContent() {
         search: searchTerm,
       });
 
-      fetch(`${urlApi}/addresses?${queryParams}`, {
+      fetch(`${urlApi}/activities?${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -70,8 +99,8 @@ function ShowContent() {
           }
           return response.json();
         })
-        .then((data: AddressData) => {
-          setAddresses(data.data);
+        .then((data: ActivityData) => {
+          setActivities(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })
         .catch((error: Error) => {
@@ -90,8 +119,8 @@ function ShowContent() {
     <TabsContent value="all">
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Adresses</CardTitle>
-          <AddAddress addresses={addresses} setAddresses={setAddresses} />
+          <CardTitle>Activités</CardTitle>
+          <AddActivity activities={activities} setActivities={setActivities} addresses={addresses} sports={sports} />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">
@@ -106,17 +135,20 @@ function ShowContent() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Alias</TableHead>
+                <TableHead>Nom de l'activité</TableHead>
+                <TableHead>Nombre de participants</TableHead>
+                <TableHead>Sport</TableHead>
                 <TableHead>Adresse</TableHead>
-                <TableHead>Ville</TableHead>
-                <TableHead>Code postal</TableHead>
+                <TableHead>Fréquence</TableHead>
+                <TableHead>Dates et heure</TableHead>
+                <TableHead>Intervalle</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <AddressesList addresses={addresses} />
+              <ActivitiesList activities={activities} sports={sports} addresses={addresses} />
             </TableBody>
           </Table>
         </CardContent>
@@ -125,37 +157,37 @@ function ShowContent() {
             <PaginationContent>
               {page > 1 && (
                 <PaginationItem>
-                  <PaginationPrevious href={`/dashboard/addresses?page=${page - 1}`} />
+                  <PaginationPrevious href={`/dashboard/activities?page=${page - 1}`} />
                 </PaginationItem>
               )}
               {page > 3 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page - 2}`}>{page - 2}</PaginationLink>
+                  <PaginationLink href={`/dashboard/activities?page=${page - 2}`}>{page - 2}</PaginationLink>
                 </PaginationItem>
               )}
               {page > 2 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page - 1}`}>{page - 1}</PaginationLink>
+                  <PaginationLink href={`/dashboard/activities?page=${page - 1}`}>{page - 1}</PaginationLink>
                 </PaginationItem>
               )}
               <PaginationItem>
-                <PaginationLink href={`/dashboard/addresses?page=${page}`} isActive>
+                <PaginationLink href={`/dashboard/activities?page=${page}`} isActive>
                   {page}
                 </PaginationLink>
               </PaginationItem>
               {page < maxPage && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page + 1}`}>{page + 1}</PaginationLink>
+                  <PaginationLink href={`/dashboard/activities?page=${page + 1}`}>{page + 1}</PaginationLink>
                 </PaginationItem>
               )}
               {page < maxPage - 1 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page + 2}`}>{page + 2}</PaginationLink>
+                  <PaginationLink href={`/dashboard/activities?page=${page + 2}`}>{page + 2}</PaginationLink>
                 </PaginationItem>
               )}
               {page < maxPage && (
                 <PaginationItem>
-                  <PaginationNext href={`/dashboard/addresses?page=${page + 1}`} />
+                  <PaginationNext href={`/dashboard/activities?page=${page + 1}`} />
                 </PaginationItem>
               )}
             </PaginationContent>
@@ -167,6 +199,75 @@ function ShowContent() {
 }
 
 export default function Page(): JSX.Element {
+  const router = useRouter();
+  const [sports, setSports] = useState<Sport[]>([]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+
+  useEffect(() => {
+    const urlApi = process.env.NEXT_PUBLIC_API_URL;
+
+    const queryParams = new URLSearchParams({
+      all: 'true',
+    });
+
+    fetch(`${urlApi}/sports?${queryParams}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
+      .then((data: SportData) => {
+        const sportsArray = data.data.map((sport) => {
+          return {
+            id: sport.id,
+            name: sport.name,
+            max_participants: sport.max_participants,
+            min_participants: sport.min_participants,
+          };
+        });
+        setSports(sportsArray);
+      })
+      .catch((error: Error) => {
+        console.log(error);
+      });
+
+    fetch(`${urlApi}/addresses?${queryParams}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
+      .then((data: AddressData) => {
+        const addressesArray = data.data.map((address) => {
+          return {
+            id: address.id,
+            road: address.road,
+            number: address.number,
+            complement: address.complement,
+            name: address.name,
+          };
+        });
+        setAddresses(addressesArray);
+      })
+      .catch((error: Error) => {
+        console.log(error);
+      });
+  }, [router]);
+
   return (
     <main>
       <div className="flex flex-col h-full">
@@ -175,7 +276,7 @@ export default function Page(): JSX.Element {
             <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
               <Tabs defaultValue="all">
                 <Suspense>
-                  <ShowContent />
+                  <ShowContent sports={sports} addresses={addresses} />
                 </Suspense>
               </Tabs>
             </main>

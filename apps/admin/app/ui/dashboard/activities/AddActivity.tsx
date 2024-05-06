@@ -1,7 +1,10 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import { Button } from '@repo/ui/components/ui/button';
+import { Calendar } from '@repo/ui/components/ui/calendar';
+import { Checkbox } from '@repo/ui/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -13,9 +16,15 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@repo/ui/components/ui/form';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@repo/ui/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@repo/ui/components/ui/radio-group';
+import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
+import { TimePicker } from '@repo/ui/components/ui/time-picker';
 import { useToast } from '@repo/ui/hooks/use-toast';
-import { PlusCircle } from 'lucide-react';
+import { cn } from '@repo/ui/lib/utils';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { Calendar as CalendarIcon, PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
@@ -46,27 +55,48 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const frenchDays = [
+    { id: 'monday', name: 'Lundi' },
+    { id: 'tuesday', name: 'Mardi' },
+    { id: 'wednesday', name: 'Mercredi' },
+    { id: 'thursday', name: 'Jeudi' },
+    { id: 'friday', name: 'Vendredi' },
+    { id: 'saturday', name: 'Samedi' },
+    { id: 'sunday', name: 'Dimanche' },
+  ];
 
-  const formSchema = z.object({
-    name: z.string().min(1, { message: 'Le champ est requis' }),
-    min_participants: z.number().int().min(1, { message: 'Le champ est requis' }),
-    max_participants: z.number().int().min(1, { message: 'Le champ est requis' }),
-    id_sport: z.number().int().min(1).optional(),
-    id_address: z.number().int().min(1).optional(),
-    recurrence: z.enum(['weekly', 'monthly', 'annual']),
-    days: z
-      .array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']))
-      .refine((days) => {
-        if (formSchema.parse(days).recurrence === 'weekly' && days.length === 0) {
-          return false;
-        }
-        return true;
-      }),
-    start_date: z.string().date(),
-    end_date: z.string().date(),
-    interval: z.number().int().min(1),
-    description: z.string().optional(),
-  });
+  const formSchema = z
+    .object({
+      name: z.string().min(1, { message: 'Le champ est requis' }),
+      min_participants: z.coerce
+        .number({ message: 'Le champ doit uniquement contenir un nombre' })
+        .int()
+        .min(1, { message: 'Le champ est requis' }),
+      max_participants: z.coerce
+        .number({ message: 'Le champ doit uniquement contenir un nombre' })
+        .int()
+        .min(1, { message: 'Le champ est requis' }),
+      id_sport: z.number().int().min(1).nullable().optional(),
+      id_address: z.number().int().min(1).nullable().optional(),
+      recurrence: z.enum(['weekly', 'monthly', 'annual']),
+      days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).optional()),
+      start_date: z.date(),
+      end_date: z.date(),
+      interval: z.coerce.number({ message: 'Le champ est requis' }).int().min(1, { message: 'Le champ est requis' }),
+      description: z.string().optional(),
+    })
+    .refine((data) => data.min_participants <= data.max_participants, {
+      message: 'Le nombre minimum de participants doit être inférieur ou égal au nombre maximum de participants',
+      path: ['min_participants'],
+    })
+    .refine((data) => new Date(data.start_date) < new Date(data.end_date), {
+      message: 'La date de début ne peut pas être avant la date de fin',
+      path: ['start_date'],
+    })
+    .refine((data) => (data.recurrence === 'weekly' ? data.days.length > 0 : true), {
+      message: 'Vous devez sélectionner au moins un jour pour une récurrence hebdomadaire',
+      path: ['recurrence'],
+    });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -74,72 +104,76 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
       name: '',
       min_participants: undefined,
       max_participants: undefined,
-      id_sport: undefined,
-      id_address: undefined,
+      id_sport: null,
+      id_address: null,
       recurrence: undefined,
       days: [],
-      start_date: '',
-      end_date: '',
+      start_date: undefined,
+      end_date: undefined,
       interval: undefined,
     },
   });
 
   async function submit(values: z.infer<typeof formSchema>) {
-    console.log('Submit function called');
-    console.log(form.formState.isValid);
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    console.log(values);
-
-    // fetch(`${urlApi}/addresses`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-    //   },
-    //   body: JSON.stringify({
-    //     name: values.name,
-    //     description: values.description,
-    //     min_participants: values.min_participants,
-    //     max_participants: values.max_participants,
-    //     days: values.days,
-    //     recurrence: values.recurrence,
-    //     interval: values.interval,
-    //     start_date: values.start_date,
-    //     end_date: values.end_date,
-    //     id_sport: values.id_sport,
-    //     id_address: values.id_address,
-    //   }),
-    // })
-    //   .then((response) => {
-    //     if (response.status === 403) {
-    //       router.push('/');
-    //     }
-    //     return response.json();
-    //   })
-    //   .then((data: { id: number }) => {
-    //     toast({ title: 'Adresse ajouté', description: "L'adresse a été ajouté avec succès" });
-    //     const newActivity: Activity = {
-    //       id: data.id,
-    //       name: values.name,
-    //       min_participants: values.min_participants,
-    //       max_participants: values.max_participants,
-    //       id_sport: values.id_sport || null,
-    //       id_address: values.id_address || null,
-    //       days: values.days,
-    //       end_date: values.end_date,
-    //       start_date: values.start_date,
-    //       description: values.description || null,
-    //       recurrence: values.recurrence,
-    //       interval: values.interval,
-    //     };
-    //     if (activities.length < 10) {
-    //       setActivities([...activities, newActivity]);
-    //     }
-    //   })
-    //   .catch((error: Error) => {
-    //     toast({ title: 'Erreur', description: error?.message });
-    //   });
+    fetch(`${urlApi}/activities`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({
+        name: values.name,
+        description: values.description,
+        min_participants: values.min_participants,
+        max_participants: values.max_participants,
+        days: values.days,
+        recurrence: values.recurrence,
+        interval: values.interval,
+        start_date: values.start_date,
+        end_date: values.end_date,
+        id_sport: values.id_sport,
+        id_address: values.id_address,
+      }),
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
+      .then((data: { id: number }) => {
+        toast({ title: 'Adresse ajouté', description: "L'adresse a été ajouté avec succès" });
+        const newActivity: Activity = {
+          id: data.id,
+          name: values.name,
+          min_participants: values.min_participants,
+          max_participants: values.max_participants,
+          id_sport: values.id_sport || null,
+          id_address: values.id_address || null,
+          days: values.days.filter((day) => day !== undefined) as (
+            | 'monday'
+            | 'tuesday'
+            | 'wednesday'
+            | 'thursday'
+            | 'friday'
+            | 'saturday'
+            | 'sunday'
+          )[],
+          end_date: values.end_date.toISOString(),
+          start_date: values.start_date.toISOString(),
+          description: values.description || null,
+          recurrence: values.recurrence,
+          interval: values.interval,
+        };
+        if (activities.length < 10) {
+          setActivities([...activities, newActivity]);
+        }
+      })
+      .catch((error: Error) => {
+        toast({ title: 'Erreur', description: error?.message });
+      });
 
     setOpen(false);
   }
@@ -155,195 +189,304 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Ajout d'une activité</DialogTitle>
-          <DialogDescription>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(submit)}>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Nom de l'activité</Label>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+          <ScrollArea className="h-[500px] w-full">
+            <DialogDescription className="mx-5">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(submit)}>
+                  <div className="grid gap-4">
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Nom de l'activité</Label>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="description"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Description</Label>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="min_participants"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Minimum de participants</Label>
+                            <FormControl>
+                              <Input {...field} type="number" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="max_participants"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Maximum de participants</Label>
+                            <FormControl>
+                              <Input {...field} type="number" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="id_sport"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Sport</Label>
+                            <FormControl>
+                              <Input {...field} value={field.value ?? ''} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="id_address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Adresse</Label>
+                            <FormControl>
+                              <Input {...field} value={field.value ?? ''} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="start_date"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Date/Heure de début</Label>
+                            <br />
+                            <Popover>
+                              <FormControl>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !field.value && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value ? (
+                                      format(field.value, 'PPP HH:mm:ss', { locale: fr })
+                                    ) : (
+                                      <span>Choisissez une date</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                              </FormControl>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  locale={fr}
+                                  mode="single"
+                                  selected={field.value ? new Date(field.value) : undefined}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                />
+                                <div className="p-3 border-t border-border">
+                                  <TimePicker
+                                    setDate={field.onChange}
+                                    date={field.value ? new Date(field.value) : undefined}
+                                  />
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="end_date"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Date/Heure de début</Label>
+                            <br />
+                            <Popover>
+                              <FormControl>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !field.value && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value ? (
+                                      format(field.value, 'PPP HH:mm:ss', { locale: fr })
+                                    ) : (
+                                      <span>Choisissez une date</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                              </FormControl>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  locale={fr}
+                                  mode="single"
+                                  selected={field.value ? new Date(field.value) : undefined}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                />
+                                <div className="p-3 border-t border-border">
+                                  <TimePicker
+                                    setDate={field.onChange}
+                                    date={field.value ? new Date(field.value) : undefined}
+                                  />
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="recurrence"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Fréquence</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-1"
+                              >
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="weekly" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Hébdomadaire</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="monthly" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Mensuelle</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="annual" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Annuelle</FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="days"
+                        render={() => (
+                          <FormItem>
+                            <Accordion type="single" collapsible className="w-full">
+                              <AccordionItem value="role">
+                                <AccordionTrigger className="font-bold">Jours</AccordionTrigger>
+                                <AccordionContent>
+                                  {frenchDays.map((day) => (
+                                    <FormField
+                                      key={day.id}
+                                      control={form.control}
+                                      name="days"
+                                      render={({ field }) => {
+                                        return (
+                                          <FormItem key={day.id}>
+                                            <FormControl>
+                                              <Checkbox
+                                                onCheckedChange={(checked) => {
+                                                  return checked
+                                                    ? field.onChange([...(field.value || []), day.id])
+                                                    : field.onChange(field.value?.filter((value) => value !== day.id));
+                                                }}
+                                              />
+                                            </FormControl>
+                                            <FormLabel className="font-normal">{day.name}</FormLabel>
+                                          </FormItem>
+                                        );
+                                      }}
+                                    />
+                                  ))}
+                                </AccordionContent>
+                              </AccordionItem>
+                            </Accordion>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="interval"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Intervalle</Label>
+                            <FormControl>
+                              <Input {...field} type="number" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Description</Label>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <div className="flex gap-4 mt-4">
+                    <Button type="submit" className="w-full">
+                      Créer
+                    </Button>
+                    <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">
+                      Annuler
+                    </Button>
                   </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="min_participants"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Minimum de participants</Label>
-                          <FormControl>
-                            <Input {...field} type="number" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="max_participants"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Maximum de participants</Label>
-                          <FormControl>
-                            <Input {...field} type="number" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="id_sport"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Sport</Label>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="id_address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Adresse</Label>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="start_date"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Date/Heure de début</Label>
-                          <FormControl>
-                            <Input {...field} type="date" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="end_date"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Date/Heure de fin</Label>
-                          <FormControl>
-                            <Input {...field} type="date" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="recurrence"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Récurrence</Label>
-                          <FormControl>
-                            <RadioGroup
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                              className="flex flex-col space-y-1"
-                            >
-                              <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="weekly" />
-                                </FormControl>
-                                <FormLabel className="font-normal">Hébdomadaire</FormLabel>
-                              </FormItem>
-                              <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="monthly" />
-                                </FormControl>
-                                <FormLabel className="font-normal">Mensuelle</FormLabel>
-                              </FormItem>
-                              <FormItem className="flex items-center space-x-3 space-y-0">
-                                <FormControl>
-                                  <RadioGroupItem value="annual" />
-                                </FormControl>
-                                <FormLabel className="font-normal">Annuelle</FormLabel>
-                              </FormItem>
-                            </RadioGroup>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="grid">
-                    <FormField
-                      control={form.control}
-                      name="interval"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Label className="font-bold">Intervalle</Label>
-                          <FormControl>
-                            <Input {...field} type="number" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4 mt-4">
-                  <Button type="submit" className="w-full">
-                    Créer
-                  </Button>
-                  <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">
-                    Annuler
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogDescription>
+                </form>
+              </Form>
+            </DialogDescription>
+          </ScrollArea>
         </DialogHeader>
       </DialogContent>
     </Dialog>

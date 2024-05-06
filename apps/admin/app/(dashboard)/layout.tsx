@@ -1,6 +1,6 @@
 import '@repo/ui/globals.css';
 import { cn } from '@repo/ui/lib/utils';
-import { Home, LineChart, Package, Package2, ShoppingCart, Users } from 'lucide-react';
+import { BarChart, Home, LineChart, Package, Package2, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import Link from 'next/link';
@@ -45,12 +45,12 @@ export default function RootLayout({
                     href="/dashboard/users"
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
                   >
-                    <ShoppingCart className="h-4 w-4" />
-                    Gestion des utilisateur
+                    <Users className="h-4 w-4" />
+                    Gestion des utilisateurs
                   </Link>
                   <Link
                     href="#"
-                    className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
                   >
                     <Package className="h-4 w-4" />
                     Posts
@@ -73,7 +73,7 @@ export default function RootLayout({
                     href="#"
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
                   >
-                    <LineChart className="h-4 w-4" />
+                    <BarChart className="h-4 w-4" />
                     Gestion des donations
                   </Link>
                   <Link
@@ -82,6 +82,13 @@ export default function RootLayout({
                   >
                     <LineChart className="h-4 w-4" />
                     Gestion du marketplace
+                  </Link>
+                  <Link
+                    href="/dashboard/votes"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  >
+                    <LineChart className="h-4 w-4" />
+                    Gestion des votes
                   </Link>
                   <Link
                     href="#"

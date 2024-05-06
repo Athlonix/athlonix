@@ -71,10 +71,6 @@ function EditVote({ votes, setVotes, id, setEditingVote }: Props) {
       });
   }
 
-  function setOpen(arg0: boolean): void {
-    throw new Error('Function not implemented.');
-  }
-
   return (
     <Form {...form}>
       <form
@@ -134,7 +130,7 @@ function EditVote({ votes, setVotes, id, setEditingVote }: Props) {
           <Button type="submit" className="w-full">
             Modifier
           </Button>
-          <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">
+          <Button variant="secondary" type="button" className="w-full">
             Annuler
           </Button>
         </div>
@@ -144,6 +140,3 @@ function EditVote({ votes, setVotes, id, setEditingVote }: Props) {
 }
 
 export default EditVote;
-function setEditingVote(arg0: null) {
-  throw new Error('Function not implemented.');
-}

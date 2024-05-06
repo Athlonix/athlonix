@@ -122,6 +122,17 @@ function ActivityRow(props: ActivityRowProps) {
       .then((response) => response.json())
       .then(() => {
         toast({ title: 'Succès', description: "L'activité a été supprimé avec succès" });
+
+        setName('Supprimé');
+        setMinParticipants(0);
+        setMaxParticipants(0);
+        setIdSport(null);
+        setIdAddress(null);
+        setDays([]);
+        setEndDate('');
+        setStartDate('');
+        setDescription('');
+        setInterval(0);
       })
       .catch((error: Error) => {
         toast({ title: 'Erreur', description: error?.message });
@@ -205,59 +216,61 @@ function ActivityRow(props: ActivityRowProps) {
         {interval} {FrenchReccurenceNoun[recurrence]}
         {interval > 1 && recurrence !== 'monthly' ? 's' : ''}
       </TableCell>
-      <TableCell>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button aria-haspopup="true" size="icon" variant="ghost">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <Button variant="ghost" className="w-full p-0 font-normal pl-2">
-              <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-                <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Edition de l'adresse {props.activity.id}</DialogTitle>
-                    <DialogDescription>
-                      <EditForm
-                        activity={props.activity}
-                        setter={setter}
-                        addresses={props.addresses}
-                        sports={props.sports}
-                        closeDialog={() => setOpenEdit(false)}
-                      />
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            </Button>
-            <Button variant="ghost" className="w-full p-0 font-normal pl-2">
-              <Dialog open={openDelete} onOpenChange={setOpenDelete}>
-                <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Suppression de l'adresse {props.activity.id}</DialogTitle>
-                    <DialogDescription>
-                      <div className="mb-4">Êtes-vous sûr de vouloir supprimer cette activité ?</div>
-                      <div className="flex w-full justify-end gap-4">
-                        <Button variant="destructive" onClick={deleteActivity}>
-                          Supprimer
-                        </Button>
-                        <Button variant="secondary" onClick={() => setOpenDelete(false)}>
-                          Annuler
-                        </Button>
-                      </div>
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            </Button>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </TableCell>
+      {name !== 'Supprimé' && (
+        <TableCell>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button aria-haspopup="true" size="icon" variant="ghost">
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+                <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+                  <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edition de l'adresse {props.activity.id}</DialogTitle>
+                      <DialogDescription>
+                        <EditForm
+                          activity={props.activity}
+                          setter={setter}
+                          addresses={props.addresses}
+                          sports={props.sports}
+                          closeDialog={() => setOpenEdit(false)}
+                        />
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+              </Button>
+              <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+                <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+                  <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Suppression de l'adresse {props.activity.id}</DialogTitle>
+                      <DialogDescription>
+                        <div className="mb-4">Êtes-vous sûr de vouloir supprimer cette activité ?</div>
+                        <div className="flex w-full justify-end gap-4">
+                          <Button variant="destructive" onClick={deleteActivity}>
+                            Supprimer
+                          </Button>
+                          <Button variant="secondary" onClick={() => setOpenDelete(false)}>
+                            Annuler
+                          </Button>
+                        </div>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+              </Button>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      )}
     </TableRow>
   );
 }

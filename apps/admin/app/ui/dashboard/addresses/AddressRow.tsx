@@ -65,6 +65,13 @@ function AddressRow(address: AddressProps) {
       .then((response) => response.json())
       .then(() => {
         toast({ title: 'Succès', description: "L'adresse a été supprimé avec succès" });
+
+        setName('Supprimé');
+        setRoad('');
+        setComplement('');
+        setPostalCode('');
+        setCity('');
+        setNumber(0);
       })
       .catch((error: Error) => {
         toast({ title: 'Erreur', description: error?.message });
@@ -82,63 +89,65 @@ function AddressRow(address: AddressProps) {
       </TableCell>
       <TableCell>{city}</TableCell>
       <TableCell>{postalCode}</TableCell>
-      <TableCell>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button aria-haspopup="true" size="icon" variant="ghost">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <Button variant="ghost" className="w-full p-0 font-normal pl-2">
-              <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-                <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Edition de l'adresse {address.id}</DialogTitle>
-                    <DialogDescription>
-                      <EditForm
-                        id={address.id}
-                        road={road}
-                        postal_code={postalCode}
-                        complement={complement}
-                        city={city}
-                        number={number}
-                        name={name}
-                        closeDialog={() => setOpenEdit(false)}
-                        setter={setter}
-                      />
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            </Button>
-            <Button variant="ghost" className="w-full p-0 font-normal pl-2">
-              <Dialog open={openDelete} onOpenChange={setOpenDelete}>
-                <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Suppression de l'adresse {address.id}</DialogTitle>
-                    <DialogDescription>
-                      <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet adresse ?</div>
-                      <div className="flex w-full justify-end gap-4">
-                        <Button variant="destructive" onClick={deleteAddress}>
-                          Supprimer
-                        </Button>
-                        <Button variant="secondary" onClick={() => setOpenDelete(false)}>
-                          Annuler
-                        </Button>
-                      </div>
-                    </DialogDescription>
-                  </DialogHeader>
-                </DialogContent>
-              </Dialog>
-            </Button>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </TableCell>
+      {name !== 'Supprimé' && (
+        <TableCell>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button aria-haspopup="true" size="icon" variant="ghost">
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+                <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+                  <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Edition de l'adresse {address.id}</DialogTitle>
+                      <DialogDescription>
+                        <EditForm
+                          id={address.id}
+                          road={road}
+                          postal_code={postalCode}
+                          complement={complement}
+                          city={city}
+                          number={number}
+                          name={name}
+                          closeDialog={() => setOpenEdit(false)}
+                          setter={setter}
+                        />
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+              </Button>
+              <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+                <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+                  <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Suppression de l'adresse {address.id}</DialogTitle>
+                      <DialogDescription>
+                        <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet adresse ?</div>
+                        <div className="flex w-full justify-end gap-4">
+                          <Button variant="destructive" onClick={deleteAddress}>
+                            Supprimer
+                          </Button>
+                          <Button variant="secondary" onClick={() => setOpenDelete(false)}>
+                            Annuler
+                          </Button>
+                        </div>
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
+              </Button>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      )}
     </TableRow>
   );
 }

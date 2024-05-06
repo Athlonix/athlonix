@@ -27,6 +27,7 @@ type User = {
   last_name: string;
   id_referer: number | null;
   date_validity: string | null;
+  created_at: string;
   roles: { id: number; name: string }[];
 };
 

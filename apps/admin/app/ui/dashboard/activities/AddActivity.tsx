@@ -19,6 +19,7 @@ import { Label } from '@repo/ui/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@repo/ui/components/ui/popover';
 import { RadioGroup, RadioGroupItem } from '@repo/ui/components/ui/radio-group';
 import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/components/ui/select';
 import { TimePicker } from '@repo/ui/components/ui/time-picker';
 import { useToast } from '@repo/ui/hooks/use-toast';
 import { cn } from '@repo/ui/lib/utils';
@@ -46,12 +47,29 @@ type Activity = {
   interval: number;
 };
 
+type Sport = {
+  id: number;
+  name: string;
+  max_participants: number | null;
+  min_participants: number;
+};
+
+type Address = {
+  id: number;
+  road: string;
+  number: number;
+  complement: string | null;
+  name: string | null;
+};
+
 interface Props {
   activities: Activity[];
   setActivities: React.Dispatch<React.SetStateAction<Activity[]>>;
+  addresses: Address[];
+  sports: Sport[];
 }
 
-function AddActivity({ activities, setActivities }: Props): JSX.Element {
+function AddActivity({ activities, setActivities, addresses, sports }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -76,12 +94,13 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
         .number({ message: 'Le champ doit uniquement contenir un nombre' })
         .int()
         .min(1, { message: 'Le champ est requis' }),
-      id_sport: z.number().int().min(1).nullable().optional(),
-      id_address: z.number().int().min(1).nullable().optional(),
+      id_sport: z.coerce.number().int().optional(),
+      id_address: z.coerce.number().int().optional(),
       recurrence: z.enum(['weekly', 'monthly', 'annual']),
       days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).optional()),
-      start_date: z.date(),
-      end_date: z.date(),
+      date: z.date(),
+      start_time: z.date(),
+      end_time: z.date(),
       interval: z.coerce.number({ message: 'Le champ est requis' }).int().min(1, { message: 'Le champ est requis' }),
       description: z.string().optional(),
     })
@@ -89,9 +108,9 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
       message: 'Le nombre minimum de participants doit être inférieur ou égal au nombre maximum de participants',
       path: ['min_participants'],
     })
-    .refine((data) => new Date(data.start_date) < new Date(data.end_date), {
-      message: 'La date de début ne peut pas être avant la date de fin',
-      path: ['start_date'],
+    .refine((data) => data.start_time < data.end_time, {
+      message: "L'heure de début ne peut pas être après l'heure de fin",
+      path: ['start_time'],
     })
     .refine((data) => (data.recurrence === 'weekly' ? data.days.length > 0 : true), {
       message: 'Vous devez sélectionner au moins un jour pour une récurrence hebdomadaire',
@@ -102,20 +121,33 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: '',
+      description: '',
       min_participants: undefined,
       max_participants: undefined,
-      id_sport: null,
-      id_address: null,
+      id_sport: -1,
+      id_address: -1,
       recurrence: undefined,
       days: [],
-      start_date: undefined,
-      end_date: undefined,
-      interval: undefined,
+      date: new Date(),
+      start_time: undefined,
+      end_time: undefined,
+      interval: 1,
     },
   });
 
   async function submit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
+
+    console.log(values);
+
+    if (values.recurrence === 'weekly') {
+      values.start_time = new Date(values.start_time);
+      values.end_time = new Date(values.end_time);
+    }
+    if (values.recurrence === 'monthly' || values.recurrence === 'annual') {
+      values.start_time = new Date(new Date(values.start_time).setDate(values.date.getDate()));
+      values.end_time = new Date(new Date(values.end_time).setDate(values.date.getDate()));
+    }
 
     fetch(`${urlApi}/activities`, {
       method: 'POST',
@@ -131,10 +163,10 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
         days: values.days,
         recurrence: values.recurrence,
         interval: values.interval,
-        start_date: values.start_date,
-        end_date: values.end_date,
-        id_sport: values.id_sport,
-        id_address: values.id_address,
+        start_date: values.start_time,
+        end_date: values.end_time,
+        id_sport: values.id_sport === -1 ? null : values.id_sport ?? null,
+        id_address: values.id_address === -1 ? null : values.id_address ?? null,
       }),
     })
       .then((response) => {
@@ -150,8 +182,8 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
           name: values.name,
           min_participants: values.min_participants,
           max_participants: values.max_participants,
-          id_sport: values.id_sport || null,
-          id_address: values.id_address || null,
+          id_sport: values.id_sport === -1 ? null : values.id_sport ?? null,
+          id_address: values.id_address === -1 ? null : values.id_address ?? null,
           days: values.days.filter((day) => day !== undefined) as (
             | 'monday'
             | 'tuesday'
@@ -161,8 +193,8 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
             | 'saturday'
             | 'sunday'
           )[],
-          end_date: values.end_date.toISOString(),
-          start_date: values.start_date.toISOString(),
+          end_date: values.end_time.toISOString(),
+          start_date: values.start_time.toISOString(),
           description: values.description || null,
           recurrence: values.recurrence,
           interval: values.interval,
@@ -261,9 +293,21 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
                         render={({ field }) => (
                           <FormItem>
                             <Label className="font-bold">Sport</Label>
-                            <FormControl>
-                              <Input {...field} value={field.value ?? ''} />
-                            </FormControl>
+                            <Select onValueChange={field.onChange} defaultValue="-1">
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Aucun" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="-1">Aucun</SelectItem>
+                                {sports.map((sport) => (
+                                  <SelectItem key={sport.id} value={sport.id.toString()}>
+                                    {sport.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -276,105 +320,21 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
                         render={({ field }) => (
                           <FormItem>
                             <Label className="font-bold">Adresse</Label>
-                            <FormControl>
-                              <Input {...field} value={field.value ?? ''} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="grid">
-                      <FormField
-                        control={form.control}
-                        name="start_date"
-                        render={({ field }) => (
-                          <FormItem>
-                            <Label className="font-bold">Date/Heure de début</Label>
-                            <br />
-                            <Popover>
+                            <Select onValueChange={field.onChange} defaultValue="-1">
                               <FormControl>
-                                <PopoverTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    className={cn(
-                                      'w-full justify-start text-left font-normal',
-                                      !field.value && 'text-muted-foreground',
-                                    )}
-                                  >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {field.value ? (
-                                      format(field.value, 'PPP HH:mm:ss', { locale: fr })
-                                    ) : (
-                                      <span>Choisissez une date</span>
-                                    )}
-                                  </Button>
-                                </PopoverTrigger>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Aucun" />
+                                </SelectTrigger>
                               </FormControl>
-                              <PopoverContent className="w-auto p-0">
-                                <Calendar
-                                  locale={fr}
-                                  mode="single"
-                                  selected={field.value ? new Date(field.value) : undefined}
-                                  onSelect={field.onChange}
-                                  initialFocus
-                                />
-                                <div className="p-3 border-t border-border">
-                                  <TimePicker
-                                    setDate={field.onChange}
-                                    date={field.value ? new Date(field.value) : undefined}
-                                  />
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="grid">
-                      <FormField
-                        control={form.control}
-                        name="end_date"
-                        render={({ field }) => (
-                          <FormItem>
-                            <Label className="font-bold">Date/Heure de début</Label>
-                            <br />
-                            <Popover>
-                              <FormControl>
-                                <PopoverTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    className={cn(
-                                      'w-full justify-start text-left font-normal',
-                                      !field.value && 'text-muted-foreground',
-                                    )}
-                                  >
-                                    <CalendarIcon className="mr-2 h-4 w-4" />
-                                    {field.value ? (
-                                      format(field.value, 'PPP HH:mm:ss', { locale: fr })
-                                    ) : (
-                                      <span>Choisissez une date</span>
-                                    )}
-                                  </Button>
-                                </PopoverTrigger>
-                              </FormControl>
-                              <PopoverContent className="w-auto p-0">
-                                <Calendar
-                                  locale={fr}
-                                  mode="single"
-                                  selected={field.value ? new Date(field.value) : undefined}
-                                  onSelect={field.onChange}
-                                  initialFocus
-                                />
-                                <div className="p-3 border-t border-border">
-                                  <TimePicker
-                                    setDate={field.onChange}
-                                    date={field.value ? new Date(field.value) : undefined}
-                                  />
-                                </div>
-                              </PopoverContent>
-                            </Popover>
+                              <SelectContent>
+                                <SelectItem value="-1">Aucun</SelectItem>
+                                {addresses.map((address) => (
+                                  <SelectItem key={address.id} value={address.id.toString()}>
+                                    {address.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -395,19 +355,55 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
                               >
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                   <FormControl>
-                                    <RadioGroupItem value="weekly" />
+                                    <RadioGroupItem
+                                      value="weekly"
+                                      onClick={() => {
+                                        const daysItem = document.getElementById('daysItem');
+                                        const dateItem = document.getElementById('dateItem');
+                                        if (dateItem) {
+                                          dateItem.hidden = true;
+                                        }
+                                        if (daysItem) {
+                                          daysItem.hidden = false;
+                                        }
+                                      }}
+                                    />
                                   </FormControl>
                                   <FormLabel className="font-normal">Hébdomadaire</FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                   <FormControl>
-                                    <RadioGroupItem value="monthly" />
+                                    <RadioGroupItem
+                                      value="monthly"
+                                      onClick={() => {
+                                        const daysItem = document.getElementById('daysItem');
+                                        const dateItem = document.getElementById('dateItem');
+                                        if (dateItem) {
+                                          dateItem.hidden = false;
+                                        }
+                                        if (daysItem) {
+                                          daysItem.hidden = true;
+                                        }
+                                      }}
+                                    />
                                   </FormControl>
                                   <FormLabel className="font-normal">Mensuelle</FormLabel>
                                 </FormItem>
                                 <FormItem className="flex items-center space-x-3 space-y-0">
                                   <FormControl>
-                                    <RadioGroupItem value="annual" />
+                                    <RadioGroupItem
+                                      value="annual"
+                                      onClick={() => {
+                                        const daysItem = document.getElementById('daysItem');
+                                        const dateItem = document.getElementById('dateItem');
+                                        if (dateItem) {
+                                          dateItem.hidden = false;
+                                        }
+                                        if (daysItem) {
+                                          daysItem.hidden = true;
+                                        }
+                                      }}
+                                    />
                                   </FormControl>
                                   <FormLabel className="font-normal">Annuelle</FormLabel>
                                 </FormItem>
@@ -421,9 +417,133 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
                     <div className="grid">
                       <FormField
                         control={form.control}
+                        name="date"
+                        render={({ field }) => (
+                          <FormItem id="dateItem" hidden>
+                            <Label className="font-bold">Date</Label>
+                            <br />
+                            <Popover>
+                              <FormControl>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !field.value && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value ? (
+                                      format(field.value, 'PPP', { locale: fr })
+                                    ) : (
+                                      <span>Choisissez une date</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                              </FormControl>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  locale={fr}
+                                  mode="single"
+                                  selected={field.value ? new Date(field.value) : undefined}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="start_time"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Heure de début</Label>
+                            <br />
+                            <Popover>
+                              <FormControl>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !field.value && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value ? (
+                                      format(field.value, 'HH:mm:ss', { locale: fr })
+                                    ) : (
+                                      <span>Choisissez un horaire</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                              </FormControl>
+                              <PopoverContent className="w-auto p-0">
+                                <div className="p-3 border-t border-border">
+                                  <TimePicker
+                                    setDate={field.onChange}
+                                    date={field.value ? new Date(field.value) : undefined}
+                                  />
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="end_time"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Heure de fin</Label>
+                            <br />
+                            <Popover>
+                              <FormControl>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !field.value && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value ? (
+                                      format(field.value, 'HH:mm:ss', { locale: fr })
+                                    ) : (
+                                      <span>Choisissez un horaire</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                              </FormControl>
+                              <PopoverContent className="w-auto p-0">
+                                <div className="p-3 border-t border-border">
+                                  <TimePicker
+                                    setDate={field.onChange}
+                                    date={field.value ? new Date(field.value) : undefined}
+                                  />
+                                </div>
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
                         name="days"
                         render={() => (
-                          <FormItem>
+                          <FormItem id="daysItem" hidden>
                             <Accordion type="single" collapsible className="w-full">
                               <AccordionItem value="role">
                                 <AccordionTrigger className="font-bold">Jours</AccordionTrigger>
@@ -438,9 +558,31 @@ function AddActivity({ activities, setActivities }: Props): JSX.Element {
                                           <FormItem key={day.id}>
                                             <FormControl>
                                               <Checkbox
+                                                checked={field.value?.includes(
+                                                  day.id as
+                                                    | 'monday'
+                                                    | 'tuesday'
+                                                    | 'wednesday'
+                                                    | 'thursday'
+                                                    | 'friday'
+                                                    | 'saturday'
+                                                    | 'sunday'
+                                                    | undefined,
+                                                )}
                                                 onCheckedChange={(checked) => {
                                                   return checked
-                                                    ? field.onChange([...(field.value || []), day.id])
+                                                    ? field.onChange([
+                                                        ...(field.value || []),
+                                                        day.id as
+                                                          | 'monday'
+                                                          | 'tuesday'
+                                                          | 'wednesday'
+                                                          | 'thursday'
+                                                          | 'friday'
+                                                          | 'saturday'
+                                                          | 'sunday'
+                                                          | undefined,
+                                                      ])
                                                     : field.onChange(field.value?.filter((value) => value !== day.id));
                                                 }}
                                               />

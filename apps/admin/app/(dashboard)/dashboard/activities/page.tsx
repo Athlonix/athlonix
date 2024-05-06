@@ -120,7 +120,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Activités</CardTitle>
-          <AddActivity activities={activities} setActivities={setActivities} />
+          <AddActivity activities={activities} setActivities={setActivities} addresses={addresses} sports={sports} />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">

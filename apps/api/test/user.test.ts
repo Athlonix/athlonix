@@ -28,8 +28,8 @@ describe('User tests', () => {
     const admin: { id: number; id_auth: string } = await res.json();
     auth_admin = admin.id_auth;
     id_admin = admin.id;
-    await insertRole(id_user, Role.ADMIN);
-    await insertRole(id_user, Role.MEMBER);
+    await insertRole(id_admin, Role.ADMIN);
+    await insertRole(id_admin, Role.MEMBER);
 
     const loginRes = await app.request(`${path}/auth/login`, {
       method: 'POST',

@@ -20,17 +20,17 @@ export const activities = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 activities.openapi(getAllActivities, async (c) => {
-  const { search, skip, take } = c.req.valid('query');
-  const { from, to } = getPagination(skip, take - 1);
+  const { all, search, skip, take } = c.req.valid('query');
 
-  const query = supabase
-    .from('ACTIVITIES')
-    .select('*', { count: 'exact' })
-    .range(from, to)
-    .order('id', { ascending: true });
+  const query = supabase.from('ACTIVITIES').select('*', { count: 'exact' }).order('id', { ascending: true });
 
   if (search) {
     query.ilike('name', `%${search}%`);
+  }
+
+  if (!all) {
+    const { from, to } = getPagination(skip, take - 1);
+    query.range(from, to);
   }
 
   const { data, error, count } = await query;

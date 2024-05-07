@@ -22,7 +22,7 @@ interface Props {
 function EditVote({ votes, setVotes, id, setEditingVote }: Props) {
   const { toast } = useToast();
   const router = useRouter();
-  const editedVote = votes.find((vote) => vote.id === id);
+  const editedVote: Vote | undefined = votes.find((vote: Vote) => vote.id === id);
 
   const formSchema = z.object({
     title: z.string().min(2, { message: 'Le titre doit contenir au moins 2 caractères' }),

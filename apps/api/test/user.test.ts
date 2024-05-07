@@ -1,7 +1,7 @@
 import app from '../src/index.js';
 import { supAdmin } from '../src/libs/supabase.js';
 import { Role } from '../src/validators/general.js';
-import { deleteAdmin } from './utils.js';
+import { deleteAdmin, insertRole } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
@@ -26,11 +26,11 @@ describe('User tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const admin = await res.json();
+    const admin: { id: number; id_auth: string } = await res.json();
     auth_admin = admin.id_auth;
     id_admin = admin.id;
-    const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: admin.id, id_role: Role.ADMIN });
-    if (error) throw new Error('Error while updating user');
+    await insertRole(id_user, Role.ADMIN);
+    await insertRole(id_user, Role.MEMBER);
 
     const loginRes = await app.request(`${path}/auth/login`, {
       method: 'POST',

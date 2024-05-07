@@ -1,5 +1,5 @@
 import app from '../src/index.js';
-import { supAdmin } from '../src/libs/supabase.js';
+
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole } from './utils.js';
 

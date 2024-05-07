@@ -1,5 +1,4 @@
 import app from '../src/index.js';
-import { supAdmin } from '../src/libs/supabase.js';
 import { deleteAdmin } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);

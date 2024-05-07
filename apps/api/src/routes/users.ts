@@ -1,6 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
-import { paginationSchema } from '../utils/pagnination.js';
+import { queryAllSchema } from '../utils/pagnination.js';
 import { updateUserSchema, userSchema } from '../validators/auth.js';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
@@ -12,10 +12,7 @@ export const getAllUsers = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    query: z.object({
-      search: z.string().optional(),
-      ...paginationSchema.shape,
-    }),
+    query: queryAllSchema,
   },
   responses: {
     200: {
@@ -265,7 +262,7 @@ export const getUsersActivities = createRoute({
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
-    query: paginationSchema,
+    query: queryAllSchema,
   },
   responses: {
     200: {

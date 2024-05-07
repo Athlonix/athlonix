@@ -24,17 +24,24 @@ export const users = new OpenAPIHono<{ Variables: Variables }>({
 users.openapi(getAllUsers, async (c) => {
   const roles = c.get('user').roles;
   await checkRole(roles, false, [Role.ADMIN]);
-  const { search, skip, take } = c.req.valid('query');
-  const searchTerm = search || '';
+  const { search, all, skip, take } = c.req.valid('query');
 
-  const { from, to } = getPagination(skip, take);
-  const { data, error, count } = await supabase
+  const query = supabase
     .from('USERS')
     .select('*, roles:ROLES (id, name)', { count: 'exact' })
-    .range(from, to)
-    .order('created_at', { ascending: true })
     .filter('deleted_at', 'is', null)
-    .ilike('username', `%${searchTerm}%`);
+    .order('created_at', { ascending: true });
+
+  if (search) {
+    query.ilike('username', `%${search}%`);
+  }
+
+  if (!all) {
+    const { from, to } = getPagination(skip, take - 1);
+    query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     return c.json({ error: error.message }, 500);

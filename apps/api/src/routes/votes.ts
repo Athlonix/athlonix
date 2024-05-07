@@ -1,6 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
-import { paginationSchema } from '../utils/pagnination.js';
+import { queryAllSchema } from '../utils/pagnination.js';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const pollsSchema = z.object({
@@ -81,7 +81,7 @@ export const getAllPolls = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    query: paginationSchema,
+    query: queryAllSchema.omit({ search: true, all: true }),
   },
   responses: {
     200: {

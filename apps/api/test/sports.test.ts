@@ -76,7 +76,7 @@ describe('Sports tests', () => {
 
   test('Update sport', async () => {
     const res = await app.request(`${path}/sports/${id_sport}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,

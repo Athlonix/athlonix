@@ -32,8 +32,8 @@ describe('Activities tests', () => {
     const user: { id: number; id_auth: string } = await res.json();
     id_auth = user.id_auth;
     id_admin = user.id;
-    await insertRole(id_user, Role.ADMIN);
-    await insertRole(id_user, Role.MEMBER);
+    await insertRole(id_admin, Role.ADMIN);
+    await insertRole(id_admin, Role.MEMBER);
   });
 
   test('Login admin', async () => {

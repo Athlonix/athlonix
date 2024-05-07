@@ -17,7 +17,6 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import type React from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';

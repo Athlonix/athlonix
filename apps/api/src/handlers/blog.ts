@@ -23,15 +23,26 @@ export const blog = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 blog.openapi(getAllPosts, async (c) => {
-  const { skip, take } = c.req.valid('query');
-  const { from, to } = getPagination(skip, take - 1);
-  const { data, error } = await supabase.from('POSTS').select('*').range(from, to);
+  const { all, search, skip, take } = c.req.valid('query');
+
+  const query = supabase.from('POSTS').select('*', { count: 'exact' }).order('id', { ascending: true });
+
+  if (search) {
+    query.ilike('title', `%${search}%`);
+  }
+
+  if (!all) {
+    const { from, to } = getPagination(skip, take - 1);
+    query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json(data, 200);
+  return c.json({ data, count }, 200);
 });
 
 blog.openapi(getPost, async (c) => {
@@ -129,15 +140,30 @@ blog.openapi(commentOnPost, async (c) => {
 
 blog.openapi(getComments, async (c) => {
   const { id } = c.req.valid('param');
-  const { skip, take } = c.req.valid('query');
-  const { from, to } = getPagination(skip, take - 1);
-  const { data, error } = await supabase.from('COMMENTS').select('*').eq('id_post', id).range(from, to);
+  const { all, search, skip, take } = c.req.valid('query');
 
-  if (error) {
-    return c.json({ error: error.message }, 500);
+  const query = supabase
+    .from('COMMENTS')
+    .select('*', { count: 'exact' })
+    .eq('id_post', id)
+    .order('id', { ascending: true });
+
+  if (search) {
+    query.ilike('content', `%${search}%`);
   }
 
-  return c.json(data, 200);
+  if (!all) {
+    const { from, to } = getPagination(skip, take - 1);
+    query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    return c.json({ error: "Failed to get comments, verify the post's id" }, 400);
+  }
+
+  return c.json({ data, count }, 200);
 });
 
 blog.openapi(createResponse, async (c) => {

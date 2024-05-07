@@ -1,13 +1,14 @@
 import app from '../src/index.js';
-import { supAdmin } from '../src/libs/supabase.js';
+import { deleteAdmin } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
-let id_user: number;
-let id_auth: string;
 
 describe('Auth tests', () => {
-  test('POST /auth/signup', async () => {
+  let id_user: number;
+  let id_auth: string;
+
+  beforeAll(async () => {
     const res = await app.request(`${path}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -20,7 +21,7 @@ describe('Auth tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const users: { id: number; id_auth: string; first_name: string } = await res.json();
+    const users: { id: number; id_auth: string } = await res.json();
     expect(users).toMatchObject({ first_name: 'auth_test' });
     id_auth = users.id_auth;
     id_user = users.id;
@@ -51,9 +52,6 @@ describe('Auth tests', () => {
   });
 
   afterAll(async () => {
-    const { error } = await supAdmin.from('USERS').delete().eq('id', id_user);
-    const { error: errorAuth } = await supAdmin.auth.admin.deleteUser(id_auth);
-    expect(error).toBeNull();
-    expect(errorAuth).toBeNull();
+    await deleteAdmin(id_user, id_auth);
   });
 });

@@ -5,21 +5,21 @@ import { deleteAdmin, insertRole } from './utils.js';
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
 
-describe('Location tests', () => {
+describe('Sports tests', () => {
   let id_user: number;
   let id_auth: string;
   let jwt: string;
-  let id_location: number;
+  let id_sport: number;
 
   beforeAll(async () => {
     const res = await app.request(`${path}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        first_name: 'location',
-        last_name: 'location',
-        username: 'location',
-        email: 'location@gmail.com',
+        first_name: 'sport',
+        last_name: 'sport',
+        username: 'sport',
+        email: 'sport@gmail.com',
         password: 'password123456',
       }),
     });
@@ -34,7 +34,7 @@ describe('Location tests', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'location@gmail.com',
+        email: 'sport@gmail.com',
         password: 'password123456',
       }),
     });
@@ -43,30 +43,28 @@ describe('Location tests', () => {
     jwt = loginUser.token;
   });
 
-  test('Create address', async () => {
-    const res = await app.request(`${path}/addresses`, {
+  test('Create sport', async () => {
+    const res = await app.request(`${path}/sports`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        road: 'Road test',
-        postal_code: '12345',
-        complement: 'Complement test',
-        city: 'City test',
-        number: 123,
-        name: 'Name test',
-        id_lease: null,
+        name: 'sport test',
+        description: 'nice sport',
+        min_players: 1,
+        max_players: 100,
+        image: 'https://www.google.com',
       }),
     });
     expect(res.status).toBe(201);
-    const location: { id: number } = await res.json();
-    id_location = location.id;
+    const sport: { id: number } = await res.json();
+    id_sport = sport.id;
   });
 
-  test('Get all addresses', async () => {
-    const res = await app.request(`${path}/addresses`, {
+  test('Get all sports', async () => {
+    const res = await app.request(`${path}/sports?all=true`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -76,28 +74,26 @@ describe('Location tests', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Update address', async () => {
-    const res = await app.request(`${path}/addresses/${id_location}`, {
+  test('Update sport', async () => {
+    const res = await app.request(`${path}/sports/${id_sport}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        road: 'Road test',
-        postal_code: '12345',
-        complement: 'Complement test',
-        city: 'City test',
-        number: 123,
-        name: 'Name test',
-        id_lease: null,
+        name: 'sport test updated',
+        description: 'nice sport updated',
+        min_players: 1,
+        max_players: 100,
+        image: 'https://www.google.com',
       }),
     });
     expect(res.status).toBe(200);
   });
 
-  test('Delete address', async () => {
-    const res = await app.request(`${path}/addresses/${id_location}`, {
+  test('Delete sport', async () => {
+    const res = await app.request(`${path}/sports/${id_sport}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

@@ -1,4 +1,4 @@
-import { Bell, CircleUser, Home, LineChart, Menu, Package, Package2, Search, ShoppingCart, Users } from 'lucide-react';
+import { CircleUser, Home, LineChart, Menu, Package, Package2, Search, ShoppingCart, Users } from 'lucide-react';
 import Link from 'next/link';
 
 import { Badge } from '@repo/ui/components/ui/badge';

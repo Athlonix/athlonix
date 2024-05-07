@@ -1,5 +1,4 @@
 import '@repo/ui/globals.css';
-import { cn } from '@repo/ui/lib/utils';
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 

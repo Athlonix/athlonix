@@ -12,34 +12,19 @@ export const location = new OpenAPIHono<{ Variables: Variables }>({
 
 location.openapi(getAllAddresses, async (c) => {
   const { all, search, skip, take } = c.req.valid('query');
-  const searchTerm = search || '';
 
-  if (all) {
-    const { data, error, count } = await supabase
-      .from('ADDRESSES')
-      .select('*', { count: 'exact' })
-      .order('id', { ascending: true })
-      .ilike('road', `%${searchTerm}%`);
+  const query = supabase.from('ADDRESSES').select('*', { count: 'exact' }).order('id', { ascending: true });
 
-    if (error) {
-      return c.json({ error: error.message }, 500);
-    }
-
-    const responseData = {
-      data: data || [],
-      count: count || 0,
-    };
-
-    return c.json(responseData, 200);
+  if (search) {
+    query.ilike('road', `%${search}%`);
   }
 
-  const { from, to } = getPagination(skip, take - 1);
-  const { data, error, count } = await supabase
-    .from('ADDRESSES')
-    .select('*', { count: 'exact' })
-    .range(from, to)
-    .order('id', { ascending: true })
-    .ilike('road', `%${searchTerm}%`);
+  if (!all) {
+    const { from, to } = getPagination(skip, take - 1);
+    query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     return c.json({ error: error.message }, 500);

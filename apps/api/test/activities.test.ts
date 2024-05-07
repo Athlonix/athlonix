@@ -1,6 +1,7 @@
 import app from '../src/index.js';
 import { supAdmin } from '../src/libs/supabase.js';
 import { Role } from '../src/validators/general.js';
+import { deleteAdmin, insertRole } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
@@ -31,9 +32,8 @@ describe('Activities tests', () => {
     const user: { id: number; id_auth: string } = await res.json();
     id_auth = user.id_auth;
     id_admin = user.id;
-    const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.ADMIN });
-    const { error: errorAuth } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.MEMBER });
-    if (error || errorAuth) throw new Error('Error while updating user');
+    await insertRole(id_user, Role.ADMIN);
+    await insertRole(id_user, Role.MEMBER);
   });
 
   test('Login admin', async () => {
@@ -233,14 +233,7 @@ describe('Activities tests', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Delete admin', async () => {
-    const res = await app.request(`${path}/users/${id_admin}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-    expect(res.status).toBe(200);
+  afterAll(async () => {
+    await deleteAdmin(id_user, id_auth);
   });
 });

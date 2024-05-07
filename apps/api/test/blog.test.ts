@@ -1,6 +1,7 @@
 import app from '../src/index.js';
 import { supAdmin } from '../src/libs/supabase.js';
 import { Role } from '../src/validators/general.js';
+import { deleteAdmin, insertRole } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
@@ -28,9 +29,8 @@ describe('Blog tests', () => {
     const user: { id: number; id_auth: string } = await res.json();
     id_auth = user.id_auth;
     id_user = user.id;
-    const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.REDACTOR });
-    const { error: errorAuth } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.MEMBER });
-    if (error || errorAuth) throw new Error('Error while updating user');
+    await insertRole(id_user, Role.REDACTOR);
+    await insertRole(id_user, Role.MEMBER);
 
     const loginRes = await app.request(`${path}/auth/login`, {
       method: 'POST',
@@ -139,9 +139,6 @@ describe('Blog tests', () => {
   });
 
   afterAll(async () => {
-    const { error } = await supAdmin.from('USERS').delete().eq('id', id_user);
-    const { error: errorAuth } = await supAdmin.auth.admin.deleteUser(id_auth);
-    expect(error).toBeNull();
-    expect(errorAuth).toBeNull();
+    await deleteAdmin(id_user, id_auth);
   });
 });

@@ -1,5 +1,6 @@
 import app from '../src/index.js';
 import { supAdmin } from '../src/libs/supabase.js';
+import { deleteAdmin } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
@@ -52,9 +53,6 @@ describe('Auth tests', () => {
   });
 
   afterAll(async () => {
-    const { error } = await supAdmin.from('USERS').delete().eq('id', id_user);
-    const { error: errorAuth } = await supAdmin.auth.admin.deleteUser(id_auth);
-    expect(error).toBeNull();
-    expect(errorAuth).toBeNull();
+    await deleteAdmin(id_user, id_auth);
   });
 });

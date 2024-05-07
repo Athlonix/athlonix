@@ -1,5 +1,4 @@
 import app from '../src/index.js';
-import { supAdmin } from '../src/libs/supabase.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole } from './utils.js';
 
@@ -131,12 +130,10 @@ describe('Activities tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const user: { id: number; id_auth: string } = await res.json();
+    const user: { id: number } = await res.json();
     id_user = user.id;
-    id_auth = user.id_auth;
 
-    const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.MEMBER });
-    if (error) throw new Error('Error while updating user');
+    await insertRole(id_user, Role.MEMBER);
   });
 
   test('Login user', async () => {
@@ -234,6 +231,6 @@ describe('Activities tests', () => {
   });
 
   afterAll(async () => {
-    await deleteAdmin(id_user, id_auth);
+    await deleteAdmin(id_admin, id_auth);
   });
 });

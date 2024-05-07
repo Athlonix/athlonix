@@ -2,6 +2,7 @@ import { supAdmin } from '../src/libs/supabase.js';
 
 export async function deleteAdmin(id: number, id_auth: string): Promise<void> {
   const { error } = await supAdmin.from('USERS').delete().eq('id', id);
+  console.log('error', error);
   if (error) throw new Error('Error while deleting user');
 
   const { error: errorAuth } = await supAdmin.auth.admin.deleteUser(id_auth.toString());

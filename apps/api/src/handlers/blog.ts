@@ -25,7 +25,10 @@ export const blog = new OpenAPIHono<{ Variables: Variables }>({
 blog.openapi(getAllPosts, async (c) => {
   const { all, search, skip, take } = c.req.valid('query');
 
-  const query = supabase.from('POSTS').select('*', { count: 'exact' }).order('id', { ascending: true });
+  const query = supabase
+    .from('POSTS')
+    .select('*, comments:COMMENTS(id), reports:REPORTS(id)', { count: 'exact' })
+    .order('id', { ascending: true });
 
   if (search) {
     query.ilike('title', `%${search}%`);

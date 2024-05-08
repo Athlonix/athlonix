@@ -30,7 +30,7 @@ export type Database = {
     Tables: {
       ACTIVITIES: {
         Row: {
-          days: Database['public']['Enums']['days'][];
+          days: Database['public']['Enums']['days'][] | null;
           description: string | null;
           end_date: string;
           id: number;
@@ -44,7 +44,7 @@ export type Database = {
           start_date: string;
         };
         Insert: {
-          days: Database['public']['Enums']['days'][];
+          days?: Database['public']['Enums']['days'][] | null;
           description?: string | null;
           end_date: string;
           id?: number;
@@ -58,7 +58,7 @@ export type Database = {
           start_date: string;
         };
         Update: {
-          days?: Database['public']['Enums']['days'][];
+          days?: Database['public']['Enums']['days'][] | null;
           description?: string | null;
           end_date?: string;
           id?: number;
@@ -850,6 +850,70 @@ export type Database = {
             columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      REASONS: {
+        Row: {
+          id: number;
+          reason: string;
+        };
+        Insert: {
+          id?: number;
+          reason: string;
+        };
+        Update: {
+          id?: number;
+          reason?: string;
+        };
+        Relationships: [];
+      };
+      REPORTS: {
+        Row: {
+          content: string;
+          created_at: string;
+          id: number;
+          id_comment: number | null;
+          id_post: number | null;
+          id_reason: number;
+        };
+        Insert: {
+          content: string;
+          created_at?: string;
+          id?: number;
+          id_comment?: number | null;
+          id_post?: number | null;
+          id_reason: number;
+        };
+        Update: {
+          content?: string;
+          created_at?: string;
+          id?: number;
+          id_comment?: number | null;
+          id_post?: number | null;
+          id_reason?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'REPORTS_id_comment_fkey';
+            columns: ['id_comment'];
+            isOneToOne: false;
+            referencedRelation: 'COMMENTS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'REPORTS_id_post_fkey';
+            columns: ['id_post'];
+            isOneToOne: false;
+            referencedRelation: 'POSTS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'REPORTS_id_reason_fkey';
+            columns: ['id_reason'];
+            isOneToOne: false;
+            referencedRelation: 'REASONS';
             referencedColumns: ['id'];
           },
         ];

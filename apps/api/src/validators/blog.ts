@@ -34,4 +34,13 @@ export const commentSchema = z.object({
   id_user: z.number().min(1),
 });
 
+export const reportSchema = z.object({
+  id: z.number().min(1),
+  created_at: z.string().datetime(),
+  id_reason: z.number().min(1),
+  content: z.string().max(255),
+  id_post: z.number().min(1).nullable(),
+  id_comment: z.number().min(1).nullable(),
+});
+
 export const insertCommentSchema = insertResponseSchema;

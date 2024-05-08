@@ -7,7 +7,7 @@
     "./biome": "./biome.json"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.7.0"
+    "@biomejs/biome": "1.7.3"
   },
   "scripts": {
     "clean": "git clean -xdf .turbo node_modules"

@@ -1,13 +1,12 @@
 'use client';
 
-import { type Post, dummyPosts } from '@/app/lib/dummy_posts';
+import type { Post } from '@/app/lib/type/Post';
 import { BlogPost } from '@/app/ui/components/BlogPost';
 import { PostFiltering } from '@/app/ui/components/PostFiltering';
 import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { Plus, Search } from 'lucide-react';
-import next from 'next';
 import { useEffect, useState } from 'react';
 
 export default function Page(): JSX.Element {
@@ -35,7 +34,7 @@ export default function Page(): JSX.Element {
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    fetch(`${process.env.ATHLONIX_API_URL}/blog/posts?skip=0&take=10`)
+    fetch(`${process.env.NEXT_PUBLIC_ATHLONIX_API_URL}/blog/posts?skip=0&take=10`)
       .then((r) => {
         return r.json();
       })

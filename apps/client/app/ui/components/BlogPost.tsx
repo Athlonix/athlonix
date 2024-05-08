@@ -78,7 +78,6 @@ export const BlogPost: React.FC<PostProps> = ({
                 type="button"
                 className="cursor-pointer"
                 onClick={() => {
-                  console.log('testttt');
                   handleLikeButton(id);
                 }}
               >

@@ -4,6 +4,7 @@ export interface Post {
   createdAt: Date;
   cover_image: string;
   description: string;
+  userLiked: boolean;
   author: {
     id: string;
     username: string;

@@ -1,17 +1,8 @@
-import { randomInt } from 'node:crypto';
 import crypto from 'node:crypto';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import {
-  createPoll,
-  deletePoll,
-  getAllPolls,
-  getOnePoll,
-  getPollResults,
-  updatePoll,
-  voteToPoll,
-} from '../routes/votes.js';
+import { createPoll, deletePoll, getAllPolls, getOnePoll, updatePoll, voteToPoll } from '../routes/votes.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import { Role, type Variables } from '../validators/general.js';
@@ -24,29 +15,23 @@ polls.openapi(getAllPolls, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, true);
-  const { skip, take } = c.req.valid('query');
-  const { from, to } = getPagination(skip, take - 1);
+  const { all, search, skip, take } = c.req.valid('query');
 
-  const { data, error } = await supabase
+  const query = supabase
     .from('POLLS')
-    .select(
-      `
-    id,
-    title,
-    description,
-    start_at,
-    end_at,
-    max_choices,
-    id_user,
-    results: POLLS_OPTIONS (
-      id,
-      content,
-      votes: POLLS_VOTES (id_option)
-    )
-  `,
-      { count: 'exact' },
-    )
-    .range(from, to);
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))', { count: 'exact' })
+    .order('id', { ascending: true });
+
+  if (search) {
+    query.ilike('title', `%${search}%`);
+  }
+
+  if (!all) {
+    const { from, to } = getPagination(skip, take - 1);
+    query.range(from, to);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return c.json({ error: error.message }, 500);
@@ -68,23 +53,7 @@ polls.openapi(getOnePoll, async (c) => {
 
   const { data, error } = await supabase
     .from('POLLS')
-    .select(
-      `
-      id,
-      title,
-      description,
-      start_at,
-      end_at,
-      max_choices,
-      id_user,
-      results: POLLS_OPTIONS (
-        id,
-        content,
-        votes: POLLS_VOTES (id_option)
-      )
-    `,
-      { count: 'exact' },
-    )
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))', { count: 'exact' })
     .eq('id', id)
     .single();
 
@@ -218,9 +187,6 @@ polls.openapi(voteToPoll, async (c) => {
     return c.json({ error: 'Failed to vote' }, 400);
   }
 
-  const randomDelay = randomInt(10, 5000);
-  setTimeout(async () => {}, randomDelay);
-
   const { data: pollData, error: pollError } = await supabase
     .from('USERS_VOTES')
     .insert({ id_poll: id, user: hash })
@@ -231,38 +197,4 @@ polls.openapi(voteToPoll, async (c) => {
   }
 
   return c.json({ message: 'Vote registered' }, 201);
-});
-
-type Results = {
-  id: number;
-  title: string;
-  results: { id: number; content: string; votes: number }[];
-};
-
-polls.openapi(getPollResults, async (c) => {
-  const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, true);
-  const { id } = c.req.valid('param');
-  const { data, error } = await supabase
-    .from('POLLS')
-    .select('*, results:POLLS_VOTES(*), options:POLLS_OPTIONS(*)')
-    .eq('id', id)
-    .single();
-
-  if (error || !data) {
-    return c.json({ error: 'Poll not found' }, 404);
-  }
-
-  const results: Results = {
-    id: data.id,
-    title: data.title,
-    results: data.options.map((option: { id: number; content: string }) => ({
-      id: option.id,
-      content: option.content,
-      votes: data.results.filter((vote: { id_option: number }) => vote.id_option === option.id).length,
-    })),
-  };
-
-  return c.json(results, 200);
 });

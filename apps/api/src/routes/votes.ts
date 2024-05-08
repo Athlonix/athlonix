@@ -81,7 +81,7 @@ export const getAllPolls = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    query: queryAllSchema.omit({ search: true, all: true }),
+    query: queryAllSchema,
   },
   responses: {
     200: {
@@ -204,33 +204,6 @@ export const voteToPoll = createRoute({
       content: {
         'application/json': {
           schema: { type: 'string' },
-        },
-      },
-    },
-    500: serverErrorSchema,
-    404: notFoundSchema,
-  },
-  tags: ['poll'],
-});
-
-export const getPollResults = createRoute({
-  method: 'get',
-  path: '/polls/{id}/results',
-  summary: 'Get poll results',
-  description: 'Get poll results',
-  security: [{ Bearer: [] }],
-  middleware: authMiddleware,
-  request: {
-    params: idParamValidator,
-  },
-  responses: {
-    200: {
-      description: 'Successful response',
-      content: {
-        'application/json': {
-          schema: {
-            data: pollResultSchema,
-          },
         },
       },
     },

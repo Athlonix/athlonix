@@ -13,6 +13,7 @@ import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
 import { health } from './handlers/health.js';
 import { location } from './handlers/location.js';
+import { reasons } from './handlers/reasons.js';
 import { sports } from './handlers/sports.js';
 import { users } from './handlers/users.js';
 import { polls } from './handlers/votes.js';
@@ -50,6 +51,7 @@ app.route('/', location);
 app.route('/', polls);
 app.route('/auth', auth);
 app.route('/blog', blog);
+app.route('/', reasons);
 
 app.doc('/doc', (c: Context) => ({
   openapi: '3.0.0',

@@ -20,8 +20,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@repo/ui/components/ui/
 import { RadioGroup, RadioGroupItem } from '@repo/ui/components/ui/radio-group';
 import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/components/ui/select';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { TimePicker } from '@repo/ui/components/ui/time-picker';
-import { useToast } from '@repo/ui/hooks/use-toast';
 import { cn } from '@repo/ui/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -71,7 +71,6 @@ interface Props {
 
 function AddActivity({ activities, setActivities, addresses, sports }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
-  const { toast } = useToast();
   const router = useRouter();
   const frenchDays = [
     { id: 'monday', name: 'Lundi' },
@@ -176,7 +175,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
         return response.json();
       })
       .then((data: { id: number }) => {
-        toast({ title: 'Adresse ajouté', description: "L'adresse a été ajouté avec succès" });
+        toast.success('Activité ajouté', { duration: 2000, description: "L'activité a été ajouté avec succès" });
         const newActivity: Activity = {
           id: data.id,
           name: values.name,
@@ -204,7 +203,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
         }
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
+        toast.error('Erreur', { duration: 2000, description: error?.message });
       });
 
     setOpen(false);
@@ -319,7 +318,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                         name="id_address"
                         render={({ field }) => (
                           <FormItem>
-                            <Label className="font-bold">Adresse</Label>
+                            <Label className="font-bold">Activité</Label>
                             <Select onValueChange={field.onChange} defaultValue="-1">
                               <FormControl>
                                 <SelectTrigger>
@@ -573,7 +572,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                           <FormItem>
                             <Label className="font-bold">Intervalle</Label>
                             <FormControl>
-                              <Input {...field} type="number" />
+                              <Input {...field} type="number" min={1} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

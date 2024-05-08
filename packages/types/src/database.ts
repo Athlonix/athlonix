@@ -708,6 +708,7 @@ export type Database = {
           content: string;
           cover_image: string | null;
           created_at: string;
+          description: string | null;
           id: number;
           id_user: number;
           title: string;
@@ -717,6 +718,7 @@ export type Database = {
           content: string;
           cover_image?: string | null;
           created_at?: string;
+          description?: string | null;
           id?: number;
           id_user: number;
           title: string;
@@ -726,6 +728,7 @@ export type Database = {
           content?: string;
           cover_image?: string | null;
           created_at?: string;
+          description?: string | null;
           id?: number;
           id_user?: number;
           title?: string;
@@ -741,24 +744,54 @@ export type Database = {
           },
         ];
       };
+      POSTS_CATEGORIES: {
+        Row: {
+          id: number;
+          id_category: number;
+          id_post: number;
+        };
+        Insert: {
+          id?: number;
+          id_category: number;
+          id_post: number;
+        };
+        Update: {
+          id?: number;
+          id_category?: number;
+          id_post?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'POSTS_CATEGORIES_id_category_fkey';
+            columns: ['id_category'];
+            isOneToOne: false;
+            referencedRelation: 'CATEGORIES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'POSTS_CATEGORIES_id_post_fkey';
+            columns: ['id_post'];
+            isOneToOne: false;
+            referencedRelation: 'POSTS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       POSTS_REACTIONS: {
         Row: {
           id_post: number;
           id_user: number;
-          like: boolean | null;
-          reaction: string | null;
+          reaction: Database['public']['Enums']['reaction'] | null;
         };
         Insert: {
           id_post: number;
           id_user?: number;
-          like?: boolean | null;
-          reaction?: string | null;
+          reaction?: Database['public']['Enums']['reaction'] | null;
         };
         Update: {
           id_post?: number;
           id_user?: number;
-          like?: boolean | null;
-          reaction?: string | null;
+          reaction?: Database['public']['Enums']['reaction'] | null;
         };
         Relationships: [
           {
@@ -770,6 +803,39 @@ export type Database = {
           },
           {
             foreignKeyName: 'public_POSTS_LIKES_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      POSTS_VIEWS: {
+        Row: {
+          id_post: number;
+          id_user: number;
+          viewed: string;
+        };
+        Insert: {
+          id_post: number;
+          id_user?: number;
+          viewed?: string;
+        };
+        Update: {
+          id_post?: number;
+          id_user?: number;
+          viewed?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'POSTS_VIEWS_id_post_fkey';
+            columns: ['id_post'];
+            isOneToOne: false;
+            referencedRelation: 'POSTS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'POSTS_VIEWS_id_user_fkey';
             columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
@@ -1306,6 +1372,7 @@ export type Database = {
     };
     Enums: {
       days: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+      reaction: 'like';
       recurrence: 'weekly' | 'monthly' | 'annual';
     };
     CompositeTypes: {

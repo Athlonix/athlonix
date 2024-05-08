@@ -20,6 +20,7 @@ function LogoutUser() {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
     },
   })
     .then((response) => {
@@ -51,15 +52,15 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
   });
 
   return (
-    <nav className="flex items-center justify-center mb-20">
+    <nav className="flex items-center justify-center mb-8">
       <div className="w-full flex items-center justify-between">
         <ul className="flex gap-4">{navBarElements}</ul>
         {!isAuthenticated ? (
           <div>
-            <Button className="w-[120px] mr-4">
+            <Button asChild className="w-[120px] mr-4">
               <Link href="signup">S'inscrire</Link>
             </Button>
-            <Button className="w-[120px]">
+            <Button asChild className="w-[120px]">
               <Link href="login">Se connecter</Link>
             </Button>
           </div>

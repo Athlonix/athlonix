@@ -3,6 +3,7 @@ module.exports = {
   transpilePackages: ['@repo/ui'],
   output: 'standalone',
   images: {
+    domains: [process.env.SUPABASE_DOMAIN],
     minimumCacheTTL: 60,
     formats: ['image/avif', 'image/webp'],
   },

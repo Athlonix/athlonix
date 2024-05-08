@@ -1,3 +1,4 @@
+import { equal } from 'node:assert';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
@@ -20,6 +21,7 @@ import {
 } from '../routes/blog.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
+import { postCardListSchemaResponse } from '../validators/blog.js';
 import type { Variables } from '../validators/general.js';
 import { Role } from '../validators/general.js';
 
@@ -32,7 +34,17 @@ blog.openapi(getAllPosts, async (c) => {
 
   const query = supabase
     .from('POSTS')
-    .select('*, comments:COMMENTS(id), reports:REPORTS(id)', { count: 'exact' })
+    .select(
+      `id,title,created_at,cover_image,description,
+      author:USERS!public_POSTS_user_id_fkey(id,username),
+      categories:POSTS_CATEGORIES(CATEGORIES(id,name)),
+      comments_number:COMMENTS(count),
+      views_number:POSTS_VIEWS(count),
+      likes_number:POSTS_REACTIONS(count),
+      comments:COMMENTS(id),
+      reports:REPORTS(id)`,
+      { count: 'exact' },
+    )
     .order('id', { ascending: true });
 
   if (search) {
@@ -46,11 +58,24 @@ blog.openapi(getAllPosts, async (c) => {
 
   const { data, error, count } = await query;
 
-  if (error) {
+  if (error || !data) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json({ data, count }, 200);
+  const finalData = data.map((row) => {
+    return {
+      ...row,
+      categories: row.categories.map((category) => ({
+        id: category.CATEGORIES?.id,
+        name: category.CATEGORIES?.name,
+      })),
+      comments_number: row.comments_number[0]?.count,
+      views_number: row.views_number[0]?.count,
+      likes_number: row.likes_number[0]?.count,
+    };
+  });
+
+  return c.json({ data: finalData, count }, 200);
 });
 
 blog.openapi(getPost, async (c) => {

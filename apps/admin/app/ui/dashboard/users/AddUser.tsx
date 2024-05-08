@@ -13,7 +13,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
-import { useToast } from '@repo/ui/hooks/use-toast';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
@@ -40,7 +40,6 @@ interface Props {
 
 function AddUser({ users, setUsers }: Props) {
   const [open, setOpen] = useState(false);
-  const { toast } = useToast();
   const router = useRouter();
 
   const formSchema = z.object({
@@ -85,7 +84,7 @@ function AddUser({ users, setUsers }: Props) {
         return response.json();
       })
       .then((data: { id: number }) => {
-        toast({ title: 'Utilisateur créé', description: "L'utilisateur a été créé avec succès" });
+        toast.success('Utilisateur créé', { duration: 2000, description: 'Utilisateur a été créé avec succès' });
         const newUser = {
           id: data.id,
           email: values.email,
@@ -102,7 +101,7 @@ function AddUser({ users, setUsers }: Props) {
         }
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
+        toast.error('Erreur', { duration: 2000, description: error?.message });
       });
 
     setOpen(false);

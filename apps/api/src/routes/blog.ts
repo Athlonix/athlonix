@@ -7,6 +7,7 @@ import {
   insertCommentSchema,
   insertPostSchema,
   insertResponseSchema,
+  postCardListSchemaResponse,
   postSchema,
   reportSchema,
   responseSchema,
@@ -28,7 +29,7 @@ export const getAllPosts = createRoute({
       content: {
         'application/json': {
           schema: {
-            data: z.array(postSchema),
+            data: postCardListSchemaResponse,
           },
         },
       },

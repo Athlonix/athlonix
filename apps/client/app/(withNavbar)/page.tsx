@@ -1,30 +1,21 @@
 'use client';
 
 import { Button } from '@repo/ui/components/ui/button';
-import { Toaster } from '@repo/ui/components/ui/toaster';
-import { useToast } from '@repo/ui/hooks/use-toast';
+import { Toaster, toast } from '@repo/ui/components/ui/sonner';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
-import { Suspense } from 'react';
-import { navLinks } from '../lib/navlinks';
-import { NavBar } from '../ui/NavBar';
+import { Suspense, useEffect } from 'react';
 
 function ShowToast() {
   const searchParams = useSearchParams();
-  const { toast } = useToast();
-
   const search = searchParams.get('loggedIn');
 
   useEffect(() => {
     if (search === 'true') {
-      toast({
-        title: 'Bon retour !',
-        description: 'Vous êtes connecté !',
-      });
+      toast.info('Bon retour !', { duration: 2000, description: 'Vous êtes connecté !' });
     }
-  }, [search, toast]);
+  }, [search]);
 
   return <Toaster />;
 }
@@ -32,9 +23,8 @@ function ShowToast() {
 export default function Page(): JSX.Element {
   return (
     <>
-      <NavBar links={navLinks} />
       <main className="flex flex-col items-center gap-y-8 py-6">
-        <section className="flex flex-col max-w-7xl gap-y-4">
+        <section className="flex flex-col gap-y-4">
           <div className="flex gap-8 h-44 items-center justify-center">
             <h1 className="font-semibold text-[144px]">Athlonix</h1>
             <div className="h-[168px] max-w-[720px]">

@@ -16,8 +16,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@repo/ui/components/ui/dropdown-menu';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
-import { useToast } from '@repo/ui/hooks/use-toast';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
@@ -80,7 +80,6 @@ const FrenchDays: Record<string, string> = {
 };
 
 function ActivityRow(props: ActivityRowProps) {
-  const { toast } = useToast();
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
@@ -121,7 +120,7 @@ function ActivityRow(props: ActivityRowProps) {
     })
       .then((response) => response.json())
       .then(() => {
-        toast({ title: 'Succès', description: "L'activité a été supprimé avec succès" });
+        toast.success('Succès', { duration: 2000, description: "L'activité a été supprimé avec succès" });
 
         setName('Supprimé');
         setMinParticipants(0);
@@ -135,7 +134,7 @@ function ActivityRow(props: ActivityRowProps) {
         setInterval(0);
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
+        toast.error('Erreur', { duration: 2000, description: error?.message });
       });
 
     setOpenDelete(false);

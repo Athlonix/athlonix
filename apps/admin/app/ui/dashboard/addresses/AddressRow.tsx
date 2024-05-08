@@ -16,8 +16,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@repo/ui/components/ui/dropdown-menu';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
-import { useToast } from '@repo/ui/hooks/use-toast';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
@@ -33,7 +33,6 @@ interface AddressProps {
 }
 
 function AddressRow(address: AddressProps) {
-  const { toast } = useToast();
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
 
@@ -64,7 +63,7 @@ function AddressRow(address: AddressProps) {
     })
       .then((response) => response.json())
       .then(() => {
-        toast({ title: 'Succès', description: "L'adresse a été supprimé avec succès" });
+        toast.success('Succès', { duration: 2000, description: "L'adresse a été supprimé avec succès" });
 
         setName('Supprimé');
         setRoad('');
@@ -74,7 +73,7 @@ function AddressRow(address: AddressProps) {
         setNumber(0);
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
+        toast.error('Erreur', { duration: 2000, description: error?.message });
       });
 
     setOpenDelete(false);

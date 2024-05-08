@@ -1,3 +1,4 @@
+import { Toaster } from '@repo/ui/components/ui/sonner';
 import '@repo/ui/globals.css';
 import { cn } from '@repo/ui/lib/utils';
 import type { Metadata } from 'next';
@@ -20,7 +21,10 @@ export default function RootLayout({
 }): JSX.Element {
   return (
     <html lang="en">
-      <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>{children}</body>
+      <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
+        {children}
+        <Toaster richColors closeButton visibleToasts={1} />
+      </body>
     </html>
   );
 }

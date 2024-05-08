@@ -14,7 +14,6 @@ import {
 } from '@repo/ui/components/ui/pagination';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
-import { Toaster } from '@repo/ui/components/ui/toaster';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -279,7 +278,6 @@ export default function Page(): JSX.Element {
           </Tabs>
         </div>
       </div>
-      <Toaster />
     </main>
   );
 }

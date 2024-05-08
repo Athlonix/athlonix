@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 export default function LoginForm(): JSX.Element {
   const router = useRouter();
-  const urlApi = process.env.ATHLONIX_API_URL;
+  const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
   const formSchema = z.object({
     email: z.string().email({ message: 'Email invalide' }),
@@ -40,11 +40,11 @@ export default function LoginForm(): JSX.Element {
       }),
     })
       .then((response) => response.json())
-      .then((data) => {
+      .then((data: { user: Record<string, unknown>; token: string }) => {
         localStorage.setItem('user', JSON.stringify(data));
         router.push('/?loggedIn=true');
       })
-      .catch((error) => {
+      .catch((error: Error) => {
         console.log(error);
       });
   }

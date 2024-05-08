@@ -1,18 +1,19 @@
-import { exit } from 'node:process';
 import app from '../src/index.js';
-import { supAdmin } from '../src/libs/supabase.js';
-import { Role } from '../src/validators/general';
+
+import { Role } from '../src/validators/general.js';
+import { deleteAdmin, insertRole } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
-let id_user: number;
-let id_auth: string;
-let jwt: string;
-let id_post: number;
-let id_comment: number;
 
 describe('Blog tests', () => {
-  test('Create redactor', async () => {
+  let id_user: number;
+  let id_auth: string;
+  let jwt: string;
+  let id_post: number;
+  let id_comment: number;
+
+  beforeAll(async () => {
     const res = await app.request(`${path}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -25,19 +26,13 @@ describe('Blog tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const user = await res.json();
+    const user: { id: number; id_auth: string } = await res.json();
     id_auth = user.id_auth;
     id_user = user.id;
-    const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.REDACTOR });
-    const { error: errorAuth } = await supAdmin.from('USERS_ROLES').insert({ id_user: user.id, id_role: Role.MEMBER });
-    if (error || errorAuth) {
-      console.error('Error while updating user');
-      exit(1);
-    }
-  });
+    await insertRole(id_user, Role.REDACTOR);
+    await insertRole(id_user, Role.MEMBER);
 
-  test('Login redactor', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const loginRes = await app.request(`${path}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -45,9 +40,9 @@ describe('Blog tests', () => {
         password: 'password123456',
       }),
     });
-    expect(res.status).toBe(200);
-    const user = await res.json();
-    jwt = user.token;
+    expect(loginRes.status).toBe(200);
+    const loginUser: { token: string } = await loginRes.json();
+    jwt = loginUser.token;
   });
 
   test('Create post', async () => {
@@ -64,7 +59,7 @@ describe('Blog tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const post = await res.json();
+    const post: { id: number } = await res.json();
     id_post = post.id;
   });
 
@@ -76,7 +71,7 @@ describe('Blog tests', () => {
       },
     });
     expect(res.status).toBe(200);
-    const post = await res.json();
+    const post: { title: string } = await res.json();
     expect(post).toMatchObject({ title: 'Post test' });
   });
 
@@ -107,7 +102,7 @@ describe('Blog tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const comment = await res.json();
+    const comment: { id: number } = await res.json();
     id_comment = comment.id;
   });
 
@@ -143,10 +138,7 @@ describe('Blog tests', () => {
     expect(res.status).toBe(200);
   });
 
-  test('Delete redactor', async () => {
-    const { error } = await supAdmin.from('USERS').delete().eq('id', id_user);
-    const { error: errorAuth } = await supAdmin.auth.admin.deleteUser(id_auth);
-    expect(error).toBeNull();
-    expect(errorAuth).toBeNull();
+  afterAll(async () => {
+    await deleteAdmin(id_user, id_auth);
   });
 });

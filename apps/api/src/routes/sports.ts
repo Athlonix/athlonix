@@ -1,6 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
-import { paginationSchema } from '../utils/pagnination.js';
+import { queryAllSchema } from '../utils/pagnination.js';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const sportSchema = z.object({
@@ -18,7 +18,7 @@ export const getAllSports = createRoute({
   summary: 'Get all sports',
   description: 'Get all sports',
   request: {
-    query: paginationSchema,
+    query: queryAllSchema,
   },
   responses: {
     200: {

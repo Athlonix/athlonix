@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "clean": "git clean -xdf .turbo node_modules .next",
+    "clean": "rm -rf .next/ .turbo/ node_modules/",
     "dev": "next dev --port 3100",
     "build": "next build",
     "start": "next start",
@@ -12,6 +12,7 @@
     "types:check": "tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.3.4",
     "@repo/ui": "workspace:*",
     "next": "^14.2.3",
     "react": "^18.3.1",

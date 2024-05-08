@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   admin:
     container_name: athlonix-admin

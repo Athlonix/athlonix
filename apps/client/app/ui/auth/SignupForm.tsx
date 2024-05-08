@@ -36,7 +36,7 @@ export default function SignupForm(): JSX.Element {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const urlApi = process.env.ATHLONIX_API_URL;
+    const urlApi = process.env.NEXT_PUBLIC_API_URL;
     fetch(`${urlApi}/auth/signup`, {
       method: 'POST',
       headers: {
@@ -54,7 +54,7 @@ export default function SignupForm(): JSX.Element {
       .then(() => {
         router.push('/login');
       })
-      .catch((error) => console.log(error));
+      .catch((error: Error) => console.log(error));
   }
 
   return (

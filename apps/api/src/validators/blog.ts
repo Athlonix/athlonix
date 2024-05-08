@@ -44,8 +44,8 @@ export const commentSchema = z.object({
   content: z.string().max(255),
   id_post: z.number().min(1).nullable(),
   responses: z.array(responseSchema).optional(),
-  updated_at: z.string().nullable(),
-  created_at: z.string(),
+  updated_at: z.string().datetime().nullable(),
+  created_at: z.string().datetime(),
   id_user: z.number().min(1),
 });
 

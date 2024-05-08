@@ -1,6 +1,7 @@
 import { serve } from '@hono/node-server';
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
+import type { Context } from 'hono';
 import { compress } from 'hono/compress';
 import { cors } from 'hono/cors';
 import { HTTPException } from 'hono/http-exception';
@@ -14,6 +15,7 @@ import { health } from './handlers/health.js';
 import { location } from './handlers/location.js';
 import { sports } from './handlers/sports.js';
 import { users } from './handlers/users.js';
+import { polls } from './handlers/votes.js';
 
 const app = new OpenAPIHono();
 
@@ -45,10 +47,11 @@ app.route('/', users);
 app.route('/', activities);
 app.route('/', sports);
 app.route('/', location);
+app.route('/', polls);
 app.route('/auth', auth);
 app.route('/blog', blog);
 
-app.doc('/doc', (c) => ({
+app.doc('/doc', (c: Context) => ({
   openapi: '3.0.0',
   info: {
     version: '1.0.0',
@@ -56,12 +59,12 @@ app.doc('/doc', (c) => ({
   },
   servers: [
     {
-      url: 'https://athlonix-api.jayllyz.fr',
-      description: 'Production server',
-    },
-    {
       url: new URL(c.req.url).origin,
       description: 'Development server',
+    },
+    {
+      url: 'https://athlonix-api.jayllyz.fr',
+      description: 'Production server',
     },
   ],
 }));
@@ -75,7 +78,7 @@ app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
 app.get('/ui', swaggerUI({ url: '/doc' }));
 
 const port = Number(process.env.PORT || 3101);
-console.log(`Server is running on port ${port}`);
+console.info(`Server is running on port ${port}`);
 
 serve({
   fetch: app.fetch,

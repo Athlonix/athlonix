@@ -34,7 +34,7 @@ export default function Page(): JSX.Element {
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_ATHLONIX_API_URL}/blog/posts?skip=0&take=10`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/posts?skip=0&take=10`)
       .then((r) => {
         return r.json();
       })

@@ -1,19 +1,18 @@
-import { exit } from 'node:process';
 import app from '../src/index.js';
-import { supAdmin } from '../src/libs/supabase.js';
-import { Role } from '../src/validators/general';
-import { deleteAdmin } from './utils.js';
+import { Role } from '../src/validators/general.js';
+import { deleteAdmin, insertRole } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
-let id_user: number;
-let id_auth: string;
-let id_admin: number;
-let auth_admin: string;
-let jwt: string;
 
 describe('User tests', () => {
-  test('Create admin', async () => {
+  let id_user: number;
+  let id_auth: string;
+  let id_admin: number;
+  let auth_admin: string;
+  let jwt: string;
+
+  beforeAll(async () => {
     const res = await app.request(`${path}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -26,18 +25,13 @@ describe('User tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const admin = await res.json();
+    const admin: { id: number; id_auth: string } = await res.json();
     auth_admin = admin.id_auth;
     id_admin = admin.id;
-    const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user: admin.id, id_role: Role.ADMIN });
-    if (error) {
-      console.error('Error while updating user');
-      exit(1);
-    }
-  });
+    await insertRole(id_admin, Role.ADMIN);
+    await insertRole(id_admin, Role.MEMBER);
 
-  test('Login admin', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const loginRes = await app.request(`${path}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -45,9 +39,9 @@ describe('User tests', () => {
         password: 'password123456',
       }),
     });
-    expect(res.status).toBe(200);
-    const admin = await res.json();
-    jwt = admin.token;
+    expect(loginRes.status).toBe(200);
+    const loginAdmin: { token: string } = await loginRes.json();
+    jwt = loginAdmin.token;
   });
 
   test('Create user', async () => {
@@ -63,7 +57,7 @@ describe('User tests', () => {
       }),
     });
     expect(res.status).toBe(201);
-    const user = await res.json();
+    const user: { id: number; id_auth: string } = await res.json();
     id_user = user.id;
     id_auth = user.id_auth;
   });

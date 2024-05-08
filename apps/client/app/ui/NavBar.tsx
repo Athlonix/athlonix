@@ -15,7 +15,7 @@ interface NavBarProps {
 }
 
 function LogoutUser() {
-  const urlApi = process.env.ATHLONIX_API_URL;
+  const urlApi = process.env.NEXT_PUBLIC_API_URL;
   fetch(`${urlApi}/auth/logout`, {
     method: 'DELETE',
     headers: {
@@ -29,7 +29,7 @@ function LogoutUser() {
         window.location.href = '/';
       }
     })
-    .catch((error) => console.log(error));
+    .catch((error: Error) => console.log(error));
 }
 
 export const NavBar: React.FC<NavBarProps> = ({ links }) => {

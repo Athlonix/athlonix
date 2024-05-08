@@ -25,9 +25,9 @@ export const blog = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 blog.openapi(getAllPosts, async (c) => {
-  const { skip, take } = c.req.valid('query');
-  const { from, to } = getPagination(skip, take - 1);
-  const { data, error } = await supabase
+  const { all, search, skip, take } = c.req.valid('query');
+
+  const query = supabase
     .from('POSTS')
     .select(
       `id,title,created_at,cover_image,description,
@@ -36,10 +36,20 @@ blog.openapi(getAllPosts, async (c) => {
       comments_number:COMMENTS(count),
       views_number:POSTS_VIEWS(count),
       likes_number:POSTS_REACTIONS(count)`,
+      { count: 'exact' },
     )
-    .range(from, to);
+    .order('id', { ascending: true });
 
-  console.log(data);
+  if (search) {
+    query.ilike('title', `%${search}%`);
+  }
+
+  if (!all) {
+    const { from, to } = getPagination(skip, take - 1);
+    query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
 
   if (error || !data) {
     return c.json({ error: error.message }, 500);
@@ -58,7 +68,7 @@ blog.openapi(getAllPosts, async (c) => {
     };
   });
 
-  return c.json(finalData, 200);
+  return c.json({ data: finalData, count }, 200);
 });
 
 blog.openapi(getPost, async (c) => {
@@ -119,7 +129,7 @@ blog.openapi(deletePost, async (c) => {
   await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
 
   const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
-  if (roles?.some((role) => allowed.includes(role))) {
+  if (roles?.some((role) => allowed.include(role))) {
     const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
     if (error || count === 0) {
@@ -156,15 +166,30 @@ blog.openapi(commentOnPost, async (c) => {
 
 blog.openapi(getComments, async (c) => {
   const { id } = c.req.valid('param');
-  const { skip, take } = c.req.valid('query');
-  const { from, to } = getPagination(skip, take - 1);
-  const { data, error } = await supabase.from('COMMENTS').select('*').eq('id_post', id).range(from, to);
+  const { all, search, skip, take } = c.req.valid('query');
 
-  if (error) {
-    return c.json({ error: error.message }, 500);
+  const query = supabase
+    .from('COMMENTS')
+    .select('*', { count: 'exact' })
+    .eq('id_post', id)
+    .order('id', { ascending: true });
+
+  if (search) {
+    query.ilike('content', `%${search}%`);
   }
 
-  return c.json(data, 200);
+  if (!all) {
+    const { from, to } = getPagination(skip, take - 1);
+    query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    return c.json({ error: "Failed to get comments, verify the post's id" }, 400);
+  }
+
+  return c.json({ data, count }, 200);
 });
 
 blog.openapi(createResponse, async (c) => {

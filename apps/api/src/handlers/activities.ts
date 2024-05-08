@@ -20,15 +20,31 @@ export const activities = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 activities.openapi(getAllActivities, async (c) => {
-  const { skip, take } = c.req.valid('query');
-  const { from, to } = getPagination(skip, take - 1);
-  const { data, error } = await supabase.from('ACTIVITIES').select('*').range(from, to);
+  const { all, search, skip, take } = c.req.valid('query');
+
+  const query = supabase.from('ACTIVITIES').select('*', { count: 'exact' }).order('id', { ascending: true });
+
+  if (search) {
+    query.ilike('name', `%${search}%`);
+  }
+
+  if (!all) {
+    const { from, to } = getPagination(skip, take - 1);
+    query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json(data, 200);
+  const responseData = {
+    data: data || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
 });
 
 activities.openapi(getOneActivity, async (c) => {

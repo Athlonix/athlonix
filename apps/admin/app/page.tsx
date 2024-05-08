@@ -1,9 +1,11 @@
-import { Button } from '@repo/ui/components/ui/button';
+import { LoginForm } from '@/app/ui/LoginForm';
 
 export default function Page(): JSX.Element {
   return (
     <main>
-      <Button variant={'default'}>Hello Admin</Button>
+      <div className="flex items-center justify-center h-screen">
+        <LoginForm />
+      </div>
     </main>
   );
 }

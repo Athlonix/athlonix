@@ -7,11 +7,9 @@
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
-      "inputs": ["**/*.js", "**/*.ts", "**/*.tsx", "**/*.jsx", "**/*.json", "**/*.css", "**/*.scss"],
       "dependsOn": ["^lint"]
     },
     "lint:check": {
-      "inputs": ["**/*.js", "**/*.ts", "**/*.tsx", "**/*.jsx", "**/*.json", "**/*.css", "**/*.scss"],
       "dependsOn": ["^lint:check"]
     },
     "dev": {
@@ -29,5 +27,5 @@
       "dependsOn": ["^clean"]
     }
   },
-  "globalEnv": ["SUPABASE_URL", "SUPABASE_KEY", "SUPABASE_SERVICE_KEY"]
+  "globalEnv": ["SUPABASE_URL", "SUPABASE_KEY", "SUPABASE_SERVICE_KEY", "NEXT_PUBLIC_API_URL", "API_URL"]
 }

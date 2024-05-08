@@ -1,6 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
-import { paginationSchema } from '../utils/pagnination.js';
+import { queryAllSchema } from '../utils/pagnination.js';
 import { updateUserSchema, userSchema } from '../validators/auth.js';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
@@ -12,7 +12,7 @@ export const getAllUsers = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    query: paginationSchema,
+    query: queryAllSchema,
   },
   responses: {
     200: {
@@ -190,6 +190,69 @@ export const removeUserRole = createRoute({
   tags: ['user'],
 });
 
+export const updateUserRole = createRoute({
+  method: 'put',
+  path: '/users/{id}/roles',
+  summary: 'Update a user roles',
+  description: 'Update a user roles',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            roles: z.array(z.number()).nullable(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: { message: z.string() },
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});
+
+export const softDeleteUser = createRoute({
+  method: 'delete',
+  path: '/users/{id}/soft',
+  summary: 'Soft delete a user',
+  description: 'Soft delete a user',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: {
+            data: { message: z.string() },
+          },
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});
+
 export const getUsersActivities = createRoute({
   method: 'get',
   path: '/users/{id}/activities',
@@ -199,7 +262,7 @@ export const getUsersActivities = createRoute({
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
-    query: paginationSchema,
+    query: queryAllSchema,
   },
   responses: {
     200: {

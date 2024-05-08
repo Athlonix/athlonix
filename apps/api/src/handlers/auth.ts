@@ -25,9 +25,7 @@ auth.openapi(signupUser, async (c) => {
   });
 
   if (error || !data?.user?.email) {
-    throw new Error(error?.message || 'Error while signing up', {
-      cause: error,
-    });
+    return c.json({ message: 'Error while creating user' }, 400);
   }
 
   const { data: user, error: insertError } = await supabase
@@ -46,9 +44,7 @@ auth.openapi(signupUser, async (c) => {
     .single();
 
   if (insertError) {
-    throw new Error('Error while creating user', {
-      cause: insertError,
-    });
+    return c.json({ message: 'Error while creating user' }, 400);
   }
 
   return c.json(user, 201);
@@ -63,7 +59,7 @@ auth.openapi(loginUser, async (c) => {
 
   const { data: user, error: userError } = await supabase
     .from('USERS')
-    .select('*')
+    .select('*, roles:ROLES (id, name)')
     .eq('id_auth', data.user.id)
     .single();
 

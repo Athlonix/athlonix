@@ -26,8 +26,10 @@ spec:
         env:
           - name: PORT
             value: "3102"
-          - name: ATHLONIX_API_URL
+          - name: API_URL
             value: "http://athlonix-api:3101"
+          - name: NEXT_PUBLIC_API_URL
+            value: "https://athlonix-api.jayllyz.fr"
         resources:
           limits:
             memory: "2Gi"

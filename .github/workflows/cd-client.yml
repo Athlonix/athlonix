@@ -28,6 +28,7 @@ permissions:
 
 env:
   SUPABASE_STORAGE_URL: ${{ secrets.SUPABASE_STORAGE_URL }}
+  SUPABASE_DOMAIN: ${{ secrets.SUPABASE_DOMAIN }}
 
 jobs:
   client:
@@ -90,6 +91,7 @@ jobs:
             PORT=3102
             NEXT_PUBLIC_API_URL=https://athlonix-api.jayllyz.fr
             NEXT_PUBLIC_ATHLONIX_STORAGE_URL=${{ env.SUPABASE_STORAGE_URL }}
+            SUPABASE_DOMAIN=${{ env.SUPABASE_DOMAIN }}
 
       - name: 💬 Set output
         id: image-tag

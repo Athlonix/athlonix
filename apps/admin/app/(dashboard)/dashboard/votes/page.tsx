@@ -4,9 +4,8 @@ import AddVote from '@/app/ui/dashboard/votes/addVotes';
 import EditVote from '@/app/ui/dashboard/votes/editVotes';
 import { Button } from '@repo/ui/components/ui/button';
 import { Dialog, DialogContent } from '@repo/ui/components/ui/dialog';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
-import { Toaster } from '@repo/ui/components/ui/toaster';
-import { toast } from '@repo/ui/hooks/use-toast';
 import { Suspense, useEffect, useState } from 'react';
 
 export type Vote = {
@@ -36,11 +35,10 @@ function deleteVote(id: number, votes: Vote[], setVotes: React.Dispatch<React.Se
     })
     .then(() => {
       setVotes(votes.filter((vote) => vote.id !== id));
-      toast({ title: 'Vote supprimé', description: 'Le vote a bien été supprimé' });
+      toast.success('Vote supprimé', { duration: 2000, description: 'Le vote a bien été supprimé' });
     })
     .catch((error: Error) => {
-      console.error(error);
-      toast({ title: 'Erreur', description: 'Une erreur est survenue lors de la suppression du vote' });
+      toast.error('Erreur', { duration: 2000, description: 'Une erreur est survenue lors de la suppression du vote' });
     });
 }
 
@@ -144,7 +142,6 @@ export default function Votes() {
           </Suspense>
         </div>
       </div>
-      <Toaster />
     </div>
   );
 }

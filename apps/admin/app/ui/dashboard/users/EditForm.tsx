@@ -5,7 +5,7 @@ import { Checkbox } from '@repo/ui/components/ui/checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@repo/ui/components/ui/form';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
-import { useToast } from '@repo/ui/hooks/use-toast';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { useRouter } from 'next/navigation';
 import type { Dispatch, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
@@ -65,7 +65,6 @@ function EditForm(props: EditFormProps): JSX.Element {
     },
   });
 
-  const { toast } = useToast();
   const router = useRouter();
 
   async function submitEdit(values: z.infer<typeof formSchema>) {
@@ -90,7 +89,7 @@ function EditForm(props: EditFormProps): JSX.Element {
         return response.json();
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
+        toast.error('Erreur', { duration: 2000, description: error?.message });
       });
 
     fetch(`${urlApi}/users/${props.id}/roles`, {
@@ -110,7 +109,7 @@ function EditForm(props: EditFormProps): JSX.Element {
         return response.json();
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
+        toast.error('Erreur', { duration: 2000, description: error?.message });
       });
 
     props.setter.username(values.username);
@@ -120,7 +119,8 @@ function EditForm(props: EditFormProps): JSX.Element {
       roles.map((role) => ({ id: role.id, name: role.label })).filter((role) => values.roles?.includes(role.id)),
     );
 
-    toast({ title: 'Succès', description: 'Utilisateur modifié avec succès' });
+    console.log('testo');
+    toast.success('Succès', { duration: 2000, description: 'Utilisateur modifié avec succès' });
 
     props.closeDialog();
   }

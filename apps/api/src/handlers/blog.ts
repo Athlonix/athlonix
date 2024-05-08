@@ -58,13 +58,13 @@ blog.openapi(getAllPosts, async (c) => {
   const finalData = data.map((row) => {
     return {
       ...row,
-      categories: row.categories.map((cat) => ({
-        id: cat.CATEGORIES?.id,
-        name: cat.CATEGORIES?.name,
+      categories: row.categories.map((category) => ({
+        id: category.CATEGORIES?.id,
+        name: category.CATEGORIES?.name,
       })),
-      comments_number: row.comments_number[0].count,
-      views_number: row.views_number[0].count,
-      likes_number: row.likes_number[0].count,
+      comments_number: row.comments_number[0]?.count,
+      views_number: row.views_number[0]?.count,
+      likes_number: row.likes_number[0]?.count,
     };
   });
 

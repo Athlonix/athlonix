@@ -6,7 +6,7 @@ import { Button } from '@repo/ui/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
-import { useToast } from '@repo/ui/hooks/use-toast';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useForm } from 'react-hook-form';
@@ -20,7 +20,6 @@ interface Props {
 }
 
 function EditVote({ votes, setVotes, id, setEditingVote }: Props) {
-  const { toast } = useToast();
   const router = useRouter();
   const editedVote: Vote | undefined = votes.find((vote: Vote) => vote.id === id);
 
@@ -63,11 +62,11 @@ function EditVote({ votes, setVotes, id, setEditingVote }: Props) {
       .then((data: Vote) => {
         setVotes(votes.map((vote) => (vote.id === id ? data : vote)));
         setEditingVote(null);
-        toast({ title: 'Succès', description: 'Le vote a été modifié avec succès' });
+        toast.success('Succès', { duration: 2000, description: 'Le vote a été modifié avec succès' });
       })
       .catch((error: Error) => {
         console.error(error);
-        toast({ title: 'Erreur', description: 'Une erreur est survenue' });
+        toast.error('Erreur', { duration: 2000, description: 'Une erreur est survenue' });
       });
   }
 

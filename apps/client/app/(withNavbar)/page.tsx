@@ -1,24 +1,26 @@
 'use client';
 
 import { Button } from '@repo/ui/components/ui/button';
-import { toast } from '@repo/ui/components/ui/sonner';
+import { Toaster, toast } from '@repo/ui/components/ui/sonner';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 
-export default function Page(): JSX.Element {
+function ShowToast() {
   const searchParams = useSearchParams();
-  const loggedIn = searchParams.get('loggedIn');
+  const search = searchParams.get('loggedIn');
 
   useEffect(() => {
-    if (loggedIn) {
-      toast('Bon retour !', {
-        description: 'Vous êtes connecté !',
-      });
+    if (search === 'true') {
+      toast.info('Bon retour !', { duration: 2000, description: 'Vous êtes connecté !' });
     }
-  }, [loggedIn]);
+  }, [search]);
 
+  return <Toaster />;
+}
+
+export default function Page(): JSX.Element {
   return (
     <>
       <main className="flex flex-col items-center gap-y-8 py-6">
@@ -93,6 +95,10 @@ export default function Page(): JSX.Element {
             <p className="font-normal text-xl">événements organisés</p>
           </div>
         </section>
+
+        <Suspense>
+          <ShowToast />
+        </Suspense>
       </main>
     </>
   );

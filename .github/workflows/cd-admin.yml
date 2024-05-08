@@ -26,6 +26,9 @@ permissions:
   contents: read
   packages: write
 
+env:
+  SUPABASE_STORAGE_URL: ${{ secrets.SUPABASE_STORAGE_URL }}
+
 jobs:
   admin:
     name: CD Admin
@@ -86,6 +89,7 @@ jobs:
             |
             PORT=3100
             NEXT_PUBLIC_API_URL=https://athlonix-api.jayllyz.fr
+            NEXT_PUBLIC_ATHLONIX_STORAGE_URL=${{ env.SUPABASE_STORAGE_URL }}
             
 
       - name: 💬 Set output

@@ -129,7 +129,7 @@ blog.openapi(deletePost, async (c) => {
   await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
 
   const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
-  if (roles?.some((role) => allowed.include(role))) {
+  if (roles?.some((role) => allowed.includes(role))) {
     const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
     if (error || count === 0) {

@@ -3,7 +3,7 @@ import { Button } from '@repo/ui/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
-import { useToast } from '@repo/ui/hooks/use-toast';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { useRouter } from 'next/navigation';
 import type { Dispatch, SetStateAction } from 'react';
 import { useForm } from 'react-hook-form';
@@ -55,7 +55,6 @@ function EditForm(props: EditFormProps): JSX.Element {
     },
   });
 
-  const { toast } = useToast();
   const router = useRouter();
 
   async function submitEdit(values: z.infer<typeof formSchema>) {
@@ -83,7 +82,7 @@ function EditForm(props: EditFormProps): JSX.Element {
         return response.json();
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
+        toast.error('Erreur', { duration: 2000, description: error?.message });
       });
 
     props.setter.road(values.road);
@@ -93,7 +92,7 @@ function EditForm(props: EditFormProps): JSX.Element {
     props.setter.number(values.number);
     props.setter.name(values.name || '');
 
-    toast({ title: 'Succès', description: 'Adresse modifié avec succès' });
+    toast.success('Succès', { duration: 2000, description: 'Adresse modifié avec succès' });
 
     props.closeDialog();
   }

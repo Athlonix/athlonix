@@ -10,8 +10,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@repo/ui/components/ui/
 import { RadioGroup, RadioGroupItem } from '@repo/ui/components/ui/radio-group';
 import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/components/ui/select';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { TimePicker } from '@repo/ui/components/ui/time-picker';
-import { useToast } from '@repo/ui/hooks/use-toast';
 import { cn } from '@repo/ui/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -138,7 +138,6 @@ function EditForm(props: EditFormProps): JSX.Element {
     },
   });
 
-  const { toast } = useToast();
   const router = useRouter();
 
   async function submitEdit(values: z.infer<typeof formSchema>) {
@@ -171,7 +170,7 @@ function EditForm(props: EditFormProps): JSX.Element {
         return response.json();
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
+        toast.error('Erreur', { duration: 2000, description: error?.message });
       });
 
     props.setter.name(values.name);
@@ -196,7 +195,7 @@ function EditForm(props: EditFormProps): JSX.Element {
     props.setter.idSport(values.id_sport === -1 ? null : values.id_sport ?? null);
     props.setter.idAddress(values.id_address === -1 ? null : values.id_address ?? null);
 
-    toast({ title: 'Succès', description: 'Activité modifié avec succès' });
+    toast.success('Succès', { duration: 2000, description: 'Activité modifié avec succès' });
 
     props.closeDialog();
   }

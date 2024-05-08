@@ -15,7 +15,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/co
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
-import { useToast } from '@repo/ui/hooks/use-toast';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
@@ -30,7 +30,6 @@ interface Props {
 
 function AddVote({ votes, setVotes }: Props) {
   const [open, setOpen] = useState(false);
-  const { toast } = useToast();
   const router = useRouter();
 
   const formSchema = z.object({
@@ -38,7 +37,7 @@ function AddVote({ votes, setVotes }: Props) {
     description: z.string().min(2, { message: 'La description doit contenir au moins 2 caractères' }),
     start_at: z.string(),
     end_at: z.string(),
-    max_choices: z.number().min(1, { message: 'Le nombre de choix doit être supérieur à 0' }),
+    max_choices: z.coerce.number().min(1, { message: 'Le nombre de choix doit être supérieur à 0' }),
     options: z.array(
       z.object({ content: z.string().min(2, { message: 'Le choix doit contenir au moins 2 caractères' }) }),
     ),
@@ -87,12 +86,12 @@ function AddVote({ votes, setVotes }: Props) {
       })
       .then((data: Vote) => {
         if (data) {
-          toast({ title: 'Vote créé', description: 'Le vote a été créé avec succès' });
+          toast.success('Vote créé', { duration: 2000, description: 'Le vote a été créé avec succès' });
           setVotes([...votes, data]);
         }
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: 'Une erreur est survenue' });
+        toast.error('Erreur', { duration: 2000, description: 'Une erreur est survenue' });
       });
 
     setOpen(false);

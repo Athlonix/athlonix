@@ -17,8 +17,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@repo/ui/components/ui/dropdown-menu';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
-import { useToast } from '@repo/ui/hooks/use-toast';
 import { MoreHorizontal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -48,7 +48,6 @@ const RoleBadge: Record<number, string> = {
 };
 
 function UserRow(user: UserProps) {
-  const { toast } = useToast();
   const router = useRouter();
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -76,7 +75,7 @@ function UserRow(user: UserProps) {
         return response.json();
       })
       .then(() => {
-        toast({ title: 'Succès', description: "L'utilisateur a été supprimé avec succès" });
+        toast.success('Succès', { duration: 2000, description: "L'utilisateur a été supprimé avec succès" });
 
         setUsername('Supprimé');
         setFirstName('');
@@ -84,7 +83,7 @@ function UserRow(user: UserProps) {
         setRoles([]);
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
+        toast.error('Erreur', { duration: 2000, description: error?.message });
       });
 
     setOpenDelete(false);

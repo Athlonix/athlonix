@@ -13,7 +13,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
-import { useToast } from '@repo/ui/hooks/use-toast';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
@@ -39,7 +39,6 @@ interface Props {
 
 function addAddress({ addresses, setAddresses }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
-  const { toast } = useToast();
   const router = useRouter();
 
   const formSchema = z.object({
@@ -95,7 +94,7 @@ function addAddress({ addresses, setAddresses }: Props): JSX.Element {
         return response.json();
       })
       .then((data: { id: number }) => {
-        toast({ title: 'Adresse ajouté', description: "L'adresse a été ajouté avec succès" });
+        toast.success('Adresse ajouté', { duration: 2000, description: "L'adresse a été ajouté avec succès" });
         const newAddress: Address = {
           id: data.id,
           road: values.road,
@@ -111,7 +110,7 @@ function addAddress({ addresses, setAddresses }: Props): JSX.Element {
         }
       })
       .catch((error: Error) => {
-        toast({ title: 'Erreur', description: error?.message });
+        toast.error('Erreur', { duration: 2000, description: "L'adresse a été ajouté avec succès" });
       });
 
     setOpen(false);

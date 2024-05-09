@@ -1,11 +1,34 @@
 'use client';
 
 import ReportsList from '@/app/ui/dashboard/posts/details/ReportsList';
+import { Button } from '@repo/ui/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@repo/ui/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@repo/ui/components/ui/dropdown-menu';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@repo/ui/components/ui/pagination';
 import { Separator } from '@repo/ui/components/ui/separator';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
+import { MoreHorizontal } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 
 type Post = {
   id: number;
@@ -31,14 +54,20 @@ type ReportsData = {
   count: number;
 };
 
-function page() {
+function ShowReports() {
   const searchParams = useSearchParams();
-  const idPost = searchParams.get('id_post');
   const router = useRouter();
+  const idPost = searchParams.get('id_post');
+  let page = searchParams.get('page') || 1;
+  if (typeof page === 'string') {
+    page = Number.parseInt(page);
+  }
 
-  const [post, setPost] = React.useState<Post>();
-  const [reports, setReports] = React.useState<Report[]>([]);
-  const [reasons, setReasons] = React.useState<Reason[]>([]);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [maxPage, setMaxPage] = useState<number>(1);
+  const [post, setPost] = useState<Post>();
+  const [reports, setReports] = useState<Report[]>([]);
+  const [reasons, setReasons] = useState<Reason[]>([]);
 
   useEffect(() => {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
@@ -63,7 +92,12 @@ function page() {
         console.log(error);
       });
 
-    fetch(`${urlApi}/blog/posts/${idPost}/reports`, {
+    const queryParams = new URLSearchParams({
+      skip: `${page - 1}`,
+      take: '10',
+    });
+
+    fetch(`${urlApi}/blog/posts/${idPost}/reports?${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -78,6 +112,7 @@ function page() {
       })
       .then((data: ReportsData) => {
         setReports(data.data);
+        setMaxPage(Math.ceil(data.count / 10));
       })
       .catch((error) => {
         console.log(error);
@@ -101,15 +136,157 @@ function page() {
       .catch((error) => {
         console.log(error);
       });
-  }, [idPost, router]);
+  }, [idPost, router, page]);
+
+  function deletePost() {
+    if (idPost === null) {
+      return;
+    }
+    const id = Number(idPost);
+
+    const urlApi = process.env.NEXT_PUBLIC_API_URL;
+
+    fetch(`${urlApi}/blog/posts/${id}/soft`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
+      .then((response) => {
+        console.log(response);
+        router.push('/dashboard/posts');
+      });
+
+    setOpenDelete(false);
+  }
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
+    <>
       <div className="flex items-center gap-5 justify-center">
         <h1 className="text-lg font-semibold md:text-2xl">{post?.title}</h1>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button aria-haspopup="true" size="icon" variant="ghost">
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+              <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+                <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Suppression du post</DialogTitle>
+                    <DialogDescription>
+                      <div className="mb-4">Êtes-vous sûr de vouloir supprimer ce post?</div>
+                      <div className="flex w-full justify-end gap-4">
+                        <Button variant="destructive" onClick={deletePost}>
+                          Supprimer
+                        </Button>
+                        <Button variant="secondary" onClick={() => setOpenDelete(false)}>
+                          Annuler
+                        </Button>
+                      </div>
+                    </DialogDescription>
+                  </DialogHeader>
+                </DialogContent>
+              </Dialog>
+            </Button>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <Separator />
-      <ReportsList reports={reports} reasons={reasons} />
+      <div className="mx-5 border border-black rounded-lg">
+        <ReportsList reports={reports} reasons={reasons} />
+      </div>
+      <Pagination>
+        <PaginationContent>
+          {page > 1 && (
+            <PaginationItem>
+              <PaginationPrevious
+                className="border border-gray-500 rounded-lg"
+                href={`/dashboard/posts/details?page=${page - 1}&id_post=${idPost}`}
+              />
+            </PaginationItem>
+          )}
+          {page > 3 && (
+            <PaginationItem>
+              <PaginationLink
+                className="border border-gray-500 rounded-lg"
+                href={`/dashboard/posts/details?page=${page - 2}&id_post=${idPost}`}
+              >
+                {page - 2}
+              </PaginationLink>
+            </PaginationItem>
+          )}
+          {page > 2 && (
+            <PaginationItem>
+              <PaginationLink
+                className="border border-gray-500 rounded-lg"
+                href={`/dashboard/posts/details?page=${page - 1}&id_post=${idPost}`}
+              >
+                {page - 1}
+              </PaginationLink>
+            </PaginationItem>
+          )}
+          <PaginationItem>
+            <PaginationLink
+              className="border border-gray-500 rounded-lg"
+              href={`/dashboard/posts/details?page=${page}&id_post=${idPost}`}
+              isActive
+            >
+              {page}
+            </PaginationLink>
+          </PaginationItem>
+          {page < maxPage && (
+            <PaginationItem>
+              <PaginationLink
+                className="border border-gray-500 rounded-lg"
+                href={`/dashboard/posts/details?page=${page + 1}&id_post=${idPost}`}
+              >
+                {page + 1}
+              </PaginationLink>
+            </PaginationItem>
+          )}
+          {page < maxPage - 1 && (
+            <PaginationItem>
+              <PaginationLink
+                className="border border-gray-500 rounded-lg"
+                href={`/dashboard/posts/details?page=${page + 2}&id_post=${idPost}`}
+              >
+                {page + 2}
+              </PaginationLink>
+            </PaginationItem>
+          )}
+          {page < maxPage && (
+            <PaginationItem>
+              <PaginationNext
+                className="border border-gray-500 rounded-lg"
+                href={`/dashboard/posts/details?page=${page + 1}&id_post=${idPost}`}
+              />
+            </PaginationItem>
+          )}
+        </PaginationContent>
+      </Pagination>
+    </>
+  );
+}
+
+function page() {
+  return (
+    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
+      <Suspense>
+        <ShowReports />
+      </Suspense>
     </main>
   );
 }

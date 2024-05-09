@@ -23,7 +23,7 @@ function ReportsList({ reports, reasons }: Props) {
   return (
     <Table>
       <TableHeader>
-        <TableRow>
+        <TableRow className="border-black">
           <TableHead>Date</TableHead>
           <TableHead>Raison</TableHead>
           <TableHead>Message</TableHead>

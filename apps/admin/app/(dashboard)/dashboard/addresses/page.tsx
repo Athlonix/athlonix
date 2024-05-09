@@ -124,37 +124,67 @@ function ShowContent() {
             <PaginationContent>
               {page > 1 && (
                 <PaginationItem>
-                  <PaginationPrevious href={`/dashboard/addresses?page=${page - 1}`} />
+                  <PaginationPrevious
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page - 1}`}
+                  />
                 </PaginationItem>
               )}
               {page > 3 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page - 2}`}>{page - 2}</PaginationLink>
+                  <PaginationLink
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page - 2}`}
+                  >
+                    {page - 2}
+                  </PaginationLink>
                 </PaginationItem>
               )}
               {page > 2 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page - 1}`}>{page - 1}</PaginationLink>
+                  <PaginationLink
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page - 1}`}
+                  >
+                    {page - 1}
+                  </PaginationLink>
                 </PaginationItem>
               )}
               <PaginationItem>
-                <PaginationLink href={`/dashboard/addresses?page=${page}`} isActive>
+                <PaginationLink
+                  className="border border-gray-500 rounded-lg"
+                  href={`/dashboard/addresses?page=${page}`}
+                  isActive
+                >
                   {page}
                 </PaginationLink>
               </PaginationItem>
               {page < maxPage && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page + 1}`}>{page + 1}</PaginationLink>
+                  <PaginationLink
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page + 1}`}
+                  >
+                    {page + 1}
+                  </PaginationLink>
                 </PaginationItem>
               )}
               {page < maxPage - 1 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page + 2}`}>{page + 2}</PaginationLink>
+                  <PaginationLink
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page + 2}`}
+                  >
+                    {page + 2}
+                  </PaginationLink>
                 </PaginationItem>
               )}
               {page < maxPage && (
                 <PaginationItem>
-                  <PaginationNext href={`/dashboard/addresses?page=${page + 1}`} />
+                  <PaginationNext
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page + 1}`}
+                  />
                 </PaginationItem>
               )}
             </PaginationContent>

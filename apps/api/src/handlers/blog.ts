@@ -1,4 +1,3 @@
-import { equal } from 'node:assert';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
@@ -21,7 +20,6 @@ import {
 } from '../routes/blog.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
-import { postCardListSchemaResponse } from '../validators/blog.js';
 import type { Variables } from '../validators/general.js';
 import { Role } from '../validators/general.js';
 

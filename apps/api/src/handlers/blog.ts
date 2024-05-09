@@ -16,7 +16,6 @@ import {
 } from '../routes/blog.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
-import { postCardListSchemaResponse } from '../validators/blog.js';
 import type { Variables } from '../validators/general.js';
 import { Role } from '../validators/general.js';
 
@@ -83,14 +82,14 @@ blog.openapi(getPost, async (c) => {
 });
 
 blog.openapi(createPost, async (c) => {
-  const { title, content, cover_image } = c.req.valid('json');
+  const { title, content, cover_image, description } = c.req.valid('json');
   const user = c.get('user');
   const id_user = user.id;
   await checkRole(user.roles, false, [Role.REDACTOR, Role.MODERATOR]);
 
   const { data, error } = await supabase
     .from('POSTS')
-    .insert({ title, content, id_user, cover_image })
+    .insert({ title, content, id_user, cover_image, description })
     .select()
     .single();
 

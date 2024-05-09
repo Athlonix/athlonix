@@ -5,6 +5,7 @@ export const postSchema = z.object({
   title: z.string(),
   content: z.string(),
   cover_image: z.string().nullable(),
+  description: z.string().nullable(),
 });
 
 export const postCardSchemaResponse = z.object({

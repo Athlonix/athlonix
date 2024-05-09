@@ -1,4 +1,5 @@
 import '@repo/ui/globals.css';
+import CollapsedNav from '@/app/ui/CollapsedNav';
 import { cn } from '@repo/ui/lib/utils';
 import { BarChart, Home, LineChart, Package, Package2, Users } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -49,7 +50,7 @@ export default function RootLayout({
                     Gestion des utilisateurs
                   </Link>
                   <Link
-                    href="#"
+                    href="/dashboard/posts"
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
                   >
                     <Package className="h-4 w-4" />
@@ -108,7 +109,12 @@ export default function RootLayout({
               </div>
             </div>
           </div>
-          {children}
+          <div className="flex flex-col h-full">
+            <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+              <CollapsedNav />
+            </header>
+            {children}
+          </div>
         </div>
       </body>
     </html>

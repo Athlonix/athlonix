@@ -1,4 +1,3 @@
-import { equal } from 'node:assert';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
@@ -11,6 +10,7 @@ import {
   getAllPosts,
   getComments,
   getPost,
+  softDeletePost,
   updateComment,
   updatePost,
 } from '../routes/blog.js';
@@ -34,9 +34,12 @@ blog.openapi(getAllPosts, async (c) => {
       categories:POSTS_CATEGORIES(CATEGORIES(id,name)),
       comments_number:COMMENTS(count),
       views_number:POSTS_VIEWS(count),
-      likes_number:POSTS_REACTIONS(count)`,
+      likes_number:POSTS_REACTIONS(count),
+      comments:COMMENTS(id),
+      reports:REPORTS(id)`,
       { count: 'exact' },
     )
+    .filter('deleted_at', 'is', null)
     .order('id', { ascending: true });
 
   if (search) {
@@ -145,6 +148,58 @@ blog.openapi(deletePost, async (c) => {
   }
 
   return c.json({ message: 'Post deleted successfully' }, 200);
+});
+
+blog.openapi(softDeletePost, async (c) => {
+  const { id } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true, [Role.MODERATOR, Role.ADMIN]);
+
+  const allowed = [Role.MODERATOR, Role.ADMIN];
+
+  if (roles?.some((role) => allowed.includes(role))) {
+    const { data, error } = await supabase
+      .from('POSTS')
+      .update({
+        content: '[supprimé par un modérateur]',
+        title: '[supprimé par un modérateur]',
+        cover_image: null,
+        description: null,
+        deleted_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .select();
+
+    if (error || !data) {
+      return c.json({ error: 'Post not found' }, 404);
+    }
+
+    return c.json({ message: 'Post deleted successfully' }, 200);
+  }
+
+  if (!roles?.some((role) => allowed.includes(role))) {
+    const { data, error } = await supabase
+      .from('POSTS')
+      .update({
+        content: "[supprimé par l'utilisateur]",
+        title: "[supprimé par l'utilisateur]",
+        cover_image: null,
+        description: null,
+        deleted_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+      .eq('id_user', user.id)
+      .select();
+
+    if (error || !data) {
+      return c.json({ error: 'Post not found' }, 404);
+    }
+
+    return c.json({ message: 'Post deleted successfully' }, 200);
+  }
+
+  return c.json({ error: 'Post not found' }, 404);
 });
 
 blog.openapi(commentOnPost, async (c) => {

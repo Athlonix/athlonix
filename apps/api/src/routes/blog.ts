@@ -151,6 +151,26 @@ export const deletePost = createRoute({
   tags: ['blog'],
 });
 
+export const softDeletePost = createRoute({
+  method: 'patch',
+  path: '/posts/{id}/soft',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  summary: 'Soft delete a post',
+  description: 'Soft delete a post',
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['blog'],
+});
+
 export const commentOnPost = createRoute({
   method: 'post',
   path: '/posts/{id}/comments',

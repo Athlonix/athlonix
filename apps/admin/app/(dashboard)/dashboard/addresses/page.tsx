@@ -124,37 +124,67 @@ function ShowContent() {
             <PaginationContent>
               {page > 1 && (
                 <PaginationItem>
-                  <PaginationPrevious href={`/dashboard/addresses?page=${page - 1}`} />
+                  <PaginationPrevious
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page - 1}`}
+                  />
                 </PaginationItem>
               )}
               {page > 3 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page - 2}`}>{page - 2}</PaginationLink>
+                  <PaginationLink
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page - 2}`}
+                  >
+                    {page - 2}
+                  </PaginationLink>
                 </PaginationItem>
               )}
               {page > 2 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page - 1}`}>{page - 1}</PaginationLink>
+                  <PaginationLink
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page - 1}`}
+                  >
+                    {page - 1}
+                  </PaginationLink>
                 </PaginationItem>
               )}
               <PaginationItem>
-                <PaginationLink href={`/dashboard/addresses?page=${page}`} isActive>
+                <PaginationLink
+                  className="border border-gray-500 rounded-lg"
+                  href={`/dashboard/addresses?page=${page}`}
+                  isActive
+                >
                   {page}
                 </PaginationLink>
               </PaginationItem>
               {page < maxPage && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page + 1}`}>{page + 1}</PaginationLink>
+                  <PaginationLink
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page + 1}`}
+                  >
+                    {page + 1}
+                  </PaginationLink>
                 </PaginationItem>
               )}
               {page < maxPage - 1 && (
                 <PaginationItem>
-                  <PaginationLink href={`/dashboard/addresses?page=${page + 2}`}>{page + 2}</PaginationLink>
+                  <PaginationLink
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page + 2}`}
+                  >
+                    {page + 2}
+                  </PaginationLink>
                 </PaginationItem>
               )}
               {page < maxPage && (
                 <PaginationItem>
-                  <PaginationNext href={`/dashboard/addresses?page=${page + 1}`} />
+                  <PaginationNext
+                    className="border border-gray-500 rounded-lg"
+                    href={`/dashboard/addresses?page=${page + 1}`}
+                  />
                 </PaginationItem>
               )}
             </PaginationContent>
@@ -167,18 +197,14 @@ function ShowContent() {
 
 export default function Page(): JSX.Element {
   return (
-    <main>
+    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
       <div className="flex flex-col h-full">
-        <div className="flex min-h-screen w-full flex-col bg-muted/40">
-          <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-            <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
-              <Tabs defaultValue="all">
-                <Suspense>
-                  <ShowContent />
-                </Suspense>
-              </Tabs>
-            </main>
-          </div>
+        <div className="grid flex-1 items-start">
+          <Tabs defaultValue="all">
+            <Suspense>
+              <ShowContent />
+            </Suspense>
+          </Tabs>
         </div>
       </div>
     </main>

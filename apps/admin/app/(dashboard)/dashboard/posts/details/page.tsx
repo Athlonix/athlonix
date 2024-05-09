@@ -97,7 +97,7 @@ function ShowReports() {
       take: '10',
     });
 
-    fetch(`${urlApi}/blog/posts/${idPost}/reports?${queryParams}`, {
+    fetch(`${urlApi}/reports/posts/${idPost}?${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

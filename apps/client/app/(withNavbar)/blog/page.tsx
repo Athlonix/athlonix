@@ -39,7 +39,9 @@ export default function Page(): JSX.Element {
         return r.json();
       })
       .then((postsData) => {
-        setPosts(postsData);
+        if (postsData?.data) {
+          setPosts(postsData.data);
+        }
       });
   }, []);
 

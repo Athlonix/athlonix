@@ -56,6 +56,7 @@ describe('Blog tests', () => {
         title: 'Post test',
         content: 'Post test content',
         cover_image: 'https://example.com/image.jpg',
+        description: 'Post test description',
       }),
     });
     expect(res.status).toBe(201);

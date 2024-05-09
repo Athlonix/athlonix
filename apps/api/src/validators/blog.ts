@@ -5,6 +5,7 @@ export const postSchema = z.object({
   title: z.string(),
   content: z.string(),
   cover_image: z.string().nullable(),
+  description: z.string().nullable(),
 });
 
 export const postCardSchemaResponse = z.object({
@@ -28,6 +29,7 @@ export const updatePostSchema = z.object({
   title: z.string().optional(),
   content: z.string().optional(),
   cover_image: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
 });
 
 export const responseSchema = z.object({

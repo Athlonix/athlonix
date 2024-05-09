@@ -28,6 +28,7 @@ export const updatePostSchema = z.object({
   title: z.string().optional(),
   content: z.string().optional(),
   cover_image: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
 });
 
 export const responseSchema = z.object({

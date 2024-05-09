@@ -103,13 +103,13 @@ blog.openapi(createPost, async (c) => {
 
 blog.openapi(updatePost, async (c) => {
   const { id } = c.req.valid('param');
-  const { title, content, cover_image } = c.req.valid('json');
+  const { title, content, cover_image, description } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
   const { data, error } = await supabase
     .from('POSTS')
-    .update({ title, content, cover_image, updated_at: new Date().toISOString() })
+    .update({ title, content, cover_image, description, updated_at: new Date().toISOString() })
     .eq('id', id)
     .eq('id_user', user.id)
     .select()

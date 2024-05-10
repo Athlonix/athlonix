@@ -1,6 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
+import { activitySchemaReponse } from '../validators/activities.js';
 import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const activitySchema = z.object({
@@ -32,7 +33,7 @@ export const getAllActivities = createRoute({
       content: {
         'application/json': {
           schema: {
-            data: z.array(activitySchema),
+            data: z.array(activitySchemaReponse),
           },
         },
       },

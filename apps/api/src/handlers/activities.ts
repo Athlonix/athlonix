@@ -22,7 +22,10 @@ export const activities = new OpenAPIHono<{ Variables: Variables }>({
 activities.openapi(getAllActivities, async (c) => {
   const { all, search, skip, take } = c.req.valid('query');
 
-  const query = supabase.from('ACTIVITIES').select('*', { count: 'exact' }).order('id', { ascending: true });
+  const query = supabase
+    .from('ACTIVITIES')
+    .select('*, sport:SPORTS (id,name)', { count: 'exact' })
+    .order('id', { ascending: true });
 
   if (search) {
     query.ilike('name', `%${search}%`);
@@ -39,8 +42,13 @@ activities.openapi(getAllActivities, async (c) => {
     return c.json({ error: error.message }, 500);
   }
 
+  const cleanData = data.map((activity) => {
+    const { id_sport, ...cleaned } = activity;
+    return cleaned;
+  });
+
   const responseData = {
-    data: data || [],
+    data: cleanData || [],
     count: count || 0,
   };
 

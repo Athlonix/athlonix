@@ -37,7 +37,7 @@ export const getReports = createRoute({
     },
     500: serverErrorSchema,
   },
-  tags: ['blog'],
+  tags: ['report'],
 });
 
 export const createReport = createRoute({
@@ -81,7 +81,7 @@ export const createReport = createRoute({
     400: badRequestSchema,
     500: serverErrorSchema,
   },
-  tags: ['blog'],
+  tags: ['report'],
 });
 
 export const deleteReport = createRoute({
@@ -103,12 +103,12 @@ export const deleteReport = createRoute({
     500: serverErrorSchema,
     404: notFoundSchema,
   },
-  tags: ['blog'],
+  tags: ['report'],
 });
 
 export const getReportComments = createRoute({
   method: 'get',
-  path: '/comments/{id_comment}/reports',
+  path: '/reports/comments/{id_comment}',
   summary: 'Get comments and responses on a report',
   description: 'Get comments and responses on a report',
   request: {
@@ -140,12 +140,12 @@ export const getReportComments = createRoute({
     500: serverErrorSchema,
     404: notFoundSchema,
   },
-  tags: ['blog'],
+  tags: ['report'],
 });
 
 export const createReportComment = createRoute({
   method: 'post',
-  path: '/comments/{id_comment}/reports',
+  path: '/reports/comments/{id_comment}',
   summary: 'Create a response to a report',
   description: 'Create a response to a report',
   security: [{ Bearer: [] }],
@@ -181,5 +181,5 @@ export const createReportComment = createRoute({
     500: serverErrorSchema,
     404: notFoundSchema,
   },
-  tags: ['blog'],
+  tags: ['report'],
 });

@@ -37,7 +37,7 @@ export const getReports = createRoute({
     },
     500: serverErrorSchema,
   },
-  tags: ['blog'],
+  tags: ['report'],
 });
 
 export const createReport = createRoute({
@@ -81,7 +81,7 @@ export const createReport = createRoute({
     400: badRequestSchema,
     500: serverErrorSchema,
   },
-  tags: ['blog'],
+  tags: ['report'],
 });
 
 export const deleteReport = createRoute({
@@ -103,7 +103,7 @@ export const deleteReport = createRoute({
     500: serverErrorSchema,
     404: notFoundSchema,
   },
-  tags: ['blog'],
+  tags: ['report'],
 });
 
 export const getReportComments = createRoute({
@@ -140,7 +140,7 @@ export const getReportComments = createRoute({
     500: serverErrorSchema,
     404: notFoundSchema,
   },
-  tags: ['blog'],
+  tags: ['report'],
 });
 
 export const createReportComment = createRoute({
@@ -181,5 +181,5 @@ export const createReportComment = createRoute({
     500: serverErrorSchema,
     404: notFoundSchema,
   },
-  tags: ['blog'],
+  tags: ['report'],
 });

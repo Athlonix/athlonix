@@ -69,6 +69,7 @@ export const createMatch = createRoute({
   path: '/matches',
   summary: 'Create a match',
   description: 'Create a match',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     body: {
@@ -83,7 +84,7 @@ export const createMatch = createRoute({
     },
   },
   responses: {
-    200: {
+    201: {
       description: 'Successful response',
     },
     500: serverErrorSchema,
@@ -93,13 +94,15 @@ export const createMatch = createRoute({
 
 export const createMatchTournament = createRoute({
   method: 'post',
-  path: '/matches/tournament/{id_tournament}',
+  path: '/matches/{id}/tournaments/{id_tournament}',
   summary: 'Create a match for a tournament',
   description: 'Create a match for a tournament',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: z.object({
-      id_tournament: z.number().min(1),
+      id: z.coerce.number().min(1),
+      id_tournament: z.coerce.number().min(1),
     }),
     body: {
       content: {
@@ -125,6 +128,7 @@ export const updateMatch = createRoute({
   path: '/matches/{id}',
   summary: 'Update a match',
   description: 'Update a match',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -154,12 +158,36 @@ export const updateMatchWinner = createRoute({
   path: '/matches/{id}/winner',
   summary: 'Update the winner of a match',
   description: 'Update the winner of a match',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
     query: z.object({
-      idTeam: z.number().min(1),
-      winner: z.boolean(),
+      idTeam: z.coerce.number().min(1),
+      winner: z.coerce.boolean(),
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['match'],
+});
+
+export const deleteMatchTournament = createRoute({
+  method: 'delete',
+  path: '/matches/{id}/tournaments/{id_tournament}',
+  summary: 'Delete a match from a tournament',
+  description: 'Delete a match from a tournament',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: z.object({
+      id: z.coerce.number().min(1),
+      id_tournament: z.coerce.number().min(1),
     }),
   },
   responses: {
@@ -177,6 +205,7 @@ export const deleteMatch = createRoute({
   path: '/matches/{id}',
   summary: 'Delete a match',
   description: 'Delete a match',
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,

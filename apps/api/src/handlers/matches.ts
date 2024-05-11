@@ -3,7 +3,9 @@ import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
   createMatch,
+  createMatchTournament,
   deleteMatch,
+  deleteMatchTournament,
   getAllMatches,
   getMatchById,
   updateMatch,
@@ -22,7 +24,7 @@ matches.openapi(getAllMatches, async (c) => {
 
   const query = supabase
     .from('MATCHES')
-    .select('*, teams_matches(winner) as winner', { count: 'exact' })
+    .select('*, winner:TEAMS_MATCHES(winner)', { count: 'exact' })
     .order('id', { ascending: true });
 
   if (search) {
@@ -65,29 +67,15 @@ matches.openapi(createMatch, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error } = await supabase.from('MATCHES').insert({ start_time, end_time });
+  if (start_time >= end_time) return c.json({ error: 'Start time must be before end time' }, 400);
+
+  const { data, error } = await supabase.from('MATCHES').insert({ start_time, end_time }).select().single();
 
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json(data, 200);
-});
-
-matches.openapi(updateMatch, async (c) => {
-  const { id } = c.req.valid('param');
-  const { start_time, end_time } = c.req.valid('json');
-  const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, false);
-
-  const { data, error } = await supabase.from('MATCHES').update({ start_time, end_time }).eq('id', id);
-
-  if (error) {
-    return c.json({ error: error.message }, 500);
-  }
-
-  return c.json(data, 200);
+  return c.json(data, 201);
 });
 
 matches.openapi(updateMatchWinner, async (c) => {
@@ -106,17 +94,95 @@ matches.openapi(updateMatchWinner, async (c) => {
   return c.json(data, 200);
 });
 
-matches.openapi(deleteMatch, async (c) => {
+matches.openapi(updateMatch, async (c) => {
+  console.log('GROS NIQUE');
   const { id } = c.req.valid('param');
+  const { start_time, end_time } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error } = await supabase.from('MATCHES').delete().eq('id', id);
+  if (start_time >= end_time) return c.json({ error: 'Start time must be before end time' }, 400);
+
+  const { data: matchData, error: matchError } = await supabase.from('MATCHES').select('*').eq('id', id).single();
+
+  if (matchError || !matchData) {
+    return c.json({ error: 'Match not found' }, 404);
+  }
+
+  if (matchData.start_time && new Date(matchData.start_time) < new Date()) {
+    return c.json({ error: 'Match already started' }, 400);
+  }
+
+  if (matchData.end_time && new Date(matchData.end_time) < new Date()) {
+    return c.json({ error: 'Match already ended' }, 400);
+  }
+
+  const { data, error } = await supabase
+    .from('MATCHES')
+    .update({ start_time, end_time })
+    .eq('id', id)
+    .select()
+    .single();
 
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
   return c.json(data, 200);
+});
+
+matches.openapi(createMatchTournament, async (c) => {
+  const { id, id_tournament } = c.req.valid('param');
+  const { round } = c.req.valid('json');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { data, error } = await supabase
+    .from('TOURNAMENTS_MATCHES')
+    .insert({ id_match: id, id_tournament, round })
+    .eq('id_match', id)
+    .select()
+    .single();
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  return c.json(data, 201);
+});
+
+matches.openapi(deleteMatchTournament, async (c) => {
+  const { id, id_tournament } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { error } = await supabase
+    .from('TOURNAMENTS_MATCHES')
+    .delete()
+    .eq('id_match', id)
+    .eq('id_tournament', id_tournament);
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  return c.json({ message: 'Match deleted from tournament' }, 200);
+});
+
+matches.openapi(deleteMatch, async (c) => {
+  const { id } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { error } = await supabase.from('MATCHES').delete().eq('id', id);
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  return c.json({ message: 'Match deleted' }, 200);
 });

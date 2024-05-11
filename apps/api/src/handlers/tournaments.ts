@@ -116,13 +116,13 @@ tournaments.openapi(deleteTournament, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error } = await supabase.from('TOURNAMENTS').delete().eq('id', id);
+  const { error } = await supabase.from('TOURNAMENTS').delete().eq('id', id);
 
-  if (error || !data) {
+  if (error) {
     return c.json({ error: 'Failed to delete tournament' }, 500);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: 'Tournament deleted' }, 200);
 });
 
 tournaments.openapi(getTournamentTeams, async (c) => {
@@ -191,13 +191,13 @@ tournaments.openapi(deleteTeam, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error } = await supabase.from('TEAMS').delete().eq('id', id_team).eq('id_tournament', id);
+  const { error } = await supabase.from('TEAMS').delete().eq('id', id_team).eq('id_tournament', id);
 
-  if (error || !data) {
+  if (error) {
     return c.json({ error: 'Failed to delete team' }, 500);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: 'Team deleted' }, 200);
 });
 
 tournaments.openapi(joinTeam, async (c) => {
@@ -235,11 +235,13 @@ tournaments.openapi(leaveTeam, async (c) => {
   const roles = user.roles;
   await checkRole(roles, true);
 
-  const { data, error } = await supabase.from('USERS_TEAMS').delete().eq('id', id_team).eq('id_tournament', id);
+  const { error } = await supabase.from('USERS_TEAMS').delete().eq('id_user', user.id).eq('id_team', id_team);
 
-  if (error || !data) {
+  console.log(error);
+
+  if (error) {
     return c.json({ error: 'Failed to leave team' }, 500);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: 'Team left' }, 200);
 });

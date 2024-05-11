@@ -13,7 +13,7 @@ VALUES
 INSERT INTO "public"."REASONS" ("id", "reason")
 VALUES
   (1, 'Spam'),
-  (2, "Insultes ou harcèlement"),
-  (3, "Informations mensongères ou glorification de la violence"),
-  (4, "Divulgation d'informations privé permettant d'identifier une personne"),
-  (5, "Autre raison");
+  (2, 'Insultes ou harcèlement'),
+  (3, 'Informations mensongères ou glorification de la violence'),
+  (4, 'Divulgation d''informations privé permettant d''identifier une personne'),
+  (5, 'Autre raison');

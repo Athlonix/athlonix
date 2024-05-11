@@ -20,8 +20,8 @@ export const getAllMatches = createRoute({
             data: z.array(
               z.object({
                 id: z.number(),
-                match_start_time: z.string().datetime(),
-                match_end_time: z.string().datetime(),
+                start_time: z.string().datetime(),
+                end_time: z.string().datetime(),
                 winner: z.array(z.boolean().nullable()),
               }),
             ),
@@ -50,8 +50,8 @@ export const getMatchById = createRoute({
           schema: {
             data: z.object({
               id: z.number(),
-              match_start_time: z.string().datetime(),
-              match_end_time: z.string().datetime(),
+              start_time: z.string().datetime(),
+              end_time: z.string().datetime(),
               winner: z.array(z.boolean().nullable()),
             }),
           },
@@ -75,9 +75,8 @@ export const createMatch = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            match_start_time: z.string().datetime(),
-            match_end_time: z.string().datetime(),
-            winner: z.array(z.boolean().nullable()),
+            start_time: z.string().datetime(),
+            end_time: z.string().datetime(),
           }),
         },
       },
@@ -133,8 +132,8 @@ export const updateMatch = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            match_start_time: z.string().datetime(),
-            match_end_time: z.string().datetime(),
+            start_time: z.string().datetime(),
+            end_time: z.string().datetime(),
           }),
         },
       },
@@ -158,12 +157,10 @@ export const updateMatchWinner = createRoute({
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
-    request: {
-      query: z.object({
-        idTeam: z.number().min(1),
-        winner: z.boolean(),
-      }),
-    },
+    query: z.object({
+      idTeam: z.number().min(1),
+      winner: z.boolean(),
+    }),
   },
   responses: {
     200: {

@@ -73,7 +73,7 @@ export const createTournament = createRoute({
   path: '/tournaments',
   summary: 'Create a tournament',
   description: 'Create a tournament',
-  security: [{ bearerAuth: [] }],
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     body: {
@@ -111,7 +111,7 @@ export const updateTournament = createRoute({
   path: '/tournaments/{id}',
   summary: 'Update a tournament',
   description: 'Update a tournament',
-  security: [{ bearerAuth: [] }],
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -151,13 +151,13 @@ export const deleteTournament = createRoute({
   path: '/tournaments/{id}',
   summary: 'Delete a tournament',
   description: 'Delete a tournament',
-  security: [{ bearerAuth: [] }],
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
   },
   responses: {
-    204: {
+    200: {
       description: 'Successful response',
     },
     500: serverErrorSchema,
@@ -235,7 +235,7 @@ export const createTeams = createRoute({
   path: '/tournaments/{id}/teams',
   summary: 'Create a team for a tournament',
   description: 'Create a team for a tournament',
-  security: [{ bearerAuth: [] }],
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
@@ -272,7 +272,7 @@ export const updateTeam = createRoute({
   path: '/tournaments/{id}/teams/{id_team}',
   summary: 'Update a team of a tournament',
   description: 'Update a team of a tournament',
-  security: [{ bearerAuth: [] }],
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: z.object({
@@ -313,7 +313,7 @@ export const deleteTeam = createRoute({
   path: '/tournaments/{id}/teams/{id_team}',
   summary: 'Delete a team of a tournament',
   description: 'Delete a team of a tournament',
-  security: [{ bearerAuth: [] }],
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: z.object({
@@ -322,7 +322,7 @@ export const deleteTeam = createRoute({
     }),
   },
   responses: {
-    204: {
+    200: {
       description: 'Successful response',
     },
     500: serverErrorSchema,
@@ -336,7 +336,7 @@ export const joinTeam = createRoute({
   path: '/tournaments/{id}/teams/{id_team}/join',
   summary: 'Join a team of a tournament',
   description: 'Join a team of a tournament',
-  security: [{ bearerAuth: [] }],
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: z.object({
@@ -345,7 +345,7 @@ export const joinTeam = createRoute({
     }),
   },
   responses: {
-    204: {
+    200: {
       description: 'Successful response',
     },
     500: serverErrorSchema,
@@ -355,11 +355,11 @@ export const joinTeam = createRoute({
 });
 
 export const leaveTeam = createRoute({
-  method: 'post',
+  method: 'delete',
   path: '/tournaments/{id}/teams/{id_team}/leave',
   summary: 'Leave a team of a tournament',
   description: 'Leave a team of a tournament',
-  security: [{ bearerAuth: [] }],
+  security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: z.object({
@@ -368,7 +368,7 @@ export const leaveTeam = createRoute({
     }),
   },
   responses: {
-    204: {
+    200: {
       description: 'Successful response',
     },
     500: serverErrorSchema,

@@ -13,9 +13,11 @@ import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
 import { health } from './handlers/health.js';
 import { location } from './handlers/location.js';
+import { matches } from './handlers/matches.js';
 import { reasons } from './handlers/reasons.js';
 import { reports } from './handlers/reports.js';
 import { sports } from './handlers/sports.js';
+import { tournaments } from './handlers/tournaments.js';
 import { users } from './handlers/users.js';
 import { polls } from './handlers/votes.js';
 
@@ -54,6 +56,8 @@ app.route('/auth', auth);
 app.route('/blog', blog);
 app.route('/', reasons);
 app.route('/', reports);
+app.route('/', matches);
+app.route('/', tournaments);
 
 app.doc('/doc', (c: Context) => ({
   openapi: '3.0.0',

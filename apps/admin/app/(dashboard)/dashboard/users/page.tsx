@@ -1,5 +1,6 @@
 'use client';
 
+import PaginationComponent from '@/app/ui/Pagination';
 import AddUser from '@/app/ui/dashboard/users/AddUser';
 import UsersList from '@/app/ui/dashboard/users/UsersList';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
@@ -127,75 +128,7 @@ function ShowContent() {
           </Table>
         </CardContent>
         <CardFooter>
-          <Pagination>
-            <PaginationContent>
-              {page > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/users?page=${page - 1}`}
-                  />
-                </PaginationItem>
-              )}
-              {page > 3 && (
-                <PaginationItem>
-                  <PaginationLink
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/users?page=${page - 2}`}
-                  >
-                    {page - 2}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              {page > 2 && (
-                <PaginationItem>
-                  <PaginationLink
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/users?page=${page - 1}`}
-                  >
-                    {page - 1}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              <PaginationItem>
-                <PaginationLink
-                  className="border border-gray-500 rounded-lg"
-                  href={`/dashboard/users?page=${page}`}
-                  isActive
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-              {page < maxPage && (
-                <PaginationItem>
-                  <PaginationLink
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/users?page=${page + 1}`}
-                  >
-                    {page + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              {page < maxPage - 1 && (
-                <PaginationItem>
-                  <PaginationLink
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/users?page=${page + 2}`}
-                  >
-                    {page + 2}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              {page < maxPage && (
-                <PaginationItem>
-                  <PaginationNext
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/users?page=${page + 1}`}
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
+          <PaginationComponent page={page} maxPage={maxPage} href="/dashboard/users" />
         </CardFooter>
       </Card>
     </TabsContent>

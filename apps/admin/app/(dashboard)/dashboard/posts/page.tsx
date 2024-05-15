@@ -1,15 +1,8 @@
 'use client';
 
+import PaginationComponent from '@/app/ui/Pagination';
 import PostsList from '@/app/ui/dashboard/posts/PostsList';
 import { Input } from '@repo/ui/components/ui/input';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@repo/ui/components/ui/pagination';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -96,63 +89,7 @@ function ShowContent() {
           <PostsList posts={posts} />
         </div>
       </div>
-      <Pagination>
-        <PaginationContent>
-          {page > 1 && (
-            <PaginationItem>
-              <PaginationPrevious
-                className="border border-gray-500 rounded-lg"
-                href={`/dashboard/posts?page=${page - 1}`}
-              />
-            </PaginationItem>
-          )}
-          {page > 3 && (
-            <PaginationItem>
-              <PaginationLink className="border border-gray-500 rounded-lg" href={`/dashboard/posts?page=${page - 2}`}>
-                {page - 2}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-          {page > 2 && (
-            <PaginationItem>
-              <PaginationLink className="border border-gray-500 rounded-lg" href={`/dashboard/posts?page=${page - 1}`}>
-                {page - 1}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-          <PaginationItem>
-            <PaginationLink
-              className="border border-gray-500 rounded-lg"
-              href={`/dashboard/posts?page=${page}`}
-              isActive
-            >
-              {page}
-            </PaginationLink>
-          </PaginationItem>
-          {page < maxPage && (
-            <PaginationItem>
-              <PaginationLink className="border border-gray-500 rounded-lg" href={`/dashboard/posts?page=${page + 1}`}>
-                {page + 1}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-          {page < maxPage - 1 && (
-            <PaginationItem>
-              <PaginationLink className="border border-gray-500 rounded-lg" href={`/dashboard/posts?page=${page + 2}`}>
-                {page + 2}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-          {page < maxPage && (
-            <PaginationItem>
-              <PaginationNext
-                className="border border-gray-500 rounded-lg"
-                href={`/dashboard/posts?page=${page + 1}`}
-              />
-            </PaginationItem>
-          )}
-        </PaginationContent>
-      </Pagination>
+      <PaginationComponent page={page} maxPage={maxPage} href="/dashboard/posts" />
     </>
   );
 }

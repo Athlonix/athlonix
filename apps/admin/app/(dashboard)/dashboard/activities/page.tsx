@@ -1,17 +1,10 @@
 'use client';
 
+import PaginationComponent from '@/app/ui/Pagination';
 import ActivitiesList from '@/app/ui/dashboard/activities/ActivitiesList';
 import AddActivity from '@/app/ui/dashboard/activities/AddActivity';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@repo/ui/components/ui/pagination';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
 import { useSearchParams } from 'next/navigation';
@@ -152,75 +145,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
           </Table>
         </CardContent>
         <CardFooter>
-          <Pagination>
-            <PaginationContent>
-              {page > 1 && (
-                <PaginationItem>
-                  <PaginationPrevious
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/activities?page=${page - 1}`}
-                  />
-                </PaginationItem>
-              )}
-              {page > 3 && (
-                <PaginationItem>
-                  <PaginationLink
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/activities?page=${page - 2}`}
-                  >
-                    {page - 2}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              {page > 2 && (
-                <PaginationItem>
-                  <PaginationLink
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/activities?page=${page - 1}`}
-                  >
-                    {page - 1}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              <PaginationItem>
-                <PaginationLink
-                  className="border border-gray-500 rounded-lg"
-                  href={`/dashboard/activities?page=${page}`}
-                  isActive
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-              {page < maxPage && (
-                <PaginationItem>
-                  <PaginationLink
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/activities?page=${page + 1}`}
-                  >
-                    {page + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              {page < maxPage - 1 && (
-                <PaginationItem>
-                  <PaginationLink
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/activities?page=${page + 2}`}
-                  >
-                    {page + 2}
-                  </PaginationLink>
-                </PaginationItem>
-              )}
-              {page < maxPage && (
-                <PaginationItem>
-                  <PaginationNext
-                    className="border border-gray-500 rounded-lg"
-                    href={`/dashboard/activities?page=${page + 1}`}
-                  />
-                </PaginationItem>
-              )}
-            </PaginationContent>
-          </Pagination>
+          <PaginationComponent page={page} maxPage={maxPage} href="/dashboard/activities" />
         </CardFooter>
       </Card>
     </TabsContent>

@@ -1,6 +1,8 @@
 'use client';
 
 import PaginationComponent from '@/app/ui/Pagination';
+import AddTournaments from '@/app/ui/dashboard/tournaments/AddTournaments';
+import TournamentsList from '@/app/ui/dashboard/tournaments/TournamentsList';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
@@ -29,7 +31,7 @@ type Address = {
   name: string | null;
 };
 
-function ShowContent(): JSX.Element {
+function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
   let page = searchParams.get('page') || 1;
@@ -84,7 +86,7 @@ function ShowContent(): JSX.Element {
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Tournois</CardTitle>
-          {/* <AddActivity activities={activities} setActivities={setActivities} addresses={addresses} sports={sports} /> */}
+          <AddTournaments tournaments={tournaments} setTournaments={setTournaments} addresses={addresses} />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">
@@ -110,7 +112,7 @@ function ShowContent(): JSX.Element {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {/* <ActivitiesList activities={activities} sports={sports} addresses={addresses} /> */}
+              <TournamentsList tournaments={tournaments} addresses={addresses} />
             </TableBody>
           </Table>
         </CardContent>
@@ -123,13 +125,39 @@ function ShowContent(): JSX.Element {
 }
 
 function page() {
+  const urlApi = process.env.NEXT_PUBLIC_API_URL;
+  const router = useRouter();
+  const [addresses, setAddresses] = useState<Address[]>([]);
+
+  useEffect(() => {
+    fetch(`${urlApi}/addresses`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setAddresses(data.data);
+      })
+      .catch((error: Error) => {
+        console.log(error);
+      });
+  }, [router.push, urlApi]);
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
       <div className="flex flex-col h-full">
         <div className="grid flex-1 items-start">
           <Tabs defaultValue="all">
             <Suspense>
-              <ShowContent />
+              <ShowContent addresses={addresses} />
             </Suspense>
           </Tabs>
         </div>

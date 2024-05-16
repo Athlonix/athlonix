@@ -237,8 +237,6 @@ tournaments.openapi(leaveTeam, async (c) => {
 
   const { error } = await supabase.from('USERS_TEAMS').delete().eq('id_user', user.id).eq('id_team', id_team);
 
-  console.log(error);
-
   if (error) {
     return c.json({ error: 'Failed to leave team' }, 500);
   }

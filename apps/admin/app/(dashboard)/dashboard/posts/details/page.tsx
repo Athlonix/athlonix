@@ -160,7 +160,6 @@ function ShowReports() {
         return response.json();
       })
       .then((response) => {
-        console.log(response);
         router.push('/dashboard/posts');
       });
 

@@ -95,7 +95,6 @@ matches.openapi(updateMatchWinner, async (c) => {
 });
 
 matches.openapi(updateMatch, async (c) => {
-  console.log('GROS NIQUE');
   const { id } = c.req.valid('param');
   const { start_time, end_time } = c.req.valid('json');
   const user = c.get('user');

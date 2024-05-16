@@ -119,7 +119,6 @@ function EditForm(props: EditFormProps): JSX.Element {
       roles.map((role) => ({ id: role.id, name: role.label })).filter((role) => values.roles?.includes(role.id)),
     );
 
-    console.log('testo');
     toast.success('Succès', { duration: 2000, description: 'Utilisateur modifié avec succès' });
 
     props.closeDialog();

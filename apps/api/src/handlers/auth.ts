@@ -105,7 +105,7 @@ auth.openapi(refreshTokens, async (c) => {
     });
   }
 
-  return c.json({ message: 'Token refreshed' });
+  return c.json({ message: 'Token refreshed' }, 200);
 });
 
 auth.openapi(logoutUser, async (c) => {
@@ -119,5 +119,5 @@ auth.openapi(logoutUser, async (c) => {
     }
   }
 
-  return c.json({ message: 'Logged out' });
+  return c.json({ message: 'Logged out' }, 200);
 });

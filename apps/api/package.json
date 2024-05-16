@@ -17,21 +17,21 @@
   "dependencies": {
     "@hono/node-server": "^1.11.1",
     "@hono/swagger-ui": "^0.2.2",
-    "@hono/zod-openapi": "^0.11.1",
+    "@hono/zod-openapi": "0.11.1",
     "@hono/zod-validator": "^0.2.1",
     "@repo/types": "workspace:*",
-    "@supabase/supabase-js": "^2.43.1",
-    "hono": "^4.3.4",
+    "@supabase/supabase-js": "^2.43.2",
+    "hono": "^4.3.7",
     "zod": "^3.23.8",
     "zod-validation-error": "^3.3.0"
   },
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^20.12.11",
+    "@types/node": "^20.12.12",
     "@types/swagger-ui-dist": "^3.30.4",
-    "supabase": "^1.165.0",
-    "tsx": "^4.9.5",
+    "supabase": "^1.167.4",
+    "tsx": "^4.10.3",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   }

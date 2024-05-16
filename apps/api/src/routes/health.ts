@@ -1,4 +1,5 @@
-import { createRoute } from '@hono/zod-openapi';
+import { createRoute, z } from '@hono/zod-openapi';
+import { serverErrorSchema } from '../validators/general.js';
 
 export const healthCheck = createRoute({
   method: 'get',
@@ -9,12 +10,13 @@ export const healthCheck = createRoute({
     200: {
       description: 'Successful response',
       content: {
-        'application/json': {
+        'text/plain': {
           schema: { type: 'string' },
         },
       },
     },
   },
+  500: serverErrorSchema,
   tags: ['health'],
 });
 
@@ -27,11 +29,12 @@ export const dbHealthCheck = createRoute({
     200: {
       description: 'Successful response',
       content: {
-        'application/json': {
+        'text/plain': {
           schema: { type: 'string' },
         },
       },
     },
   },
+  500: serverErrorSchema,
   tags: ['health'],
 });

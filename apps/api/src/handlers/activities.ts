@@ -42,13 +42,8 @@ activities.openapi(getAllActivities, async (c) => {
     return c.json({ error: error.message }, 500);
   }
 
-  const cleanData = data.map((activity) => {
-    const { id_sport, ...cleaned } = activity;
-    return cleaned;
-  });
-
   const responseData = {
-    data: cleanData || [],
+    data: data || [],
     count: count || 0,
   };
 
@@ -57,13 +52,17 @@ activities.openapi(getAllActivities, async (c) => {
 
 activities.openapi(getOneActivity, async (c) => {
   const { id } = c.req.valid('param');
-  const { data, error } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
+  try {
+    const { data, error } = await supabase.from('ACTIVITIES').select('*, sport:SPORTS (id,name)').eq('id', id).single();
 
-  if (error || !data) {
-    return c.json({ error: 'Activity not found' }, 404);
+    if (error || !data) {
+      return c.json({ error: 'Activity not found' }, 404);
+    }
+
+    return c.json(data, 200);
+  } catch (error) {
+    return c.json({ error: 'Activity not found' }, 500);
   }
-
-  return c.json(data, 200);
 });
 
 activities.openapi(createActivity, async (c) => {

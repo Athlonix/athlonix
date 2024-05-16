@@ -12,5 +12,5 @@ health.openapi(dbHealthCheck, (c) => {
   if (supabase) {
     return c.json('OK', 200);
   }
-  return c.json('Failed', 500);
+  return c.json({ error: 'Database connection error' }, 500);
 });

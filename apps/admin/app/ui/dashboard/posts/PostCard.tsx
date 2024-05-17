@@ -2,7 +2,6 @@ import { Card, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/
 import { Separator } from '@repo/ui/components/ui/separator';
 import { CircleAlert, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
 
 type Post = {
   id: number;

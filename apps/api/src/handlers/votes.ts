@@ -133,7 +133,7 @@ polls.openapi(deletePoll, async (c) => {
   const { error } = await supabase.from('POLLS').delete().eq('id', id);
 
   if (error) {
-    return c.json({ error: 'Failed to delete poll' }, 400);
+    return c.json({ error: 'Poll not found' }, 404);
   }
 
   return c.json({ message: 'Poll deleted' }, 200);

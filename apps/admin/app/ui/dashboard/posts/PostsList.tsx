@@ -1,5 +1,4 @@
 import PostCard from '@/app/ui/dashboard/posts/PostCard';
-import React from 'react';
 
 type Post = {
   id: number;

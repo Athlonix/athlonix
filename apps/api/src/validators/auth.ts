@@ -27,16 +27,22 @@ export type selectUser = {
 };
 
 export const userSchema = z.object({
-  id: z.number(),
+  id: z.number().min(1),
   email: z.string().email(),
   username: z.string().min(2),
   first_name: z.string().min(2),
   last_name: z.string().min(2),
-  id_referer: z.number(),
-  id_auth: z.number(),
+  id_referer: z.number().nullable(),
+  id_auth: z.string().nullable(),
   date_validity: z.string().datetime().nullable(),
   created_at: z.string().datetime(),
-  roles: z.array(z.number().min(1)).nullable(),
+  roles: z.object({ id: z.number(), name: z.string() }).array(),
+  deleted_at: z.string().datetime().nullable(),
+});
+
+export const loginResponseSchema = z.object({
+  user: userSchema,
+  token: z.string(),
 });
 
 export const loginSchema = z.object({

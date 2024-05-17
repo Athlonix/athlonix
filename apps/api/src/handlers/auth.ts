@@ -16,7 +16,7 @@ auth.openapi(signupUser, async (c) => {
 
   const { data: userExist } = await supabase.from('USERS').select('id').eq('email', email);
   if (userExist && userExist.length > 0) {
-    return c.json({ message: 'Email already exists' }, 400);
+    return c.json({ error: 'Email already exists' }, 400);
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -25,7 +25,7 @@ auth.openapi(signupUser, async (c) => {
   });
 
   if (error || !data?.user?.email) {
-    return c.json({ message: 'Error while creating user' }, 400);
+    return c.json({ error: 'Error while creating user' }, 400);
   }
 
   const { data: user, error: insertError } = await supabase
@@ -39,12 +39,13 @@ auth.openapi(signupUser, async (c) => {
       date_validity: null,
       id_auth: data.user.id,
       created_at: new Date().toISOString(),
+      deleted_at: null,
     })
     .select()
     .single();
 
   if (insertError) {
-    return c.json({ message: 'Error while creating user' }, 400);
+    return c.json({ error: 'Error while creating user' }, 400);
   }
 
   return c.json(user, 201);
@@ -105,7 +106,7 @@ auth.openapi(refreshTokens, async (c) => {
     });
   }
 
-  return c.json({ message: 'Token refreshed' });
+  return c.json({ message: 'Token refreshed' }, 200);
 });
 
 auth.openapi(logoutUser, async (c) => {
@@ -119,5 +120,5 @@ auth.openapi(logoutUser, async (c) => {
     }
   }
 
-  return c.json({ message: 'Logged out' });
+  return c.json({ message: 'Logged out' }, 200);
 });

@@ -27,7 +27,9 @@ export const serverErrorSchema = {
   description: 'Internal server error',
   content: {
     'application/json': {
-      schema: z.object({ error: z.string() }),
+      schema: z.object({
+        error: z.string(),
+      }),
     },
   },
 };

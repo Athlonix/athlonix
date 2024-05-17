@@ -1,5 +1,5 @@
-import { createRoute } from '@hono/zod-openapi';
-import { loginSchema, signUpSchema } from '../validators/auth.js';
+import { createRoute, z } from '@hono/zod-openapi';
+import { loginResponseSchema, loginSchema, signUpSchema, userSchema } from '../validators/auth.js';
 import { badRequestSchema, serverErrorSchema } from '../validators/general.js';
 
 export const signupUser = createRoute({
@@ -21,7 +21,7 @@ export const signupUser = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: userSchema.omit({ roles: true }),
         },
       },
     },
@@ -50,7 +50,7 @@ export const loginUser = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: loginResponseSchema,
         },
       },
     },
@@ -70,7 +70,9 @@ export const refreshTokens = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: z.object({
+            message: z.string(),
+          }),
         },
       },
     },
@@ -89,7 +91,9 @@ export const logoutUser = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: z.object({
+            message: z.string(),
+          }),
         },
       },
     },

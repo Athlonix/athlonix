@@ -1,7 +1,6 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
-import { queryAllSchema } from '../utils/pagnination.js';
-import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getReasons = createRoute({
   method: 'get',
@@ -83,6 +82,7 @@ export const createReason = createRoute({
         },
       },
     },
+    400: badRequestSchema,
     500: serverErrorSchema,
   },
   tags: ['reason'],
@@ -120,6 +120,7 @@ export const updateReason = createRoute({
       },
     },
     404: notFoundSchema,
+    400: badRequestSchema,
     500: serverErrorSchema,
   },
   tags: ['reason'],
@@ -140,7 +141,9 @@ export const deleteReason = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: z.object({
+            message: z.string(),
+          }),
         },
       },
     },

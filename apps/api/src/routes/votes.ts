@@ -1,7 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
-import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const pollsSchema = z.object({
   id: z.number().positive(),
@@ -11,7 +11,7 @@ export const pollsSchema = z.object({
   end_at: z.string().datetime(),
   max_choices: z.number().min(1),
   id_user: z.number().positive(),
-  results: z.array(z.object({ id_option: z.number().positive(), votes: z.number().positive(), content: z.string() })),
+  results: z.array(z.object({ id: z.number().positive(), votes: z.number().positive(), content: z.string() })),
 });
 
 export const createPollSchema = z.object({
@@ -35,12 +35,6 @@ export const voteSchema = z.object({
   id_poll: z.number(),
 });
 
-export const pollResultSchema = z.object({
-  id: z.number(),
-  title: z.string().max(50),
-  results: z.array(z.object({ id: z.number(), content: z.string(), votes: z.number() })),
-});
-
 export const createPoll = createRoute({
   method: 'post',
   path: '/polls',
@@ -62,12 +56,11 @@ export const createPoll = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: pollsSchema,
-          },
+          schema: pollsSchema.omit({ results: true }),
         },
       },
     },
+    400: badRequestSchema,
     500: serverErrorSchema,
   },
   tags: ['poll'],
@@ -88,9 +81,7 @@ export const getAllPolls = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: z.array(pollsSchema),
-          },
+          schema: z.array(pollsSchema),
         },
       },
     },
@@ -114,9 +105,7 @@ export const getOnePoll = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: pollsSchema,
-          },
+          schema: pollsSchema,
         },
       },
     },
@@ -148,14 +137,13 @@ export const updatePoll = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: pollsSchema,
-          },
+          schema: pollsSchema.omit({ results: true }),
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
 
   tags: ['poll'],
@@ -172,8 +160,13 @@ export const deletePoll = createRoute({
     params: idParamValidator,
   },
   responses: {
-    204: {
+    200: {
       description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ message: z.string() }),
+        },
+      },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
@@ -203,12 +196,13 @@ export const voteToPoll = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: z.object({ message: z.string() }),
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['poll'],
 });

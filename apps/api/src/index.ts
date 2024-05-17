@@ -41,9 +41,9 @@ app.get('/', (c) => c.text('Athlonix API!', 200));
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
-    return err.getResponse();
+    return c.json({ error: err.message }, err.status || 500);
   }
-  return c.json({ message: 'Internal server error' }, 500);
+  return c.json({ error: 'Internal server error' }, 500);
 });
 
 app.route('/', health);

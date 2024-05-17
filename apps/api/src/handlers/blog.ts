@@ -60,17 +60,20 @@ blog.openapi(getAllPosts, async (c) => {
   const finalData = data.map((row) => {
     return {
       ...row,
-      categories: row.categories.map((category) => ({
-        id: category.CATEGORIES?.id,
-        name: category.CATEGORIES?.name,
-      })),
-      comments_number: row.comments_number[0]?.count,
-      views_number: row.views_number[0]?.count,
-      likes_number: row.likes_number[0]?.count,
+      author: row.author ? { id: row.author.id, username: row.author.username } : null,
+      categories: row.categories
+        ? row.categories.map((category) => ({
+            id: category.CATEGORIES?.id ?? null,
+            name: category.CATEGORIES?.name ?? null,
+          }))
+        : [],
+      comments_number: row.comments_number[0]?.count || 0,
+      views_number: row.views_number[0]?.count || 0,
+      likes_number: row.likes_number[0]?.count || 0,
     };
   });
 
-  return c.json({ data: finalData, count }, 200);
+  return c.json({ data: finalData, count: count || 0 }, 200);
 });
 
 blog.openapi(getPost, async (c) => {
@@ -243,7 +246,7 @@ blog.openapi(getComments, async (c) => {
     return c.json({ error: "Failed to get comments, verify the post's id" }, 400);
   }
 
-  return c.json({ data, count }, 200);
+  return c.json({ data, count: count || 0 }, 200);
 });
 
 blog.openapi(createResponse, async (c) => {

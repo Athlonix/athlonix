@@ -4,7 +4,7 @@ import { queryAllSchema } from '../utils/pagnination.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const sportSchema = z.object({
-  id: z.number().min(0),
+  id: z.number().min(1),
   name: z.string().max(50),
   description: z.string().max(255).nullable(),
   min_players: z.number().min(1),

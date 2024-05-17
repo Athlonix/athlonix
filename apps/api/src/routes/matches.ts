@@ -3,8 +3,8 @@ import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
-export const getAllMatchesSchema = z.object({
-  id: z.number().min(0),
+export const matchSchema = z.object({
+  id: z.number().min(1),
   start_time: z.string().datetime().nullable(),
   end_time: z.string().datetime().nullable(),
   winner: z
@@ -12,13 +12,8 @@ export const getAllMatchesSchema = z.object({
       winner: z.boolean().nullable(),
       id_team: z.number(),
     })
-    .nullable(),
-});
-
-export const matchSchema = z.object({
-  id: z.number().min(0),
-  start_time: z.string().datetime().nullable(),
-  end_time: z.string().datetime().nullable(),
+    .nullable()
+    .optional(),
 });
 
 export const createMatchSchema = z.object({
@@ -40,7 +35,7 @@ export const getAllMatches = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            data: z.array(getAllMatchesSchema),
+            data: z.array(matchSchema),
             count: z.number(),
           }),
         },
@@ -64,7 +59,7 @@ export const getMatchById = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: getAllMatchesSchema,
+          schema: matchSchema,
         },
       },
     },

@@ -12,13 +12,15 @@ export const postCardSchemaResponse = z.object({
   id: z.number().min(1),
   title: z.string(),
   created_at: z.string(),
-  cover_image: z.string(),
-  description: z.string(),
-  author: z.object({ id: z.number(), username: z.string() }),
-  categories: z.object({ id: z.number(), name: z.string() }).array(),
-  comments_number: z.number(),
-  views_number: z.number(),
-  likes_number: z.number(),
+  cover_image: z.string().nullable(),
+  description: z.string().nullable(),
+  author: z.object({ id: z.number(), username: z.string() }).nullable(),
+  categories: z.object({ id: z.number().nullable(), name: z.string().nullable() }).array(),
+  comments: z.object({ id: z.number() }).array(),
+  reports: z.object({ id: z.number() }).array(),
+  comments_number: z.number().min(0),
+  views_number: z.number().min(0),
+  likes_number: z.number().min(0),
 });
 
 export const postCardListSchemaResponse = z.array(postCardSchemaResponse);

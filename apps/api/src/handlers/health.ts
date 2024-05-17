@@ -8,9 +8,9 @@ health.openapi(healthCheck, (c) => {
   return c.json('OK', 200);
 });
 
-health.openapi(dbHealthCheck, (c) => {
-  if (supabase) {
-    return c.json('OK', 200);
-  }
-  return c.json({ error: 'Database connection error' }, 500);
-});
+// health.openapi(dbHealthCheck, (c) => {
+//   if (supabase) {
+//     return c.json('OK', 200);
+//   }
+//   return c.json({ error: 'Database connection error' }, 500);
+// });

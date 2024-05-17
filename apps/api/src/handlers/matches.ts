@@ -24,7 +24,7 @@ matches.openapi(getAllMatches, async (c) => {
 
   const query = supabase
     .from('MATCHES')
-    .select('*, winner:TEAMS_MATCHES(winner)', { count: 'exact' })
+    .select('*, winner:TEAMS_MATCHES(winner, id_team)', { count: 'exact' })
     .order('id', { ascending: true });
 
   if (search) {
@@ -52,7 +52,11 @@ matches.openapi(getAllMatches, async (c) => {
 
 matches.openapi(getMatchById, async (c) => {
   const { id } = c.req.valid('param');
-  const { data, error } = await supabase.from('MATCHES').select('*').eq('id', id).single();
+  const { data, error } = await supabase
+    .from('MATCHES')
+    .select('*, winner:TEAMS_MATCHES(winner, id_team)')
+    .eq('id', id)
+    .single();
 
   if (error || !data) {
     return c.json({ error: 'Match not found' }, 404);
@@ -67,7 +71,8 @@ matches.openapi(createMatch, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  if (start_time >= end_time) return c.json({ error: 'Start time must be before end time' }, 400);
+  if (start_time && end_time && start_time >= end_time)
+    return c.json({ error: 'Start time must be before end time' }, 400);
 
   const { data, error } = await supabase.from('MATCHES').insert({ start_time, end_time }).select().single();
 
@@ -85,13 +90,13 @@ matches.openapi(updateMatchWinner, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error } = await supabase.from('TEAMS_MATCHES').update({ id_team: idTeam, winner }).eq('id_match', id);
+  const { error } = await supabase.from('TEAMS_MATCHES').update({ id_team: idTeam, winner }).eq('id_match', id);
 
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json(data, 200);
+  return c.json({ message: 'Match winner updated' }, 200);
 });
 
 matches.openapi(updateMatch, async (c) => {

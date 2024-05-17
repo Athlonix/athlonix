@@ -20,7 +20,7 @@ export const getReports = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
+          schema: z.object({
             data: z.array(
               z.object({
                 id: z.number().min(1),
@@ -31,11 +31,13 @@ export const getReports = createRoute({
                 id_comment: z.number().min(1).nullable(),
               }),
             ),
-          },
+            count: z.number(),
+          }),
         },
       },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
   },
   tags: ['report'],
 });
@@ -99,6 +101,13 @@ export const deleteReport = createRoute({
   responses: {
     200: {
       description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string(),
+          }),
+        },
+      },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
@@ -122,7 +131,7 @@ export const getReportComments = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
+          schema: z.object({
             data: z.array(
               z.object({
                 id: z.number().min(1),
@@ -133,11 +142,13 @@ export const getReportComments = createRoute({
                 id_comment: z.number().min(1).nullable(),
               }),
             ),
-          },
+            count: z.number(),
+          }),
         },
       },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
     404: notFoundSchema,
   },
   tags: ['report'],

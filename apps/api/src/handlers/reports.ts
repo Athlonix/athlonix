@@ -29,10 +29,15 @@ reports.openapi(getReports, async (c) => {
   const { data, error, count } = await query;
 
   if (error) {
-    return c.json({ error: 'Failed to get reports' }, 400);
+    return c.json({ error: 'Failed to get reports' }, 500);
   }
 
-  return c.json({ data, count }, 200);
+  const responseData = {
+    data: data || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
 });
 
 reports.openapi(createReport, async (c) => {
@@ -106,7 +111,12 @@ reports.openapi(getReportComments, async (c) => {
     return c.json({ error: 'Failed to get comments' }, 400);
   }
 
-  return c.json({ data, count }, 200);
+  const responseData = {
+    data: data || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
 });
 
 reports.openapi(createReportComment, async (c) => {

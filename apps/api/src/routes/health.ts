@@ -10,8 +10,8 @@ export const healthCheck = createRoute({
     200: {
       description: 'Successful response',
       content: {
-        'text/plain': {
-          schema: { type: 'string' },
+        'application/json': {
+          schema: z.string(),
         },
       },
     },
@@ -29,8 +29,8 @@ export const dbHealthCheck = createRoute({
     200: {
       description: 'Successful response',
       content: {
-        'text/plain': {
-          schema: { type: 'string' },
+        'application/json': {
+          schema: z.string(),
         },
       },
     },

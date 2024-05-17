@@ -39,7 +39,7 @@ activities.openapi(getAllActivities, async (c) => {
   const { data, error, count } = await query;
 
   if (error) {
-    return c.json({ error: error.message }, 500);
+    return c.json({ error: 'Failed to fetch activities' }, 500);
   }
 
   const responseData = {
@@ -52,17 +52,14 @@ activities.openapi(getAllActivities, async (c) => {
 
 activities.openapi(getOneActivity, async (c) => {
   const { id } = c.req.valid('param');
-  try {
-    const { data, error } = await supabase.from('ACTIVITIES').select('*, sport:SPORTS (id,name)').eq('id', id).single();
 
-    if (error || !data) {
-      return c.json({ error: 'Activity not found' }, 404);
-    }
+  const { data, error } = await supabase.from('ACTIVITIES').select('*, sport:SPORTS (id,name)').eq('id', id).single();
 
-    return c.json(data, 200);
-  } catch (error) {
-    return c.json({ error: 'Activity not found' }, 500);
+  if (error || !data) {
+    return c.json({ error: 'Activity not found' }, 404);
   }
+
+  return c.json(data, 200);
 });
 
 activities.openapi(createActivity, async (c) => {

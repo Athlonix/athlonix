@@ -1,7 +1,30 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
-import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+
+export const getAllMatchesSchema = z.object({
+  id: z.number().min(0),
+  start_time: z.string().datetime().nullable(),
+  end_time: z.string().datetime().nullable(),
+  winner: z
+    .object({
+      winner: z.boolean().nullable(),
+      id_team: z.number(),
+    })
+    .array(),
+});
+
+export const matchSchema = z.object({
+  id: z.number().min(0),
+  start_time: z.string().datetime().nullable(),
+  end_time: z.string().datetime().nullable(),
+});
+
+export const createMatchSchema = z.object({
+  start_time: z.string().datetime().nullable(),
+  end_time: z.string().datetime().nullable(),
+});
 
 export const getAllMatches = createRoute({
   method: 'get',
@@ -16,16 +39,10 @@ export const getAllMatches = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: z.array(
-              z.object({
-                id: z.number(),
-                start_time: z.string().datetime(),
-                end_time: z.string().datetime(),
-                winner: z.array(z.boolean().nullable()),
-              }),
-            ),
-          },
+          schema: z.object({
+            data: z.array(getAllMatchesSchema),
+            count: z.number(),
+          }),
         },
       },
     },
@@ -47,14 +64,7 @@ export const getMatchById = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: z.object({
-              id: z.number(),
-              start_time: z.string().datetime(),
-              end_time: z.string().datetime(),
-              winner: z.array(z.boolean().nullable()),
-            }),
-          },
+          schema: getAllMatchesSchema,
         },
       },
     },
@@ -75,10 +85,7 @@ export const createMatch = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: z.object({
-            start_time: z.string().datetime(),
-            end_time: z.string().datetime(),
-          }),
+          schema: createMatchSchema,
         },
       },
     },
@@ -86,8 +93,14 @@ export const createMatch = createRoute({
   responses: {
     201: {
       description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: matchSchema,
+        },
+      },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
   },
   tags: ['match'],
 });
@@ -146,9 +159,15 @@ export const updateMatch = createRoute({
   responses: {
     200: {
       description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: matchSchema,
+        },
+      },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['match'],
 });
@@ -170,6 +189,13 @@ export const updateMatchWinner = createRoute({
   responses: {
     200: {
       description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string(),
+          }),
+        },
+      },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
@@ -193,6 +219,13 @@ export const deleteMatchTournament = createRoute({
   responses: {
     200: {
       description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string(),
+          }),
+        },
+      },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
@@ -213,6 +246,13 @@ export const deleteMatch = createRoute({
   responses: {
     200: {
       description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string(),
+          }),
+        },
+      },
     },
     500: serverErrorSchema,
     404: notFoundSchema,

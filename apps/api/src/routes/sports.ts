@@ -1,12 +1,12 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
-import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const sportSchema = z.object({
-  id: z.number(),
+  id: z.number().min(0),
   name: z.string().max(50),
-  description: z.string().max(255),
+  description: z.string().max(255).nullable(),
   min_players: z.number().min(1),
   max_players: z.number().min(1).nullable(),
   image: z.string().nullable(),
@@ -25,9 +25,10 @@ export const getAllSports = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
+          schema: z.object({
             data: z.array(sportSchema),
-          },
+            count: z.number(),
+          }),
         },
       },
     },
@@ -49,9 +50,7 @@ export const getOneSport = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: sportSchema,
-          },
+          schema: sportSchema,
         },
       },
     },
@@ -82,13 +81,12 @@ export const createSport = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: sportSchema,
-          },
+          schema: sportSchema,
         },
       },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
   },
   tags: ['sport'],
 });
@@ -115,13 +113,12 @@ export const updateSport = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: sportSchema,
-          },
+          schema: sportSchema,
         },
       },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
     404: notFoundSchema,
   },
   tags: ['sport'],
@@ -142,9 +139,9 @@ export const deleteSport = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: sportSchema,
-          },
+          schema: z.object({
+            message: z.string(),
+          }),
         },
       },
     },

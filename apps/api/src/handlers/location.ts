@@ -95,7 +95,7 @@ location.openapi(deleteAddress, async (c) => {
   const { error } = await supabase.from('ADDRESSES').delete().eq('id', id);
 
   if (error) {
-    return c.json({ error: error.message }, 500);
+    return c.json({ error: 'Address not found' }, 404);
   }
 
   return c.json({ message: 'Address deleted' }, 200);

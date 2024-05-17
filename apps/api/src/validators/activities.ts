@@ -32,5 +32,14 @@ export const activitySchemaReponse = z.object({
       name: z.string().max(50),
     })
     .nullable(),
+  id_sport: z.coerce.number().nullable(),
   id_address: z.coerce.number().nullable(),
+});
+
+export const userActivities = z.object({
+  active: z.boolean(),
+  created_at: z.string(),
+  id_user: z.number(),
+  id_activity: z.number(),
+  activity: activitySchemaReponse.omit({ sport: true }).nullable(),
 });

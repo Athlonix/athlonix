@@ -2,7 +2,7 @@ import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
 import { activitySchema, activitySchemaReponse } from '../validators/activities.js';
-import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getAllActivities = createRoute({
   method: 'get',
@@ -17,15 +17,14 @@ export const getAllActivities = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: z.object({
-              data: z.array(activitySchemaReponse),
-              count: z.number(),
-            }),
-          },
+          schema: z.object({
+            data: z.array(activitySchemaReponse),
+            count: z.number(),
+          }),
         },
       },
     },
+    500: serverErrorSchema,
   },
   tags: ['activity'],
 });
@@ -43,9 +42,7 @@ export const getOneActivity = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: activitySchemaReponse,
-          },
+          schema: activitySchemaReponse,
         },
       },
     },
@@ -80,6 +77,7 @@ export const createActivity = createRoute({
         },
       },
     },
+    400: badRequestSchema,
     500: serverErrorSchema,
   },
   tags: ['activity'],
@@ -107,14 +105,13 @@ export const updateActivity = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: activitySchema,
-          },
+          schema: activitySchema,
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['activity'],
 });
@@ -155,7 +152,7 @@ export const applyToActivity = createRoute({
     params: idParamValidator,
   },
   responses: {
-    200: {
+    201: {
       description: 'Successful response',
       content: {
         'application/json': {
@@ -165,6 +162,7 @@ export const applyToActivity = createRoute({
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['activity'],
 });
@@ -199,6 +197,7 @@ export const cancelApplication = createRoute({
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['activity'],
 });
@@ -233,6 +232,7 @@ export const validApplication = createRoute({
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['activity'],
 });

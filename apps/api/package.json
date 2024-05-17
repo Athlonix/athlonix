@@ -31,7 +31,7 @@
     "@types/node": "^20.12.12",
     "@types/swagger-ui-dist": "^3.30.4",
     "supabase": "^1.167.4",
-    "tsx": "^4.10.3",
+    "tsx": "^4.10.4",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   }

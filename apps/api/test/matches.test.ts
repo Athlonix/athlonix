@@ -54,7 +54,7 @@ describe('Matches tests', () => {
       },
       body: JSON.stringify({
         start_time: '2050-05-12T15:44:17.153Z',
-        end_time: '20250-05-13T15:44:17.153Z',
+        end_time: '2050-05-13T15:44:17.153Z',
       }),
     });
 

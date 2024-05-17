@@ -42,8 +42,13 @@ matches.openapi(getAllMatches, async (c) => {
     return c.json({ error: error.message }, 500);
   }
 
+  const formattedData = data.map((item) => ({
+    ...item,
+    winner: item.winner.length > 0 ? (item.winner[0] ? item.winner[0] : null) : null,
+  }));
+
   const responseData = {
-    data: data || [],
+    data: formattedData || [],
     count: count || 0,
   };
 
@@ -62,7 +67,12 @@ matches.openapi(getMatchById, async (c) => {
     return c.json({ error: 'Match not found' }, 404);
   }
 
-  return c.json(data, 200);
+  const formattedData = {
+    ...data,
+    winner: data.winner.length > 0 ? (data.winner[0] ? data.winner[0] : null) : null,
+  };
+
+  return c.json(formattedData, 200);
 });
 
 matches.openapi(createMatch, async (c) => {

@@ -12,7 +12,7 @@ export const getAllMatchesSchema = z.object({
       winner: z.boolean().nullable(),
       id_team: z.number(),
     })
-    .array(),
+    .nullable(),
 });
 
 export const matchSchema = z.object({

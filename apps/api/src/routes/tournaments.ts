@@ -1,4 +1,3 @@
-import { count } from 'node:console';
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';

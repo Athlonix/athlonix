@@ -15,7 +15,7 @@ import {
 } from '@repo/ui/components/ui/dropdown-menu';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 type Report = {
   id: number;

@@ -19,22 +19,3 @@ export const healthCheck = createRoute({
   500: serverErrorSchema,
   tags: ['health'],
 });
-
-export const dbHealthCheck = createRoute({
-  method: 'get',
-  path: '/health/db',
-  summary: 'Database health check',
-  description: 'Database health check',
-  responses: {
-    200: {
-      description: 'Successful response',
-      content: {
-        'application/json': {
-          schema: z.string(),
-        },
-      },
-    },
-  },
-  500: serverErrorSchema,
-  tags: ['health'],
-});

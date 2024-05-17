@@ -28,7 +28,7 @@ import { Separator } from '@repo/ui/components/ui/separator';
 import { MoreHorizontal } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import React, { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 type Post = {
   id: number;

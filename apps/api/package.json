@@ -17,11 +17,12 @@
   "dependencies": {
     "@hono/node-server": "^1.11.1",
     "@hono/swagger-ui": "^0.2.2",
-    "@hono/zod-openapi": "0.12.1",
+    "@hono/zod-openapi": "0.12.2",
     "@hono/zod-validator": "^0.2.1",
     "@repo/types": "workspace:*",
     "@supabase/supabase-js": "^2.43.2",
-    "hono": "^4.3.7",
+    "hono": "^4.3.8",
+    "stripe": "^15.7.0",
     "zod": "^3.23.8",
     "zod-validation-error": "^3.3.0"
   },
@@ -31,7 +32,7 @@
     "@types/node": "^20.12.12",
     "@types/swagger-ui-dist": "^3.30.4",
     "supabase": "^1.167.4",
-    "tsx": "^4.10.4",
+    "tsx": "^4.10.5",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   }

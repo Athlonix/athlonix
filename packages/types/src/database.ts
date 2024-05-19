@@ -381,21 +381,21 @@ export type Database = {
       };
       DONATIONS: {
         Row: {
-          amount: number | null;
+          amount: number;
           created_at: string;
           id: number;
           id_user: number | null;
           receipt_url: string;
         };
         Insert: {
-          amount?: number | null;
+          amount: number;
           created_at?: string;
           id?: number;
           id_user?: number | null;
           receipt_url: string;
         };
         Update: {
-          amount?: number | null;
+          amount?: number;
           created_at?: string;
           id?: number;
           id_user?: number | null;

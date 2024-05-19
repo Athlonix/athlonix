@@ -25,10 +25,14 @@ stripe.openapi(webhook, async (context: Context) => {
 
     switch (event.type) {
       case 'charge.succeeded': {
-        const email = event.data.object.receipt_email as string;
+        console.log(event.data.object);
+        const email = event.data.object.receipt_email || 'test@email.com';
         const amount = event.data.object.amount / 100;
         const receipt_url = event.data.object.receipt_url as string;
-        await handleDonations(email, amount, receipt_url);
+        const data = await handleDonations(email, amount, receipt_url);
+        if (data.error) {
+          return context.json({ error: data.error }, 400);
+        }
         break;
       }
       default:

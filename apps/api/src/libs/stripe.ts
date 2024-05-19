@@ -9,21 +9,18 @@ export async function handleDonations(email: string, amount: number, receipt_url
     return { error: 'Invalid amount' };
   }
 
-  const { data: user, error: userError } = await supabase.from('USERS').select('id').eq('email', email).single();
+  const { data: user } = await supabase.from('USERS').select('id').eq('email', email).single();
 
-  if (userError) {
-    return { error: userError.message };
+  let id_user = null;
+  if (user) {
+    id_user = user.id;
   }
 
-  const { error, data } = await supabase
-    .from('DONATIONS')
-    .insert({ email, amount, receipt_url, id_user: user.id ?? null })
-    .single();
+  const { error, data } = await supabase.from('DONATIONS').insert({ amount, receipt_url, id_user }).select();
 
   if (error) {
     return { error: error.message };
   }
-  console.log(data);
 
   return { data };
 }

@@ -59,7 +59,7 @@ describe('Matches tests', () => {
     });
 
     expect(res.status).toBe(201);
-    const match = await res.json();
+    const match = (await res.json()) as { id: number };
     id_match = match.id;
   });
 

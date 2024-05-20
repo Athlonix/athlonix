@@ -11,7 +11,7 @@ export async function handleDonations(email: string, amount: number, receipt_url
 
   const { data: user } = await supabase.from('USERS').select('id').eq('email', email).single();
 
-  let id_user = null;
+  let id_user: null | number = null;
   if (user) {
     id_user = user.id;
   }

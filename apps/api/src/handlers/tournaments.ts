@@ -2,16 +2,27 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
+  createMatch,
+  createRound,
   createTeams,
   createTournament,
+  deleteMatch,
+  deleteRound,
   deleteTeam,
   deleteTournament,
+  getAllMatches,
   getAllTournaments,
+  getMatchById,
+  getRoundById,
+  getRounds,
   getTournamentById,
   getTournamentTeams,
   getTournamentTeamsById,
   joinTeam,
   leaveTeam,
+  updateMatch,
+  updateMatchWinner,
+  updateRound,
   updateTeam,
   updateTournament,
 } from '../routes/tournaments.js';
@@ -247,4 +258,211 @@ tournaments.openapi(leaveTeam, async (c) => {
   }
 
   return c.json({ message: 'Team left' }, 200);
+});
+
+tournaments.openapi(getRounds, async (c) => {
+  const { id } = c.req.valid('param');
+  const { data, error, count } = await supabase
+    .from('ROUNDS')
+    .select('*', { count: 'exact' })
+    .eq('id_tournament', id)
+    .order('order', { ascending: true });
+
+  if (error) {
+    return c.json({ error: 'Tournament not found' }, 404);
+  }
+
+  const responseData = {
+    data: data || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
+});
+
+tournaments.openapi(getRoundById, async (c) => {
+  const { id, id_round } = c.req.valid('param');
+  const { data, error } = await supabase.from('ROUNDS').select('*').eq('id_tournament', id).eq('id', id_round).single();
+
+  if (error || !data) {
+    return c.json({ error: 'Round not found' }, 404);
+  }
+
+  return c.json(data, 200);
+});
+
+tournaments.openapi(createRound, async (c) => {
+  const { name, order } = c.req.valid('json');
+  const { id } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { data, error } = await supabase.from('ROUNDS').insert({ name, id_tournament: id, order }).select().single();
+
+  if (error || !data) {
+    return c.json({ error: 'Failed to create round' }, 400);
+  }
+
+  return c.json(data, 201);
+});
+
+tournaments.openapi(updateRound, async (c) => {
+  const { id, id_round } = c.req.valid('param');
+  const { name, order } = c.req.valid('json');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { data, error } = await supabase
+    .from('ROUNDS')
+    .update({ name, order })
+    .eq('id', id_round)
+    .eq('id_tournament', id)
+    .select()
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Failed to update round' }, 500);
+  }
+
+  return c.json(data, 200);
+});
+
+tournaments.openapi(deleteRound, async (c) => {
+  const { id, id_round } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { error } = await supabase.from('ROUNDS').delete().eq('id', id_round).eq('id_tournament', id);
+
+  if (error) {
+    return c.json({ error: 'Failed to delete round' }, 500);
+  }
+
+  return c.json({ message: 'Round deleted' }, 200);
+});
+
+tournaments.openapi(getAllMatches, async (c) => {
+  const { id_round } = c.req.valid('param');
+
+  const query = supabase
+    .from('MATCHES')
+    .select('*, winner:TEAMS_MATCHES(winner, id_team)', { count: 'exact' })
+    .eq('id_round', id_round)
+    .order('id', { ascending: true });
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  const formattedData = data.map((item) => ({
+    ...item,
+    winner: item.winner.length > 0 ? (item.winner[0] ? item.winner[0] : null) : null,
+  }));
+
+  const responseData = {
+    data: formattedData || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
+});
+
+tournaments.openapi(getMatchById, async (c) => {
+  const { id, id_round } = c.req.valid('param');
+  const { data, error } = await supabase
+    .from('MATCHES')
+    .select('*, winner:TEAMS_MATCHES(winner, id_team)')
+    .eq('id', id)
+    .eq('id_round', id_round)
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Match not found' }, 404);
+  }
+
+  const formattedData = {
+    ...data,
+    winner: data.winner.length > 0 ? (data.winner[0] ? data.winner[0] : null) : null,
+  };
+
+  return c.json(formattedData, 200);
+});
+
+tournaments.openapi(createMatch, async (c) => {
+  const { id_round } = c.req.valid('param');
+  const { start_time, end_time } = c.req.valid('json');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  if (start_time && end_time && start_time >= end_time)
+    return c.json({ error: 'Start time must be before end time' }, 400);
+
+  const { data, error } = await supabase.from('MATCHES').insert({ start_time, end_time, id_round }).select().single();
+
+  if (error || !data) {
+    return c.json({ error: 'Failed to create match' }, 500);
+  }
+
+  return c.json(data, 201);
+});
+
+tournaments.openapi(updateMatchWinner, async (c) => {
+  const { id } = c.req.valid('param');
+  const { idTeam, winner } = c.req.valid('query');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { error } = await supabase.from('TEAMS_MATCHES').update({ id_team: idTeam, winner }).eq('id_match', id);
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  return c.json({ message: 'Match winner updated' }, 200);
+});
+
+tournaments.openapi(updateMatch, async (c) => {
+  const { id } = c.req.valid('param');
+  const { start_time, end_time } = c.req.valid('json');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  if (start_time && end_time && start_time >= end_time)
+    return c.json({ error: 'Start time must be before end time' }, 400);
+
+  const { data, error } = await supabase
+    .from('MATCHES')
+    .update({ start_time, end_time })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Failed to update match' }, 500);
+  }
+
+  return c.json(data, 200);
+});
+
+tournaments.openapi(deleteMatch, async (c) => {
+  const { id } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { error } = await supabase.from('MATCHES').delete().eq('id', id);
+
+  if (error) {
+    return c.json({ error: 'Failed to delete match' }, 500);
+  }
+
+  return c.json({ message: 'Match deleted' }, 200);
 });

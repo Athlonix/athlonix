@@ -17,14 +17,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@repo/ui/components/ui/dropdown-menu';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@repo/ui/components/ui/pagination';
 import { Separator } from '@repo/ui/components/ui/separator';
 import { MoreHorizontal } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
@@ -160,7 +152,7 @@ function ShowReports() {
         }
         return response.json();
       })
-      .then((response) => {
+      .then(() => {
         router.push('/dashboard/posts');
       });
 

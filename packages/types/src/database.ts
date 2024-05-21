@@ -503,19 +503,30 @@ export type Database = {
         Row: {
           end_time: string | null;
           id: number;
+          id_round: number;
           start_time: string | null;
         };
         Insert: {
           end_time?: string | null;
           id?: number;
+          id_round: number;
           start_time?: string | null;
         };
         Update: {
           end_time?: string | null;
           id?: number;
+          id_round?: number;
           start_time?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'MATCHES_id_round_fkey';
+            columns: ['id_round'];
+            isOneToOne: false;
+            referencedRelation: 'ROUNDS';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       MATERIALS: {
         Row: {
@@ -711,6 +722,7 @@ export type Database = {
           content: string;
           cover_image: string | null;
           created_at: string;
+          deleted_at: string | null;
           description: string | null;
           id: number;
           id_user: number;
@@ -721,6 +733,7 @@ export type Database = {
           content: string;
           cover_image?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           description?: string | null;
           id?: number;
           id_user: number;
@@ -731,6 +744,7 @@ export type Database = {
           content?: string;
           cover_image?: string | null;
           created_at?: string;
+          deleted_at?: string | null;
           description?: string | null;
           id?: number;
           id_user?: number;
@@ -1054,6 +1068,35 @@ export type Database = {
         };
         Relationships: [];
       };
+      ROUNDS: {
+        Row: {
+          id: number;
+          id_tournament: number;
+          name: string;
+          order: number;
+        };
+        Insert: {
+          id?: number;
+          id_tournament: number;
+          name: string;
+          order?: number;
+        };
+        Update: {
+          id?: number;
+          id_tournament?: number;
+          name?: string;
+          order?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'ROUNDS_id_tournament_fkey';
+            columns: ['id_tournament'];
+            isOneToOne: false;
+            referencedRelation: 'TOURNAMENTS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       SPORTS: {
         Row: {
           description: string | null;
@@ -1102,7 +1145,7 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_TEAMS_id_tournament_fkey';
+            foreignKeyName: 'TEAMS_id_tournament_fkey';
             columns: ['id_tournament'];
             isOneToOne: false;
             referencedRelation: 'TOURNAMENTS';
@@ -1128,14 +1171,14 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_TEAMS_MATCHES_id_match_fkey';
+            foreignKeyName: 'TEAMS_MATCHES_id_match_fkey';
             columns: ['id_match'];
             isOneToOne: false;
             referencedRelation: 'MATCHES';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'public_TEAMS_MATCHES_id_team_fkey';
+            foreignKeyName: 'TEAMS_MATCHES_id_team_fkey';
             columns: ['id_team'];
             isOneToOne: false;
             referencedRelation: 'TEAMS';
@@ -1179,41 +1222,8 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_TOURNAMENTS_id_address_fkey';
+            foreignKeyName: 'TOURNAMENTS_id_address_fkey';
             columns: ['id_address'];
-            isOneToOne: false;
-            referencedRelation: 'TOURNAMENTS';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      TOURNAMENTS_MATCHES: {
-        Row: {
-          id_match: number;
-          id_tournament: number;
-          round: number;
-        };
-        Insert: {
-          id_match: number;
-          id_tournament: number;
-          round: number;
-        };
-        Update: {
-          id_match?: number;
-          id_tournament?: number;
-          round?: number;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'public_TOURNAMENTS_MATCHES_id_match_fkey';
-            columns: ['id_match'];
-            isOneToOne: false;
-            referencedRelation: 'MATCHES';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'public_TOURNAMENTS_MATCHES_id_tournament_fkey';
-            columns: ['id_tournament'];
             isOneToOne: false;
             referencedRelation: 'TOURNAMENTS';
             referencedColumns: ['id'];

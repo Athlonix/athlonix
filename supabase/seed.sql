@@ -9,6 +9,7 @@ VALUES
   (7, 'SECRATARY'), 
   (8, 'TREASURER'), 
   (9, 'PRESIDENT');
+  (10, 'EMPLOYEE');
 
 INSERT INTO "public"."REASONS" ("id", "reason")
 VALUES

@@ -30,7 +30,7 @@ export type Database = {
     Tables: {
       ACTIVITIES: {
         Row: {
-          days: Database['public']['Enums']['days'][] | null;
+          days: Database['public']['Enums']['days'][];
           description: string | null;
           end_date: string;
           id: number;
@@ -44,7 +44,7 @@ export type Database = {
           start_date: string;
         };
         Insert: {
-          days?: Database['public']['Enums']['days'][] | null;
+          days: Database['public']['Enums']['days'][];
           description?: string | null;
           end_date: string;
           id?: number;
@@ -58,7 +58,7 @@ export type Database = {
           start_date: string;
         };
         Update: {
-          days?: Database['public']['Enums']['days'][] | null;
+          days?: Database['public']['Enums']['days'][];
           description?: string | null;
           end_date?: string;
           id?: number;
@@ -287,8 +287,8 @@ export type Database = {
           created_at: string;
           id: number;
           id_activity: number | null;
+          id_parent: number | null;
           id_post: number | null;
-          id_response: number | null;
           id_user: number;
           updated_at: string | null;
         };
@@ -297,8 +297,8 @@ export type Database = {
           created_at?: string;
           id?: number;
           id_activity?: number | null;
+          id_parent?: number | null;
           id_post?: number | null;
-          id_response?: number | null;
           id_user: number;
           updated_at?: string | null;
         };
@@ -307,15 +307,15 @@ export type Database = {
           created_at?: string;
           id?: number;
           id_activity?: number | null;
+          id_parent?: number | null;
           id_post?: number | null;
-          id_response?: number | null;
           id_user?: number;
           updated_at?: string | null;
         };
         Relationships: [
           {
             foreignKeyName: 'comments_id_comment_fkey';
-            columns: ['id_response'];
+            columns: ['id_parent'];
             isOneToOne: false;
             referencedRelation: 'COMMENTS';
             referencedColumns: ['id'];
@@ -608,94 +608,41 @@ export type Database = {
       };
       POLLS: {
         Row: {
-          description: string | null;
-          end_at: string;
+          content: string | null;
           id: number;
-          id_user: number;
-          max_choices: number;
-          start_at: string;
           title: string;
         };
         Insert: {
-          description?: string | null;
-          end_at: string;
+          content?: string | null;
           id?: number;
-          id_user: number;
-          max_choices?: number;
-          start_at: string;
           title: string;
         };
         Update: {
-          description?: string | null;
-          end_at?: string;
+          content?: string | null;
           id?: number;
-          id_user?: number;
-          max_choices?: number;
-          start_at?: string;
           title?: string;
         };
-        Relationships: [
-          {
-            foreignKeyName: 'public_POLLS_id_user_fkey';
-            columns: ['id_user'];
-            isOneToOne: false;
-            referencedRelation: 'USERS';
-            referencedColumns: ['id'];
-          },
-        ];
+        Relationships: [];
       };
-      POLLS_OPTIONS: {
+      POLLS_ANSWERS: {
         Row: {
-          content: string;
+          answer: string;
           id: number;
           id_poll: number;
         };
         Insert: {
-          content: string;
+          answer: string;
           id?: number;
           id_poll: number;
         };
         Update: {
-          content?: string;
+          answer?: string;
           id?: number;
           id_poll?: number;
         };
         Relationships: [
           {
-            foreignKeyName: 'public_POLLS_OPTIONS_id_poll_fkey';
-            columns: ['id_poll'];
-            isOneToOne: false;
-            referencedRelation: 'POLLS';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      POLLS_VOTES: {
-        Row: {
-          id: number;
-          id_option: number;
-          id_poll: number;
-        };
-        Insert: {
-          id?: number;
-          id_option: number;
-          id_poll: number;
-        };
-        Update: {
-          id?: number;
-          id_option?: number;
-          id_poll?: number;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'public_POLLS_VOTES_id_option_fkey';
-            columns: ['id_option'];
-            isOneToOne: false;
-            referencedRelation: 'POLLS_OPTIONS';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'public_POLLS_VOTES_id_poll_fkey';
+            foreignKeyName: 'public_POLLS_ANSWERS_id_poll_fkey';
             columns: ['id_poll'];
             isOneToOne: false;
             referencedRelation: 'POLLS';
@@ -762,14 +709,14 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'POSTS_CATEGORIES_id_category_fkey';
+            foreignKeyName: 'public_POST_CATEGORIES_category_id_fkey';
             columns: ['id_category'];
             isOneToOne: false;
             referencedRelation: 'CATEGORIES';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'POSTS_CATEGORIES_id_post_fkey';
+            foreignKeyName: 'public_POST_CATEGORIES_post_id_fkey';
             columns: ['id_post'];
             isOneToOne: false;
             referencedRelation: 'POSTS';
@@ -781,17 +728,17 @@ export type Database = {
         Row: {
           id_post: number;
           id_user: number;
-          reaction: Database['public']['Enums']['reaction'] | null;
+          reaction: Database['public']['Enums']['reaction'];
         };
         Insert: {
           id_post: number;
           id_user?: number;
-          reaction?: Database['public']['Enums']['reaction'] | null;
+          reaction?: Database['public']['Enums']['reaction'];
         };
         Update: {
           id_post?: number;
           id_user?: number;
-          reaction?: Database['public']['Enums']['reaction'] | null;
+          reaction?: Database['public']['Enums']['reaction'];
         };
         Relationships: [
           {
@@ -814,28 +761,28 @@ export type Database = {
         Row: {
           id_post: number;
           id_user: number;
-          viewed: string;
+          viewed_at: string;
         };
         Insert: {
           id_post: number;
-          id_user?: number;
-          viewed?: string;
+          id_user: number;
+          viewed_at?: string;
         };
         Update: {
           id_post?: number;
           id_user?: number;
-          viewed?: string;
+          viewed_at?: string;
         };
         Relationships: [
           {
-            foreignKeyName: 'POSTS_VIEWS_id_post_fkey';
+            foreignKeyName: 'public_POSTS_VIEWS_id_post_fkey';
             columns: ['id_post'];
             isOneToOne: false;
             referencedRelation: 'POSTS';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'POSTS_VIEWS_id_user_fkey';
+            foreignKeyName: 'public_POSTS_VIEWS_id_user_fkey';
             columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
@@ -916,70 +863,6 @@ export type Database = {
             columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      REASONS: {
-        Row: {
-          id: number;
-          reason: string;
-        };
-        Insert: {
-          id?: number;
-          reason: string;
-        };
-        Update: {
-          id?: number;
-          reason?: string;
-        };
-        Relationships: [];
-      };
-      REPORTS: {
-        Row: {
-          content: string;
-          created_at: string;
-          id: number;
-          id_comment: number | null;
-          id_post: number | null;
-          id_reason: number;
-        };
-        Insert: {
-          content: string;
-          created_at?: string;
-          id?: number;
-          id_comment?: number | null;
-          id_post?: number | null;
-          id_reason: number;
-        };
-        Update: {
-          content?: string;
-          created_at?: string;
-          id?: number;
-          id_comment?: number | null;
-          id_post?: number | null;
-          id_reason?: number;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'REPORTS_id_comment_fkey';
-            columns: ['id_comment'];
-            isOneToOne: false;
-            referencedRelation: 'COMMENTS';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'REPORTS_id_post_fkey';
-            columns: ['id_post'];
-            isOneToOne: false;
-            referencedRelation: 'POSTS';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'REPORTS_id_reason_fkey';
-            columns: ['id_reason'];
-            isOneToOne: false;
-            referencedRelation: 'REASONS';
             referencedColumns: ['id'];
           },
         ];
@@ -1221,7 +1104,6 @@ export type Database = {
         Row: {
           created_at: string;
           date_validity: string | null;
-          deleted_at: string | null;
           email: string;
           first_name: string;
           id: number;
@@ -1233,7 +1115,6 @@ export type Database = {
         Insert: {
           created_at: string;
           date_validity?: string | null;
-          deleted_at?: string | null;
           email: string;
           first_name: string;
           id?: number;
@@ -1245,7 +1126,6 @@ export type Database = {
         Update: {
           created_at?: string;
           date_validity?: string | null;
-          deleted_at?: string | null;
           email?: string;
           first_name?: string;
           id?: number;
@@ -1333,32 +1213,6 @@ export type Database = {
             columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      USERS_VOTES: {
-        Row: {
-          id: number;
-          id_poll: number;
-          user: string;
-        };
-        Insert: {
-          id?: number;
-          id_poll: number;
-          user: string;
-        };
-        Update: {
-          id?: number;
-          id_poll?: number;
-          user?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'public_USERS_VOTES_id_poll_fkey';
-            columns: ['id_poll'];
-            isOneToOne: false;
-            referencedRelation: 'POLLS';
             referencedColumns: ['id'];
           },
         ];

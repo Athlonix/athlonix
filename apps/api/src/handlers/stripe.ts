@@ -1,7 +1,8 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import type { Context } from 'hono';
 import Stripe from 'stripe';
-import { handleDonations } from '../libs/stripe.js';
+import { a } from 'vitest/dist/suite-IbNSsUWN.js';
+import { handleDonations, handleSubscription } from '../libs/stripe.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import { listDonations, webhook } from '../routes/stripe.js';
@@ -34,6 +35,49 @@ stripe.openapi(webhook, async (context: Context) => {
         if (data.error) {
           return context.json({ error: data.error }, 400);
         }
+        break;
+      }
+
+      case 'checkout.session.completed': {
+        const mode = event.data.object.mode as string;
+        if (mode !== 'subscription') {
+          break;
+        }
+
+        const subscription = event.data.object.subscription as string;
+        const invoice = await stripe.invoices.retrieve(event.data.object.invoice as string);
+
+        const data = await handleSubscription(subscription, invoice.invoice_pdf as string);
+        if (data.error) {
+          return context.json({ error: data.error }, 400);
+        }
+        break;
+      }
+      case 'invoice.payment_failed': {
+        const subscription = event.data.object.subscription as string;
+        const user = await stripe.subscriptions.retrieve(subscription);
+
+        if (user.status !== 'active' || !user.customer) {
+          break;
+        }
+
+        const { email } = user.customer as Stripe.Customer;
+
+        const { data: userDb } = await supabase
+          .from('USERS')
+          .select('id')
+          .eq('email', email || '')
+          .single();
+
+        if (!userDb) {
+          break;
+        }
+
+        const id_user = userDb.id;
+
+        await supabase.from('USERS').update({ subscription: null, date_validity: null }).eq('id', id_user);
+        await supabase.from('USERS_ROLES').delete().eq('id_user', id_user);
+
         break;
       }
       default:

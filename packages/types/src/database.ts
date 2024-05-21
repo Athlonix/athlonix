@@ -381,22 +381,25 @@ export type Database = {
       };
       DONATIONS: {
         Row: {
+          amount: number;
           created_at: string;
           id: number;
-          id_user: number;
-          money: number | null;
+          id_user: number | null;
+          receipt_url: string;
         };
         Insert: {
+          amount: number;
           created_at?: string;
           id?: number;
-          id_user: number;
-          money?: number | null;
+          id_user?: number | null;
+          receipt_url: string;
         };
         Update: {
+          amount?: number;
           created_at?: string;
           id?: number;
-          id_user?: number;
-          money?: number | null;
+          id_user?: number | null;
+          receipt_url?: string;
         };
         Relationships: [
           {

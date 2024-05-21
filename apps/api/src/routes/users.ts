@@ -1,8 +1,9 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
+import { userActivities } from '../validators/activities.js';
 import { updateUserSchema, userSchema } from '../validators/auth.js';
-import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getAllUsers = createRoute({
   method: 'get',
@@ -19,9 +20,10 @@ export const getAllUsers = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: userSchema,
-          },
+          schema: z.object({
+            data: z.array(userSchema),
+            count: z.number(),
+          }),
         },
       },
     },
@@ -45,9 +47,7 @@ export const getOneUser = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: userSchema,
-          },
+          schema: userSchema,
         },
       },
     },
@@ -79,14 +79,23 @@ export const updateUser = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: userSchema,
-          },
+          schema: userSchema,
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
+    403: {
+      description: 'Forbidden',
+      content: {
+        'application/json': {
+          schema: z.object({
+            error: z.string(),
+          }),
+        },
+      },
+    },
   },
   tags: ['user'],
 });
@@ -106,9 +115,9 @@ export const deleteUser = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: userSchema,
-          },
+          schema: z.object({
+            message: z.string(),
+          }),
         },
       },
     },
@@ -142,14 +151,15 @@ export const addUserRole = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: { message: z.string() },
-          },
+          schema: z.object({
+            message: z.string(),
+          }),
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['user'],
 });
@@ -178,14 +188,15 @@ export const removeUserRole = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: { message: z.string() },
-          },
+          schema: z.object({
+            message: z.string(),
+          }),
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['user'],
 });
@@ -214,14 +225,15 @@ export const updateUserRole = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: { message: z.string() },
-          },
+          schema: z.object({
+            message: z.string(),
+          }),
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['user'],
 });
@@ -241,14 +253,15 @@ export const softDeleteUser = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: { message: z.string() },
-          },
+          schema: z.object({
+            message: z.string(),
+          }),
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['user'],
 });
@@ -269,14 +282,16 @@ export const getUsersActivities = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: userSchema,
-          },
+          schema: z.object({
+            data: z.array(userActivities),
+            count: z.number(),
+          }),
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['user'],
 });

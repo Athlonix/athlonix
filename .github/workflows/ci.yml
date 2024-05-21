@@ -17,6 +17,11 @@ permissions:
   contents: read
   pull-requests: read
 
+env:
+  SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+  SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+  SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
+
 jobs:
   ci:
     runs-on: self-hosted
@@ -42,3 +47,17 @@ jobs:
 
       - name: 🧪 Check type coverage
         run: npx type-coverage --detail --at-least 90 -p tsconfig.json
+
+
+      - if: github.ref == 'refs/heads/main'
+        name: 🚀 Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - if: github.ref == 'refs/heads/main'
+        name: 🚀 Deploy migrations
+        run: 
+          |
+          supabase link --project-ref ${{ env.SUPABASE_PROJECT_ID }}
+          supabase db push -p ${{ env.SUPABASE_DB_PASSWORD }}

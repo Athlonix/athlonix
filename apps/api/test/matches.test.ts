@@ -53,13 +53,13 @@ describe('Matches tests', () => {
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        start_time: '2024-05-12T15:44:17.153Z',
-        end_time: '2024-05-13T15:44:17.153Z',
+        start_time: '2050-05-12T15:44:17.153Z',
+        end_time: '2050-05-13T15:44:17.153Z',
       }),
     });
 
     expect(res.status).toBe(201);
-    const match = await res.json();
+    const match = (await res.json()) as { id: number };
     id_match = match.id;
   });
 
@@ -138,8 +138,8 @@ describe('Matches tests', () => {
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        start_time: '2024-05-12T15:44:17.153Z',
-        end_time: '2024-05-14T15:44:17.153Z',
+        start_time: '2050-05-12T15:44:17.153Z',
+        end_time: '2050-05-14T15:44:17.153Z',
       }),
     });
 
@@ -154,8 +154,6 @@ describe('Matches tests', () => {
         Authorization: `Bearer ${jwt}`,
       },
     });
-
-    console.log(res.status, await res.text());
 
     expect(res.status).toBe(200);
   });

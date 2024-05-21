@@ -100,7 +100,7 @@ users.openapi(updateUser, async (c) => {
       .from('USERS')
       .update({ first_name, last_name, username })
       .eq('id', id)
-      .select()
+      .select('*, roles:ROLES (id, name)')
       .single();
 
     if (error || !data) {
@@ -115,7 +115,7 @@ users.openapi(updateUser, async (c) => {
     .from('USERS')
     .update({ first_name, last_name, username })
     .eq('id', id)
-    .select()
+    .select('*, roles:ROLES (id, name)')
     .single();
 
   if (error || !data) {
@@ -287,9 +287,9 @@ users.openapi(getUsersActivities, async (c) => {
   const { skip, take } = c.req.valid('query');
   const { from, to } = getPagination(skip, take - 1);
 
-  const { data, error } = await supabase
+  const { data, error, count } = await supabase
     .from('ACTIVITIES_USERS')
-    .select('*, activity:ACTIVITIES(*)')
+    .select('*, activity:ACTIVITIES(*)', { count: 'exact' })
     .eq('id_user', user.id)
     .range(from, to);
 
@@ -297,5 +297,10 @@ users.openapi(getUsersActivities, async (c) => {
     return c.json({ error: 'User not found' }, 404);
   }
 
-  return c.json(data, 200);
+  const responseData = {
+    data: data || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
 });

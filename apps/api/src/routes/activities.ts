@@ -1,23 +1,8 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
-import { activitySchemaReponse } from '../validators/activities.js';
-import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
-
-export const activitySchema = z.object({
-  id: z.coerce.number(),
-  name: z.string().max(50),
-  description: z.string().max(255).nullable(),
-  max_participants: z.coerce.number().min(1),
-  min_participants: z.coerce.number().min(1),
-  days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])),
-  recurrence: z.enum(['weekly', 'monthly', 'annual']),
-  interval: z.coerce.number().min(1),
-  start_date: z.string().datetime(),
-  end_date: z.string().datetime(),
-  id_sport: z.coerce.number().nullable(),
-  id_address: z.coerce.number().nullable(),
-});
+import { activitySchema, activitySchemaReponse } from '../validators/activities.js';
+import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getAllActivities = createRoute({
   method: 'get',
@@ -32,9 +17,10 @@ export const getAllActivities = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
+          schema: z.object({
             data: z.array(activitySchemaReponse),
-          },
+            count: z.number(),
+          }),
         },
       },
     },
@@ -56,9 +42,7 @@ export const getOneActivity = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: activitySchema,
-          },
+          schema: activitySchemaReponse,
         },
       },
     },
@@ -89,12 +73,11 @@ export const createActivity = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: activitySchema,
-          },
+          schema: activitySchema,
         },
       },
     },
+    400: badRequestSchema,
     500: serverErrorSchema,
   },
   tags: ['activity'],
@@ -122,14 +105,13 @@ export const updateActivity = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: activitySchema,
-          },
+          schema: activitySchema,
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['activity'],
 });
@@ -149,9 +131,7 @@ export const deleteActivity = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: activitySchema,
-          },
+          schema: z.object({ message: z.string() }),
         },
       },
     },
@@ -172,18 +152,17 @@ export const applyToActivity = createRoute({
     params: idParamValidator,
   },
   responses: {
-    200: {
+    201: {
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: activitySchema,
-          },
+          schema: z.object({ message: z.string() }),
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['activity'],
 });
@@ -212,14 +191,13 @@ export const cancelApplication = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: activitySchema,
-          },
+          schema: z.object({ message: z.string() }),
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['activity'],
 });
@@ -248,14 +226,13 @@ export const validApplication = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: activitySchema,
-          },
+          schema: z.object({ message: z.string() }),
         },
       },
     },
     500: serverErrorSchema,
     404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['activity'],
 });

@@ -1,6 +1,5 @@
 import ReportRow from '@/app/ui/dashboard/posts/details/ReportRow';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
-import React from 'react';
 
 type Report = {
   id: number;

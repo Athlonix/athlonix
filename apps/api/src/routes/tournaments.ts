@@ -1,7 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
-import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const tournamentSchema = z.object({
   id: z.number(),
@@ -32,13 +32,15 @@ export const getAllTournaments = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
+          schema: z.object({
             data: z.array(tournamentSchema),
-          },
+            count: z.number(),
+          }),
         },
       },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
   },
   tags: ['tournament'],
 });
@@ -56,9 +58,7 @@ export const getTournamentById = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: tournamentSchema,
-          },
+          schema: tournamentSchema,
         },
       },
     },
@@ -93,7 +93,7 @@ export const createTournament = createRoute({
     },
   },
   responses: {
-    200: {
+    201: {
       description: 'Successful response',
       content: {
         'application/json': {
@@ -180,7 +180,7 @@ export const getTournamentTeams = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
+          schema: z.object({
             data: z.array(
               z.object({
                 id: z.number(),
@@ -188,7 +188,8 @@ export const getTournamentTeams = createRoute({
                 created_at: z.string().datetime(),
               }),
             ),
-          },
+            count: z.number(),
+          }),
         },
       },
     },
@@ -214,13 +215,11 @@ export const getTournamentTeamsById = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: z.object({
-              id: z.number(),
-              name: z.string().max(255),
-              created_at: z.string().datetime(),
-            }),
-          },
+          schema: z.object({
+            id: z.number(),
+            name: z.string().max(255),
+            created_at: z.string().datetime(),
+          }),
         },
       },
     },
@@ -250,7 +249,7 @@ export const createTeams = createRoute({
     },
   },
   responses: {
-    200: {
+    201: {
       description: 'Successful response',
       content: {
         'application/json': {
@@ -263,6 +262,7 @@ export const createTeams = createRoute({
       },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
   },
   tags: ['tournament'],
 });

@@ -2,7 +2,6 @@ import { Button } from '@repo/ui/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@repo/ui/components/ui/sheet';
 import { Home, LineChart, Menu, Package, Package2, ShoppingCart, Users } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
 
 function CollapsedNav() {
   return (

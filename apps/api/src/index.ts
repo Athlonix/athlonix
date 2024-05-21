@@ -17,6 +17,7 @@ import { matches } from './handlers/matches.js';
 import { reasons } from './handlers/reasons.js';
 import { reports } from './handlers/reports.js';
 import { sports } from './handlers/sports.js';
+import { stripe } from './handlers/stripe.js';
 import { tournaments } from './handlers/tournaments.js';
 import { users } from './handlers/users.js';
 import { polls } from './handlers/votes.js';
@@ -41,9 +42,9 @@ app.get('/', (c) => c.text('Athlonix API!', 200));
 
 app.onError((err, c) => {
   if (err instanceof HTTPException) {
-    return err.getResponse();
+    return c.json({ error: err.message }, err.status || 500);
   }
-  return c.json({ message: 'Internal server error' }, 500);
+  return c.json({ error: 'Internal server error' }, 500);
 });
 
 app.route('/', health);
@@ -58,6 +59,7 @@ app.route('/', reasons);
 app.route('/', reports);
 app.route('/', matches);
 app.route('/', tournaments);
+app.route('/', stripe);
 
 app.doc('/doc', (c: Context) => ({
   openapi: '3.0.0',

@@ -127,13 +127,18 @@ tournaments.openapi(deleteTournament, async (c) => {
 
 tournaments.openapi(getTournamentTeams, async (c) => {
   const { id } = c.req.valid('param');
-  const { data, error } = await supabase.from('TEAMS').select('*').eq('id_tournament', id);
+  const { data, error, count } = await supabase.from('TEAMS').select('*', { count: 'exact' }).eq('id_tournament', id);
 
   if (error) {
-    return c.json({ error: error.message }, 500);
+    return c.json({ error: 'Tournament not found' }, 404);
   }
 
-  return c.json(data, 200);
+  const responseData = {
+    data: data || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
 });
 
 tournaments.openapi(getTournamentTeamsById, async (c) => {
@@ -157,7 +162,7 @@ tournaments.openapi(createTeams, async (c) => {
   const { data, error } = await supabase.from('TEAMS').insert({ name, id_tournament: id }).select().single();
 
   if (error || !data) {
-    return c.json({ error: 'Failed to create team' }, 500);
+    return c.json({ error: 'Failed to create team' }, 400);
   }
 
   return c.json(data, 201);
@@ -236,8 +241,6 @@ tournaments.openapi(leaveTeam, async (c) => {
   await checkRole(roles, true);
 
   const { error } = await supabase.from('USERS_TEAMS').delete().eq('id_user', user.id).eq('id_team', id_team);
-
-  console.log(error);
 
   if (error) {
     return c.json({ error: 'Failed to leave team' }, 500);

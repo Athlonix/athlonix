@@ -137,8 +137,6 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
   async function submit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    console.log(values);
-
     if (values.recurrence === 'weekly') {
       values.start_time = new Date(values.start_time);
       values.end_time = new Date(values.end_time);

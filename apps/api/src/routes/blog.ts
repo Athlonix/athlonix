@@ -27,9 +27,10 @@ export const getAllPosts = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
+          schema: z.object({
             data: postCardListSchemaResponse,
-          },
+            count: z.number(),
+          }),
         },
       },
     },
@@ -51,9 +52,7 @@ export const getPost = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: postSchema,
-          },
+          schema: postSchema,
         },
       },
     },
@@ -84,9 +83,7 @@ export const createPost = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: postSchema,
-          },
+          schema: postSchema,
         },
       },
     },
@@ -118,9 +115,7 @@ export const updatePost = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: postSchema,
-          },
+          schema: postSchema,
         },
       },
     },
@@ -222,14 +217,15 @@ export const getComments = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
+          schema: z.object({
             data: z.array(commentSchema),
-          },
+            count: number(),
+          }),
         },
       },
     },
     500: serverErrorSchema,
-    404: notFoundSchema,
+    400: badRequestSchema,
   },
   tags: ['blog'],
 });

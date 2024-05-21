@@ -1,7 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
-import { idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const addressSchema = z.object({
   id: z.number(),
@@ -35,11 +35,12 @@ export const createAddress = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: addressSchema,
         },
       },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
   },
   tags: ['location'],
 });
@@ -57,9 +58,10 @@ export const getAllAddresses = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: addressSchema,
-          },
+          schema: z.object({
+            data: z.array(addressSchema),
+            count: z.number(),
+          }),
         },
       },
     },
@@ -81,9 +83,7 @@ export const getOneAddress = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: {
-            data: addressSchema,
-          },
+          schema: addressSchema,
         },
       },
     },
@@ -115,11 +115,12 @@ export const updateAddress = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: addressSchema,
         },
       },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
     404: notFoundSchema,
   },
   tags: ['location'],
@@ -140,7 +141,7 @@ export const deleteAddress = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: { type: 'string' },
+          schema: z.object({ message: z.string() }),
         },
       },
     },

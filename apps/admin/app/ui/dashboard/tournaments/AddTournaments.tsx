@@ -227,6 +227,21 @@ function AddTournaments({ tournaments, setTournaments, addresses }: Props): JSX.
                         )}
                       />
                     </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="prize"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Récompenses</Label>
+                            <FormControl>
+                              <Textarea {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
                   </div>
                   <div className="flex gap-4 mt-4">
                     <Button type="submit" className="w-full">

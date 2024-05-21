@@ -1,4 +1,4 @@
-import EditForm from '@/app/ui/dashboard/activities/EditForm';
+import EditForm from '@/app/ui/dashboard/tournaments/EditForm';
 import { Button } from '@repo/ui/components/ui/button';
 import {
   Dialog,
@@ -14,6 +14,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@repo/ui/components/ui/dropdown-menu';
+import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
@@ -57,8 +58,42 @@ function TournamentRow(props: TournamentRowProps) {
   const [idAddress, setIdAddress] = useState(props.tournament.id_address);
   const [defaultMatchLength, setDefaultMatchLength] = useState(props.tournament.default_match_length);
 
+  const setter = {
+    name: setName,
+    max_participants: setMaxParticipants,
+    team_capacity: setTeamCapacity,
+    rules: setRules,
+    prize: setPrize,
+    id_address: setIdAddress,
+    default_match_length: setDefaultMatchLength,
+  };
+
   async function deleteActivity() {
-    console.log('TODO');
+    const urlApi = process.env.NEXT_PUBLIC_API_URL;
+    fetch(`${urlApi}/tournaments/${props.tournament.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => response.json())
+      .then(() => {
+        toast.success('Succès', { duration: 2000, description: "L'adresse a été supprimé avec succès" });
+
+        setName('Supprimé');
+        setDefaultMatchLength(null);
+        setMaxParticipants(0);
+        setTeamCapacity(0);
+        setRules('');
+        setPrize('');
+        setIdAddress(null);
+      })
+      .catch((error: Error) => {
+        toast.error('Erreur', { duration: 2000, description: error?.message });
+      });
+
+    setOpenDelete(false);
   }
 
   return (
@@ -99,15 +134,16 @@ function TournamentRow(props: TournamentRowProps) {
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>Edition de l'adresse {props.tournament.id}</DialogTitle>
-                      {/* <DialogDescription>
-                        <EditForm
-                          activity={props.activity}
-                          setter={setter}
-                          addresses={props.addresses}
-                          sports={props.sports}
-                          closeDialog={() => setOpenEdit(false)}
-                        />
-                      </DialogDescription> */}
+                      <ScrollArea className="h-[500px] w-full">
+                        <DialogDescription className="mx-5">
+                          <EditForm
+                            tournament={props.tournament}
+                            setter={setter}
+                            addresses={props.addresses}
+                            closeDialog={() => setOpenEdit(false)}
+                          />
+                        </DialogDescription>
+                      </ScrollArea>
                     </DialogHeader>
                   </DialogContent>
                 </Dialog>

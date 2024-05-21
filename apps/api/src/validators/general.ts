@@ -21,6 +21,7 @@ export enum Role {
   SECRATARY = 7,
   TREASURER = 8,
   PRESIDENT = 9,
+  EMPLOYEE = 10,
 }
 
 export const serverErrorSchema = {

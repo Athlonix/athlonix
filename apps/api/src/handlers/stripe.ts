@@ -1,7 +1,12 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import type { Context } from 'hono';
 import Stripe from 'stripe';
-import { handleDonations } from '../libs/stripe.js';
+import {
+  handleDonations,
+  handleRenewalSubscription,
+  handleRevokeSubscription,
+  handleSubscription,
+} from '../libs/stripe.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import { listDonations, webhook } from '../routes/stripe.js';
@@ -31,6 +36,51 @@ stripe.openapi(webhook, async (context: Context) => {
         const amount = event.data.object.amount / 100;
         const receipt_url = event.data.object.receipt_url as string;
         const data = await handleDonations(email, amount, receipt_url);
+        if (data.error) {
+          return context.json({ error: data.error }, 400);
+        }
+        break;
+      }
+
+      case 'customer.subscription.created': {
+        const subscription = event.data.object.id as string;
+        const invoice = await stripe.invoices.retrieve(event.data.object.latest_invoice as string);
+
+        const data = await handleSubscription(subscription, invoice.invoice_pdf as string);
+        if (data.error) {
+          return context.json({ error: data.error }, 400);
+        }
+        break;
+      }
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object;
+        const previousAttributes = event.data.previous_attributes;
+
+        if (subscription.current_period_end !== previousAttributes?.current_period_end) {
+          const customer = (await stripe.customers.retrieve(subscription.customer as string)) as Stripe.Customer;
+          if (!customer) {
+            return context.json({ error: 'Customer not found' }, 400);
+          }
+
+          if (subscription.status === 'active') {
+            const data = await handleRenewalSubscription(
+              customer,
+              subscription.id,
+              new Date(subscription.current_period_end * 1000),
+            );
+            if (data.error) {
+              return context.json({ error: data.error }, 400);
+            }
+          }
+        }
+
+        break;
+      }
+      case 'customer.subscription.deleted' || 'customer.subscription.paused': {
+        const subscription = event.data.object.id as string;
+        const user = await stripe.subscriptions.retrieve(subscription);
+
+        const data = await handleRevokeSubscription(user.customer as Stripe.Customer);
         if (data.error) {
           return context.json({ error: data.error }, 400);
         }
@@ -81,7 +131,7 @@ stripe.openapi(listDonations, async (c) => {
     return c.json({ error: error.message }, 500);
   }
 
-  const total = data.reduce((acc, curr) => acc + curr.amount, 0);
+  const total = data.reduce((acc: number, curr: { amount: number }) => acc + curr.amount, 0);
 
   return c.json({ data, total, count: count || 0 }, 200);
 });

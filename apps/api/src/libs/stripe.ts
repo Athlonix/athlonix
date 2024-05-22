@@ -47,13 +47,13 @@ export async function handleSubscription(subscription: string, invoice: string) 
 
   const { email } = invoiceDetails.customer as Stripe.Customer;
 
-  const { data: user } = await supabase
+  const { data: user, error: userDb } = await supabase
     .from('USERS')
     .select('id')
     .eq('email', email || '')
     .single();
 
-  if (!user) {
+  if (!user || userDb) {
     return { error: 'User not found' };
   }
 
@@ -80,13 +80,13 @@ export async function handleRevokeSubscription(customer: Stripe.Customer) {
 
   const { email } = customer;
 
-  const { data: userDb } = await supabase
+  const { data: userDb, error: errorUser } = await supabase
     .from('USERS')
     .select('id')
     .eq('email', email || '')
     .single();
 
-  if (!userDb) {
+  if (errorUser || !userDb) {
     return { error: 'User not found' };
   }
 

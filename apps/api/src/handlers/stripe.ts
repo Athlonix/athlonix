@@ -37,14 +37,9 @@ stripe.openapi(webhook, async (context: Context) => {
         break;
       }
 
-      case 'checkout.session.completed': {
-        const mode = event.data.object.mode as string;
-        if (mode !== 'subscription') {
-          break;
-        }
-
-        const subscription = event.data.object.subscription as string;
-        const invoice = await stripe.invoices.retrieve(event.data.object.invoice as string);
+      case 'customer.subscription.created': {
+        const subscription = event.data.object.id as string;
+        const invoice = await stripe.invoices.retrieve(event.data.object.latest_invoice as string);
 
         const data = await handleSubscription(subscription, invoice.invoice_pdf as string);
         if (data.error) {
@@ -52,13 +47,12 @@ stripe.openapi(webhook, async (context: Context) => {
         }
         break;
       }
-      case 'checkout.session.expired': {
-        const subscription = event.data.object.subscription as string;
+      case 'customer.subscription.updated': {
+        break;
+      }
+      case 'customer.subscription.deleted' || 'customer.subscription.paused': {
+        const subscription = event.data.object.id as string;
         const user = await stripe.subscriptions.retrieve(subscription);
-
-        if (!user.customer) {
-          break;
-        }
 
         const data = await handleRevokeSubscription(user.customer as Stripe.Customer);
         if (data.error) {

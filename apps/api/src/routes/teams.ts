@@ -5,7 +5,7 @@ import { activityMemberParamSchema, activityMemberSchema } from '../validators/t
 
 export const addActivityMember = createRoute({
   method: 'post',
-  path: '/activities/{id_activity}/team/{id_member}',
+  path: '/activities/{id_activity}/team/{id_user}',
   summary: 'Add a user to an activity team',
   description: 'Add a user to an activity team',
   security: [{ Bearer: [] }],
@@ -19,6 +19,33 @@ export const addActivityMember = createRoute({
       content: {
         'application/json': {
           schema: activityMemberParamSchema,
+        },
+      },
+    },
+    500: serverErrorSchema,
+    400: badRequestSchema,
+  },
+  tags: ['activity_team'],
+});
+
+export const removeActivityMember = createRoute({
+  method: 'delete',
+  path: '/activities/{id_activity}/team/{id_user}',
+  summary: 'Delete an user from an activity team',
+  description: 'Delete an user from an activity team',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: activityMemberParamSchema,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string(),
+          }),
         },
       },
     },

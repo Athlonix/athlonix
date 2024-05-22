@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { Role } from '../validators/general.js';
 import { supabase } from './supabase.js';
 
 export async function handleDonations(email: string, amount: number, receipt_url: string) {
@@ -58,11 +59,44 @@ export async function handleSubscription(subscription: string, invoice: string) 
 
   const id_user = user.id;
 
-  const { error, data } = await supabase.from('USERS').update({ subscription, invoice }).eq('id', id_user).select();
+  const { error, data } = await supabase.from('USERS').update({ subscription, invoice }).eq('id', id_user);
 
   if (error) {
     return { error: error.message };
   }
 
+  const { error: errorInsert } = await supabase.from('USERS_ROLES').insert({ id_user, id_role: Role.MEMBER });
+  if (errorInsert) {
+    return { error: errorInsert.message };
+  }
+
   return { data };
+}
+
+export async function handleRevokeSubscription(customer: Stripe.Customer) {
+  if (!customer) {
+    return { error: 'Customer not found' };
+  }
+
+  const { email } = customer;
+
+  const { data: userDb } = await supabase
+    .from('USERS')
+    .select('id')
+    .eq('email', email || '')
+    .single();
+
+  if (!userDb) {
+    return { error: 'User not found' };
+  }
+
+  const id_user = userDb.id;
+
+  const { error: deleteRole } = await supabase.from('USERS_ROLES').delete().eq('id_user', id_user);
+
+  if (deleteRole) {
+    return { error: deleteRole.message };
+  }
+
+  return { data: 'Subscription revoked' };
 }

@@ -1,8 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import type { Context } from 'hono';
 import Stripe from 'stripe';
-import { a } from 'vitest/dist/suite-IbNSsUWN.js';
-import { handleDonations, handleSubscription } from '../libs/stripe.js';
+import { handleDonations, handleRevokeSubscription, handleSubscription } from '../libs/stripe.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import { listDonations, webhook } from '../routes/stripe.js';
@@ -57,27 +56,14 @@ stripe.openapi(webhook, async (context: Context) => {
         const subscription = event.data.object.subscription as string;
         const user = await stripe.subscriptions.retrieve(subscription);
 
-        if (user.status !== 'active' || !user.customer) {
+        if (!user.customer) {
           break;
         }
 
-        const { email } = user.customer as Stripe.Customer;
-
-        const { data: userDb } = await supabase
-          .from('USERS')
-          .select('id')
-          .eq('email', email || '')
-          .single();
-
-        if (!userDb) {
-          break;
+        const data = await handleRevokeSubscription(user.customer as Stripe.Customer);
+        if (data.error) {
+          return context.json({ error: data.error }, 400);
         }
-
-        const id_user = userDb.id;
-
-        await supabase.from('USERS').update({ subscription: null, date_validity: null }).eq('id', id_user);
-        await supabase.from('USERS_ROLES').delete().eq('id_user', id_user);
-
         break;
       }
       default:

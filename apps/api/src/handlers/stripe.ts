@@ -52,7 +52,7 @@ stripe.openapi(webhook, async (context: Context) => {
         }
         break;
       }
-      case 'invoice.payment_failed': {
+      case 'checkout.session.expired': {
         const subscription = event.data.object.subscription as string;
         const user = await stripe.subscriptions.retrieve(subscription);
 

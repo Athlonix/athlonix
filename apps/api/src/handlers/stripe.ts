@@ -105,7 +105,7 @@ stripe.openapi(listDonations, async (c) => {
     return c.json({ error: error.message }, 500);
   }
 
-  const total = data.reduce((acc, curr) => acc + curr.amount, 0);
+  const total = data.reduce((acc: number, curr: { amount: number }) => acc + curr.amount, 0);
 
   return c.json({ data, total, count: count || 0 }, 200);
 });

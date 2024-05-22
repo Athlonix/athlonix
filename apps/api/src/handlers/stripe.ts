@@ -1,7 +1,12 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import type { Context } from 'hono';
 import Stripe from 'stripe';
-import { handleDonations, handleRevokeSubscription, handleSubscription } from '../libs/stripe.js';
+import {
+  handleDonations,
+  handleRenewalSubscription,
+  handleRevokeSubscription,
+  handleSubscription,
+} from '../libs/stripe.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import { listDonations, webhook } from '../routes/stripe.js';
@@ -48,6 +53,27 @@ stripe.openapi(webhook, async (context: Context) => {
         break;
       }
       case 'customer.subscription.updated': {
+        const subscription = event.data.object;
+        const previousAttributes = event.data.previous_attributes;
+
+        if (subscription.current_period_end !== previousAttributes?.current_period_end) {
+          const customer = (await stripe.customers.retrieve(subscription.customer as string)) as Stripe.Customer;
+          if (!customer) {
+            return context.json({ error: 'Customer not found' }, 400);
+          }
+
+          if (subscription.status === 'active') {
+            const data = await handleRenewalSubscription(
+              customer,
+              subscription.id,
+              new Date(subscription.current_period_end * 1000),
+            );
+            if (data.error) {
+              return context.json({ error: data.error }, 400);
+            }
+          }
+        }
+
         break;
       }
       case 'customer.subscription.deleted' || 'customer.subscription.paused': {

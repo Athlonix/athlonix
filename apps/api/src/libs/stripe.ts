@@ -105,3 +105,36 @@ export async function handleRevokeSubscription(customer: Stripe.Customer) {
 
   return { data: 'Subscription revoked' };
 }
+
+export async function handleRenewalSubscription(customer: Stripe.Customer, subscription: string, date: Date) {
+  if (!customer || !subscription || !date) {
+    return { error: 'Missing required fields' };
+  }
+
+  const { email } = customer;
+
+  const { data: userDb, error: errorUser } = await supabase
+    .from('USERS')
+    .select('id')
+    .eq('email', email || '')
+    .eq('subscription', subscription)
+    .single();
+
+  if (errorUser || !userDb) {
+    return { error: 'User not found' };
+  }
+
+  const id_user = userDb.id;
+
+  const { error, data } = await supabase
+    .from('USERS')
+    .update({ subscription, date_validity: date.toLocaleString() })
+    .eq('id', id_user)
+    .select();
+
+  if (error) {
+    return { error: error.message };
+  }
+
+  return { data };
+}

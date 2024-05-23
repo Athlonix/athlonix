@@ -27,7 +27,7 @@ jobs:
 
       - name: 🛠️ Setup pnpm
         uses: pnpm/action-setup@v4
-  
+
       - name: 🛠️ Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -42,3 +42,16 @@ jobs:
 
       - name: 🧪 Check type coverage
         run: npx type-coverage --detail --at-least 90 -p tsconfig.json
+
+      - if: github.ref == 'refs/heads/main'
+        name: 🚀 Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - if: github.ref == 'refs/heads/main'
+        name: 🚀 Deploy migrations
+        continue-on-error: true
+        run: |
+          supabase link --project-ref ${{ env.SUPABASE_PROJECT_ID }}
+          supabase db push -p ${{ env.SUPABASE_DB_PASSWORD }}

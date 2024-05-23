@@ -1,10 +1,9 @@
 'use server';
 import { Button } from '@repo/ui/components/ui/button';
-import { Card } from '@repo/ui/components/ui/card';
 
 export default async function DonationPage(): Promise<JSX.Element> {
   return (
-    <section className="w-full py-20 md:py-32 bg-gray-100 dark:bg-gray-800">
+    <section className="w-full py-20 md:py-32 bg-gray-100 dark:bg-gray-800 rounded-3xl">
       <div className="container px-4 md:px-6 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
         <div className="space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight">Aider Athlonix</h1>

@@ -1,5 +1,6 @@
 'use server';
 import { Button } from '@repo/ui/components/ui/button';
+import Link from 'next/link';
 
 export default async function DonationPage(): Promise<JSX.Element> {
   return (
@@ -13,9 +14,9 @@ export default async function DonationPage(): Promise<JSX.Element> {
             membres.
           </p>
           <Button className="bg-gray-900 text-gray-50 hover:bg-gray-900/90 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90">
-            <a href="https://donate.stripe.com/test_bIY9E70lS2IW6Ws5kk" target="_blank" rel="noreferrer">
+            <Link href="https://donate.stripe.com/test_bIY9E70lS2IW6Ws5kk" target="_blank">
               Donner maintenant
-            </a>
+            </Link>
           </Button>
         </div>
         <img

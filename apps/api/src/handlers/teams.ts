@@ -2,12 +2,48 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { HTTPException } from 'hono/http-exception';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { addActivityMember, removeActivityMember } from '../routes/teams.js';
+import { addActivityMember, getOneActivityTeam, removeActivityMember } from '../routes/teams.js';
 import type { Variables } from '../validators/general.js';
 import { Role } from '../validators/general.js';
 
 export const activities_teams = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
+});
+
+activities_teams.openapi(getOneActivityTeam, async (c) => {
+  const { id_activity } = c.req.valid('param');
+
+  const { data, error } = await supabase
+    .from('ACTIVITIES')
+    .select('id_activity:id, ACTIVITY_TEAMS(members:USERS(id,username,first_name,last_name))')
+    .eq('id', id_activity)
+    .single();
+
+  if (error) {
+    return c.json({ error: 'server error' }, 500);
+  }
+
+  if (!data) {
+    return c.json({ error: 'Activity not found' }, 404);
+  }
+
+  const membersCleaned = data.ACTIVITY_TEAMS.map((t) => {
+    if (t.members !== null) {
+      return t.members;
+    }
+  }) as {
+    id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+  }[];
+
+  const cleanedData = {
+    id_activity: data.id_activity,
+    members: membersCleaned,
+  };
+
+  return c.json(cleanedData, 200);
 });
 
 activities_teams.openapi(addActivityMember, async (c) => {

@@ -1,7 +1,32 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
-import { badRequestSchema, serverErrorSchema } from '../validators/general.js';
-import { activityMemberParamSchema, activityMemberSchema } from '../validators/teams.js';
+import { badRequestSchema, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import { activityMemberParamSchema, activityTeamSchema } from '../validators/teams.js';
+
+export const getOneActivityTeam = createRoute({
+  method: 'get',
+  path: '/activities/{id_activity}/team',
+  summary: 'Get an activity team',
+  description: 'Get an activity team',
+  request: {
+    params: z.object({
+      id_activity: z.coerce.number().min(1),
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: activityTeamSchema,
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['activity_team'],
+});
 
 export const addActivityMember = createRoute({
   method: 'post',
@@ -24,6 +49,7 @@ export const addActivityMember = createRoute({
     },
     500: serverErrorSchema,
     400: badRequestSchema,
+    404: notFoundSchema,
   },
   tags: ['activity_team'],
 });
@@ -51,6 +77,7 @@ export const removeActivityMember = createRoute({
     },
     500: serverErrorSchema,
     400: badRequestSchema,
+    404: notFoundSchema,
   },
   tags: ['activity_team'],
 });

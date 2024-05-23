@@ -30,7 +30,7 @@ describe('User tests', () => {
     id_admin = admin.id;
     await insertRole(id_admin, Role.ADMIN);
     await insertRole(id_admin, Role.MEMBER);
-    await setValidSubscription(id_user);
+    await setValidSubscription(id_admin);
 
     const loginRes = await app.request(`${path}/auth/login`, {
       method: 'POST',

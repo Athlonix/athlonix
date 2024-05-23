@@ -40,7 +40,7 @@ jobs:
           cache: pnpm
 
       - name: ⬆️ Install dependencies
-        run: pnpm install
+        run: pnpm --color install
 
       - name: 🚀 Run Biome
         run: pnpm run lint:check

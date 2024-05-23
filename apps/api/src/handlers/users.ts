@@ -243,7 +243,7 @@ users.openapi(softDeleteUser, async (c) => {
 
   const { data: user_data, error: errorID } = await supabase
     .from('USERS')
-    .select('id, deleted_at')
+    .select('id, deleted_at, id_auth')
     .eq('id', id)
     .single();
 
@@ -270,11 +270,16 @@ users.openapi(softDeleteUser, async (c) => {
       email: `Deleted${user_data.id}`,
       date_validity: null,
       deleted_at: new Date().toISOString(),
+      id_auth: null,
     })
     .eq('id', id);
 
   if (error) {
     return c.json({ error: 'Failed to delete user' }, 500);
+  }
+
+  if (user_data?.id_auth) {
+    await supAdmin.auth.admin.deleteUser(user_data.id_auth);
   }
 
   return c.json({ message: 'User deleted' }, 200);

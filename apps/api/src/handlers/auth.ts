@@ -65,6 +65,7 @@ auth.openapi(loginUser, async (c) => {
     .single();
 
   if (userError || !user) throw new HTTPException(404, { message: 'User not found' });
+  if (user.deleted_at !== null) throw new HTTPException(404, { message: 'User has been deleted' });
 
   setCookie(c, 'access_token', data?.session.access_token, {
     maxAge: 31536000, // 1 year

@@ -26,6 +26,8 @@ permissions:
   contents: read
   packages: write
 
+env:
+  FORCE_COLOR: 1
 
 jobs:
   api:

@@ -1,8 +1,5 @@
-# Description 📝
-<!--- Describe your changes in detail -->
-
-## Issue ticket 🏷️
-<!--- Please link to the issue here: -->
+## Summary 📝
+<!--- Describe your changes, include tickets if applicable -->
 
 ## Which part of the repository is impacted ?
 

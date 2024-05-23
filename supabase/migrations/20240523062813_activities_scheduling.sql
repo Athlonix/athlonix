@@ -11,12 +11,10 @@ create table "public"."ACTIVITIES_EXCEPTIONS" (
     "max_participants" integer
 );
 
-
 create table "public"."ACTIVITY_TEAMS" (
     "id_activity" bigint not null,
     "id_user" integer not null
 );
-
 
 alter table "public"."ACTIVITIES" drop column "days";
 
@@ -24,13 +22,11 @@ alter table "public"."ACTIVITIES" drop column "interval";
 
 alter table "public"."ACTIVITIES" drop column "recurrence";
 
-alter table "public"."ACTIVITIES" add column "days_of_month" days;
-
-alter table "public"."ACTIVITIES" add column "days_of_week" days;
-
 alter table "public"."ACTIVITIES" add column "end_time" time without time zone;
 
 alter table "public"."ACTIVITIES" add column "frequency" frequency;
+
+alter table "public"."ACTIVITIES" add column "days_of_week" days[];
 
 alter table "public"."ACTIVITIES" add column "start_time" time without time zone;
 
@@ -147,5 +143,3 @@ grant trigger on table "public"."ACTIVITY_TEAMS" to "service_role";
 grant truncate on table "public"."ACTIVITY_TEAMS" to "service_role";
 
 grant update on table "public"."ACTIVITY_TEAMS" to "service_role";
-
-

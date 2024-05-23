@@ -37,7 +37,7 @@ jobs:
           cache: pnpm
   
       - name: ⬆️ Install dependencies
-        run: pnpm -F api install
+        run: pnpm --color -F api install
 
       - name: 🚀 Start Supabase
         run: 

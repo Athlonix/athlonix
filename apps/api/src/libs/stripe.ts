@@ -97,10 +97,10 @@ export async function handleRevokeSubscription(customer: Stripe.Customer) {
 
   const id_user = userDb.id;
 
-  const { error: deleteRole } = await supabase.from('USERS_ROLES').delete().eq('id_user', id_user);
+  const { error: deleteSub } = await supabase.from('USERS').update({ date_validity: null }).eq('id', id_user);
 
-  if (deleteRole) {
-    return { error: deleteRole.message };
+  if (deleteSub) {
+    return { error: deleteSub.message };
   }
 
   return { data: 'Subscription revoked' };

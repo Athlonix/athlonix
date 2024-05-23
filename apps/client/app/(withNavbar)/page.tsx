@@ -73,7 +73,12 @@ export default function Page(): JSX.Element {
               musculation en passant par le football, vous trouverez forcément votre bonheur parmi nos activités.
             </p>
             <Button asChild className="w-44">
-              <Link href="/">Deviens membre !</Link>
+              <Link href="/">Devenir membre</Link>
+            </Button>
+            <Button asChild className="w-44 ml-6">
+              <Link href="https://donate.stripe.com/test_bIY9E70lS2IW6Ws5kk" target="_blank" rel="noreferrer">
+                Faire un don
+              </Link>
             </Button>
           </div>
           <div className="max-w-[496px] flex-1">

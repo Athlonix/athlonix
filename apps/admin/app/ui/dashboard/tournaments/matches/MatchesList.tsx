@@ -1,4 +1,5 @@
 import AddMatch from '@/app/ui/dashboard/tournaments/matches/AddMatch';
+import AddRound from '@/app/ui/dashboard/tournaments/matches/AddRound';
 import DeleteMatch from '@/app/ui/dashboard/tournaments/matches/DeleteMatch';
 import DeleteRound from '@/app/ui/dashboard/tournaments/matches/DeleteRound';
 import EditMatch from '@/app/ui/dashboard/tournaments/matches/EditMatch';

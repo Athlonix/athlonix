@@ -1,24 +1,7 @@
 'use client';
 
-import PaginationComponent from '@/app/ui/Pagination';
-import ReportsList from '@/app/ui/dashboard/posts/details/ReportsList';
+import AddRound from '@/app/ui/dashboard/tournaments/matches/AddRound';
 import MatchesList from '@/app/ui/dashboard/tournaments/matches/MatchesList';
-import { Button } from '@repo/ui/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@repo/ui/components/ui/dialog';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from '@repo/ui/components/ui/dropdown-menu';
-import { Input } from '@repo/ui/components/ui/input';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
@@ -65,6 +48,8 @@ function page() {
   const [rounds, setRounds] = useState<Round[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+
+  const [roundsLoading, setRoundsLoading] = useState(true);
 
   const hasFetchedData = useRef(false);
 
@@ -120,6 +105,7 @@ function page() {
         return data.data;
       })
       .then((rounds) => {
+        setRoundsLoading(false);
         rounds.map((round) => {
           fetch(`${urlApi}/tournaments/${idTournament}/rounds/${round.id}/matches`, {
             method: 'GET',
@@ -150,6 +136,13 @@ function page() {
         {rounds.map((round) => (
           <MatchesList key={round.id} round={round} matches={matches} teams={teams} idTournament={idTournament || ''} />
         ))}
+      </div>
+      <div className="py-10 rounded-lg border border-dashed shadow-sm p-4">
+        <div className="w-full">
+          <div className="flex justify-center">
+            {roundsLoading ? '' : <AddRound id_tournament={idTournament || ''} order={rounds.length} />}
+          </div>
+        </div>
       </div>
     </main>
   );

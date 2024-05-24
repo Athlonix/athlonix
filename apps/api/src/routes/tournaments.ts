@@ -19,18 +19,20 @@ export const matchSchema = z.object({
   id: z.number().min(1),
   start_time: z.string().datetime().nullable(),
   end_time: z.string().datetime().nullable(),
-  winner: z
-    .object({
-      winner: z.boolean().nullable(),
-      id_team: z.number(),
-    })
-    .nullable()
-    .optional(),
+  winner: z.array(z.number()).nullable(),
+  teams: z.array(
+    z.object({
+      id: z.number().min(1),
+      name: z.string().max(255),
+    }),
+  ),
 });
 
 export const createMatchSchema = z.object({
   start_time: z.string().datetime().nullable(),
   end_time: z.string().datetime().nullable(),
+  teams: z.array(z.number().min(1)).optional(),
+  winner: z.array(z.number().min(1)).optional(),
 });
 
 export const getAllTournaments = createRoute({
@@ -671,10 +673,7 @@ export const updateMatch = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: z.object({
-            start_time: z.string().datetime(),
-            end_time: z.string().datetime(),
-          }),
+          schema: createMatchSchema,
         },
       },
     },
@@ -691,41 +690,6 @@ export const updateMatch = createRoute({
     500: serverErrorSchema,
     404: notFoundSchema,
     400: badRequestSchema,
-  },
-  tags: ['tournament'],
-});
-
-export const updateMatchWinner = createRoute({
-  method: 'patch',
-  path: '/tournaments/{id_tournament}/rounds/{id_round}/matches/{id}/winner',
-  summary: 'Update the winner of a match',
-  description: 'Update the winner of a match',
-  security: [{ Bearer: [] }],
-  middleware: authMiddleware,
-  request: {
-    params: z.object({
-      id_tournament: z.coerce.number(),
-      id_round: z.coerce.number(),
-      id: z.coerce.number(),
-    }),
-    query: z.object({
-      idTeam: z.coerce.number().min(1),
-      winner: z.coerce.boolean(),
-    }),
-  },
-  responses: {
-    200: {
-      description: 'Successful response',
-      content: {
-        'application/json': {
-          schema: z.object({
-            message: z.string(),
-          }),
-        },
-      },
-    },
-    500: serverErrorSchema,
-    404: notFoundSchema,
   },
   tags: ['tournament'],
 });

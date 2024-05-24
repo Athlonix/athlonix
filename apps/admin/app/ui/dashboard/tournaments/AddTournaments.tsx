@@ -191,7 +191,7 @@ function AddTournaments({ tournaments, setTournaments, addresses }: Props): JSX.
                         name="id_address"
                         render={({ field }) => (
                           <FormItem>
-                            <Label className="font-bold">Adresse</Label>
+                            <Label className="font-bold">Tournoi</Label>
                             <Select onValueChange={field.onChange} defaultValue="-1">
                               <FormControl>
                                 <SelectTrigger>

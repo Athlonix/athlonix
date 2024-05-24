@@ -110,7 +110,7 @@ function EditForm(props: EditFormProps): JSX.Element {
     props.setter.rules(values.rules ?? null);
     props.setter.prize(values.prize ?? null);
 
-    toast.success('Succès', { duration: 2000, description: 'Adresse modifié avec succès' });
+    toast.success('Succès', { duration: 2000, description: 'Tournoi modifié avec succès' });
 
     props.closeDialog();
   }
@@ -185,7 +185,7 @@ function EditForm(props: EditFormProps): JSX.Element {
               name="id_address"
               render={({ field }) => (
                 <FormItem>
-                  <Label className="font-bold">Adresse</Label>
+                  <Label className="font-bold">Tournoi</Label>
                   <Select onValueChange={field.onChange} defaultValue="-1">
                     <FormControl>
                       <SelectTrigger>

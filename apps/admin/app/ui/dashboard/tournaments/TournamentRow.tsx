@@ -18,6 +18,7 @@ import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
+import Link from 'next/link';
 import React from 'react';
 import { useState } from 'react';
 
@@ -68,7 +69,7 @@ function TournamentRow(props: TournamentRowProps) {
     default_match_length: setDefaultMatchLength,
   };
 
-  async function deleteActivity() {
+  async function deleteTournament() {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
     fetch(`${urlApi}/tournaments/${props.tournament.id}`, {
       method: 'DELETE',
@@ -79,7 +80,7 @@ function TournamentRow(props: TournamentRowProps) {
     })
       .then((response) => response.json())
       .then(() => {
-        toast.success('Succès', { duration: 2000, description: "L'adresse a été supprimé avec succès" });
+        toast.success('Succès', { duration: 2000, description: 'Le tournoi a été supprimé avec succès' });
 
         setName('Supprimé');
         setDefaultMatchLength(null);
@@ -98,7 +99,9 @@ function TournamentRow(props: TournamentRowProps) {
 
   return (
     <TableRow key={props.tournament.id}>
-      <TableCell className="font-medium">{name}</TableCell>
+      <TableCell className="font-medium">
+        <Link href={`/dashboard/tournaments/matches?id_tournament=${props.tournament.id}`}>{name}</Link>
+      </TableCell>
       <TableCell>{defaultMatchLength}</TableCell>
       <TableCell>{maxParticipants}</TableCell>
       <TableCell>{teamCapacity}</TableCell>
@@ -133,7 +136,7 @@ function TournamentRow(props: TournamentRowProps) {
                   <DialogTrigger className="w-full text-left">Editer</DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Edition de l'adresse {props.tournament.id}</DialogTitle>
+                      <DialogTitle>Edition du tournoi {props.tournament.id}</DialogTitle>
                       <ScrollArea className="h-[500px] w-full">
                         <DialogDescription className="mx-5">
                           <EditForm
@@ -155,9 +158,9 @@ function TournamentRow(props: TournamentRowProps) {
                     <DialogHeader>
                       <DialogTitle>Suppression de l'adresse {props.tournament.id}</DialogTitle>
                       <DialogDescription>
-                        <div className="mb-4">Êtes-vous sûr de vouloir supprimer cette activité ?</div>
+                        <div className="mb-4">Êtes-vous sûr de vouloir supprimer ce tournoi ?</div>
                         <div className="flex w-full justify-end gap-4">
-                          <Button variant="destructive" onClick={deleteActivity}>
+                          <Button variant="destructive" onClick={deleteTournament}>
                             Supprimer
                           </Button>
                           <Button variant="secondary" onClick={() => setOpenDelete(false)}>

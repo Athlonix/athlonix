@@ -21,7 +21,6 @@ import {
   joinTeam,
   leaveTeam,
   updateMatch,
-  updateMatchWinner,
   updateRound,
   updateTeam,
   updateTournament,
@@ -29,6 +28,10 @@ import {
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
+
+interface winnerAccumulator {
+  [key: number]: number[];
+}
 
 export const tournaments = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
@@ -349,7 +352,7 @@ tournaments.openapi(getAllMatches, async (c) => {
 
   const query = supabase
     .from('MATCHES')
-    .select('*, winner:TEAMS_MATCHES(winner, id_team)', { count: 'exact' })
+    .select('*, winner:TEAMS_MATCHES(winner, id_team), teams:TEAMS(id, name)', { count: 'exact' })
     .eq('id_round', id_round)
     .order('id', { ascending: true });
 
@@ -359,9 +362,19 @@ tournaments.openapi(getAllMatches, async (c) => {
     return c.json({ error: error.message }, 500);
   }
 
+  const winnerTeamsId = data.reduce<winnerAccumulator>((acc, item) => {
+    const winningTeams = item.winner.filter((team) => team.winner).map((team) => team.id_team);
+
+    if (winningTeams.length > 0) {
+      acc[item.id] = winningTeams;
+    }
+
+    return acc;
+  }, {});
+
   const formattedData = data.map((item) => ({
     ...item,
-    winner: item.winner.length > 0 ? (item.winner[0] ? item.winner[0] : null) : null,
+    winner: winnerTeamsId[item.id] || [],
   }));
 
   const responseData = {
@@ -376,7 +389,7 @@ tournaments.openapi(getMatchById, async (c) => {
   const { id, id_round } = c.req.valid('param');
   const { data, error } = await supabase
     .from('MATCHES')
-    .select('*, winner:TEAMS_MATCHES(winner, id_team)')
+    .select('*, winner:TEAMS_MATCHES(winner, id_team), teams:TEAMS(id, name)')
     .eq('id', id)
     .eq('id_round', id_round)
     .single();
@@ -385,9 +398,11 @@ tournaments.openapi(getMatchById, async (c) => {
     return c.json({ error: 'Match not found' }, 404);
   }
 
+  const winnerTeamsId = data.winner.filter((team) => team.winner).map((team) => team.id_team);
+
   const formattedData = {
     ...data,
-    winner: data.winner.length > 0 ? (data.winner[0] ? data.winner[0] : null) : null,
+    winner: winnerTeamsId || [],
   };
 
   return c.json(formattedData, 200);
@@ -395,7 +410,7 @@ tournaments.openapi(getMatchById, async (c) => {
 
 tournaments.openapi(createMatch, async (c) => {
   const { id_round } = c.req.valid('param');
-  const { start_time, end_time } = c.req.valid('json');
+  const { start_time, end_time, teams, winner } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
@@ -403,34 +418,53 @@ tournaments.openapi(createMatch, async (c) => {
   if (start_time && end_time && start_time >= end_time)
     return c.json({ error: 'Start time must be before end time' }, 400);
 
-  const { data, error } = await supabase.from('MATCHES').insert({ start_time, end_time, id_round }).select().single();
+  const { data: dataMatches, error: errorMatches } = await supabase
+    .from('MATCHES')
+    .insert({ start_time, end_time, id_round })
+    .select()
+    .single();
 
-  if (error || !data) {
+  if (errorMatches || !dataMatches) {
     return c.json({ error: 'Failed to create match' }, 500);
   }
 
-  return c.json(data, 201);
-});
+  const { data: dataTeams, error: errorTeams } = await supabase
+    .from('TEAMS_MATCHES')
+    .insert([
+      ...(teams ?? []).map((id_team) => ({
+        id_match: dataMatches.id,
+        id_team,
+        winner: winner?.includes(id_team) ?? false,
+      })),
+    ])
+    .select('*, teams:TEAMS(id, name)');
 
-tournaments.openapi(updateMatchWinner, async (c) => {
-  const { id } = c.req.valid('param');
-  const { idTeam, winner } = c.req.valid('query');
-  const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, false);
-
-  const { error } = await supabase.from('TEAMS_MATCHES').update({ id_team: idTeam, winner }).eq('id_match', id);
-
-  if (error) {
-    return c.json({ error: error.message }, 500);
+  if (errorTeams || !dataTeams) {
+    return c.json({ error: 'Failed to create match' }, 500);
   }
 
-  return c.json({ message: 'Match winner updated' }, 200);
+  const formattedTeams = dataTeams.map((item) => {
+    if (!item.teams) {
+      throw new Error('Unexpected null or undefined teams');
+    }
+    return {
+      id: item.id_team,
+      name: item.teams.name,
+    };
+  });
+
+  const formattedData = {
+    ...dataMatches,
+    winner: [],
+    teams: formattedTeams || [],
+  };
+
+  return c.json(formattedData, 201);
 });
 
 tournaments.openapi(updateMatch, async (c) => {
   const { id } = c.req.valid('param');
-  const { start_time, end_time } = c.req.valid('json');
+  const { start_time, end_time, teams, winner } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
@@ -449,7 +483,45 @@ tournaments.openapi(updateMatch, async (c) => {
     return c.json({ error: 'Failed to update match' }, 500);
   }
 
-  return c.json(data, 200);
+  const { data: dataTeams, error: errorTeams } = await supabase
+    .from('TEAMS_MATCHES')
+    .upsert([
+      ...(teams ?? []).map((id_team) => ({
+        id_match: id,
+        id_team,
+        winner: winner?.includes(id_team) ?? false,
+      })),
+    ])
+    .select('*, teams:TEAMS(id, name)');
+
+  console.log(dataTeams, errorTeams);
+
+  if (errorTeams || !dataTeams) {
+    return c.json({ error: 'Failed to update match' }, 500);
+  }
+
+  const formattedTeams = dataTeams.map((item) => {
+    if (!item.teams) {
+      throw new Error('Unexpected null or undefined teams');
+    }
+    return {
+      id: item.id_team,
+      name: item.teams.name,
+      winner: item.winner,
+    };
+  });
+
+  const winnerTeamsId = dataTeams.filter((team) => team.winner).map((team) => team.id_team);
+
+  const formattedData = {
+    id: data.id,
+    start_time: data.start_time,
+    end_time: data.end_time,
+    winner: winnerTeamsId || [],
+    teams: formattedTeams || [],
+  };
+
+  return c.json(formattedData, 200);
 });
 
 tournaments.openapi(deleteMatch, async (c) => {

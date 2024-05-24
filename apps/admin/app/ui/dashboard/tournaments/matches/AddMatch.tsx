@@ -31,23 +31,13 @@ type Team = {
   name: string;
 };
 
-type Match = {
-  id: number;
-  start_time: string | null;
-  end_time: string | null;
-  id_round: number;
-  winner: number[];
-  teams: Team[];
-};
-
-interface EditMatchProps {
+interface AddMatchProps {
   idTournament: string;
   idRound: number;
-  match: Match;
   teams: Team[];
 }
 
-function EditMatch(props: EditMatchProps) {
+function AddMatch(props: AddMatchProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -57,29 +47,21 @@ function EditMatch(props: EditMatchProps) {
       start_time: z.date().optional(),
       end_time: z.date().optional(),
       id_teams: z.array(z.number()).optional(),
-      winner: z.array(z.number()).optional(),
     })
     .refine(
       (data) => {
         return data.start_time && data.end_time ? data.start_time < data.end_time : true;
       },
       { message: 'La date de début ne peut être après la date de fin', path: ['start_time'] },
-    )
-    .refine(
-      (data) => {
-        return data.winner?.every((winner) => data.id_teams?.includes(winner)) ?? false;
-      },
-      { message: 'Le gagnant doit être une équipe du match', path: ['winner'] },
     );
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       date: new Date(),
-      start_time: new Date(props.match.start_time || new Date()),
-      end_time: new Date(props.match.end_time || new Date()),
-      id_teams: props.match.teams.map((team) => team.id),
-      winner: props.match.winner,
+      start_time: new Date(),
+      end_time: new Date(),
+      id_teams: [],
     },
   });
 
@@ -104,8 +86,8 @@ function EditMatch(props: EditMatchProps) {
           )
         : null;
 
-    fetch(`${urlApi}/tournaments/${props.idTournament}/rounds/${props.idRound.toString()}/matches/${props.match.id}`, {
-      method: 'PUT',
+    fetch(`${urlApi}/tournaments/${props.idTournament}/rounds/${props.idRound.toString()}/matches`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
@@ -114,7 +96,7 @@ function EditMatch(props: EditMatchProps) {
         start_time: start_time ? new Date(start_time).toISOString() : null,
         end_time: end_time ? new Date(end_time).toISOString() : null,
         teams: values.id_teams,
-        winner: values.winner,
+        winner: [],
       }),
     })
       .then((response) => {
@@ -127,7 +109,7 @@ function EditMatch(props: EditMatchProps) {
         console.error(error);
       });
 
-    const url = `/dashboard/tournaments/matches?id_tournament=${props.idTournament}&updated=true`;
+    const url = `/dashboard/tournaments/matches?id_tournament=${props.idTournament}&created=true`;
     window.location.href = url;
   }
 
@@ -135,12 +117,13 @@ function EditMatch(props: EditMatchProps) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" className="h-8 gap-1">
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Modifier le match</span>
+          <PlusCircle className="h-3.5 w-3.5" />
+          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Créer un match</span>
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Modification du match</DialogTitle>
+          <DialogTitle>Création du match</DialogTitle>
           <DialogDescription className="mx-5">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(submit)}>
@@ -310,51 +293,9 @@ function EditMatch(props: EditMatchProps) {
                     )}
                   />
                 </div>
-                <div className="grid">
-                  <FormField
-                    control={form.control}
-                    name="winner"
-                    render={() => (
-                      <FormItem id="daysItem">
-                        <Accordion type="single" collapsible className="w-full">
-                          <AccordionItem value="role">
-                            <AccordionTrigger className="font-bold">Gagnant(s)</AccordionTrigger>
-                            <AccordionContent>
-                              {props.match.teams.map((team) => (
-                                <FormField
-                                  key={team.id}
-                                  control={form.control}
-                                  name="winner"
-                                  render={({ field }) => {
-                                    return (
-                                      <FormItem key={team.id}>
-                                        <FormControl>
-                                          <Checkbox
-                                            checked={field.value?.includes(team.id)}
-                                            onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([...(field.value || []), team.id])
-                                                : field.onChange(field.value?.filter((value) => value !== team.id));
-                                            }}
-                                          />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">{team.name}</FormLabel>
-                                      </FormItem>
-                                    );
-                                  }}
-                                />
-                              ))}
-                            </AccordionContent>
-                          </AccordionItem>
-                        </Accordion>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
                 <div className="flex gap-4 mt-4">
                   <Button type="submit" className="w-full">
-                    Modifier
+                    Créer
                   </Button>
                   <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">
                     Annuler
@@ -369,4 +310,4 @@ function EditMatch(props: EditMatchProps) {
   );
 }
 
-export default EditMatch;
+export default AddMatch;

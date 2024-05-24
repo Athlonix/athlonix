@@ -20,7 +20,6 @@ import {
 } from '@repo/ui/components/ui/dropdown-menu';
 import { Input } from '@repo/ui/components/ui/input';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { MoreHorizontal } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -61,15 +60,22 @@ function page() {
   const router = useRouter();
   const idTournament = searchParams.get('id_tournament');
   const updated = searchParams.get('updated');
+  const created = searchParams.get('created');
+  const deleted = searchParams.get('deleted');
   const [rounds, setRounds] = useState<Round[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
 
   const hasFetchedData = useRef(false);
 
-  if (updated) {
-    toast.success('Match modifié', { duration: 2000, description: 'Le Match a été modifié avec succès' });
-  }
+  if (updated)
+    toast.success('Modification appliqué', {
+      duration: 2000,
+      description: 'Les modifications ont été appliqué avec succès',
+    });
+  else if (created) toast.success('Elément crée', { duration: 2000, description: "L'élement a été crée avec succès" });
+  else if (deleted)
+    toast.success('Elément supprimé', { duration: 2000, description: "L'élement a été supprimé avec succès" });
 
   useEffect(() => {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;

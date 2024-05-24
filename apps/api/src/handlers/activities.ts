@@ -68,17 +68,25 @@ activities.openapi(createActivity, async (c) => {
     description,
     max_participants,
     min_participants,
-    id_sport,
-    id_address,
-    recurrence,
-    interval,
-    days,
+    days_of_week,
+    frequency,
     start_date,
     end_date,
+    start_time,
+    end_time,
+    id_sport,
+    id_address,
   } = c.req.valid('json');
+
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
+
+  const uniqueEventInvalid: boolean = !frequency && (!start_date || !end_date || !start_time || !start_time);
+
+  if (uniqueEventInvalid) {
+    return c.json({ error: 'You must provide date and time to create a unique event' }, 400);
+  }
 
   const { data, error } = await supabase
     .from('ACTIVITIES')
@@ -89,9 +97,6 @@ activities.openapi(createActivity, async (c) => {
       min_participants,
       id_sport,
       id_address,
-      recurrence,
-      interval,
-      days,
       start_date,
       end_date,
     })

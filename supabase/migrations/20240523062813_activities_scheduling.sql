@@ -143,3 +143,5 @@ grant trigger on table "public"."ACTIVITY_TEAMS" to "service_role";
 grant truncate on table "public"."ACTIVITY_TEAMS" to "service_role";
 
 grant update on table "public"."ACTIVITY_TEAMS" to "service_role";
+
+alter table "public"."ACTIVITIES" alter column "start_date" drop not null;

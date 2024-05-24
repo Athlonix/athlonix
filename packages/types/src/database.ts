@@ -41,7 +41,7 @@ export type Database = {
           max_participants: number;
           min_participants: number;
           name: string;
-          start_date: string;
+          start_date: string | null;
           start_time: string | null;
         };
         Insert: {
@@ -56,7 +56,7 @@ export type Database = {
           max_participants: number;
           min_participants: number;
           name: string;
-          start_date: string;
+          start_date?: string | null;
           start_time?: string | null;
         };
         Update: {
@@ -71,7 +71,7 @@ export type Database = {
           max_participants?: number;
           min_participants?: number;
           name?: string;
-          start_date?: string;
+          start_date?: string | null;
           start_time?: string | null;
         };
         Relationships: [

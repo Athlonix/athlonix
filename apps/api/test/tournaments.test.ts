@@ -11,6 +11,8 @@ describe('Tournaments tests', () => {
   let jwt: string;
   let id_tournament: number;
   let id_team: number;
+  let id_match: number;
+  let id_round: number;
 
   beforeAll(async () => {
     const res = await app.request(`${path}/auth/signup`, {
@@ -94,6 +96,94 @@ describe('Tournaments tests', () => {
     expect(tournaments.data).toBeDefined();
   });
 
+  test('Create round', async () => {
+    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        name: 'round test',
+        id_tournament,
+        order: 1,
+      }),
+    });
+    expect(res.status).toBe(201);
+    const round: { id: number } = await res.json();
+    expect(round.id).toBeDefined();
+    id_round = round.id;
+  });
+
+  test('Create match', async () => {
+    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}/matches`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        start_time: '2050-05-12T15:44:17.153Z',
+        end_time: '2050-05-13T15:44:17.153Z',
+        id_round,
+        date: new Date().toISOString(),
+      }),
+    });
+    expect(res.status).toBe(201);
+    const match: { id: number } = await res.json();
+    expect(match.id).toBeDefined();
+    id_match = match.id;
+  });
+
+  test('Get all matches', async () => {
+    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}/matches`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Get all rounds', async () => {
+    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Get round', async () => {
+    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Update round', async () => {
+    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        name: 'round test updated',
+      }),
+    });
+    expect(res.status).toBe(200);
+    const round: { name: string } = await res.json();
+    expect(round.name).toBe('round test updated');
+  });
+
   test('Create team', async () => {
     const res = await app.request(`${path}/tournaments/${id_tournament}/teams`, {
       method: 'POST',
@@ -163,6 +253,28 @@ describe('Tournaments tests', () => {
 
   test('Delete team', async () => {
     const res = await app.request(`${path}/tournaments/${id_tournament}/teams/${id_team}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Delete match', async () => {
+    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}/matches/${id_match}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Delete round', async () => {
+    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

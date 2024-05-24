@@ -21,6 +21,7 @@ env:
   SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
   SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
   SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
+  FORCE_COLOR: 1
 
 jobs:
   ci:
@@ -40,14 +41,13 @@ jobs:
           cache: pnpm
 
       - name: ⬆️ Install dependencies
-        run: pnpm install
+        run: pnpm --color install
 
       - name: 🚀 Run Biome
         run: pnpm run lint:check
 
       - name: 🧪 Check type coverage
         run: npx type-coverage --detail --at-least 90 -p tsconfig.json
-
 
       - if: github.ref == 'refs/heads/main'
         name: 🚀 Setup Supabase CLI
@@ -57,7 +57,7 @@ jobs:
 
       - if: github.ref == 'refs/heads/main'
         name: 🚀 Deploy migrations
-        run: 
-          |
+        continue-on-error: true
+        run: |
           supabase link --project-ref ${{ env.SUPABASE_PROJECT_ID }}
           supabase db push -p ${{ env.SUPABASE_DB_PASSWORD }}

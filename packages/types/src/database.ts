@@ -1240,7 +1240,9 @@ export type Database = {
           id: number;
           id_auth: string | null;
           id_referer: number | null;
+          invoice: string | null;
           last_name: string;
+          subscription: string | null;
           username: string;
         };
         Insert: {
@@ -1252,7 +1254,9 @@ export type Database = {
           id?: number;
           id_auth?: string | null;
           id_referer?: number | null;
+          invoice?: string | null;
           last_name: string;
+          subscription?: string | null;
           username: string;
         };
         Update: {
@@ -1264,7 +1268,9 @@ export type Database = {
           id?: number;
           id_auth?: string | null;
           id_referer?: number | null;
+          invoice?: string | null;
           last_name?: string;
+          subscription?: string | null;
           username?: string;
         };
         Relationships: [

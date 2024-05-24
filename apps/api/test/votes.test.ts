@@ -1,6 +1,6 @@
 import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
-import { deleteAdmin, insertRole } from './utils.js';
+import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
@@ -29,6 +29,7 @@ describe('Votes tests', () => {
     id_user = user.id;
     await insertRole(id_user, Role.ADMIN);
     await insertRole(id_user, Role.MEMBER);
+    await setValidSubscription(id_user);
 
     const loginRes = await app.request(`${path}/auth/login`, {
       method: 'POST',

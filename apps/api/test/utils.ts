@@ -12,3 +12,9 @@ export async function insertRole(id_user: number, id_role: number): Promise<void
   const { error } = await supAdmin.from('USERS_ROLES').insert({ id_user, id_role });
   if (error) throw new Error('Error while updating user');
 }
+
+export async function setValidSubscription(id: number): Promise<void> {
+  const date_validity = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleString();
+  const { error } = await supAdmin.from('USERS').update({ date_validity, subscription: 'valid' }).eq('id', id);
+  if (error) throw new Error('Error while updating user');
+}

@@ -14,7 +14,6 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@repo/ui/components/ui/form';
 import { Label } from '@repo/ui/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@repo/ui/components/ui/popover';
-import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { TimePicker } from '@repo/ui/components/ui/time-picker';
 import { cn } from '@repo/ui/lib/utils';
 import { format } from 'date-fns';

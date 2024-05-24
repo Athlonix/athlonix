@@ -1,4 +1,3 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
   Dialog,
@@ -11,8 +10,6 @@ import {
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 type Round = {
   id: number;

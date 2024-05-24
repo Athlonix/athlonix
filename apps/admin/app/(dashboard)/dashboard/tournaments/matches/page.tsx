@@ -5,7 +5,7 @@ import MatchesList from '@/app/ui/dashboard/tournaments/matches/MatchesList';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 
 type Round = {
   id: number;
@@ -38,7 +38,7 @@ type MatchesData = {
   count: number;
 };
 
-function page() {
+function ShowContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const idTournament = searchParams.get('id_tournament');
@@ -128,10 +128,7 @@ function page() {
   }, [router, idTournament]);
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
-      <div className="flex items-center gap-5">
-        <h1 className="text-lg font-semibold md:text-2xl">Tournoi</h1>
-      </div>
+    <>
       <div className="flex flex-col gap-4">
         {rounds.map((round) => (
           <MatchesList key={round.id} round={round} matches={matches} teams={teams} idTournament={idTournament || ''} />
@@ -144,7 +141,20 @@ function page() {
           </div>
         </div>
       </div>
-    </main>
+    </>
+  );
+}
+
+function page() {
+  return (
+    <Suspense>
+      <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
+        <div className="flex items-center gap-5">
+          <h1 className="text-lg font-semibold md:text-2xl">Tournoi</h1>
+        </div>
+        <ShowContent />
+      </main>
+    </Suspense>
   );
 }
 

@@ -1,7 +1,7 @@
 import { startTime } from 'hono/timing';
 import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
-import { deleteAdmin, insertRole } from './utils.js';
+import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
 const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
@@ -34,6 +34,7 @@ describe('Activities tests', () => {
     id_admin = user.id;
     await insertRole(id_admin, Role.ADMIN);
     await insertRole(id_admin, Role.MEMBER);
+    await setValidSubscription(id_admin);
   });
 
   test('Login admin', async () => {
@@ -146,6 +147,7 @@ describe('Activities tests', () => {
     id_user = user.id;
 
     await insertRole(id_user, Role.MEMBER);
+    await setValidSubscription(id_user);
   });
 
   test('Login user', async () => {

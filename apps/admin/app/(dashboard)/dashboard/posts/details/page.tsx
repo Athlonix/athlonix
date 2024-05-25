@@ -1,5 +1,6 @@
 'use client';
 
+import PaginationComponent from '@/app/ui/Pagination';
 import ReportsList from '@/app/ui/dashboard/posts/details/ReportsList';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -16,14 +17,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@repo/ui/components/ui/dropdown-menu';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@repo/ui/components/ui/pagination';
 import { Separator } from '@repo/ui/components/ui/separator';
 import { MoreHorizontal } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
@@ -159,7 +152,7 @@ function ShowReports() {
         }
         return response.json();
       })
-      .then((response) => {
+      .then(() => {
         router.push('/dashboard/posts');
       });
 
@@ -207,75 +200,12 @@ function ShowReports() {
       <div className="mx-5 border border-black rounded-lg">
         <ReportsList reports={reports} reasons={reasons} />
       </div>
-      <Pagination>
-        <PaginationContent>
-          {page > 1 && (
-            <PaginationItem>
-              <PaginationPrevious
-                className="border border-gray-500 rounded-lg"
-                href={`/dashboard/posts/details?page=${page - 1}&id_post=${idPost}`}
-              />
-            </PaginationItem>
-          )}
-          {page > 3 && (
-            <PaginationItem>
-              <PaginationLink
-                className="border border-gray-500 rounded-lg"
-                href={`/dashboard/posts/details?page=${page - 2}&id_post=${idPost}`}
-              >
-                {page - 2}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-          {page > 2 && (
-            <PaginationItem>
-              <PaginationLink
-                className="border border-gray-500 rounded-lg"
-                href={`/dashboard/posts/details?page=${page - 1}&id_post=${idPost}`}
-              >
-                {page - 1}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-          <PaginationItem>
-            <PaginationLink
-              className="border border-gray-500 rounded-lg"
-              href={`/dashboard/posts/details?page=${page}&id_post=${idPost}`}
-              isActive
-            >
-              {page}
-            </PaginationLink>
-          </PaginationItem>
-          {page < maxPage && (
-            <PaginationItem>
-              <PaginationLink
-                className="border border-gray-500 rounded-lg"
-                href={`/dashboard/posts/details?page=${page + 1}&id_post=${idPost}`}
-              >
-                {page + 1}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-          {page < maxPage - 1 && (
-            <PaginationItem>
-              <PaginationLink
-                className="border border-gray-500 rounded-lg"
-                href={`/dashboard/posts/details?page=${page + 2}&id_post=${idPost}`}
-              >
-                {page + 2}
-              </PaginationLink>
-            </PaginationItem>
-          )}
-          {page < maxPage && (
-            <PaginationItem>
-              <PaginationNext
-                className="border border-gray-500 rounded-lg"
-                href={`/dashboard/posts/details?page=${page + 1}&id_post=${idPost}`}
-              />
-            </PaginationItem>
-          )}
-        </PaginationContent>
-      </Pagination>
+      <PaginationComponent
+        page={page}
+        maxPage={maxPage}
+        href="/dashboard/posts/details"
+        params={`&id_post=${idPost}`}
+      />
     </>
   );
 }

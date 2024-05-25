@@ -1,8 +1,8 @@
 'use client';
 
 import PaginationComponent from '@/app/ui/Pagination';
-import AddAddress from '@/app/ui/dashboard/addresses/AddAddress';
-import AddressesList from '@/app/ui/dashboard/addresses/AddressesList';
+import AddTournaments from '@/app/ui/dashboard/tournaments/AddTournaments';
+import TournamentsList from '@/app/ui/dashboard/tournaments/TournamentsList';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
@@ -11,32 +11,35 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
+type Tournament = {
+  id: number;
+  created_at: string;
+  default_match_length: number | null;
+  name: string;
+  max_participants: number;
+  team_capacity: number;
+  rules: string | null;
+  prize: string | null;
+  id_address: number | null;
+};
+
 type Address = {
   id: number;
   road: string;
-  postal_code: string;
-  complement: string | null;
-  city: string;
   number: number;
+  complement: string | null;
   name: string | null;
-  id_lease: number | null;
 };
 
-type AddressData = {
-  data: Address[];
-  count: number;
-};
-
-function ShowContent() {
+function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
   let page = searchParams.get('page') || 1;
   if (typeof page === 'string') {
     page = Number.parseInt(page);
   }
-
   const [maxPage, setMaxPage] = useState<number>(1);
-  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
@@ -49,7 +52,7 @@ function ShowContent() {
         search: searchTerm,
       });
 
-      fetch(`${urlApi}/addresses?${queryParams}`, {
+      fetch(`${urlApi}/tournaments?${queryParams}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -62,8 +65,8 @@ function ShowContent() {
           }
           return response.json();
         })
-        .then((data: AddressData) => {
-          setAddresses(data.data);
+        .then((data) => {
+          setTournaments(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })
         .catch((error: Error) => {
@@ -82,8 +85,8 @@ function ShowContent() {
     <TabsContent value="all">
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Adresses</CardTitle>
-          <AddAddress addresses={addresses} setAddresses={setAddresses} />
+          <CardTitle>Tournois</CardTitle>
+          <AddTournaments tournaments={tournaments} setTournaments={setTournaments} addresses={addresses} />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">
@@ -98,36 +101,63 @@ function ShowContent() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Alias</TableHead>
-                <TableHead>Adresse</TableHead>
-                <TableHead>Ville</TableHead>
-                <TableHead>Code postal</TableHead>
+                <TableHead>Nom du tournois</TableHead>
+                <TableHead>Durée par défaut</TableHead>
+                <TableHead>Nombre d'équipe max</TableHead>
+                <TableHead>Nombre de joueur par équipe</TableHead>
+                <TableHead>Addresse</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              <AddressesList addresses={addresses} />
+              <TournamentsList tournaments={tournaments} addresses={addresses} />
             </TableBody>
           </Table>
         </CardContent>
         <CardFooter>
-          <PaginationComponent page={page} maxPage={maxPage} href="/dashboard/addresses" />
+          <PaginationComponent page={page} maxPage={maxPage} href="/dashboard/tournaments" />
         </CardFooter>
       </Card>
     </TabsContent>
   );
 }
 
-export default function Page(): JSX.Element {
+function page() {
+  const urlApi = process.env.NEXT_PUBLIC_API_URL;
+  const router = useRouter();
+  const [addresses, setAddresses] = useState<Address[]>([]);
+
+  useEffect(() => {
+    fetch(`${urlApi}/addresses`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setAddresses(data.data);
+      })
+      .catch((error: Error) => {
+        console.log(error);
+      });
+  }, [router.push, urlApi]);
+
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
       <div className="flex flex-col h-full">
         <div className="grid flex-1 items-start">
           <Tabs defaultValue="all">
             <Suspense>
-              <ShowContent />
+              <ShowContent addresses={addresses} />
             </Suspense>
           </Tabs>
         </div>
@@ -135,3 +165,5 @@ export default function Page(): JSX.Element {
     </main>
   );
 }
+
+export default page;

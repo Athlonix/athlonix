@@ -30,46 +30,49 @@ export type Database = {
     Tables: {
       ACTIVITIES: {
         Row: {
-          days: Database['public']['Enums']['days'][] | null;
+          days_of_week: Database['public']['Enums']['days'][] | null;
           description: string | null;
-          end_date: string;
+          end_date: string | null;
+          end_time: string | null;
+          frequency: Database['public']['Enums']['frequency'] | null;
           id: number;
           id_address: number | null;
           id_sport: number | null;
-          interval: number;
           max_participants: number;
           min_participants: number;
           name: string;
-          recurrence: Database['public']['Enums']['recurrence'];
-          start_date: string;
+          start_date: string | null;
+          start_time: string | null;
         };
         Insert: {
-          days?: Database['public']['Enums']['days'][] | null;
+          days_of_week?: Database['public']['Enums']['days'][] | null;
           description?: string | null;
-          end_date: string;
+          end_date?: string | null;
+          end_time?: string | null;
+          frequency?: Database['public']['Enums']['frequency'] | null;
           id?: number;
           id_address?: number | null;
           id_sport?: number | null;
-          interval?: number;
           max_participants: number;
           min_participants: number;
           name: string;
-          recurrence: Database['public']['Enums']['recurrence'];
-          start_date: string;
+          start_date?: string | null;
+          start_time?: string | null;
         };
         Update: {
-          days?: Database['public']['Enums']['days'][] | null;
+          days_of_week?: Database['public']['Enums']['days'][] | null;
           description?: string | null;
-          end_date?: string;
+          end_date?: string | null;
+          end_time?: string | null;
+          frequency?: Database['public']['Enums']['frequency'] | null;
           id?: number;
           id_address?: number | null;
           id_sport?: number | null;
-          interval?: number;
           max_participants?: number;
           min_participants?: number;
           name?: string;
-          recurrence?: Database['public']['Enums']['recurrence'];
-          start_date?: string;
+          start_date?: string | null;
+          start_time?: string | null;
         };
         Relationships: [
           {
@@ -118,6 +121,47 @@ export type Database = {
           },
         ];
       };
+      ACTIVITIES_EXCEPTIONS: {
+        Row: {
+          id: number;
+          id_activity: number | null;
+          max_participants: number | null;
+          min_participants: number | null;
+          new_end_date: string | null;
+          new_start_date: string | null;
+          old_end_date: string | null;
+          old_start_date: string | null;
+        };
+        Insert: {
+          id?: number;
+          id_activity?: number | null;
+          max_participants?: number | null;
+          min_participants?: number | null;
+          new_end_date?: string | null;
+          new_start_date?: string | null;
+          old_end_date?: string | null;
+          old_start_date?: string | null;
+        };
+        Update: {
+          id?: number;
+          id_activity?: number | null;
+          max_participants?: number | null;
+          min_participants?: number | null;
+          new_end_date?: string | null;
+          new_start_date?: string | null;
+          old_end_date?: string | null;
+          old_start_date?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'ACTIVITIES_EXCEPTIONS_id_activity_fkey';
+            columns: ['id_activity'];
+            isOneToOne: false;
+            referencedRelation: 'ACTIVITIES';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       ACTIVITIES_USERS: {
         Row: {
           active: boolean;
@@ -147,6 +191,36 @@ export type Database = {
           },
           {
             foreignKeyName: 'public_ACTIVITIES_USERS_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      ACTIVITY_TEAMS: {
+        Row: {
+          id_activity: number;
+          id_user: number;
+        };
+        Insert: {
+          id_activity: number;
+          id_user: number;
+        };
+        Update: {
+          id_activity?: number;
+          id_user?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'ACTIVITY_TEAM_id_activity_fkey';
+            columns: ['id_activity'];
+            isOneToOne: false;
+            referencedRelation: 'ACTIVITIES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'ACTIVITY_TEAM_id_user_fkey';
             columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
@@ -532,14 +606,17 @@ export type Database = {
         Row: {
           id: number;
           name: string;
+          weight_grams: number | null;
         };
         Insert: {
           id?: number;
           name: string;
+          weight_grams?: number | null;
         };
         Update: {
           id?: number;
           name?: string;
+          weight_grams?: number | null;
         };
         Relationships: [];
       };
@@ -1391,8 +1468,8 @@ export type Database = {
     };
     Enums: {
       days: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+      frequency: 'weekly' | 'monthly' | 'yearly' | 'daily';
       reaction: 'like';
-      recurrence: 'weekly' | 'monthly' | 'annual';
     };
     CompositeTypes: {
       [_ in never]: never;

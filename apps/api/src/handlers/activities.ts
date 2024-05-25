@@ -68,17 +68,29 @@ activities.openapi(createActivity, async (c) => {
     description,
     max_participants,
     min_participants,
-    id_sport,
-    id_address,
-    recurrence,
-    interval,
-    days,
+    days_of_week,
+    frequency,
     start_date,
     end_date,
+    start_time,
+    end_time,
+    id_sport,
+    id_address,
   } = c.req.valid('json');
+
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
+
+  const uniqueEventInvalid: boolean = !frequency && (!start_date || !end_date || !start_time || !end_time);
+
+  if (uniqueEventInvalid) {
+    return c.json({ error: 'You must provide date and time to create a unique event' }, 400);
+  }
+
+  if (frequency && frequency === 'daily' && (!days_of_week || !start_time || !end_time)) {
+    return c.json({ error: 'You must provide days of week for weekly frequency' }, 400);
+  }
 
   const { data, error } = await supabase
     .from('ACTIVITIES')
@@ -87,13 +99,14 @@ activities.openapi(createActivity, async (c) => {
       description,
       max_participants,
       min_participants,
-      id_sport,
-      id_address,
-      recurrence,
-      interval,
-      days,
+      days_of_week,
+      frequency,
       start_date,
       end_date,
+      start_time,
+      end_time,
+      id_sport,
+      id_address,
     })
     .select()
     .single();
@@ -112,13 +125,14 @@ activities.openapi(updateActivity, async (c) => {
     description,
     max_participants,
     min_participants,
-    id_sport,
-    id_address,
-    recurrence,
-    interval,
-    days,
+    days_of_week,
+    frequency,
     start_date,
     end_date,
+    start_time,
+    end_time,
+    id_sport,
+    id_address,
   } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
@@ -127,17 +141,17 @@ activities.openapi(updateActivity, async (c) => {
   const { data, error } = await supabase
     .from('ACTIVITIES')
     .update({
-      name,
       description,
       max_participants,
       min_participants,
-      id_sport,
-      id_address,
-      recurrence,
-      interval,
-      days,
+      days_of_week,
+      frequency,
       start_date,
       end_date,
+      start_time,
+      end_time,
+      id_sport,
+      id_address,
     })
     .eq('id', id)
     .select()
@@ -173,7 +187,8 @@ activities.openapi(applyToActivity, async (c) => {
   const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
-  if (new Date(activity.end_date) < new Date()) return c.json({ error: 'Activity has already ended' }, 400);
+  if (activity.end_date && new Date(activity.end_date) < new Date())
+    return c.json({ error: 'Activity has already ended' }, 400);
 
   const { count } = await supabase
     .from('ACTIVITIES_USERS')
@@ -232,7 +247,8 @@ activities.openapi(validApplication, async (c) => {
     .single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
-  if (new Date(activity.end_date) < new Date()) return c.json({ error: 'Activity has already ended' }, 400);
+  if (activity.end_date && new Date(activity.end_date) < new Date())
+    return c.json({ error: 'Activity has already ended' }, 400);
 
   const { count } = await supabase
     .from('ACTIVITIES_USERS')

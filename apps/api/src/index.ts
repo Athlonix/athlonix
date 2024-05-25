@@ -17,6 +17,7 @@ import { reasons } from './handlers/reasons.js';
 import { reports } from './handlers/reports.js';
 import { sports } from './handlers/sports.js';
 import { stripe } from './handlers/stripe.js';
+import { activities_teams } from './handlers/teams.js';
 import { tournaments } from './handlers/tournaments.js';
 import { users } from './handlers/users.js';
 import { polls } from './handlers/votes.js';
@@ -57,6 +58,7 @@ app.route('/blog', blog);
 app.route('/', reasons);
 app.route('/', reports);
 app.route('/', tournaments);
+app.route('/', activities_teams);
 app.route('/', stripe);
 
 app.doc('/doc', (c: Context) => ({

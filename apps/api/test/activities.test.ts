@@ -1,3 +1,4 @@
+import { startTime } from 'hono/timing';
 import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
@@ -93,6 +94,15 @@ describe('Activities tests', () => {
   });
 
   test('Create activity', async () => {
+    const now = new Date();
+    const end = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+
+    const start_date = now.toISOString().split('T')[0];
+    const start_time = now.toTimeString().split(' ')[0];
+
+    const end_date = end.toISOString().split('T')[0];
+    const end_time = end.toTimeString().split(' ')[0];
+
     const res = await app.request(`${path}/activities`, {
       method: 'POST',
       headers: {
@@ -104,15 +114,17 @@ describe('Activities tests', () => {
         description: 'Description test',
         max_participants: 10,
         min_participants: 1,
-        days: ['monday', 'tuesday'],
-        start_date: new Date().toISOString(),
-        end_date: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString(),
-        recurrence: 'weekly',
-        interval: 1,
+        days_of_week: ['monday', 'tuesday'],
+        start_date: start_date,
+        end_date: end_date,
+        start_time: start_time,
+        end_time: end_time,
+        frequency: 'weekly',
         id_sport: id_sport,
         id_address: id_location,
       }),
     });
+
     expect(res.status).toBe(201);
     const activity: { id: number } = await res.json();
     activity_id = activity.id;

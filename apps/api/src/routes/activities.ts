@@ -95,7 +95,7 @@ export const updateActivity = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: activitySchema.omit({ id: true }).partial(),
+          schema: activitySchema.omit({ id: true }),
         },
       },
     },

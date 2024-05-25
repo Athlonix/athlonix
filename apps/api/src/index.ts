@@ -17,10 +17,10 @@ import { reasons } from './handlers/reasons.js';
 import { reports } from './handlers/reports.js';
 import { sports } from './handlers/sports.js';
 import { stripe } from './handlers/stripe.js';
+import { activities_teams } from './handlers/teams.js';
 import { tournaments } from './handlers/tournaments.js';
 import { users } from './handlers/users.js';
 import { polls } from './handlers/votes.js';
-import { activities_teams } from './handlers/teams.js';
 
 const app = new OpenAPIHono();
 

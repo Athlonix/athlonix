@@ -24,7 +24,7 @@ assemblies.openapi(getOneAssembly, async (c) => {
 
   const { data, error } = await supabase
     .from('ASSEMBLIES')
-    .select('*,attendees:ASSEMBLIES_ATTENDEES(users:USERS(id,first_name,last_name, email)), location:ADDRESSES(*)')
+    .select('*,attendees:ASSEMBLIES_ATTENDEES(users:USERS(id,first_name,last_name, email)), address:ADDRESSES(*)')
     .eq('id', id)
     .single();
 
@@ -37,14 +37,12 @@ assemblies.openapi(getOneAssembly, async (c) => {
     name: data.name,
     description: data.description || null,
     date: data.date,
-    location: data.location || null,
+    location: data.address[0] || null,
     attendees: data.attendees
-      ? (data.attendees.map((attendee) => attendee.users).filter(Boolean) as {
-          id: number;
-          first_name: string;
-          last_name: string;
-          email: string;
-        }[])
+      ? data.attendees
+          .map((attendee) => attendee.users)
+          .filter(Boolean)
+          .flat()
       : [],
     lawsuit: data.lawsuit || null,
   };
@@ -60,7 +58,7 @@ assemblies.openapi(getAllAssemblies, async (c) => {
 
   const query = supabase
     .from('ASSEMBLIES')
-    .select('*,attendees:ASSEMBLIES_ATTENDEES(users:USERS(id,first_name,last_name, email)), location:ADDRESSES(*)')
+    .select('*, attendees:ASSEMBLIES_ATTENDEES(users:USERS(id,first_name,last_name, email)), address:ADDRESSES(*)')
     .order('id', { ascending: true });
 
   if (search) {
@@ -91,14 +89,12 @@ assemblies.openapi(getAllAssemblies, async (c) => {
     name: row.name,
     description: row.description || null,
     date: row.date,
-    location: row.location || null,
+    location: row.address[0] || null,
     attendees: row.attendees
-      ? (row.attendees.map((attendee) => attendee.users).filter(Boolean) as {
-          id: number;
-          first_name: string;
-          last_name: string;
-          email: string;
-        }[])
+      ? row.attendees
+          .map((attendee) => attendee.users)
+          .filter(Boolean)
+          .flat()
       : [],
     lawsuit: row.lawsuit || null,
   }));

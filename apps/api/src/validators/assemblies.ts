@@ -19,8 +19,13 @@ export const assemblySchemaResponse = z.object({
   description: z.string().nullable(),
   date: z.string().datetime(),
   location: addressSchema.nullable(),
-  attendees: z.array(
-    z.object({ id: z.number().min(1), first_name: z.string(), last_name: z.string(), email: z.string().email() }),
-  ),
+  attendees: z
+    .object({
+      id: z.number().min(1),
+      first_name: z.string(),
+      last_name: z.string(),
+      email: z.string().email(),
+    })
+    .array(),
   lawsuit: z.string().nullable(),
 });

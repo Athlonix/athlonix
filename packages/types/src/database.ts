@@ -123,34 +123,25 @@ export type Database = {
       };
       ACTIVITIES_EXCEPTIONS: {
         Row: {
+          date: string;
           id: number;
-          id_activity: number | null;
+          id_activity: number;
           max_participants: number | null;
           min_participants: number | null;
-          new_end_date: string | null;
-          new_start_date: string | null;
-          old_end_date: string | null;
-          old_start_date: string | null;
         };
         Insert: {
+          date: string;
           id?: number;
-          id_activity?: number | null;
+          id_activity: number;
           max_participants?: number | null;
           min_participants?: number | null;
-          new_end_date?: string | null;
-          new_start_date?: string | null;
-          old_end_date?: string | null;
-          old_start_date?: string | null;
         };
         Update: {
+          date?: string;
           id?: number;
-          id_activity?: number | null;
+          id_activity?: number;
           max_participants?: number | null;
           min_participants?: number | null;
-          new_end_date?: string | null;
-          new_start_date?: string | null;
-          old_end_date?: string | null;
-          old_start_date?: string | null;
         };
         Relationships: [
           {
@@ -158,6 +149,54 @@ export type Database = {
             columns: ['id_activity'];
             isOneToOne: false;
             referencedRelation: 'ACTIVITIES';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      ACTIVITIES_TASKS: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          id: number;
+          id_activity_exception: number;
+          id_employee: number | null;
+          priority: Database['public']['Enums']['priority'];
+          status: Database['public']['Enums']['status'];
+          title: string;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          id?: number;
+          id_activity_exception: number;
+          id_employee?: number | null;
+          priority: Database['public']['Enums']['priority'];
+          status: Database['public']['Enums']['status'];
+          title: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          id?: number;
+          id_activity_exception?: number;
+          id_employee?: number | null;
+          priority?: Database['public']['Enums']['priority'];
+          status?: Database['public']['Enums']['status'];
+          title?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'ACTIVITIES_TASKS_id_activity_fkey';
+            columns: ['id_activity_exception'];
+            isOneToOne: false;
+            referencedRelation: 'ACTIVITIES_EXCEPTIONS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'ACTIVITIES_TASKS_id_employee_fkey';
+            columns: ['id_employee'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
             referencedColumns: ['id'];
           },
         ];
@@ -1469,7 +1508,9 @@ export type Database = {
     Enums: {
       days: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
       frequency: 'weekly' | 'monthly' | 'yearly' | 'daily';
+      priority: 'P0' | 'P1' | 'P2' | 'P3';
       reaction: 'like';
+      status: 'not started' | 'in progress' | 'completed';
     };
     CompositeTypes: {
       [_ in never]: never;

@@ -71,7 +71,7 @@ polls.openapi(createPoll, async (c) => {
   const roles = user.roles;
   const id_user = user.id;
   await checkRole(roles, false, [Role.ADMIN]);
-  const { title, description, start_at, end_at, max_choices, options } = c.req.valid('json');
+  const { title, description, start_at, end_at, max_choices, options, assembly } = c.req.valid('json');
 
   if (!options || options.length < 2) {
     return c.json({ error: 'Poll must have at least 2 options' }, 400);
@@ -79,7 +79,7 @@ polls.openapi(createPoll, async (c) => {
 
   const { data, error } = await supabase
     .from('POLLS')
-    .insert({ title, description, start_at, end_at, max_choices, id_user })
+    .insert({ title, description, start_at, end_at, max_choices, id_user, assembly })
     .select()
     .single();
 
@@ -109,11 +109,11 @@ polls.openapi(updatePoll, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false, [Role.ADMIN]);
   const { id } = c.req.valid('param');
-  const { title, description, start_at, end_at, max_choices } = c.req.valid('json');
+  const { title, description, start_at, end_at, max_choices, assembly } = c.req.valid('json');
 
   const { data, error } = await supabase
     .from('POLLS')
-    .update({ title, description, start_at, end_at, max_choices })
+    .update({ title, description, start_at, end_at, max_choices, assembly })
     .eq('id', id)
     .select()
     .single();
@@ -139,6 +139,7 @@ polls.openapi(deletePoll, async (c) => {
   return c.json({ message: 'Poll deleted' }, 200);
 });
 
+// TODO: Implement functions to simplify the verif
 polls.openapi(voteToPoll, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
@@ -157,7 +158,7 @@ polls.openapi(voteToPoll, async (c) => {
 
   const { data: votes, error: votesError } = await supabase
     .from('POLLS')
-    .select('*, USERS_VOTES(*)')
+    .select('*, USERS_VOTES(*, user:USERS(*))')
     .eq('id', id)
     .eq('USERS_VOTES.user', hash)
     .single();
@@ -176,6 +177,26 @@ polls.openapi(voteToPoll, async (c) => {
 
   if (votes && new Date(votes?.end_at) < new Date()) {
     return c.json({ error: 'Poll already ended' }, 400);
+  }
+
+  if (votes.assembly) {
+    const { data: assembly, error: assemblyError } = await supabase
+      .from('ASSEMBLIES')
+      .select('id, ASSEMBLIES_ATTENDEES(id_member)')
+      .eq('id', votes.assembly)
+      .single();
+
+    if (assemblyError || !assembly) {
+      return c.json({ error: 'Assembly not found' }, 404);
+    }
+
+    const member = assembly.ASSEMBLIES_ATTENDEES.find(
+      (attendee: { id_member: number | null }) => attendee.id_member !== null && attendee.id_member === user.id,
+    );
+
+    if (!member) {
+      return c.json({ error: 'User is not part of the assembly' }, 400);
+    }
   }
 
   const { data, error } = await supabase

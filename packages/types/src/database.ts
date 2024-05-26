@@ -679,6 +679,7 @@ export type Database = {
       };
       POLLS: {
         Row: {
+          assembly: number | null;
           description: string | null;
           end_at: string;
           id: number;
@@ -688,6 +689,7 @@ export type Database = {
           title: string;
         };
         Insert: {
+          assembly?: number | null;
           description?: string | null;
           end_at: string;
           id?: number;
@@ -697,6 +699,7 @@ export type Database = {
           title: string;
         };
         Update: {
+          assembly?: number | null;
           description?: string | null;
           end_at?: string;
           id?: number;
@@ -706,6 +709,13 @@ export type Database = {
           title?: string;
         };
         Relationships: [
+          {
+            foreignKeyName: 'POLLS_assembly_fkey';
+            columns: ['assembly'];
+            isOneToOne: false;
+            referencedRelation: 'ASSEMBLIES';
+            referencedColumns: ['id'];
+          },
           {
             foreignKeyName: 'public_POLLS_id_user_fkey';
             columns: ['id_user'];

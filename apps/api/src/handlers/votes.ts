@@ -158,7 +158,7 @@ polls.openapi(voteToPoll, async (c) => {
 
   const { data: votes, error: votesError } = await supabase
     .from('POLLS')
-    .select('*, USERS_VOTES(*, user:USERS(*))')
+    .select('*, USERS_VOTES(*)')
     .eq('id', id)
     .eq('USERS_VOTES.user', hash)
     .single();

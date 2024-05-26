@@ -1,0 +1,26 @@
+import { z } from '@hono/zod-openapi';
+import { addressSchema } from '../routes/locations.js';
+
+export const assemblySchema = z.object({
+  id: z.number().min(1),
+  name: z.string(),
+  description: z.string().nullable(),
+  date: z.string().datetime(),
+  location: z.number().min(1).nullable(),
+  lawsuit: z.string().nullable(),
+});
+
+export const insertAssemblySchema = assemblySchema.omit({ id: true });
+export const updateAssemblySchema = assemblySchema.omit({ id: true }).partial();
+
+export const assemblySchemaResponse = z.object({
+  id: z.number().min(1),
+  name: z.string(),
+  description: z.string().nullable(),
+  date: z.string().datetime(),
+  location: addressSchema.nullable(),
+  attendees: z.array(
+    z.object({ id: z.number().min(1), first_name: z.string(), last_name: z.string(), email: z.string().email() }),
+  ),
+  lawsuit: z.string().nullable(),
+});

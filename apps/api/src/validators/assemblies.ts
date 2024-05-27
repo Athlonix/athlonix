@@ -1,5 +1,4 @@
 import { z } from '@hono/zod-openapi';
-import { addressSchema } from '../routes/locations.js';
 
 export const assemblySchema = z.object({
   id: z.number().min(1),
@@ -18,7 +17,7 @@ export const assemblySchemaResponse = z.object({
   name: z.string(),
   description: z.string().nullable(),
   date: z.string().datetime(),
-  location: addressSchema.nullable(),
+  location: z.number().min(1).nullable(),
   attendees: z
     .object({
       id: z.number().min(1),

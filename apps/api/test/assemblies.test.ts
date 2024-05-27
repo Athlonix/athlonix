@@ -1,3 +1,5 @@
+import type { Tables } from '@repo/types';
+import { number } from 'zod';
 import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
@@ -76,8 +78,8 @@ describe('Activities tests', () => {
       },
     });
     expect(res.status).toBe(200);
-    const assemblies: { count: number } = await res.json();
-    expect(assemblies.count).toBeGreaterThanOrEqual(1);
+    const { count }: { count: number } = await res.json();
+    expect(count).toBeGreaterThanOrEqual(1);
   });
 
   test('Get one assembly', async () => {
@@ -94,7 +96,7 @@ describe('Activities tests', () => {
 
   test('Update assembly', async () => {
     const res = await app.request(`${path}/assemblies/${id_assembly}`, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,

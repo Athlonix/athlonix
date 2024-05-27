@@ -25,7 +25,7 @@ assemblies.openapi(getOneAssembly, async (c) => {
 
   const { data, error } = await supabase
     .from('ASSEMBLIES')
-    .select('*,attendees:ASSEMBLIES_ATTENDEES(users:USERS(id,first_name,last_name, email)), address:ADDRESSES(*)')
+    .select('*,attendees:ASSEMBLIES_ATTENDEES(users:USERS(id,first_name,last_name, email))')
     .eq('id', id)
     .single();
 
@@ -38,7 +38,7 @@ assemblies.openapi(getOneAssembly, async (c) => {
     name: data.name,
     description: data.description || null,
     date: data.date,
-    location: data.address[0] || null,
+    location: data.location || null,
     attendees: data.attendees
       ? data.attendees
           .map((attendee) => attendee.users)
@@ -59,7 +59,7 @@ assemblies.openapi(getAllAssemblies, async (c) => {
 
   const query = supabase
     .from('ASSEMBLIES')
-    .select('*, attendees:ASSEMBLIES_ATTENDEES(users:USERS(id,first_name,last_name, email)), address:ADDRESSES(*)')
+    .select('*, attendees:ASSEMBLIES_ATTENDEES(users:USERS(id,first_name,last_name, email))', { count: 'exact' })
     .order('id', { ascending: true });
 
   if (search) {
@@ -90,7 +90,7 @@ assemblies.openapi(getAllAssemblies, async (c) => {
     name: row.name,
     description: row.description || null,
     date: row.date,
-    location: row.address[0] || null,
+    location: row.location || null,
     attendees: row.attendees
       ? row.attendees
           .map((attendee) => attendee.users)

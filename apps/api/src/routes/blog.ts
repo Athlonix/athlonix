@@ -1,5 +1,4 @@
-import { createRoute } from '@hono/zod-openapi';
-import { number, z } from 'zod';
+import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
 import {
@@ -189,7 +188,7 @@ export const commentOnPost = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            id: number().min(1),
+            id: z.number().min(1),
             content: z.string().max(255),
             created_at: z.string(),
           }),
@@ -219,7 +218,7 @@ export const getComments = createRoute({
         'application/json': {
           schema: z.object({
             data: z.array(commentSchema),
-            count: number(),
+            count: z.number(),
           }),
         },
       },

@@ -1,5 +1,4 @@
 import TournamentRow from '@/app/ui/dashboard/tournaments/TournamentRow';
-import React from 'react';
 
 type Tournament = {
   id: number;

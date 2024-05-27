@@ -8,7 +8,6 @@ import {
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog';
 import { useRouter } from 'next/navigation';
-import type React from 'react';
 import { useState } from 'react';
 
 type Round = {

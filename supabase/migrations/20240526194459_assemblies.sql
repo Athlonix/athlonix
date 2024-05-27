@@ -20,6 +20,18 @@ CREATE UNIQUE INDEX "ASSEMBLIES_pkey" ON public."ASSEMBLIES" USING btree (id);
 
 alter table "public"."ASSEMBLIES" add constraint "ASSEMBLIES_pkey" PRIMARY KEY using index "ASSEMBLIES_pkey";
 
+alter table "public"."ASSEMBLIES" add constraint "ASSEMBLIES_location_fkey" FOREIGN KEY (location) REFERENCES "ADDRESSES"(id) not valid;
+
+alter table "public"."ASSEMBLIES" validate constraint "ASSEMBLIES_location_fkey";
+
 alter table "public"."ASSEMBLIES_ATTENDEES" add constraint "ASSEMBLIES_ATTENDEES_pkey" PRIMARY KEY using index "ASSEMBLIES_ATTENDEES_pkey";
+
+alter table "public"."ASSEMBLIES_ATTENDEES" add constraint "ASSEMBLIES_ATTENDEES_id_assembly_fkey" FOREIGN KEY (id_assembly) REFERENCES "ASSEMBLIES"(id) not valid;
+
+alter table "public"."ASSEMBLIES_ATTENDEES" validate constraint "ASSEMBLIES_ATTENDEES_id_assembly_fkey";
+
+alter table "public"."ASSEMBLIES_ATTENDEES" add constraint "ASSEMBLIES_ATTENDEES_id_member_fkey" FOREIGN KEY (id_member) REFERENCES "USERS"(id) not valid;
+
+alter table "public"."ASSEMBLIES_ATTENDEES" validate constraint "ASSEMBLIES_ATTENDEES_id_member_fkey";
 
 alter table "public"."POLLS" add column "assembly" bigint;

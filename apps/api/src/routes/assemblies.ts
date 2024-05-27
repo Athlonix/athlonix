@@ -14,10 +14,12 @@ export const getAllAssemblies = createRoute({
   path: '/assemblies',
   summary: 'Get all assemblies',
   description: 'Get all assemblies with pagination and filtering options',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
   request: {
     query: queryAllSchema.extend({
-      date: z.string().nullable(),
-      location: z.coerce.number().nullable(),
+      date: z.string().optional(),
+      location: z.coerce.number().optional(),
     }),
   },
   responses: {
@@ -42,6 +44,8 @@ export const getOneAssembly = createRoute({
   path: '/assemblies/{id}',
   summary: 'Get a assembly',
   description: 'Get a assembly by id',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
   request: {
     params: idParamValidator,
   },
@@ -67,6 +71,7 @@ export const createAssembly = createRoute({
   summary: 'Create a assembly',
   description: 'Create a assembly at a specific location and date',
   security: [{ Bearer: [] }],
+  middleware: authMiddleware,
   request: {
     body: {
       content: {
@@ -118,6 +123,31 @@ export const updateAssembly = createRoute({
       },
     },
     400: badRequestSchema,
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['assembly'],
+});
+
+export const deleteAssembly = createRoute({
+  method: 'delete',
+  path: '/assemblies/{id}',
+  summary: 'Delete a assembly',
+  description: 'Delete a assembly',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
     500: serverErrorSchema,
     404: notFoundSchema,
   },

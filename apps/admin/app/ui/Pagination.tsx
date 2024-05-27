@@ -6,7 +6,6 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@repo/ui/components/ui/pagination';
-import React from 'react';
 
 interface Props {
   page: number;

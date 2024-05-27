@@ -9,6 +9,7 @@ import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { secureHeaders } from 'hono/secure-headers';
 import { activities } from './handlers/activities.js';
+import { assemblies } from './handlers/assemblies.js';
 import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
 import { health } from './handlers/health.js';
@@ -48,18 +49,19 @@ app.onError((err, c) => {
 });
 
 app.route('/', health);
+app.route('/auth', auth);
 app.route('/', users);
 app.route('/', activities);
 app.route('/', sports);
 app.route('/', location);
 app.route('/', polls);
-app.route('/auth', auth);
-app.route('/blog', blog);
+app.route('/', blog);
 app.route('/', reasons);
 app.route('/', reports);
 app.route('/', tournaments);
 app.route('/', activities_teams);
 app.route('/', stripe);
+app.route('/', assemblies);
 
 app.doc('/doc', (c: Context) => ({
   openapi: '3.0.0',

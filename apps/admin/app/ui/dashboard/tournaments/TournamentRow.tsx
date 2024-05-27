@@ -19,7 +19,6 @@ import { toast } from '@repo/ui/components/ui/sonner';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
 import { useState } from 'react';
 
 type Tournament = {

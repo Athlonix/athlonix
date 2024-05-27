@@ -15,7 +15,7 @@ import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema }
 
 export const getAllPosts = createRoute({
   method: 'get',
-  path: '/posts',
+  path: '/blog/posts',
   summary: 'Get all posts',
   description: 'Get all posts',
   request: {
@@ -40,7 +40,7 @@ export const getAllPosts = createRoute({
 
 export const getPost = createRoute({
   method: 'get',
-  path: '/posts/{id}',
+  path: '/blog/posts/{id}',
   summary: 'Get a post',
   description: 'Get a post',
   request: {
@@ -63,7 +63,7 @@ export const getPost = createRoute({
 
 export const createPost = createRoute({
   method: 'post',
-  path: '/posts',
+  path: '/blog/posts',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Create a post',
@@ -94,7 +94,7 @@ export const createPost = createRoute({
 
 export const updatePost = createRoute({
   method: 'patch',
-  path: '/posts/{id}',
+  path: '/blog/posts/{id}',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Update a post',
@@ -127,7 +127,7 @@ export const updatePost = createRoute({
 
 export const deletePost = createRoute({
   method: 'delete',
-  path: '/posts/{id}',
+  path: '/blog/posts/{id}',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Delete a post',
@@ -147,7 +147,7 @@ export const deletePost = createRoute({
 
 export const softDeletePost = createRoute({
   method: 'patch',
-  path: '/posts/{id}/soft',
+  path: '/blog/posts/{id}/soft',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Soft delete a post',
@@ -167,7 +167,7 @@ export const softDeletePost = createRoute({
 
 export const commentOnPost = createRoute({
   method: 'post',
-  path: '/posts/{id}/comments',
+  path: '/blog/posts/{id}/comments',
   summary: 'Comment on a post',
   description: 'Comment on a post',
   security: [{ Bearer: [] }],
@@ -204,7 +204,7 @@ export const commentOnPost = createRoute({
 
 export const getComments = createRoute({
   method: 'get',
-  path: '/posts/{id}/comments',
+  path: '/blog/posts/{id}/comments',
   summary: 'Get comments and responses on a post',
   description: 'Get comments and responses on a post',
   request: {
@@ -231,7 +231,7 @@ export const getComments = createRoute({
 
 export const createResponse = createRoute({
   method: 'post',
-  path: '/posts/{id_post}/comments/{id_comment}/responses',
+  path: '/blog/posts/{id_post}/comments/{id_comment}/responses',
   summary: 'Create a response',
   description: 'Create a response',
   security: [{ Bearer: [] }],
@@ -267,7 +267,7 @@ export const createResponse = createRoute({
 
 export const updateComment = createRoute({
   method: 'patch',
-  path: '/posts/{id_post}/comments/{id_comment}',
+  path: '/blog/posts/{id_post}/comments/{id_comment}',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Update a comment or a response',
@@ -303,7 +303,7 @@ export const updateComment = createRoute({
 
 export const deleteComment = createRoute({
   method: 'delete',
-  path: '/posts/{id_post}/comments/{id_comment}',
+  path: '/blog/posts/{id_post}/comments/{id_comment}',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   summary: 'Delete a comment or a response',

@@ -4,6 +4,7 @@ import { zodErrorHook } from '../libs/zodError.js';
 import {
   confirmMemberPresence,
   createAssembly,
+  deleteAssembly,
   getAllAssemblies,
   getOneAssembly,
   updateAssembly,
@@ -170,6 +171,28 @@ assemblies.openapi(updateAssembly, async (c) => {
   };
 
   return c.json(format, 200);
+});
+
+assemblies.openapi(deleteAssembly, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { id } = c.req.valid('param');
+
+  const { data: assembly, error: assemblyError } = await supabase.from('ASSEMBLIES').select('id').eq('id', id).single();
+
+  if (assemblyError || !assembly) {
+    return c.json({ error: 'Assembly not found' }, 404);
+  }
+
+  const { error } = await supabase.from('ASSEMBLIES').delete().eq('id', id);
+
+  if (error) {
+    return c.json({ error: 'Failed to delete assembly' }, 500);
+  }
+
+  return c.json({ message: 'Assembly deleted' }, 200);
 });
 
 assemblies.openapi(confirmMemberPresence, async (c) => {

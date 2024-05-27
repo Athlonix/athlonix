@@ -389,7 +389,7 @@ activities.openapi(createActivityException, async (c) => {
 });
 
 activities.openapi(getAllActivitiesExceptions, async (c) => {
-  const { all, start_date, end_date } = c.req.valid('query');
+  const { start_date, end_date } = c.req.valid('query');
   const { id: id_activity } = c.req.valid('param');
 
   const query = supabase
@@ -398,11 +398,11 @@ activities.openapi(getAllActivitiesExceptions, async (c) => {
     .eq('id_activity', id_activity)
     .order('id', { ascending: true });
 
-  if (!all && start_date && end_date) {
+  if (start_date && end_date) {
     query.gte('date', start_date).lte('date', end_date);
-  } else if (!all && start_date) {
+  } else if (start_date) {
     query.gte('date', start_date);
-  } else if (!all && end_date) {
+  } else if (end_date) {
     query.lte('date', end_date);
   }
 

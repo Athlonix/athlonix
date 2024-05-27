@@ -104,4 +104,8 @@ alter table "public"."ACTIVITIES_EXCEPTIONS" drop column "start_date";
 
 alter table "public"."ACTIVITIES_EXCEPTIONS" add column "date" date not null;
 
+alter table "public"."ACTIVITIES_TASKS" add column "id_activity" bigint;
 
+alter table "public"."ACTIVITIES_TASKS" add constraint "ACTIVITIES_TASKS_id_activity_fkey1" FOREIGN KEY (id_activity) REFERENCES "ACTIVITIES"(id) not valid;
+
+alter table "public"."ACTIVITIES_TASKS" validate constraint "ACTIVITIES_TASKS_id_activity_fkey1";

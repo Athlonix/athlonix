@@ -61,8 +61,8 @@ export const getOneActivity = createRoute({
 export const getOneActivityOccurences = createRoute({
   method: 'get',
   path: '/activities/{id}/occurences',
-  summary: 'Get a activity',
-  description: 'Get a activity',
+  summary: 'Get all occurences of an activity',
+  description: 'Get all occurences of an activity',
   request: {
     query: queryActivitiesExceptionSchema.omit({ all: true }),
     params: idParamValidator,
@@ -308,7 +308,7 @@ export const getAllActivitiesExceptions = createRoute({
   description: 'Get all activities exceptions',
   request: {
     params: z.object({ id: z.coerce.number().min(1) }),
-    query: queryActivitiesExceptionSchema,
+    query: queryActivitiesExceptionSchema.omit({ all: true }),
   },
   responses: {
     200: {

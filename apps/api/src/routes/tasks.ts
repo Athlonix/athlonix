@@ -27,7 +27,30 @@ export const getAllTasks = createRoute({
     },
     500: serverErrorSchema,
   },
-  tags: ['tasks'],
+  tags: ['task'],
+});
+
+export const getOneTask = createRoute({
+  method: 'get',
+  path: '/tasks/{id}',
+  summary: 'Get a task',
+  description: 'Get a task',
+  request: {
+    params: z.object({ id: z.coerce.number().min(1) }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: taskSchema,
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['task'],
 });
 
 export const createTask = createRoute({
@@ -57,8 +80,9 @@ export const createTask = createRoute({
         },
       },
     },
+    400: badRequestSchema,
     404: notFoundSchema,
     500: serverErrorSchema,
   },
-  tags: ['tasks'],
+  tags: ['task'],
 });

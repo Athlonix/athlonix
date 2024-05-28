@@ -39,12 +39,7 @@ assemblies.openapi(getOneAssembly, async (c) => {
     description: data.description || null,
     date: data.date,
     location: data.location || null,
-    attendees: data.attendees
-      ? data.attendees
-          .map((attendee) => attendee.users)
-          .filter(Boolean)
-          .flat()
-      : [],
+    attendees: data.attendees ? data.attendees.flatMap((attendee) => attendee.users || []) : [],
     lawsuit: data.lawsuit || null,
   };
 
@@ -91,12 +86,7 @@ assemblies.openapi(getAllAssemblies, async (c) => {
     description: row.description || null,
     date: row.date,
     location: row.location || null,
-    attendees: row.attendees
-      ? row.attendees
-          .map((attendee) => attendee.users)
-          .filter(Boolean)
-          .flat()
-      : [],
+    attendees: row.attendees ? row.attendees.flatMap((attendee) => attendee.users || []) : [],
     lawsuit: row.lawsuit || null,
   }));
 

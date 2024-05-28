@@ -158,6 +158,7 @@ export type Database = {
           created_at: string;
           description: string | null;
           id: number;
+          id_activity: number | null;
           id_activity_exception: number;
           id_employee: number | null;
           priority: Database['public']['Enums']['priority'];
@@ -168,6 +169,7 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: number;
+          id_activity?: number | null;
           id_activity_exception: number;
           id_employee?: number | null;
           priority: Database['public']['Enums']['priority'];
@@ -178,6 +180,7 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: number;
+          id_activity?: number | null;
           id_activity_exception?: number;
           id_employee?: number | null;
           priority?: Database['public']['Enums']['priority'];
@@ -190,6 +193,13 @@ export type Database = {
             columns: ['id_activity_exception'];
             isOneToOne: false;
             referencedRelation: 'ACTIVITIES_EXCEPTIONS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'ACTIVITIES_TASKS_id_activity_fkey1';
+            columns: ['id_activity'];
+            isOneToOne: false;
+            referencedRelation: 'ACTIVITIES';
             referencedColumns: ['id'];
           },
           {
@@ -404,7 +414,15 @@ export type Database = {
           location?: number | null;
           name?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'ASSEMBLIES_location_fkey';
+            columns: ['location'];
+            isOneToOne: false;
+            referencedRelation: 'ADDRESSES';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       ASSEMBLIES_ATTENDEES: {
         Row: {
@@ -422,7 +440,22 @@ export type Database = {
           id_assembly?: number | null;
           id_member?: number | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: 'ASSEMBLIES_ATTENDEES_id_assembly_fkey';
+            columns: ['id_assembly'];
+            isOneToOne: false;
+            referencedRelation: 'ASSEMBLIES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'ASSEMBLIES_ATTENDEES_id_member_fkey';
+            columns: ['id_member'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
       };
       CATEGORIES: {
         Row: {

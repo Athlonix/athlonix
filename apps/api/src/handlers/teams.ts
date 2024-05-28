@@ -88,7 +88,7 @@ activities_teams.openapi(addActivityMember, async (c) => {
     return c.json({ error: 'Failed to add user to the team' }, 500);
   }
 
-  return c.json(data, 200);
+  return c.json(data, 201);
 });
 
 activities_teams.openapi(removeActivityMember, async (c) => {
@@ -108,25 +108,21 @@ activities_teams.openapi(removeActivityMember, async (c) => {
     return c.json({ error: 'User not found' }, 404);
   }
 
-  const { data, error } = await supabase
-    .from('ACTIVITY_TEAMS')
-    .insert({ id_activity: id_activity, id_user: id_user })
-    .select()
-    .single();
+  const { data: activityFound } = await supabase.from('ACTIVITIES').select('id').eq('id', id_activity).single();
 
-  if (error || !data) {
-    return c.json({ error: 'Failed to add user to the team' }, 500);
+  if (!activityFound) {
+    return c.json({ error: 'Activity not found' }, 404);
   }
 
   const { error: deletionError } = await supabase
     .from('ACTIVITY_TEAMS')
     .delete()
-    .eq('ACTIVITY_TEAMS.id_activity', id_activity)
-    .eq('ACTIVITY_TEAMS.id_user', id_user);
+    .eq('id_activity', id_activity)
+    .eq('id_user', id_user);
 
   if (deletionError) {
     return c.json({ error: 'Team member not found' }, 404);
   }
 
-  return c.json({ message: `Team memver with id ${id_user} deleted from team ${id_activity}` }, 200);
+  return c.json({ message: `Team member with id ${id_user} deleted from team ${id_activity}` }, 200);
 });

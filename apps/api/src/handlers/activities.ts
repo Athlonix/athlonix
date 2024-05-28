@@ -8,6 +8,7 @@ import {
   createActivity,
   createActivityException,
   deleteActivity,
+  deleteActivityExceptions,
   getAllActivities,
   getAllActivitiesExceptions,
   getOneActivity,
@@ -386,6 +387,21 @@ activities.openapi(createActivityException, async (c) => {
   }
 
   return c.json(activityException, 201);
+});
+
+activities.openapi(deleteActivityExceptions, async (c) => {
+  const { id } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { error } = await supabase.from('ACTIVITIES_EXCEPTIONS').delete().eq('id', id);
+
+  if (error) {
+    return c.json({ error: 'Activity exception not found' }, 404);
+  }
+
+  return c.json({ message: 'Activity exception deleted' }, 200);
 });
 
 activities.openapi(getAllActivitiesExceptions, async (c) => {

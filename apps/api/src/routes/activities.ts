@@ -301,6 +301,31 @@ export const createActivityException = createRoute({
   tags: ['activity'],
 });
 
+export const deleteActivityExceptions = createRoute({
+  method: 'delete',
+  path: '/activities_exceptions/{id}',
+  summary: 'Delete an activity exception',
+  description: 'Delete an activity exception',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: z.object({ id: z.coerce.number().min(1) }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['activity'],
+});
+
 export const getAllActivitiesExceptions = createRoute({
   method: 'get',
   path: '/activities/{id}/exceptions',

@@ -11,6 +11,7 @@ export const pollsSchema = z.object({
   end_at: z.string().datetime(),
   max_choices: z.number().min(1),
   id_user: z.number().positive(),
+  assembly: z.number().min(1).nullable(),
   results: z.array(z.object({ id: z.number().positive(), votes: z.number().positive(), content: z.string() })),
 });
 
@@ -20,6 +21,7 @@ export const createPollSchema = z.object({
   start_at: z.string().datetime(),
   end_at: z.string().datetime(),
   max_choices: z.number().min(1),
+  assembly: z.number().min(1).nullable(),
   options: z.array(z.object({ content: z.string() })),
 });
 

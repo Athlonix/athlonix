@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 
 export const queryAllSchema = z.object({
   skip: z.coerce.number().int().min(0).default(0),

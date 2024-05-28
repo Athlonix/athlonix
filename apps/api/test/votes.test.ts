@@ -57,6 +57,7 @@ describe('Votes tests', () => {
         start_at: new Date().toISOString(),
         end_at: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
         max_choices: 2,
+        assembly: null,
         options: [{ content: 'Option test' }, { content: 'Option test 2' }, { content: 'Option test 3' }],
       }),
     });

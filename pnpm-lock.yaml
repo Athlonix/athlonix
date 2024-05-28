@@ -131,8 +131,8 @@ importers:
         specifier: ^3.30.4
         version: 3.30.4
       supabase:
-        specifier: ^1.169.6
-        version: 1.169.6
+        specifier: ^1.169.8
+        version: 1.169.8
       tsx:
         specifier: ^4.11.0
         version: 4.11.0
@@ -342,8 +342,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/typescript-config
       supabase:
-        specifier: ^1.169.6
-        version: 1.169.6
+        specifier: ^1.169.8
+        version: 1.169.8
 
 packages:
 
@@ -3297,8 +3297,8 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
 
-  supabase@1.169.6:
-    resolution: {integrity: sha512-eSJ1xDFcFqy7EK5TDyC3RwJLzGJyZRgwSAt/CcOHJJ/t+TghS6hfjpyL/R6yqDeGlHo8LBuakdV605EnKSIeZA==}
+  supabase@1.169.8:
+    resolution: {integrity: sha512-39vOiK2qZBZXUo0iWIRyJB1DLMk0kNb6iW166uvWRWkKWVaBTOErL510AdD1tVGn+sELsW7erl2vy9qLFmBX0Q==}
     engines: {npm: '>=8'}
     hasBin: true
 
@@ -3515,8 +3515,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite@5.2.11:
-    resolution: {integrity: sha512-HndV31LWW05i1BLPMUCE1B9E9GFbOu1MbenhS58FuK6owSO5qHm7GiCotrNY1YE5rMeQSFBGmT5ZaLEjFizgiQ==}
+  vite@5.2.12:
+    resolution: {integrity: sha512-/gC8GxzxMK5ntBwb48pR32GGhENnjtY30G4A0jemunsBkiEZFw60s8InGpN8gkhHEkjnRK1aSAxeQgwvFhUHAA==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -7066,7 +7066,7 @@ snapshots:
       pirates: 4.0.6
       ts-interface-checker: 0.1.13
 
-  supabase@1.169.6:
+  supabase@1.169.8:
     dependencies:
       bin-links: 4.0.4
       https-proxy-agent: 7.0.4
@@ -7289,7 +7289,7 @@ snapshots:
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.1
-      vite: 5.2.11(@types/node@20.12.12)
+      vite: 5.2.12(@types/node@20.12.12)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -7300,7 +7300,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.2.11(@types/node@20.12.12):
+  vite@5.2.12(@types/node@20.12.12):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
@@ -7328,7 +7328,7 @@ snapshots:
       strip-literal: 2.1.0
       tinybench: 2.8.0
       tinypool: 0.8.4
-      vite: 5.2.11(@types/node@20.12.12)
+      vite: 5.2.12(@types/node@20.12.12)
       vite-node: 1.6.0(@types/node@20.12.12)
       why-is-node-running: 2.2.2
     optionalDependencies:

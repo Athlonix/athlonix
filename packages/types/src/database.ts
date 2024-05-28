@@ -379,6 +379,51 @@ export type Database = {
           },
         ];
       };
+      ASSEMBLIES: {
+        Row: {
+          date: string;
+          description: string | null;
+          id: number;
+          lawsuit: string | null;
+          location: number | null;
+          name: string;
+        };
+        Insert: {
+          date: string;
+          description?: string | null;
+          id?: number;
+          lawsuit?: string | null;
+          location?: number | null;
+          name: string;
+        };
+        Update: {
+          date?: string;
+          description?: string | null;
+          id?: number;
+          lawsuit?: string | null;
+          location?: number | null;
+          name?: string;
+        };
+        Relationships: [];
+      };
+      ASSEMBLIES_ATTENDEES: {
+        Row: {
+          id: number;
+          id_assembly: number | null;
+          id_member: number | null;
+        };
+        Insert: {
+          id?: number;
+          id_assembly?: number | null;
+          id_member?: number | null;
+        };
+        Update: {
+          id?: number;
+          id_assembly?: number | null;
+          id_member?: number | null;
+        };
+        Relationships: [];
+      };
       CATEGORIES: {
         Row: {
           id: number;
@@ -738,6 +783,7 @@ export type Database = {
       };
       POLLS: {
         Row: {
+          assembly: number | null;
           description: string | null;
           end_at: string;
           id: number;
@@ -747,6 +793,7 @@ export type Database = {
           title: string;
         };
         Insert: {
+          assembly?: number | null;
           description?: string | null;
           end_at: string;
           id?: number;
@@ -756,6 +803,7 @@ export type Database = {
           title: string;
         };
         Update: {
+          assembly?: number | null;
           description?: string | null;
           end_at?: string;
           id?: number;

@@ -494,8 +494,6 @@ tournaments.openapi(updateMatch, async (c) => {
     ])
     .select('*, teams:TEAMS(id, name)');
 
-  console.log(dataTeams, errorTeams);
-
   if (errorTeams || !dataTeams) {
     return c.json({ error: 'Failed to update match' }, 500);
   }

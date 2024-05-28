@@ -4,7 +4,7 @@ import { queryAllSchema } from '../utils/pagnination.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const addressSchema = z.object({
-  id: z.number(),
+  id: z.number().min(1),
   road: z.string(),
   postal_code: z.string(),
   complement: z.string().nullable(),

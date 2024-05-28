@@ -1,5 +1,4 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import type { Context } from 'hono';
 import Stripe from 'stripe';
 import {
   handleDonations,
@@ -18,7 +17,7 @@ export const stripe = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
 });
 
-stripe.openapi(webhook, async (context: Context) => {
+stripe.openapi(webhook, async (context) => {
   const STRIPE_SECRET_API_KEY = process.env.STRIPE_SECRET_API_KEY as string;
   const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET as string;
   const stripe = new Stripe(STRIPE_SECRET_API_KEY);

@@ -5,14 +5,6 @@ import AddUser from '@/app/ui/dashboard/users/AddUser';
 import UsersList from '@/app/ui/dashboard/users/UsersList';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@repo/ui/components/ui/pagination';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
 import { useSearchParams } from 'next/navigation';

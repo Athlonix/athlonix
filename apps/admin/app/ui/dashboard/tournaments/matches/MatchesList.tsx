@@ -5,7 +5,6 @@ import EditMatch from '@/app/ui/dashboard/tournaments/matches/EditMatch';
 import EditRound from '@/app/ui/dashboard/tournaments/matches/EditRound';
 import { Separator } from '@repo/ui/components/ui/separator';
 import { Crown } from 'lucide-react';
-import type React from 'react';
 
 type Round = {
   id: number;

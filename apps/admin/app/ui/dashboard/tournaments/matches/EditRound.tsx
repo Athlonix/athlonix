@@ -12,7 +12,6 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/co
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { useRouter } from 'next/navigation';
-import type React from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';

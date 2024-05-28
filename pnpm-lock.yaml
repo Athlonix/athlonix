@@ -131,8 +131,8 @@ importers:
         specifier: ^3.30.4
         version: 3.30.4
       supabase:
-        specifier: ^1.167.4
-        version: 1.167.4
+        specifier: ^1.169.8
+        version: 1.169.8
       tsx:
         specifier: ^4.11.0
         version: 4.11.0
@@ -342,8 +342,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/typescript-config
       supabase:
-        specifier: ^1.167.4
-        version: 1.167.4
+        specifier: ^1.169.8
+        version: 1.169.8
 
 packages:
 
@@ -2084,8 +2084,8 @@ packages:
     resolution: {integrity: sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA==}
     engines: {node: '>= 6'}
 
-  caniuse-lite@1.0.30001623:
-    resolution: {integrity: sha512-X/XhAVKlpIxWPpgRTnlgZssJrF0m6YtRA0QDWgsBNT12uZM6LPRydR7ip405Y3t1LamD8cP2TZFEDZFBf5ApcA==}
+  caniuse-lite@1.0.30001624:
+    resolution: {integrity: sha512-0dWnQG87UevOCPYaOR49CBcLBwoZLpws+k6W37nLjWUhumP1Isusj0p2u+3KhjNloRWK9OKMgjBBzPujQHw4nA==}
 
   chai@4.4.1:
     resolution: {integrity: sha512-13sOfMv2+DWduEU+/xbun3LScLoqN17nBeTLUsmDfKdoiC1fr0n9PU4guu4AhRcOVFk/sW8LyZWHuhWtQZiF+g==}
@@ -3297,8 +3297,8 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
 
-  supabase@1.167.4:
-    resolution: {integrity: sha512-DTaTsYQ48FdOPvTTl3H1cQnGDHvm4kQdBakeI5qbs7BFZgu2SRJDYRrCcSgH9sbZReOKrQdJCPfNpoy/Z359gA==}
+  supabase@1.169.8:
+    resolution: {integrity: sha512-39vOiK2qZBZXUo0iWIRyJB1DLMk0kNb6iW166uvWRWkKWVaBTOErL510AdD1tVGn+sELsW7erl2vy9qLFmBX0Q==}
     engines: {npm: '>=8'}
     hasBin: true
 
@@ -3515,8 +3515,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite@5.2.11:
-    resolution: {integrity: sha512-HndV31LWW05i1BLPMUCE1B9E9GFbOu1MbenhS58FuK6owSO5qHm7GiCotrNY1YE5rMeQSFBGmT5ZaLEjFizgiQ==}
+  vite@5.2.12:
+    resolution: {integrity: sha512-/gC8GxzxMK5ntBwb48pR32GGhENnjtY30G4A0jemunsBkiEZFw60s8InGpN8gkhHEkjnRK1aSAxeQgwvFhUHAA==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -5643,7 +5643,7 @@ snapshots:
   autoprefixer@10.4.19(postcss@8.4.38):
     dependencies:
       browserslist: 4.23.0
-      caniuse-lite: 1.0.30001623
+      caniuse-lite: 1.0.30001624
       fraction.js: 4.3.7
       normalize-range: 0.1.2
       picocolors: 1.0.1
@@ -5686,7 +5686,7 @@ snapshots:
 
   browserslist@4.23.0:
     dependencies:
-      caniuse-lite: 1.0.30001623
+      caniuse-lite: 1.0.30001624
       electron-to-chromium: 1.4.783
       node-releases: 2.0.14
       update-browserslist-db: 1.0.16(browserslist@4.23.0)
@@ -5717,7 +5717,7 @@ snapshots:
 
   camelcase-css@2.0.1: {}
 
-  caniuse-lite@1.0.30001623: {}
+  caniuse-lite@1.0.30001624: {}
 
   chai@4.4.1:
     dependencies:
@@ -6465,7 +6465,7 @@ snapshots:
       '@next/env': 14.2.3
       '@swc/helpers': 0.5.5
       busboy: 1.6.0
-      caniuse-lite: 1.0.30001623
+      caniuse-lite: 1.0.30001624
       graceful-fs: 4.2.11
       postcss: 8.4.31
       react: 18.3.1
@@ -7066,7 +7066,7 @@ snapshots:
       pirates: 4.0.6
       ts-interface-checker: 0.1.13
 
-  supabase@1.167.4:
+  supabase@1.169.8:
     dependencies:
       bin-links: 4.0.4
       https-proxy-agent: 7.0.4
@@ -7289,7 +7289,7 @@ snapshots:
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.1
-      vite: 5.2.11(@types/node@20.12.12)
+      vite: 5.2.12(@types/node@20.12.12)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -7300,7 +7300,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite@5.2.11(@types/node@20.12.12):
+  vite@5.2.12(@types/node@20.12.12):
     dependencies:
       esbuild: 0.20.2
       postcss: 8.4.38
@@ -7328,7 +7328,7 @@ snapshots:
       strip-literal: 2.1.0
       tinybench: 2.8.0
       tinypool: 0.8.4
-      vite: 5.2.11(@types/node@20.12.12)
+      vite: 5.2.12(@types/node@20.12.12)
       vite-node: 1.6.0(@types/node@20.12.12)
       why-is-node-running: 2.2.2
     optionalDependencies:

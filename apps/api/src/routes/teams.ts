@@ -39,7 +39,7 @@ export const addActivityMember = createRoute({
     params: activityMemberParamSchema,
   },
   responses: {
-    200: {
+    201: {
       description: 'Successful response',
       content: {
         'application/json': {

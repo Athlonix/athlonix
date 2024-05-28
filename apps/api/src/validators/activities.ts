@@ -49,3 +49,29 @@ export const userActivities = z.object({
   id_activity: z.number(),
   activity: activitySchemaReponse.omit({ sport: true }).nullable(),
 });
+
+export const activityExceptionSchema = z.object({
+  id: z.coerce.number().min(1),
+  id_activity: z.coerce.number().min(1),
+  date: z.string().date(),
+  max_participants: z.coerce.number().min(1).nullable(),
+  min_participants: z.coerce.number().min(1).nullable(),
+});
+
+export const queryActivitiesExceptionSchema = z.object({
+  start_date: z.string().date(),
+  end_date: z.string().date(),
+  all: z.coerce.boolean().optional().default(false),
+});
+
+export const activityOccurencesSchema = z.object({
+  activity: activitySchemaReponse,
+  occurences: z.array(
+    z.object({
+      id_exception: z.coerce.number().min(1).nullable(),
+      date: z.string().date(),
+      max_participants: z.coerce.number().min(1).nullable(),
+      min_participants: z.coerce.number().min(1).nullable(),
+    }),
+  ),
+});

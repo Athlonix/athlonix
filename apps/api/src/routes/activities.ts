@@ -1,7 +1,13 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
-import { activitySchema, activitySchemaReponse } from '../validators/activities.js';
+import {
+  activityExceptionSchema,
+  activityOccurencesSchema,
+  activitySchema,
+  activitySchemaReponse,
+  queryActivitiesExceptionSchema,
+} from '../validators/activities.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const getAllActivities = createRoute({
@@ -47,6 +53,31 @@ export const getOneActivity = createRoute({
       },
     },
     500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['activity'],
+});
+
+export const getOneActivityOccurences = createRoute({
+  method: 'get',
+  path: '/activities/{id}/occurences',
+  summary: 'Get all occurences of an activity',
+  description: 'Get all occurences of an activity',
+  request: {
+    query: queryActivitiesExceptionSchema.omit({ all: true }),
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: activityOccurencesSchema,
+        },
+      },
+    },
+    500: serverErrorSchema,
+    400: badRequestSchema,
     404: notFoundSchema,
   },
   tags: ['activity'],
@@ -233,6 +264,90 @@ export const validApplication = createRoute({
     500: serverErrorSchema,
     404: notFoundSchema,
     400: badRequestSchema,
+  },
+  tags: ['activity'],
+});
+
+export const createActivityException = createRoute({
+  method: 'post',
+  path: '/activities/{id}/exceptions',
+  summary: 'Create an activity exception',
+  description: 'Create an activity exception',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: activityExceptionSchema.omit({ id: true, id_activity: true }),
+        },
+      },
+    },
+    params: z.object({ id: z.coerce.number().min(1) }),
+  },
+  responses: {
+    201: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: activityExceptionSchema,
+        },
+      },
+    },
+    404: notFoundSchema,
+    400: badRequestSchema,
+    500: serverErrorSchema,
+  },
+  tags: ['activity'],
+});
+
+export const deleteActivityExceptions = createRoute({
+  method: 'delete',
+  path: '/activities_exceptions/{id}',
+  summary: 'Delete an activity exception',
+  description: 'Delete an activity exception',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: z.object({ id: z.coerce.number().min(1) }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['activity'],
+});
+
+export const getAllActivitiesExceptions = createRoute({
+  method: 'get',
+  path: '/activities/{id}/exceptions',
+  summary: 'Get all activities exceptions',
+  description: 'Get all activities exceptions',
+  request: {
+    params: z.object({ id: z.coerce.number().min(1) }),
+    query: queryActivitiesExceptionSchema.omit({ all: true }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            data: z.array(activityExceptionSchema),
+            count: z.number(),
+          }),
+        },
+      },
+    },
+    500: serverErrorSchema,
   },
   tags: ['activity'],
 });

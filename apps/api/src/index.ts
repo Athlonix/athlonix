@@ -18,6 +18,7 @@ import { reasons } from './handlers/reasons.js';
 import { reports } from './handlers/reports.js';
 import { sports } from './handlers/sports.js';
 import { stripe } from './handlers/stripe.js';
+import { tasks } from './handlers/tasks.js';
 import { activities_teams } from './handlers/teams.js';
 import { tournaments } from './handlers/tournaments.js';
 import { users } from './handlers/users.js';
@@ -62,6 +63,7 @@ app.route('/', tournaments);
 app.route('/', activities_teams);
 app.route('/', stripe);
 app.route('/', assemblies);
+app.route('/', tasks);
 
 app.doc('/doc', (c: Context) => ({
   openapi: '3.0.0',

@@ -1,13 +1,18 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { getOccurences } from '../libs/activities.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
   applyToActivity,
   cancelApplication,
   createActivity,
+  createActivityException,
   deleteActivity,
+  deleteActivityExceptions,
   getAllActivities,
+  getAllActivitiesExceptions,
   getOneActivity,
+  getOneActivityOccurences,
   updateActivity,
   validApplication,
 } from '../routes/activities.js';
@@ -62,6 +67,85 @@ activities.openapi(getOneActivity, async (c) => {
   return c.json(data, 200);
 });
 
+activities.openapi(getOneActivityOccurences, async (c) => {
+  const { id: id_activity } = c.req.valid('param');
+  let { start_date, end_date } = c.req.valid('query');
+
+  if (!start_date && !end_date) {
+    return c.json({ error: 'start_date and end_date params are mandatory' }, 400);
+  }
+
+  const { data: activityFound, error } = await supabase
+    .from('ACTIVITIES')
+    .select('*, sport:SPORTS (id,name)')
+    .eq('id', id_activity)
+    .single();
+  if (error) {
+    return c.json({ error: 'Error while fetching activity' }, 500);
+  }
+
+  if (!activityFound) {
+    return c.json({ error: 'Activity not found' }, 404);
+  }
+
+  if (!activityFound.frequency || !activityFound.days_of_week) {
+    return c.json(
+      {
+        activity: activityFound,
+        occurences: [],
+      },
+      200,
+    );
+  }
+
+  if (activityFound.start_date) {
+    if (new Date(activityFound.start_date) > new Date(start_date)) {
+      start_date = activityFound.start_date;
+    }
+  }
+
+  if (activityFound.end_date) {
+    if (new Date(activityFound.end_date) > new Date(end_date)) {
+      end_date = activityFound.end_date;
+    }
+  }
+
+  const query = supabase
+    .from('ACTIVITIES_EXCEPTIONS')
+    .select('*', { count: 'exact' })
+    .eq('id_activity', id_activity)
+    .order('id', { ascending: true });
+
+  if (start_date && end_date) {
+    query.gte('date', start_date).lte('date', end_date);
+  } else if (start_date) {
+    query.gte('date', start_date);
+  } else if (end_date) {
+    query.lte('date', end_date);
+  }
+
+  const { data: activitesExceptions, error: activitiesError } = await query;
+
+  if (activitiesError || !activitesExceptions) {
+    return c.json({ error: 'Error while fetching activity' }, 500);
+  }
+
+  const occurences = getOccurences(
+    new Date(start_date),
+    new Date(end_date),
+    activityFound.days_of_week,
+    activitesExceptions,
+  );
+
+  return c.json(
+    {
+      activity: activityFound,
+      occurences: occurences,
+    },
+    200,
+  );
+});
+
 activities.openapi(createActivity, async (c) => {
   const {
     name,
@@ -80,6 +164,7 @@ activities.openapi(createActivity, async (c) => {
 
   const user = c.get('user');
   const roles = user.roles;
+
   await checkRole(roles, false);
 
   const uniqueEventInvalid: boolean = !frequency && (!start_date || !end_date || !start_time || !end_time);
@@ -112,7 +197,7 @@ activities.openapi(createActivity, async (c) => {
     .single();
 
   if (error || !data) {
-    return c.json({ error: 'Failed to create activity' }, 400);
+    return c.json({ error: 'Failed to create activity' }, 500);
   }
 
   return c.json(data, 201);
@@ -268,4 +353,85 @@ activities.openapi(validApplication, async (c) => {
   if (errorValid) return c.json({ error: 'Failed to validate application' }, 400);
 
   return c.json({ message: `Application to activity ${activity.name} validated` }, 200);
+});
+
+activities.openapi(createActivityException, async (c) => {
+  const { date, max_participants, min_participants } = c.req.valid('json');
+
+  const { id: id_activity } = c.req.valid('param');
+
+  const user = c.get('user');
+  const roles = user.roles;
+
+  await checkRole(roles, false);
+
+  const { data: activityFound, error } = await supabase.from('ACTIVITIES').select('id').eq('id', id_activity).single();
+
+  if (error || !activityFound) {
+    return c.json({ error: 'Activity not found' }, 404);
+  }
+
+  const { data: activityException, error: insertError } = await supabase
+    .from('ACTIVITIES_EXCEPTIONS')
+    .insert({
+      id_activity,
+      date,
+      min_participants,
+      max_participants,
+    })
+    .select()
+    .single();
+
+  if (insertError || !activityException) {
+    return c.json({ error: 'Failed to create activity' }, 500);
+  }
+
+  return c.json(activityException, 201);
+});
+
+activities.openapi(deleteActivityExceptions, async (c) => {
+  const { id } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { error } = await supabase.from('ACTIVITIES_EXCEPTIONS').delete().eq('id', id);
+
+  if (error) {
+    return c.json({ error: 'Activity exception not found' }, 404);
+  }
+
+  return c.json({ message: 'Activity exception deleted' }, 200);
+});
+
+activities.openapi(getAllActivitiesExceptions, async (c) => {
+  const { start_date, end_date } = c.req.valid('query');
+  const { id: id_activity } = c.req.valid('param');
+
+  const query = supabase
+    .from('ACTIVITIES_EXCEPTIONS')
+    .select('*', { count: 'exact' })
+    .eq('id_activity', id_activity)
+    .order('id', { ascending: true });
+
+  if (start_date && end_date) {
+    query.gte('date', start_date).lte('date', end_date);
+  } else if (start_date) {
+    query.gte('date', start_date);
+  } else if (end_date) {
+    query.lte('date', end_date);
+  }
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    return c.json({ error: 'Failed to fetch activities exceptions' }, 500);
+  }
+
+  const responseData = {
+    data: data || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
 });

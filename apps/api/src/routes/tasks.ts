@@ -1,7 +1,7 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
-import { badRequestSchema, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 import { taskSchema } from '../validators/tasks.js';
 
 export const getAllTasks = createRoute({
@@ -109,6 +109,39 @@ export const deleteTask = createRoute({
       },
     },
     500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['task'],
+});
+
+export const updateTask = createRoute({
+  method: 'patch',
+  path: '/tasks/{id}',
+  summary: 'Update a task',
+  description: 'Update a task',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: taskSchema.omit({ id: true, created_at: true, id_activity_exception: true }).partial(),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: taskSchema,
+        },
+      },
+    },
+    500: serverErrorSchema,
+    400: badRequestSchema,
     404: notFoundSchema,
   },
   tags: ['task'],

@@ -1,7 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { createTask, deleteTask, getAllTasks, getOneTask } from '../routes/tasks.js';
+import { createTask, deleteTask, getAllTasks, getOneTask, updateTask } from '../routes/tasks.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import { Role, type Variables } from '../validators/general.js';
@@ -127,4 +127,25 @@ tasks.openapi(deleteTask, async (c) => {
   }
 
   return c.json({ message: `Task with id ${id} deleted` }, 200);
+});
+
+tasks.openapi(updateTask, async (c) => {
+  const { id } = c.req.valid('param');
+  const { title, description, status, priority, id_employee } = c.req.valid('json');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { data, error } = await supabase
+    .from('ACTIVITIES_TASKS')
+    .update({ title, description, status, priority, id_employee })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Failed to update task' }, 400);
+  }
+
+  return c.json(data, 200);
 });

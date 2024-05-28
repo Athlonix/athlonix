@@ -79,7 +79,7 @@ tasks.openapi(createTask, async (c) => {
       .select('id_user')
       .eq('id_activity', activityFound.id_activity);
     if (error || !teamMembers) {
-      return c.json({ error: 'Error while executing requeset' }, 500);
+      return c.json({ error: 'Error while executing request' }, 500);
     }
     const idMembers: number[] = teamMembers?.map((m) => m.id_user) as number[];
 

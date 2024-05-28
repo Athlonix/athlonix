@@ -1,7 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { createTask, getAllTasks, getOneTask } from '../routes/tasks.js';
+import { createTask, deleteTask, getAllTasks, getOneTask } from '../routes/tasks.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import { Role, type Variables } from '../validators/general.js';
@@ -112,4 +112,19 @@ tasks.openapi(createTask, async (c) => {
   }
 
   return c.json(data, 201);
+});
+
+tasks.openapi(deleteTask, async (c) => {
+  const { id } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { error } = await supabase.from('ACTIVITIES_TASKS').delete().eq('id', id);
+
+  if (error) {
+    return c.json({ error: 'Task not found' }, 404);
+  }
+
+  return c.json({ message: `Task with id ${id} deleted` }, 200);
 });

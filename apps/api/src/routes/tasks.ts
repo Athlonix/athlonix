@@ -7,7 +7,7 @@ import { taskSchema } from '../validators/tasks.js';
 export const getAllTasks = createRoute({
   method: 'get',
   path: '/activities_exceptions/{id}/tasks',
-  summary: 'Get all activity occurence tasks',
+  summary: 'Get all tasks of an activity occurence',
   description: 'Get all activity occurence tasks',
   request: {
     params: z.object({ id: z.coerce.number().min(1) }),
@@ -83,6 +83,33 @@ export const createTask = createRoute({
     400: badRequestSchema,
     404: notFoundSchema,
     500: serverErrorSchema,
+  },
+  tags: ['task'],
+});
+
+export const deleteTask = createRoute({
+  method: 'delete',
+  path: '/tasks/{id}',
+  summary: 'Delete a task',
+  description: 'Delete a task',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: z.object({ id: z.coerce.number().min(1) }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
   },
   tags: ['task'],
 });

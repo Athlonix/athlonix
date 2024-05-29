@@ -12,6 +12,7 @@ import { activities } from './handlers/activities.js';
 import { assemblies } from './handlers/assemblies.js';
 import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
+import { edm } from './handlers/edm.js';
 import { health } from './handlers/health.js';
 import { location } from './handlers/location.js';
 import { reasons } from './handlers/reasons.js';
@@ -64,6 +65,7 @@ app.route('/', activities_teams);
 app.route('/', stripe);
 app.route('/', assemblies);
 app.route('/', tasks);
+app.route('/', edm);
 
 app.doc('/doc', (c: Context) => ({
   openapi: '3.0.0',

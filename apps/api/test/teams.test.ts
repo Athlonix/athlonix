@@ -163,8 +163,7 @@ describe('Teams tests', () => {
     });
     expect(res.status).toBe(200);
 
-    const { members } = await res.json();
-
+    const members = (await res.json()) as { id: number }[];
     expect(members.length).toBeGreaterThan(0);
   });
 

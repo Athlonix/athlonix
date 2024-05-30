@@ -201,8 +201,7 @@ describe('Activities tests', () => {
     });
     expect(res.status).toBe(200);
 
-    const { data } = await res.json();
-
+    const data = (await res.json()) as { id: number }[];
     expect(data.length).toBeGreaterThan(0);
   });
 

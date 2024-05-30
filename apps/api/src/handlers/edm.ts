@@ -2,28 +2,79 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { deleteFile, uploadFile, upsertFile } from '../libs/storage.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { deleteFileRoute, updateFile, uploadFileRoute } from '../routes/edm.js';
+import { deleteFileRoute, downloadFileRoute, getAllFiles, updateFile, uploadFileRoute } from '../routes/edm.js';
+import { checkRole } from '../utils/context.js';
 import type { Variables } from '../validators/general.js';
 
 export const edm = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
 });
 
-edm.openapi(uploadFileRoute, async (c) => {
-  const { file } = c.req.valid('form');
+edm.openapi(getAllFiles, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
 
-  const { error } = await uploadFile('test', file, 'edm');
+  const { data, error, count } = await supabase.from('DOCUMENTS').select('*', { count: 'exact' });
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  return c.json({ data, count: count || 0 }, 200);
+});
+
+edm.openapi(downloadFileRoute, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+  const { id } = c.req.valid('param');
+
+  const { data, error } = await supabase.from('DOCUMENTS').select('name').eq('id', id).single();
+  if (error || !data) {
+    return c.json({ error: 'File not found' }, 404);
+  }
+
+  const { data: file, error: downloadError } = await supabase.storage.from('edm').download(data.name);
+  if (downloadError) {
+    return c.json({ error: downloadError.message }, 500);
+  }
+
+  return c.json({ file: new Blob([file]) }, 200);
+});
+
+edm.openapi(uploadFileRoute, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+  const { file, name, description } = c.req.valid('form');
+
+  const { error } = await uploadFile(name, file, 'edm');
   if (error) {
     return c.json({ error }, 500);
+  }
+
+  const { error: insertDoc } = await supabase
+    .from('DOCUMENTS')
+    .insert({ name: name, description: description, owner: user.id });
+  if (insertDoc) {
+    return c.json({ error: 'Error inserting document' }, 500);
   }
 
   return c.json({ message: 'File uploaded' }, 200);
 });
 
 edm.openapi(updateFile, async (c) => {
-  const { file, path } = c.req.valid('form');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+  const { file, name, description } = c.req.valid('form');
 
-  const { error } = await upsertFile(path, file, 'edm');
+  const { error: updateDoc } = await supabase.from('DOCUMENTS').update({ description }).eq('name', name);
+  if (updateDoc) {
+    return c.json({ error: 'Error updating document' }, 500);
+  }
+
+  const { error } = await upsertFile(name, file, 'edm');
   if (error) {
     return c.json({ error }, 500);
   }
@@ -32,9 +83,17 @@ edm.openapi(updateFile, async (c) => {
 });
 
 edm.openapi(deleteFileRoute, async (c) => {
-  const { path } = c.req.valid('json');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+  const { name } = c.req.valid('json');
 
-  const { error } = await deleteFile(path, 'edm');
+  const { error: deleteDoc } = await supabase.from('DOCUMENTS').delete().eq('name', name);
+  if (deleteDoc) {
+    return c.json({ error: 'Error deleting document' }, 500);
+  }
+
+  const { error } = await deleteFile(name, 'edm');
   if (error) {
     return c.json({ error }, 500);
   }

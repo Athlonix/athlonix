@@ -3,17 +3,76 @@ import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
+export const getAllFiles = createRoute({
+  method: 'get',
+  path: '/listFiles',
+  summary: 'List all files',
+  description: 'List all files from EDM bucket',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    query: queryAllSchema,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            data: z.array(
+              z.object({
+                id: z.number().min(1),
+                name: z.string(),
+                description: z.string().nullable(),
+                owner: z.number().min(1),
+              }),
+            ),
+            count: z.number(),
+          }),
+        },
+      },
+    },
+    400: badRequestSchema,
+    500: serverErrorSchema,
+  },
+  tags: ['edm'],
+});
+
+export const downloadFileRoute = createRoute({
+  method: 'get',
+  path: '/download/{id}',
+  summary: 'Download a file',
+  description: 'Download a file from a bucket',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response', // TODO: find a way to specify the return type
+    },
+    404: notFoundSchema,
+    500: serverErrorSchema,
+  },
+  tags: ['edm'],
+});
+
 export const uploadFileRoute = createRoute({
   method: 'post',
   path: '/upload',
   summary: 'Upload a file',
   description: 'Upload a file to a bucket',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
   request: {
     body: {
       content: {
         'multipart/form-data': {
           schema: z.object({
             file: z.instanceof(File),
+            name: z.string(),
+            description: z.string().optional(),
           }),
         },
       },
@@ -32,7 +91,7 @@ export const uploadFileRoute = createRoute({
     },
     500: serverErrorSchema,
   },
-  tags: ['file'],
+  tags: ['edm'],
 });
 
 export const updateFile = createRoute({
@@ -48,7 +107,8 @@ export const updateFile = createRoute({
         'multipart/form-data': {
           schema: z.object({
             file: z.instanceof(File),
-            path: z.string(),
+            name: z.string(),
+            description: z.string().optional(),
           }),
         },
       },
@@ -67,7 +127,7 @@ export const updateFile = createRoute({
     },
     500: serverErrorSchema,
   },
-  tags: ['file'],
+  tags: ['edm'],
 });
 
 export const deleteFileRoute = createRoute({
@@ -82,7 +142,7 @@ export const deleteFileRoute = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            path: z.string(),
+            name: z.string(),
           }),
         },
       },
@@ -101,5 +161,5 @@ export const deleteFileRoute = createRoute({
     },
     500: serverErrorSchema,
   },
-  tags: ['file'],
+  tags: ['edm'],
 });

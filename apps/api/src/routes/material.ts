@@ -20,7 +20,8 @@ export const getAllMaterials = createRoute({
   middleware: authMiddleware,
   request: {
     query: z.object({
-      ...queryAllSchema.shape,
+      search: z.string().optional(),
+      all: z.coerce.boolean().optional().default(false),
       addresses: z.union([z.coerce.number().array().min(1), z.string().transform((val) => [Number(val)])]),
     }),
   },
@@ -80,8 +81,6 @@ export const createMaterial = createRoute({
           schema: z.object({
             name: z.string(),
             weight_grams: z.coerce.number().optional(),
-            id_address: z.coerce.number(),
-            quantity: z.coerce.number(),
           }),
         },
       },
@@ -92,7 +91,7 @@ export const createMaterial = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: materialSchema,
+          schema: materialSchema.omit({ id_address: true, quantity: true }),
         },
       },
     },
@@ -116,9 +115,7 @@ export const updateMaterial = createRoute({
         'application/json': {
           schema: z.object({
             name: z.string().optional(),
-            weight_grams: z.number().optional(),
-            id_address: z.number().optional(),
-            quantity: z.number().optional(),
+            weight_grams: z.coerce.number().optional(),
           }),
         },
       },
@@ -129,7 +126,7 @@ export const updateMaterial = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: materialSchema,
+          schema: materialSchema.omit({ id_address: true, quantity: true }),
         },
       },
     },
@@ -148,6 +145,111 @@ export const deleteMaterial = createRoute({
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    404: notFoundSchema,
+    500: serverErrorSchema,
+  },
+  tags: ['material'],
+});
+
+export const changeMaterialQuantity = createRoute({
+  method: 'patch',
+  path: '/materials/{id}/quantity',
+  summary: 'Change the quantity of a material',
+  description: 'Change the quantity of a material',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            quantity: z.coerce.number(),
+            id_address: z.coerce.number(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    404: notFoundSchema,
+    500: serverErrorSchema,
+  },
+  tags: ['material'],
+});
+
+export const addMaterial = createRoute({
+  method: 'post',
+  path: '/materials/{id}/add',
+  summary: 'Add a material',
+  description: 'Add a material',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            id_address: z.coerce.number(),
+            quantity: z.coerce.number(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    404: notFoundSchema,
+    500: serverErrorSchema,
+  },
+  tags: ['material'],
+});
+
+export const removeMaterial = createRoute({
+  method: 'delete',
+  path: '/materials/{id}/remove',
+  summary: 'Remove a material',
+  description: 'Remove a material',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            id_address: z.coerce.number(),
+            quantity: z.coerce.number(),
+          }),
+        },
+      },
+    },
   },
   responses: {
     200: {

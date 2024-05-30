@@ -1,7 +1,13 @@
 'use client';
 
-import PaginationComponent from '@/app/ui/Pagination';
+import AddMaterial from '@/app/ui/dashboard/materials/AddMaterial';
+import DeleteMaterial from '@/app/ui/dashboard/materials/DeleteMaterial';
+import EditMaterial from '@/app/ui/dashboard/materials/EditMaterial';
+import MaterialsList from '@/app/ui/dashboard/materials/MaterialsList';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
+import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
+import { CircleX, Menu } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -45,6 +51,7 @@ function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
     const timer = setTimeout(() => {
       const queryParams = new URLSearchParams({
         search: searchTerm,
+        all: 'true',
       });
 
       const addressesString = addresses.map((address) => `addresses=${address.id}`).join('&');
@@ -65,7 +72,6 @@ function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
           return response.json();
         })
         .then((data: MaterialData) => {
-          console.log(data.data);
           setMaterials(data.data);
         })
         .catch((error: Error) => {
@@ -83,7 +89,7 @@ function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
   return (
     <>
       <div className="flex items-center gap-5">
-        <h1 className="text-lg font-semibold md:text-2xl">Matériel</h1>
+        <h1 className="text-lg font-semibold md:text-2xl">Gestion matériel</h1>
         <Input
           type="search"
           placeholder="Rechercher..."
@@ -92,8 +98,32 @@ function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
           value={searchTerm}
         />
       </div>
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="value-1">
+          <AccordionTrigger>Matériels</AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-col space-y-2">
+              {materials.map((material) => (
+                <div key={material.id} className="grid grid-cols-3">
+                  <div>{material.name}</div>
+                  <div>{material.weight_grams ? `${material.weight_grams} g` : 'Non renseigné'}</div>
+                  <div>
+                    <div className="flex w-full justify-end gap-4">
+                      <EditMaterial material={material} materials={materials} setMaterials={setMaterials} />
+                      <DeleteMaterial material={material} setMaterials={setMaterials} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <AddMaterial materials={materials} setMaterials={setMaterials} />
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
       <div className="flex flex-1 rounded-lg border border-dashed shadow-sm p-4" x-chunk="dashboard-02-chunk-1">
-        <div className="grid grid-cols-2 gap-4 w-full">{/* <PostsList posts={posts} /> */}</div>
+        <div className="grid grid-cols-2 gap-4 w-full">
+          <MaterialsList materials={materials} addresses={addresses} setMaterials={setMaterials} />
+        </div>
       </div>
     </>
   );

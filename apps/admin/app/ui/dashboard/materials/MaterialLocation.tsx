@@ -43,7 +43,7 @@ function MaterialLocation({ materials, address, setMaterials }: Props) {
               <div>{material.name}</div>
               <div>
                 {material.weight_grams
-                  ? `${material.weight_grams / 1000} kg (${material.weight_grams} g/u)`
+                  ? `${(material.weight_grams * material.quantity) / 100} kg (${material.weight_grams} g/u)`
                   : 'Non renseigné'}
               </div>
               <div>{material.quantity} unité(s)</div>

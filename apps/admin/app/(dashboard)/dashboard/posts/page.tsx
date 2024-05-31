@@ -56,7 +56,6 @@ function ShowContent() {
           return response.json();
         })
         .then((data: PostData) => {
-          console.log(data);
           setPosts(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })

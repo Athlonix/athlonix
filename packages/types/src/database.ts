@@ -336,14 +336,14 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_ADDRESSES_MATERIALS_id_address_fkey';
+            foreignKeyName: 'ADDRESSES_MATERIALS_id_address_fkey';
             columns: ['id_address'];
             isOneToOne: false;
             referencedRelation: 'ADDRESSES';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'public_ADDRESSES_MATERIALS_id_material_fkey';
+            foreignKeyName: 'ADDRESSES_MATERIALS_id_material_fkey';
             columns: ['id_material'];
             isOneToOne: false;
             referencedRelation: 'MATERIALS';

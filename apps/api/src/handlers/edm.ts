@@ -13,7 +13,7 @@ export const edm = new OpenAPIHono<{ Variables: Variables }>({
 edm.openapi(getAllFiles, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
-  await checkRole(roles, false);
+  await checkRole(roles, true);
 
   let { data, error, count } = await supabase.from('DOCUMENTS').select('*', { count: 'exact' });
   if (error) {

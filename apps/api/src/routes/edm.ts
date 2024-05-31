@@ -126,6 +126,7 @@ export const updateFile = createRoute({
       },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
   },
   tags: ['edm'],
 });
@@ -160,6 +161,7 @@ export const deleteFileRoute = createRoute({
       },
     },
     500: serverErrorSchema,
+    400: badRequestSchema,
   },
   tags: ['edm'],
 });

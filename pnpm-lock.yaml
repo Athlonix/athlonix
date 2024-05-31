@@ -88,17 +88,17 @@ importers:
   apps/api:
     dependencies:
       '@hono/node-server':
-        specifier: ^1.11.1
-        version: 1.11.1
+        specifier: ^1.11.2
+        version: 1.11.2
       '@hono/swagger-ui':
         specifier: ^0.2.2
-        version: 0.2.2(hono@4.4.0)
+        version: 0.2.2(hono@4.4.2)
       '@hono/zod-openapi':
         specifier: 0.14.0
-        version: 0.14.0(hono@4.4.0)(zod@3.23.8)
+        version: 0.14.0(hono@4.4.2)(zod@3.23.8)
       '@hono/zod-validator':
         specifier: ^0.2.1
-        version: 0.2.1(hono@4.4.0)(zod@3.23.8)
+        version: 0.2.1(hono@4.4.2)(zod@3.23.8)
       '@repo/types':
         specifier: workspace:*
         version: link:../../packages/types
@@ -106,8 +106,8 @@ importers:
         specifier: ^2.43.4
         version: 2.43.4
       hono:
-        specifier: ^4.4.0
-        version: 4.4.0
+        specifier: ^4.4.2
+        version: 4.4.2
       stripe:
         specifier: ^15.8.0
         version: 15.8.0
@@ -131,8 +131,8 @@ importers:
         specifier: ^3.30.4
         version: 3.30.4
       supabase:
-        specifier: ^1.169.8
-        version: 1.169.8
+        specifier: ^1.172.2
+        version: 1.172.2
       tsx:
         specifier: ^4.11.0
         version: 4.11.0
@@ -342,8 +342,8 @@ importers:
         specifier: workspace:*
         version: link:../packages/typescript-config
       supabase:
-        specifier: ^1.169.8
-        version: 1.169.8
+        specifier: ^1.172.2
+        version: 1.172.2
 
 packages:
 
@@ -592,8 +592,8 @@ packages:
   '@formatjs/intl-localematcher@0.5.4':
     resolution: {integrity: sha512-zTwEpWOzZ2CiKcB93BLngUX59hQkuZjT2+SAQEscSm52peDW/getsawMcWF1rGRpMCX6D7nSJA3CzJ8gn13N/g==}
 
-  '@hono/node-server@1.11.1':
-    resolution: {integrity: sha512-GW1Iomhmm1o4Z+X57xGby8A35Cu9UZLL7pSMdqDBkD99U5cywff8F+8hLk5aBTzNubnsFAvWQ/fZjNwPsEn9lA==}
+  '@hono/node-server@1.11.2':
+    resolution: {integrity: sha512-JhX0nUC66GeDxpIdMKWDRMEwtQBa64CY907iAF1sYqb4m2p2PdSU7zkbnNhAZLg/6IjSlTuj6CF307JlBXVvpg==}
     engines: {node: '>=18.14.1'}
 
   '@hono/swagger-ui@0.2.2':
@@ -2493,8 +2493,8 @@ packages:
   header-case@1.0.1:
     resolution: {integrity: sha512-i0q9mkOeSuhXw6bGgiQCCBgY/jlZuV/7dZXyZ9c6LcBrqwvT8eT719E9uxE5LiZftdl+z81Ugbg/VvXV4OJOeQ==}
 
-  hono@4.4.0:
-    resolution: {integrity: sha512-Bb2GHk8jmlLIuxc3U+7UBGOoA5lByJTAFnRdH2N2fqEVy9TEQzJ9saIJUQ/ZqBvEvgEFe7UjPFNSFi8cyeU+3Q==}
+  hono@4.4.2:
+    resolution: {integrity: sha512-bRhZ+BM9r04lRN2i9wiZ18yQNbZxHsmmRIItoAb43nRkHnIDsFhFh4mJ0seEs06FvenibpAgSVNHQ8ZzcDQx2A==}
     engines: {node: '>=16.0.0'}
 
   http-proxy-agent@7.0.2:
@@ -3297,8 +3297,8 @@ packages:
     engines: {node: '>=16 || 14 >=14.17'}
     hasBin: true
 
-  supabase@1.169.8:
-    resolution: {integrity: sha512-39vOiK2qZBZXUo0iWIRyJB1DLMk0kNb6iW166uvWRWkKWVaBTOErL510AdD1tVGn+sELsW7erl2vy9qLFmBX0Q==}
+  supabase@1.172.2:
+    resolution: {integrity: sha512-h2J6kKEikXnZyurUcCYg215qkQpINOhdWkiclHcWAuVeqXsNrfrYaf1s0qbbcdRyMtrVW48I+VdVTw71Cnn20Q==}
     engines: {npm: '>=8'}
     hasBin: true
 
@@ -3330,8 +3330,8 @@ packages:
     engines: {node: '>=14.0.0'}
     hasBin: true
 
-  tar@7.1.0:
-    resolution: {integrity: sha512-ENhg4W6BmjYxl8GTaE7/h99f0aXiSWv4kikRZ9n2/JRxypZniE84ILZqimAhxxX7Zb8Px6pFdheW3EeHfhnXQQ==}
+  tar@7.2.0:
+    resolution: {integrity: sha512-hctwP0Nb4AB60bj8WQgRYaMOuJYRAPMGiQUAotms5igN8ppfQM+IvjQ5HcKu1MaZh2Wy2KWVTe563Yj8dfc14w==}
     engines: {node: '>=18'}
 
   thenify-all@1.6.0:
@@ -3823,22 +3823,22 @@ snapshots:
     dependencies:
       tslib: 2.6.2
 
-  '@hono/node-server@1.11.1': {}
+  '@hono/node-server@1.11.2': {}
 
-  '@hono/swagger-ui@0.2.2(hono@4.4.0)':
+  '@hono/swagger-ui@0.2.2(hono@4.4.2)':
     dependencies:
-      hono: 4.4.0
+      hono: 4.4.2
 
-  '@hono/zod-openapi@0.14.0(hono@4.4.0)(zod@3.23.8)':
+  '@hono/zod-openapi@0.14.0(hono@4.4.2)(zod@3.23.8)':
     dependencies:
       '@asteasolutions/zod-to-openapi': 7.0.0(zod@3.23.8)
-      '@hono/zod-validator': 0.2.1(hono@4.4.0)(zod@3.23.8)
-      hono: 4.4.0
+      '@hono/zod-validator': 0.2.1(hono@4.4.2)(zod@3.23.8)
+      hono: 4.4.2
       zod: 3.23.8
 
-  '@hono/zod-validator@0.2.1(hono@4.4.0)(zod@3.23.8)':
+  '@hono/zod-validator@0.2.1(hono@4.4.2)(zod@3.23.8)':
     dependencies:
-      hono: 4.4.0
+      hono: 4.4.2
       zod: 3.23.8
 
   '@hookform/resolvers@3.4.2(react-hook-form@7.51.5(react@18.3.1))':
@@ -6185,7 +6185,7 @@ snapshots:
       no-case: 2.3.2
       upper-case: 1.1.3
 
-  hono@4.4.0: {}
+  hono@4.4.2: {}
 
   http-proxy-agent@7.0.2:
     dependencies:
@@ -7066,12 +7066,12 @@ snapshots:
       pirates: 4.0.6
       ts-interface-checker: 0.1.13
 
-  supabase@1.169.8:
+  supabase@1.172.2:
     dependencies:
       bin-links: 4.0.4
       https-proxy-agent: 7.0.4
       node-fetch: 3.3.2
-      tar: 7.1.0
+      tar: 7.2.0
     transitivePeerDependencies:
       - supports-color
 
@@ -7125,7 +7125,7 @@ snapshots:
     transitivePeerDependencies:
       - ts-node
 
-  tar@7.1.0:
+  tar@7.2.0:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0

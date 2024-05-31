@@ -71,9 +71,8 @@ function EditMaterialLocation({ material, materials, setMaterials }: Props): JSX
         if (response.status !== 200) {
           throw new Error(await response.text());
         }
-        return response.json();
       })
-      .then((data) => {
+      .then(() => {
         toast.success('Matériel modifié', { duration: 2000, description: 'Le Matériel a été modifié avec succès' });
         setMaterials((prevMaterials) => prevMaterials.map((m) => (m.id === material.id ? { ...m, ...values } : m)));
         setOpen(false);

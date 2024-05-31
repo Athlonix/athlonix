@@ -198,11 +198,16 @@ material.openapi(addMaterial, async (c) => {
 
 material.openapi(removeMaterial, async (c) => {
   const { id } = c.req.valid('param');
+  const { id_address } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { error } = await supabase.from('ADDRESSES_MATERIALS').delete().eq('id_material', id);
+  const { error } = await supabase
+    .from('ADDRESSES_MATERIALS')
+    .delete()
+    .eq('id_material', id)
+    .eq('id_address', id_address);
 
   if (error) {
     return c.json({ error: error.message }, 500);

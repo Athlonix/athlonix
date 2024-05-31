@@ -30,25 +30,37 @@ type Material = {
   weight_grams: number | null;
 };
 
+type Address = {
+  id: number;
+  road: string;
+  number: number;
+  complement: string | null;
+  name: string | null;
+};
+
 interface Props {
   materials: Material[];
-  id_address: number;
+  addresses: Address[];
   setMaterials: React.Dispatch<React.SetStateAction<Material[]>>;
 }
 
-function AddMaterialLocation({ materials, id_address, setMaterials }: Props): JSX.Element {
+function AddNewMaterial({ materials, addresses, setMaterials }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
+  const usedAddresses = materials.map((material) => material.id_address);
+
   const formSchema = z.object({
-    id_material: z.number({ message: 'Le champ est requis' }).min(1, { message: 'Le champ est requis' }),
-    quantity: z.coerce.number().min(1, { message: 'Le champ est requis' }),
+    id_material: z.coerce.number({ message: 'Le champ est requis' }).min(1, { message: 'Le champ est requis' }),
+    id_address: z.coerce.number({ message: 'Le champ est requis' }).min(1, { message: 'Le champ est requis' }),
+    quantity: z.coerce.number({ message: 'Le champ est requis' }).min(1, { message: 'Le champ est requis' }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       id_material: undefined,
+      id_address: undefined,
       quantity: undefined,
     },
   });
@@ -63,7 +75,7 @@ function AddMaterialLocation({ materials, id_address, setMaterials }: Props): JS
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       },
       body: JSON.stringify({
-        id_address: id_address,
+        id_address: values.id_address,
         quantity: values.quantity,
       }),
     })
@@ -90,9 +102,9 @@ function AddMaterialLocation({ materials, id_address, setMaterials }: Props): JS
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="h-8 gap-1">
-          <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Ajouter du matériel</span>
+        <Button className="flex gap-2">
+          <PlusCircle />
+          <div>Ajouter du matériel à une adresse</div>
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -102,6 +114,35 @@ function AddMaterialLocation({ materials, id_address, setMaterials }: Props): JS
             <Form {...form}>
               <form onSubmit={form.handleSubmit(submit)}>
                 <div className="grid gap-4">
+                  <div className="grid">
+                    <FormField
+                      control={form.control}
+                      name="id_address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label className="font-bold">Adresses</Label>
+                          <Select onValueChange={field.onChange} defaultValue="-1">
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Aucun" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {addresses.map(
+                                (address) =>
+                                  !usedAddresses.includes(address.id) && (
+                                    <SelectItem key={address.id} value={address.id.toString()}>
+                                      {address.name ?? `${address.number}, ${address.road}`}
+                                    </SelectItem>
+                                  ),
+                              )}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   <div className="grid">
                     <FormField
                       control={form.control}
@@ -161,4 +202,4 @@ function AddMaterialLocation({ materials, id_address, setMaterials }: Props): JS
   );
 }
 
-export default AddMaterialLocation;
+export default AddNewMaterial;

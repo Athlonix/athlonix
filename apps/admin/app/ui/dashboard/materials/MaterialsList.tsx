@@ -28,14 +28,9 @@ interface Props {
 function MaterialsList({ materials, addresses, setMaterials }: Props) {
   return (
     <>
-      <Accordion type="single" collapsible className="w-full">
+      <Accordion type="multiple" className="w-full">
         {addresses.map((address) => (
-          <MaterialLocation
-            key={address.id}
-            materials={materials.filter((material) => material.id_address === address.id)}
-            address={address}
-            setMaterials={setMaterials}
-          />
+          <MaterialLocation key={address.id} materials={materials} address={address} setMaterials={setMaterials} />
         ))}
       </Accordion>
     </>

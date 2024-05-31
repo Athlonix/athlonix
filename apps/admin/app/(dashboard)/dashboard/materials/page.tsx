@@ -1,13 +1,13 @@
 'use client';
 
 import AddMaterial from '@/app/ui/dashboard/materials/AddMaterial';
+import AddNewMaterial from '@/app/ui/dashboard/materials/AddNewMaterial';
 import DeleteMaterial from '@/app/ui/dashboard/materials/DeleteMaterial';
 import EditMaterial from '@/app/ui/dashboard/materials/EditMaterial';
 import MaterialsList from '@/app/ui/dashboard/materials/MaterialsList';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
-import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
-import { CircleX, Menu } from 'lucide-react';
+import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -55,8 +55,6 @@ function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
       });
 
       const addressesString = addresses.map((address) => `addresses=${address.id}`).join('&');
-
-      console.log(`${urlApi}/materials?${queryParams}&${addressesString}`);
 
       fetch(`${urlApi}/materials?${queryParams}&${addressesString}`, {
         method: 'GET',
@@ -121,10 +119,13 @@ function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
         </AccordionItem>
       </Accordion>
       <div className="flex flex-1 rounded-lg border border-dashed shadow-sm p-4" x-chunk="dashboard-02-chunk-1">
-        <div className="grid grid-cols-2 gap-4 w-full">
-          <MaterialsList materials={materials} addresses={addresses} setMaterials={setMaterials} />
-        </div>
+        <ScrollArea className="w-full">
+          <div className="grid w-full">
+            <MaterialsList materials={materials} addresses={addresses} setMaterials={setMaterials} />
+          </div>
+        </ScrollArea>
       </div>
+      <AddNewMaterial materials={materials} addresses={addresses} setMaterials={setMaterials} />
     </>
   );
 }

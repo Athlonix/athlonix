@@ -245,7 +245,6 @@ export const removeMaterial = createRoute({
         'application/json': {
           schema: z.object({
             id_address: z.coerce.number(),
-            quantity: z.coerce.number(),
           }),
         },
       },

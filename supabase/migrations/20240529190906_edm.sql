@@ -3,7 +3,8 @@ create table "public"."DOCUMENTS" (
     "name" text not null,
     "description" text,
     "owner" integer not null,
-    "created_at" timestamp with time zone not null default now()
+    "created_at" timestamp with time zone not null default now(),
+    "isAdmin" boolean not null default FALSE
 );
 
 

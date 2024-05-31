@@ -4,7 +4,7 @@ import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import { deleteFileRoute, downloadFileRoute, getAllFiles, updateFile, uploadFileRoute } from '../routes/edm.js';
 import { checkRole } from '../utils/context.js';
-import type { Variables } from '../validators/general.js';
+import { Role, type Variables } from '../validators/general.js';
 
 export const edm = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
@@ -15,23 +15,33 @@ edm.openapi(getAllFiles, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error, count } = await supabase.from('DOCUMENTS').select('*', { count: 'exact' });
+  let { data, error, count } = await supabase.from('DOCUMENTS').select('*', { count: 'exact' });
   if (error) {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json({ data, count: count || 0 }, 200);
+  // remove all documents where isAdmin is true if user is not admin
+  const userAdmin = roles.includes(Role.ADMIN) || roles.includes(Role.DIRECTOR);
+  if (!userAdmin && data) {
+    data = data.filter((doc) => !doc.isAdmin);
+  }
+
+  return c.json({ data: data || [], count: count || 0 }, 200);
 });
 
 edm.openapi(downloadFileRoute, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
-  await checkRole(roles, false);
+  await checkRole(roles, true);
   const { id } = c.req.valid('param');
 
-  const { data, error } = await supabase.from('DOCUMENTS').select('name').eq('id', id).single();
+  const { data, error } = await supabase.from('DOCUMENTS').select('name, isAdmin').eq('id', id).single();
   if (error || !data) {
     return c.json({ error: 'File not found' }, 404);
+  }
+
+  if (data.isAdmin && !roles.includes(Role.ADMIN) && !roles.includes(Role.DIRECTOR)) {
+    return c.json({ error: 'You do not have access to this file' }, 403);
   }
 
   const { data: file, error: downloadError } = await supabase.storage.from('edm').download(data.name);
@@ -48,7 +58,7 @@ edm.openapi(uploadFileRoute, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
-  const { file, name, description } = c.req.valid('form');
+  const { file, name, description, isAdmin } = c.req.valid('form');
 
   const { error } = await uploadFile(name, file, 'edm');
   if (error) {
@@ -57,7 +67,7 @@ edm.openapi(uploadFileRoute, async (c) => {
 
   const { error: insertDoc } = await supabase
     .from('DOCUMENTS')
-    .insert({ name: name, description: description, owner: user.id });
+    .insert({ name: name, description: description, owner: user.id, isAdmin });
   if (insertDoc) {
     return c.json({ error: 'Error inserting document' }, 500);
   }

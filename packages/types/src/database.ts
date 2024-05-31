@@ -575,6 +575,7 @@ export type Database = {
           created_at: string;
           description: string | null;
           id: number;
+          isAdmin: boolean;
           name: string;
           owner: number;
         };
@@ -582,6 +583,7 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: number;
+          isAdmin?: boolean;
           name: string;
           owner: number;
         };
@@ -589,6 +591,7 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: number;
+          isAdmin?: boolean;
           name?: string;
           owner?: number;
         };

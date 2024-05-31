@@ -1,7 +1,13 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
-import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
+import {
+  badRequestSchema,
+  idParamValidator,
+  notFoundSchema,
+  permissionDeniedSchema,
+  serverErrorSchema,
+} from '../validators/general.js';
 
 export const getAllFiles = createRoute({
   method: 'get',
@@ -25,6 +31,7 @@ export const getAllFiles = createRoute({
                 name: z.string(),
                 description: z.string().nullable(),
                 owner: z.number().min(1),
+                isAdmin: z.boolean(),
               }),
             ),
             count: z.number(),
@@ -73,6 +80,7 @@ export const uploadFileRoute = createRoute({
             file: z.instanceof(File),
             name: z.string(),
             description: z.string().optional(),
+            isAdmin: z.boolean(),
           }),
         },
       },
@@ -90,6 +98,8 @@ export const uploadFileRoute = createRoute({
       },
     },
     500: serverErrorSchema,
+    404: notFoundSchema,
+    403: permissionDeniedSchema,
   },
   tags: ['edm'],
 });

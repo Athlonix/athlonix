@@ -71,20 +71,6 @@ edm.openapi(updateFile, async (c) => {
   await checkRole(roles, false);
   const { file, name, description } = c.req.valid('form');
 
-  const { data: isOwner, error: ownerError } = await supabase
-    .from('DOCUMENTS')
-    .select('owner')
-    .eq('name', name)
-    .single();
-
-  if (ownerError) {
-    return c.json({ error: ownerError.message }, 500);
-  }
-
-  if (isOwner && isOwner.owner !== user.id) {
-    return c.json({ error: 'You are not the owner of this document' }, 400);
-  }
-
   const { error: updateDoc } = await supabase.from('DOCUMENTS').update({ description }).eq('name', name);
   if (updateDoc) {
     return c.json({ error: 'Error updating document' }, 500);

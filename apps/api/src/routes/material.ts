@@ -1,6 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
-import { queryAllSchema } from '../utils/pagnination.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const materialSchema = z.object({

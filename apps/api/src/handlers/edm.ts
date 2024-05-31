@@ -39,7 +39,9 @@ edm.openapi(downloadFileRoute, async (c) => {
     return c.json({ error: downloadError.message }, 500);
   }
 
-  return c.json({ file: new Blob([file]) }, 200);
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  return c.newResponse(buffer, 200, { 'Content-Type': file.type });
 });
 
 edm.openapi(uploadFileRoute, async (c) => {

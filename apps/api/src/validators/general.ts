@@ -57,6 +57,17 @@ export const notFoundSchema = {
   },
 };
 
+export const permissionDeniedSchema = {
+  description: 'Permission denied',
+  content: {
+    'application/json': {
+      schema: z.object({
+        error: z.string(),
+      }),
+    },
+  },
+};
+
 export const idParamValidator = z.object({
   id: z.coerce.number().min(1),
 });

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from '@hono/zod-openapi';
 const priority = z.enum(['P0', 'P1', 'P2', 'P3']);
 const status = z.enum(['not started', 'in progress', 'completed']);
 

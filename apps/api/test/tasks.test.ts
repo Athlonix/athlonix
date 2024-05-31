@@ -1,4 +1,3 @@
-import { startTime } from 'hono/timing';
 import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
@@ -201,8 +200,7 @@ describe('Activities tests', () => {
     });
     expect(res.status).toBe(200);
 
-    const { data } = await res.json();
-
+    const { data } = (await res.json()) as { data: { id: number }[] };
     expect(data.length).toBeGreaterThan(0);
   });
 

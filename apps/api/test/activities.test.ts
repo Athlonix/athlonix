@@ -139,7 +139,7 @@ describe('Activities tests', () => {
       },
     );
     expect(res.status).toBe(200);
-    const data = await res.json();
+    const data = (await res.json()) as { occurences: { id: number }[] };
     expect(data.occurences.length).toBe(4);
   });
 

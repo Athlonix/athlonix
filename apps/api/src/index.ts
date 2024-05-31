@@ -12,6 +12,7 @@ import { activities } from './handlers/activities.js';
 import { assemblies } from './handlers/assemblies.js';
 import { auth } from './handlers/auth.js';
 import { blog } from './handlers/blog.js';
+import { edm } from './handlers/edm.js';
 import { health } from './handlers/health.js';
 import { location } from './handlers/location.js';
 import { material } from './handlers/material.js';
@@ -65,6 +66,7 @@ app.route('/', activities_teams);
 app.route('/', stripe);
 app.route('/', assemblies);
 app.route('/', tasks);
+app.route('/', edm);
 app.route('/', material);
 
 app.doc('/doc', (c: Context) => ({

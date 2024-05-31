@@ -570,6 +570,41 @@ export type Database = {
           },
         ];
       };
+      DOCUMENTS: {
+        Row: {
+          created_at: string;
+          description: string | null;
+          id: number;
+          isAdmin: boolean;
+          name: string;
+          owner: number;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string | null;
+          id?: number;
+          isAdmin?: boolean;
+          name: string;
+          owner: number;
+        };
+        Update: {
+          created_at?: string;
+          description?: string | null;
+          id?: number;
+          isAdmin?: boolean;
+          name?: string;
+          owner?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'DOCUMENTS_owner_fkey';
+            columns: ['owner'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       DONATIONS: {
         Row: {
           amount: number;

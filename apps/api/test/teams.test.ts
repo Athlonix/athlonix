@@ -163,9 +163,8 @@ describe('Teams tests', () => {
     });
     expect(res.status).toBe(200);
 
-    const { members } = await res.json();
-
-    expect(members.length).toBeGreaterThan(0);
+    const { members } = (await res.json()) as { members: { id: number }[] };
+    expect(members).toHaveLength(1);
   });
 
   test('Remove employee from team', async () => {

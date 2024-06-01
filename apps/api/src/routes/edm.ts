@@ -9,6 +9,17 @@ import {
   serverErrorSchema,
 } from '../validators/general.js';
 
+export const documentSchema = z.object({
+  id: z.number().min(1),
+  name: z.string(),
+  description: z.string().nullable(),
+  owner: z.number().min(1),
+  isAdmin: z.boolean(),
+  updated_at: z.string().datetime(),
+  created_at: z.string().datetime(),
+  type: z.string(),
+});
+
 export const getAllFiles = createRoute({
   method: 'get',
   path: '/listFiles',
@@ -25,15 +36,7 @@ export const getAllFiles = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            data: z.array(
-              z.object({
-                id: z.number().min(1),
-                name: z.string(),
-                description: z.string().nullable(),
-                owner: z.number().min(1),
-                isAdmin: z.boolean(),
-              }),
-            ),
+            data: z.array(documentSchema),
             count: z.number(),
           }),
         },
@@ -118,6 +121,7 @@ export const updateFile = createRoute({
           schema: z.object({
             file: z.instanceof(File),
             name: z.string(),
+            isAdmin: z.boolean(),
             description: z.string().optional(),
           }),
         },

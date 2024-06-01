@@ -25,7 +25,7 @@ material.openapi(getAllMaterials, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false, [Role.ADMIN]);
 
-  let materialIds = null;
+  let materialIds: number[] | null = null;
 
   if (!all) {
     const { data: addressData, error: addressError } = await supabase

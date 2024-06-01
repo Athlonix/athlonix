@@ -578,6 +578,8 @@ export type Database = {
           isAdmin: boolean;
           name: string;
           owner: number;
+          type: string;
+          updated_at: string;
         };
         Insert: {
           created_at?: string;
@@ -586,6 +588,8 @@ export type Database = {
           isAdmin?: boolean;
           name: string;
           owner: number;
+          type: string;
+          updated_at?: string;
         };
         Update: {
           created_at?: string;
@@ -594,6 +598,8 @@ export type Database = {
           isAdmin?: boolean;
           name?: string;
           owner?: number;
+          type?: string;
+          updated_at?: string;
         };
         Relationships: [
           {

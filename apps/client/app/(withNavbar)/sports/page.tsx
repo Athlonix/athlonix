@@ -68,11 +68,7 @@ export default async function SportsPage() {
             <CardFooter className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold text-lg">{sport.name}</h3>
-                {sport.description && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {sport.description.length > 100 ? `${sport.description.slice(0, 100)}...` : sport.description}
-                  </p>
-                )}
+                {sport.description && <p className="text-sm text-gray-500 dark:text-gray-400">{sport.description}</p>}
               </div>
             </CardFooter>
           </Card>

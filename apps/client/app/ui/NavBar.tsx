@@ -1,6 +1,8 @@
 'use client';
 
+import { Avatar, AvatarFallback, AvatarImage } from '@repo/ui/components/ui/avatar';
 import { Button } from '@repo/ui/components/ui/button';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type React from 'react';
@@ -12,6 +14,19 @@ interface LinkProp {
 
 interface NavBarProps {
   links: LinkProp[];
+}
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+}
+
+function getUserAvatar(): string {
+  const user = JSON.parse(localStorage.getItem('user') as string) as { user: User };
+  return user.user.username.charAt(0).toUpperCase();
 }
 
 function LogoutUser() {
@@ -53,23 +68,36 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
 
   return (
     <nav className="flex items-center justify-center mb-8">
+      <div className="absolute top-2 left-0 mt-4 ml-4">
+        <Link href="/" className="flex items-center">
+          <Image src="/favicon.ico" alt="Accueil" width="32" height="32" />
+          <h2 className="ml-2 font-bold">Athlonix</h2>
+        </Link>
+      </div>
       <div className="w-full flex items-center justify-between">
         <ul className="flex gap-4">{navBarElements}</ul>
         {!isAuthenticated ? (
           <div>
-            <Button asChild className="w-[120px] mr-4">
-              <Link href="signup">S'inscrire</Link>
+            <Button asChild className="w-[140px] mr-4">
+              <Link href="signup">Devenir membre</Link>
             </Button>
             <Button asChild className="w-[120px]">
               <Link href="login">Se connecter</Link>
             </Button>
           </div>
         ) : (
-          <Button className="w-[120px]">
-            <Link href={''} onClick={() => LogoutUser()}>
-              Se déconnecter
+          <div className="flex items-center gap-6">
+            <Link href="/account">
+              <Avatar>
+                <AvatarFallback className="bg-slate-400">{getUserAvatar()}</AvatarFallback>
+              </Avatar>
             </Link>
-          </Button>
+            <Button className="w-[120px]">
+              <Link href={''} onClick={() => LogoutUser()}>
+                Se déconnecter
+              </Link>
+            </Button>
+          </div>
         )}
       </div>
     </nav>

@@ -67,7 +67,7 @@ edm.openapi(uploadFileRoute, async (c) => {
 
   const { error: insertDoc } = await supabase
     .from('DOCUMENTS')
-    .insert({ name: name, description: description, owner: user.id, isAdmin });
+    .insert({ name: name, description: description, owner: user.id, isAdmin, type: file.type });
   if (insertDoc) {
     return c.json({ error: 'Error inserting document' }, 500);
   }
@@ -79,9 +79,12 @@ edm.openapi(updateFile, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
-  const { file, name, description } = c.req.valid('form');
+  const { file, name, description, isAdmin } = c.req.valid('form');
 
-  const { error: updateDoc } = await supabase.from('DOCUMENTS').update({ description }).eq('name', name);
+  const { error: updateDoc } = await supabase
+    .from('DOCUMENTS')
+    .update({ description, isAdmin, updated_at: new Date().toLocaleDateString() })
+    .eq('name', name);
   if (updateDoc) {
     return c.json({ error: 'Error updating document' }, 500);
   }

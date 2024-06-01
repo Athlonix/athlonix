@@ -16,26 +16,19 @@ type SportData = {
   count: number;
 };
 
-type Error = {
-  error: string;
-  code: number;
-};
+export const dynamic = 'force-dynamic';
 
-async function getSports(): Promise<SportData | Error> {
+async function getSports(): Promise<SportData> {
   const api_url = process.env.API_URL;
   const response = await fetch(`${api_url}/sports?all=true`, { cache: 'no-cache' });
   if (!response.ok) {
-    const error = await response.json();
-    return { error: error.message, code: response.status };
+    throw new Error('Erreur lors de la récupération des sports');
   }
   return await response.json();
 }
 
 export default async function SportsPage() {
   const sportsData = await getSports();
-  if ('error' in sportsData) {
-    return <div>Une erreur est survenue: {sportsData.error}</div>;
-  }
 
   return (
     <main className="container mx-auto py-12 px-4 md:px-6">

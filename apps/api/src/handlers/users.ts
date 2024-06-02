@@ -1,4 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { HTTPException } from 'hono/http-exception';
 import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -78,7 +79,7 @@ users.openapi(updateUser, async (c) => {
   const { first_name, last_name, username } = c.req.valid('json');
   const user = c.get('user');
   const roles = c.get('user').roles || [];
-  await checkRole(roles, true);
+  if (roles.includes(Role.BANNED)) throw new HTTPException(403, { message: 'Banned user' });
 
   const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
   if (roles?.some((role) => allowed.includes(role))) {

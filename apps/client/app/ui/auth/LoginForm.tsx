@@ -41,8 +41,11 @@ export default function LoginForm(): JSX.Element {
     })
       .then((response) => response.json())
       .then((data: { user: Record<string, unknown>; token: string }) => {
-        localStorage.setItem('user', JSON.stringify(data));
-        router.push('/?loggedIn=true');
+        if (data.user && data.token) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('access_token', data.token);
+          router.push('/?loggedIn=true');
+        }
       })
       .catch((error: Error) => {
         console.log(error);

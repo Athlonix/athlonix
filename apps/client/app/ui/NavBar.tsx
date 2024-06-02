@@ -16,17 +16,22 @@ interface NavBarProps {
   links: LinkProp[];
 }
 
-interface User {
+export interface User {
   id: number;
   username: string;
   email: string;
   first_name: string;
   last_name: string;
+  subscription: string | null;
+  date_validity: string | null;
 }
 
-function getUserAvatar(): string {
-  const user = JSON.parse(localStorage.getItem('user') as string) as { user: User };
-  return user.user.username.charAt(0).toUpperCase();
+export function getUserAvatar(): string {
+  const user = JSON.parse(localStorage.getItem('user') as string) as User;
+  if (!user) {
+    return '';
+  }
+  return user?.username.charAt(0).toUpperCase();
 }
 
 function LogoutUser() {
@@ -92,7 +97,7 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
                 <AvatarFallback className="bg-slate-400">{getUserAvatar()}</AvatarFallback>
               </Avatar>
             </Link>
-            <Button className="w-[120px]">
+            <Button className="w-[120px] bg-red-900">
               <Link href={''} onClick={() => LogoutUser()}>
                 Se déconnecter
               </Link>

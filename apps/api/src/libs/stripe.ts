@@ -1,4 +1,4 @@
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
 import { Role } from '../validators/general.js';
 import { supabase } from './supabase.js';
 
@@ -27,40 +27,29 @@ export async function handleDonations(email: string, amount: number, receipt_url
   return { data };
 }
 
-export async function handleSubscription(subscription: string, invoice: string) {
-  if (!subscription || !invoice) {
+export async function handleSubscription(subscription: string, invoice: string, email: string) {
+  if (!subscription || !invoice || !email) {
     return { error: 'Missing required fields' };
   }
 
-  const STRIPE_SECRET_API_KEY = process.env.STRIPE_SECRET_API_KEY as string;
-  const stripe = new Stripe(STRIPE_SECRET_API_KEY);
-
-  const invoiceDetails = await stripe.subscriptions.retrieve(subscription);
-
-  if (!invoiceDetails) {
-    return { error: 'Subscription not found' };
-  }
-
-  if (invoiceDetails.status !== 'active') {
-    return { error: 'Subscription not active' };
-  }
-
-  const { email } = invoiceDetails.customer as Stripe.Customer;
-
   const { data: user, error: userDb } = await supabase
     .from('USERS')
-    .select('id')
-    .eq('email', email || '')
-    .eq('subscription', subscription)
+    .select('id, subscription, date_validity')
+    .eq('email', email)
     .single();
 
   if (!user || userDb) {
     return { error: 'User not found' };
   }
 
+  if (user.subscription !== null && user.subscription !== subscription) {
+    return { error: 'Wrong subscription' };
+  }
+
   const id_user = user.id;
   const next_year = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleString();
-  const { error, data } = await supabase
+
+  const { error } = await supabase
     .from('USERS')
     .update({ subscription, invoice, date_validity: next_year })
     .eq('id', id_user)
@@ -70,12 +59,16 @@ export async function handleSubscription(subscription: string, invoice: string) 
     return { error: error.message };
   }
 
-  const { error: errorInsert } = await supabase.from('USERS_ROLES').insert({ id_user, id_role: Role.MEMBER });
-  if (errorInsert) {
-    return { error: errorInsert.message };
+  if (user.subscription === null) {
+    // first subscription for this user
+    const { error: errorInsert } = await supabase.from('USERS_ROLES').insert({ id_user, id_role: Role.MEMBER });
+
+    if (errorInsert) {
+      return { error: errorInsert.message };
+    }
   }
 
-  return { data };
+  return { data: 'Subscription updated' };
 }
 
 export async function handleRevokeSubscription(customer: Stripe.Customer) {
@@ -104,37 +97,4 @@ export async function handleRevokeSubscription(customer: Stripe.Customer) {
   }
 
   return { data: 'Subscription revoked' };
-}
-
-export async function handleRenewalSubscription(customer: Stripe.Customer, subscription: string, date: Date) {
-  if (!customer || !subscription || !date) {
-    return { error: 'Missing required fields' };
-  }
-
-  const { email } = customer;
-
-  const { data: userDb, error: errorUser } = await supabase
-    .from('USERS')
-    .select('id')
-    .eq('email', email || '')
-    .eq('subscription', subscription)
-    .single();
-
-  if (errorUser || !userDb) {
-    return { error: 'User not found' };
-  }
-
-  const id_user = userDb.id;
-
-  const { error, data } = await supabase
-    .from('USERS')
-    .update({ subscription, date_validity: date.toLocaleString() })
-    .eq('id', id_user)
-    .select();
-
-  if (error) {
-    return { error: error.message };
-  }
-
-  return { data };
 }

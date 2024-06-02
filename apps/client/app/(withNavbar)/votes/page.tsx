@@ -93,9 +93,13 @@ export default function ListVotes() {
                 <Badge className="mt-4" variant="info">
                   En cours
                 </Badge>
-              ) : (
+              ) : new Date(vote.end_at) < new Date() ? (
                 <Badge className="mt-4" variant="destructive">
                   Terminé le {new Date(vote.end_at).toLocaleDateString()}
+                </Badge>
+              ) : (
+                <Badge className="mt-4" variant="secondary">
+                  Non commencé
                 </Badge>
               )}
             </div>
@@ -104,6 +108,12 @@ export default function ListVotes() {
               <Button className="mt-4">Je vote</Button>
             )}
             {new Date(vote.end_at) < new Date() && <Button className="mt-4">Voir les résultats</Button>}
+            {new Date(vote.start_at) > new Date() && (
+              <p className="mt-4 text-gray-500 dark:text-gray-400">
+                Commence le{' '}
+                {`${new Date(vote.start_at).toLocaleDateString()} à ${new Date(vote.start_at).toLocaleTimeString()}`}
+              </p>
+            )}
           </Card>
         ))}
       </div>

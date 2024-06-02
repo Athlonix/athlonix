@@ -1,11 +1,12 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@repo/ui/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Button } from '@repo/ui/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type React from 'react';
+import { getUserAvatar } from '../lib/user/utils';
 
 interface LinkProp {
   name: string;
@@ -14,19 +15,6 @@ interface LinkProp {
 
 interface NavBarProps {
   links: LinkProp[];
-}
-
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-}
-
-function getUserAvatar(): string {
-  const user = JSON.parse(localStorage.getItem('user') as string) as { user: User };
-  return user.user.username.charAt(0).toUpperCase();
 }
 
 function LogoutUser() {
@@ -92,7 +80,7 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
                 <AvatarFallback className="bg-slate-400">{getUserAvatar()}</AvatarFallback>
               </Avatar>
             </Link>
-            <Button className="w-[120px]">
+            <Button className="w-[120px] bg-red-900">
               <Link href={''} onClick={() => LogoutUser()}>
                 Se déconnecter
               </Link>

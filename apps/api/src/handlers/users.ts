@@ -1,10 +1,12 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { HTTPException } from 'hono/http-exception';
 import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
   addUserRole,
   deleteUser,
   getAllUsers,
+  getMe,
   getOneUser,
   getUsersActivities,
   removeUserRole,
@@ -12,7 +14,7 @@ import {
   updateUser,
   updateUserRole,
 } from '../routes/users.js';
-import { checkRole } from '../utils/context.js';
+import { checkBanned, checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
 import { Role } from '../validators/general.js';
@@ -55,6 +57,23 @@ users.openapi(getAllUsers, async (c) => {
   return c.json(responseData, 200);
 });
 
+users.openapi(getMe, async (c) => {
+  const user = c.get('user');
+  await checkBanned(user.roles);
+  const { data, error } = await supabase
+    .from('USERS')
+    .select('*, roles:ROLES (id, name)')
+    .eq('id', user.id)
+    .filter('deleted_at', 'is', null)
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'User not found' }, 404);
+  }
+
+  return c.json(data, 200);
+});
+
 users.openapi(getOneUser, async (c) => {
   const roles = c.get('user').roles || [];
   await checkRole(roles, true);
@@ -78,7 +97,7 @@ users.openapi(updateUser, async (c) => {
   const { first_name, last_name, username } = c.req.valid('json');
   const user = c.get('user');
   const roles = c.get('user').roles || [];
-  await checkRole(roles, true);
+  await checkBanned(roles);
 
   const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
   if (roles?.some((role) => allowed.includes(role))) {

@@ -14,7 +14,7 @@ import {
   updateUser,
   updateUserRole,
 } from '../routes/users.js';
-import { checkRole } from '../utils/context.js';
+import { checkBanned, checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
 import { Role } from '../validators/general.js';
@@ -59,6 +59,7 @@ users.openapi(getAllUsers, async (c) => {
 
 users.openapi(getMe, async (c) => {
   const user = c.get('user');
+  await checkBanned(user.roles);
   const { data, error } = await supabase
     .from('USERS')
     .select('*, roles:ROLES (id, name)')
@@ -96,7 +97,7 @@ users.openapi(updateUser, async (c) => {
   const { first_name, last_name, username } = c.req.valid('json');
   const user = c.get('user');
   const roles = c.get('user').roles || [];
-  if (roles.includes(Role.BANNED)) throw new HTTPException(403, { message: 'Banned user' });
+  await checkBanned(roles);
 
   const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
   if (roles?.some((role) => allowed.includes(role))) {

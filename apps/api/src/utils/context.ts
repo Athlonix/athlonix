@@ -17,6 +17,13 @@ export async function checkRole(user: number[], member: boolean, roles?: Role[])
   throw new HTTPException(403, { message: 'Forbidden' });
 }
 
+// Same as checkRole but without the member check since some routes don't need it
+export async function checkBanned(user: number[]) {
+  if (!user) throw new HTTPException(403, { message: 'No user role found' });
+
+  if (user.includes(Role.BANNED)) throw new HTTPException(403, { message: 'Banned user' });
+}
+
 export function getToken(c: Context) {
   const headerToken = c.req.header('authorization')?.split(' ')[1];
   const cookieToken = getCookie(c, 'access_token');

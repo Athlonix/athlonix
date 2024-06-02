@@ -57,6 +57,28 @@ export const getOneUser = createRoute({
   tags: ['user'],
 });
 
+export const getMe = createRoute({
+  method: 'get',
+  path: '/users/me',
+  summary: 'Get my informations',
+  description: 'Get my informations',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: userSchema,
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});
+
 export const updateUser = createRoute({
   method: 'patch',
   path: '/users/{id}',

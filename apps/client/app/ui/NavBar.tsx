@@ -1,11 +1,12 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@repo/ui/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Button } from '@repo/ui/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type React from 'react';
+import { getUserAvatar } from '../lib/user/utils';
 
 interface LinkProp {
   name: string;
@@ -14,24 +15,6 @@ interface LinkProp {
 
 interface NavBarProps {
   links: LinkProp[];
-}
-
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  subscription: string | null;
-  date_validity: string | null;
-}
-
-export function getUserAvatar(): string {
-  const user = JSON.parse(localStorage.getItem('user') as string) as User;
-  if (!user) {
-    return '';
-  }
-  return user?.username.charAt(0).toUpperCase();
 }
 
 function LogoutUser() {

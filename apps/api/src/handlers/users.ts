@@ -6,6 +6,7 @@ import {
   addUserRole,
   deleteUser,
   getAllUsers,
+  getMe,
   getOneUser,
   getUsersActivities,
   removeUserRole,
@@ -54,6 +55,22 @@ users.openapi(getAllUsers, async (c) => {
   };
 
   return c.json(responseData, 200);
+});
+
+users.openapi(getMe, async (c) => {
+  const user = c.get('user');
+  const { data, error } = await supabase
+    .from('USERS')
+    .select('*, roles:ROLES (id, name)')
+    .eq('id', user.id)
+    .filter('deleted_at', 'is', null)
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'User not found' }, 404);
+  }
+
+  return c.json(data, 200);
 });
 
 users.openapi(getOneUser, async (c) => {

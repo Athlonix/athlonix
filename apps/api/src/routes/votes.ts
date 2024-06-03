@@ -17,11 +17,11 @@ export const pollsSchema = z.object({
 
 export const createPollSchema = z.object({
   title: z.string().max(50),
-  description: z.string().max(255).nullable(),
+  description: z.string().max(255).optional(),
   start_at: z.string().datetime(),
   end_at: z.string().datetime(),
   max_choices: z.number().min(1),
-  assembly: z.number().min(1).nullable(),
+  assembly: z.number().min(1).optional(),
   options: z.array(z.object({ content: z.string() })),
 });
 
@@ -83,7 +83,10 @@ export const getAllPolls = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: z.array(pollsSchema),
+          schema: z.object({
+            data: z.array(pollsSchema),
+            count: z.number(),
+          }),
         },
       },
     },

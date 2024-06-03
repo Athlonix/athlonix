@@ -7,7 +7,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 interface DeleteMatchProps {
@@ -18,7 +17,6 @@ interface DeleteMatchProps {
 
 function DeleteMatch(props: DeleteMatchProps) {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
   function deleteMatch() {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;

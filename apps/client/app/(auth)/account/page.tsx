@@ -35,7 +35,7 @@ async function updateUserInformation(id: number, username: string, first_name: s
       }
       localStorage.setItem('user', JSON.stringify(data));
     })
-    .catch((error: Error) => console.log(error));
+    .catch((error: Error) => console.error(error));
 }
 
 export default function UserAccount() {

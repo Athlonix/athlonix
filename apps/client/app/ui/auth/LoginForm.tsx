@@ -48,7 +48,7 @@ export default function LoginForm(): JSX.Element {
         }
       })
       .catch((error: Error) => {
-        console.log(error);
+        console.error(error);
       });
   }
 

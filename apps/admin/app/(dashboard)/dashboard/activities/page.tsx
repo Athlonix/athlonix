@@ -96,7 +96,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
           setMaxPage(Math.ceil(data.count / 10));
         })
         .catch((error: Error) => {
-          console.log(error);
+          console.error(error);
         });
     }, 500);
 
@@ -189,7 +189,7 @@ export default function Page(): JSX.Element {
         setSports(sportsArray);
       })
       .catch((error: Error) => {
-        console.log(error);
+        console.error(error);
       });
 
     fetch(`${urlApi}/addresses?${queryParams}`, {
@@ -218,7 +218,7 @@ export default function Page(): JSX.Element {
         setAddresses(addressesArray);
       })
       .catch((error: Error) => {
-        console.log(error);
+        console.error(error);
       });
   }, [router]);
 

@@ -3,9 +3,9 @@
 import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
 import { Progress } from '@repo/ui/components/ui/progress';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 
-function page() {
+function ShowContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const idPoll = searchParams.get('id');
@@ -43,7 +43,7 @@ function page() {
   }, [router, idPoll]);
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
+    <>
       <div className="flex items-center gap-5">
         <h1 className="text-lg font-semibold md:text-2xl">Vote: {title}</h1>
       </div>
@@ -59,6 +59,16 @@ function page() {
           ))}
         </div>
       </div>
+    </>
+  );
+}
+
+function page() {
+  return (
+    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
+      <Suspense fallback={<div>Chargement...</div>}>
+        <ShowContent />
+      </Suspense>
     </main>
   );
 }

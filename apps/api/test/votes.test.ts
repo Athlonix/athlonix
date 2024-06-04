@@ -10,6 +10,7 @@ describe('Votes tests', () => {
   let id_auth: string;
   let jwt: string;
   let id_polls: number;
+  let option_id: number;
 
   beforeAll(async () => {
     const res = await app.request(`${path}/auth/signup`, {
@@ -57,7 +58,6 @@ describe('Votes tests', () => {
         start_at: new Date().toISOString(),
         end_at: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
         max_choices: 2,
-        assembly: null,
         options: [{ content: 'Option test' }, { content: 'Option test 2' }, { content: 'Option test 3' }],
       }),
     });
@@ -77,6 +77,19 @@ describe('Votes tests', () => {
     expect(res.status).toBe(200);
   });
 
+  test('Get poll by id', async () => {
+    const res = await app.request(`${path}/polls/${id_polls}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+    const result: { results: [{ id: number; votes: number; content: string }] } = await res.json();
+    option_id = result.results[0].id;
+  });
+
   test('Vote to poll', async () => {
     const res = await app.request(`${path}/polls/${id_polls}/vote`, {
       method: 'POST',
@@ -85,7 +98,7 @@ describe('Votes tests', () => {
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        options: [1, 2],
+        options: [option_id],
       }),
     });
     expect(res.status).toBe(201);
@@ -99,7 +112,7 @@ describe('Votes tests', () => {
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        options: [1, 3],
+        options: [option_id],
       }),
     });
     expect(res.status).toBe(400);

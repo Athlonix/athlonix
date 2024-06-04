@@ -12,7 +12,7 @@
   },
   "scripts": {
     "clean": "rm -rf node_module/ .turbo/",
-    "lint": "biome check --apply .",
+    "lint": "biome check --write .",
     "lint:check": "biome check .",
     "generate:component": "turbo gen react-component",
     "ui:add": "pnpm dlx shadcn-ui@latest add"

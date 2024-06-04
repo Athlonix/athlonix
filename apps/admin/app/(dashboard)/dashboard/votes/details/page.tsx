@@ -3,7 +3,7 @@
 import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
 import { Progress } from '@repo/ui/components/ui/progress';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 function ShowContent() {
   const searchParams = useSearchParams();

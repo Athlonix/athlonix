@@ -5,7 +5,7 @@ import AddVote from '@/app/ui/dashboard/votes/AddVote';
 import VotesList from '@/app/ui/dashboard/votes/VotesList';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';

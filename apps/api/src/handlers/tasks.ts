@@ -4,7 +4,7 @@ import { zodErrorHook } from '../libs/zodError.js';
 import { createTask, deleteTask, getAllTasks, getOneTask, updateTask } from '../routes/tasks.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
-import { Role, type Variables } from '../validators/general.js';
+import type { Variables } from '../validators/general.js';
 
 export const tasks = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,

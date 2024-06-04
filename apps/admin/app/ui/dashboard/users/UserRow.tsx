@@ -186,10 +186,7 @@ function UserRow(user: UserProps) {
         .padStart(2, '0')}`}</TableCell>
       <TableCell>
         {status !== null && (
-          <Badge
-            className="m-[2px]"
-            variant={StatusBadge[status]?.color as 'default' | 'destructive' | 'success'}
-          >
+          <Badge className="m-[2px]" variant={StatusBadge[status]?.color as 'default' | 'destructive' | 'success'}>
             {StatusBadge[status]?.text}
           </Badge>
         )}

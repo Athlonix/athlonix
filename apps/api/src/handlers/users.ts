@@ -355,10 +355,7 @@ users.openapi(setStatus, async (c) => {
   if (status === 'approved') {
     const oneYear = new Date();
     oneYear.setFullYear(oneYear.getFullYear() + 1);
-    ({ error } = await supabase
-      .from('USERS')
-      .update({ status, date_validity: oneYear.toISOString() })
-      .eq('id', id));
+    ({ error } = await supabase.from('USERS').update({ status, date_validity: oneYear.toISOString() }).eq('id', id));
   } else {
     ({ error } = await supabase.from('USERS').update({ status }).eq('id', id));
   }

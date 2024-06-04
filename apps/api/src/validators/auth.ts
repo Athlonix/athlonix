@@ -40,6 +40,7 @@ export const userSchema = z.object({
   deleted_at: z.string().datetime().nullable(),
   invoice: z.string().nullable(),
   subscription: z.string().nullable(),
+  status: z.enum(['applied', 'approved', 'rejected']).nullable(),
 });
 
 export const loginResponseSchema = z.object({

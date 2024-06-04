@@ -5,6 +5,7 @@ export interface User {
   first_name: string;
   last_name: string;
   subscription: string | null;
+  status: 'applied' | 'approved' | 'rejected' | null;
   date_validity: string | null;
 }
 
@@ -21,16 +22,24 @@ export async function getUserInfo(): Promise<User> {
   return user;
 }
 
-export function checkSubscription(user: User): boolean {
-  if (user.subscription === null) {
-    return false;
+export function checkSubscription(user: User): null | 'applied' | 'approved' | 'rejected' {
+  if (user.status === null) {
+    return null;
+  }
+
+  if (user.status === 'applied') {
+    return 'applied';
+  }
+
+  if (user.status === 'rejected') {
+    return 'rejected';
   }
 
   if (user.date_validity === null || new Date(user.date_validity) < new Date()) {
-    return false;
+    return null;
   }
 
-  return true;
+  return 'approved';
 }
 
 export function getUserAvatar(): string {

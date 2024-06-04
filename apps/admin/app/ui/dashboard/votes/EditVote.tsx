@@ -1,5 +1,6 @@
 'use client';
 
+import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -14,96 +15,99 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/co
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { PlusCircle } from 'lucide-react';
+import { MoreHorizontal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-type Material = {
-  id_address: number;
-  quantity: number;
-  id: number;
-  name: string;
-  weight_grams: number | null;
+type Setter = {
+  title: React.Dispatch<React.SetStateAction<string>>;
+  description: React.Dispatch<React.SetStateAction<string>>;
+  maxChoices: React.Dispatch<React.SetStateAction<number>>;
+  startAt: React.Dispatch<React.SetStateAction<string>>;
+  endAt: React.Dispatch<React.SetStateAction<string>>;
 };
 
 interface Props {
-  materials: Material[];
-  setMaterials: React.Dispatch<React.SetStateAction<Material[]>>;
+  vote: Vote;
+  setter: Setter;
 }
 
-function AddMaterial({ materials, setMaterials }: Props): JSX.Element {
+function EditVote({ vote, setter }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
   const formSchema = z.object({
-    name: z.string().min(1, { message: 'Le champ est requis' }),
-    weight_grams: z.coerce.number().optional(),
+    title: z.string().min(2, { message: 'Le titre doit contenir au moins 2 caractères' }),
+    description: z.string().optional(),
+    max_choices: z.coerce.number().min(1, { message: 'Le nombre de choix doit être supérieur à 0' }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      weight_grams: undefined,
+      title: vote.title,
+      description: vote.description,
+      max_choices: vote.max_choices,
     },
   });
 
-  async function submit(values: z.infer<typeof formSchema>) {
+  async function submitEdit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    fetch(`${urlApi}/materials`, {
-      method: 'POST',
+    fetch(`${urlApi}/polls/${vote.id}`, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       },
-      body: JSON.stringify(values),
+      body: JSON.stringify({
+        title: values.title,
+        description: values.description,
+        max_choices: values.max_choices,
+      }),
     })
-      .then(async (response) => {
+      .then((response) => {
         if (response.status === 403) {
           router.push('/');
         }
-        if (response.status !== 201) {
-          throw new Error(await response.text());
-        }
         return response.json();
       })
-      .then((data) => {
-        toast.success('Matériel ajouté', { duration: 2000, description: 'Le Matériel a été ajouté avec succès' });
-        setMaterials([...materials, data]);
-        setOpen(false);
-        form.reset();
+      .then((data: Vote) => {
+        setter.title(data.title);
+        setter.description(data.description);
+        setter.maxChoices(data.max_choices);
+        toast.success('Succès', { duration: 2000, description: 'Le vote a été modifié avec succès' });
       })
       .catch((error: Error) => {
-        toast.error('Erreur', { duration: 20000, description: error.message });
+        console.error(error);
+        toast.error('Erreur', { duration: 2000, description: 'Une erreur est survenue' });
       });
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="h-8 gap-1">
-          <PlusCircle className="h-3.5 w-3.5" />
-          <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Ajouter du matériel</span>
+        <Button>
+          <MoreHorizontal size={20} />
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Ajout de matériel</DialogTitle>
+          <DialogTitle>Modification du vote</DialogTitle>
           <DialogDescription className="mx-5">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(submit)}>
-                <div className="grid gap-4">
+              <form onSubmit={form.handleSubmit(submitEdit)} method="POST">
+                <div className="grid gap-2">
                   <div className="grid">
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="title"
                       render={({ field }) => (
                         <FormItem>
-                          <Label className="font-bold">Nom du matériel</Label>
+                          <Label className="font-bold">Titre</Label>
                           <FormControl>
                             <Input {...field} />
                           </FormControl>
@@ -115,10 +119,25 @@ function AddMaterial({ materials, setMaterials }: Props): JSX.Element {
                   <div className="grid">
                     <FormField
                       control={form.control}
-                      name="weight_grams"
+                      name="description"
                       render={({ field }) => (
                         <FormItem>
-                          <Label className="font-bold">Poids en grammes</Label>
+                          <Label className="font-bold">Description</Label>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="grid">
+                    <FormField
+                      control={form.control}
+                      name="max_choices"
+                      render={({ field }) => (
+                        <FormItem>
+                          <Label className="font-bold">Choix maximum</Label>
                           <FormControl>
                             <Input {...field} type="number" />
                           </FormControl>
@@ -130,9 +149,9 @@ function AddMaterial({ materials, setMaterials }: Props): JSX.Element {
                 </div>
                 <div className="flex gap-4 mt-4">
                   <Button type="submit" className="w-full">
-                    Ajouter
+                    Modifier
                   </Button>
-                  <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">
+                  <Button variant="secondary" type="button" className="w-full">
                     Annuler
                   </Button>
                 </div>
@@ -145,4 +164,4 @@ function AddMaterial({ materials, setMaterials }: Props): JSX.Element {
   );
 }
 
-export default AddMaterial;
+export default EditVote;

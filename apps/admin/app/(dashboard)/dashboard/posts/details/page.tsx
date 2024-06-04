@@ -82,7 +82,7 @@ function ShowReports() {
         setPost(data);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
 
     const queryParams = new URLSearchParams({
@@ -108,7 +108,7 @@ function ShowReports() {
         setMaxPage(Math.ceil(data.count / 10));
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
 
     fetch(`${urlApi}/reasons`, {
@@ -127,7 +127,7 @@ function ShowReports() {
         setReasons(data);
       })
       .catch((error) => {
-        console.log(error);
+        console.error(error);
       });
   }, [idPost, router, page]);
 

@@ -73,7 +73,7 @@ function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
           setMaterials(data.data);
         })
         .catch((error: Error) => {
-          console.log(error);
+          console.error(error);
         });
     }, 500);
 
@@ -167,7 +167,7 @@ export default function Page(): JSX.Element {
         setAddresses(addressesArray);
       })
       .catch((error: Error) => {
-        console.log(error);
+        console.error(error);
       });
   }, [router]);
 

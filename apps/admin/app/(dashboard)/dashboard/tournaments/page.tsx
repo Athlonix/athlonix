@@ -70,7 +70,7 @@ function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
           setMaxPage(Math.ceil(data.count / 10));
         })
         .catch((error: Error) => {
-          console.log(error);
+          console.error(error);
         });
     }, 500);
 
@@ -147,7 +147,7 @@ function page() {
         setAddresses(data.data);
       })
       .catch((error: Error) => {
-        console.log(error);
+        console.error(error);
       });
   }, [router.push, urlApi]);
 

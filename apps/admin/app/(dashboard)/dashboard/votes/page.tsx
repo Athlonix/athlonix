@@ -1,11 +1,14 @@
 'use client';
 
-import AddVote from '@/app/ui/dashboard/votes/addVotes';
-import EditVote from '@/app/ui/dashboard/votes/editVotes';
-import { Button } from '@repo/ui/components/ui/button';
-import { Dialog, DialogContent } from '@repo/ui/components/ui/dialog';
-import { toast } from '@repo/ui/components/ui/sonner';
+import PaginationComponent from '@/app/ui/Pagination';
+import AddVote from '@/app/ui/dashboard/votes/AddVote';
+import VotesList from '@/app/ui/dashboard/votes/VotesList';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
+import { Input } from '@repo/ui/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
+import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 export type Vote = {
@@ -16,132 +19,117 @@ export type Vote = {
   max_choices: number;
   start_at: string;
   end_at: string;
-  options: { id: number; content: string }[];
-  results: { id_choice: number; count: number }[];
+  results: { id: number; votes: number; content: string }[];
 };
 
-function deleteVote(id: number, votes: Vote[], setVotes: React.Dispatch<React.SetStateAction<Vote[]>>) {
-  const api = process.env.NEXT_PUBLIC_API_URL;
+type VoteData = {
+  data: Vote[];
+  count: number;
+};
 
-  fetch(`${api}/polls/${id}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-    },
-  })
-    .then(async (response) => {
-      return await response.json();
-    })
-    .then(() => {
-      setVotes(votes.filter((vote) => vote.id !== id));
-      toast.success('Vote supprimé', { duration: 2000, description: 'Le vote a bien été supprimé' });
-    })
-    .catch((error: Error) => {
-      toast.error('Erreur', { duration: 2000, description: 'Une erreur est survenue lors de la suppression du vote' });
-    });
-}
+function ShowContent() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  let page = searchParams.get('page') || 1;
+  if (typeof page === 'string') {
+    page = Number.parseInt(page);
+  }
 
-function VotesList({ page = 1 }: { page?: number }) {
-  const api = process.env.NEXT_PUBLIC_API_URL;
-
-  const [votes, setVotes] = useState<Vote[]>([]);
   const [maxPage, setMaxPage] = useState<number>(1);
-  const [editingVote, setEditingVote] = useState<number | null>(null);
+  const [votes, setVotes] = useState<Vote[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
-    const queryParams = new URLSearchParams({
-      skip: `${page - 1}`,
-      take: '10',
-    });
+    const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    fetch(`${api}/polls?${queryParams}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    })
-      .then(async (response) => {
-        return await response.json();
-      })
-      .then((data: Vote[]) => {
-        setVotes(data);
-        setMaxPage(Math.ceil(data.length / 10));
-      })
-      .catch((error: Error) => {
-        console.error(error);
+    setTimeout(() => {
+      const queryParams = new URLSearchParams({
+        skip: `${page - 1}`,
+        take: '10',
+        search: searchTerm,
       });
-  }, [page, api]);
+
+      fetch(`${urlApi}/polls?${queryParams}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+        },
+      })
+        .then(async (response) => {
+          if (response.status === 403) {
+            router.push('/');
+          }
+          return response.json();
+        })
+        .then((data: VoteData) => {
+          console.log(data.data);
+          setVotes(data.data);
+          setMaxPage(Math.ceil(data.count / 10));
+        })
+        .catch((error: Error) => {
+          console.error(error);
+        });
+    }, 500);
+  }, [page, searchTerm, router]);
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
   return (
-    <div className="p-4">
-      <div className="flex gap-4 items-right justify-end">
-        <AddVote votes={votes} setVotes={setVotes} />
-      </div>
-      <div className="p-4">
-        <div className="border rounded-lg overflow-hidden">
-          {votes?.length === 0 && <div className="p-4 text-center text-muted-foreground">Aucun vote</div>}
-          {votes?.length > 0 && (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Titre</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Date de début</TableHead>
-                  <TableHead>Date de fin</TableHead>
-                  <TableHead>Choix maximum</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {votes?.map((vote) => (
-                  <TableRow key={vote.id}>
-                    <TableCell>{vote.title}</TableCell>
-                    <TableCell>{vote.description}</TableCell>
-                    <TableCell>{new Date(vote.start_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(vote.end_at).toLocaleDateString()}</TableCell>
-                    <TableCell>{vote.max_choices}</TableCell>
-                    <TableCell>
-                      <Button>Détails</Button>
-                      <Button className="ml-2" onClick={() => setEditingVote(vote.id)}>
-                        Modifier
-                      </Button>
-                      <Button className="ml-2" onClick={() => deleteVote(vote.id, votes, setVotes)}>
-                        Supprimer
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </div>
-        {editingVote !== null && (
-          <Dialog open={editingVote !== null} onOpenChange={() => setEditingVote(null)}>
-            <DialogContent>
-              <EditVote id={editingVote} votes={votes} setVotes={setVotes} setEditingVote={setEditingVote} />
-            </DialogContent>
-          </Dialog>
-        )}
-      </div>
-    </div>
+    <TabsContent value="all">
+      <Card x-chunk="dashboard-06-chunk-0">
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Gestion des votes</CardTitle>
+          <AddVote votes={votes} setVotes={setVotes} />
+        </CardHeader>
+        <CardContent>
+          <div className="ml-auto flex items-center gap-2">
+            <Input
+              type="search"
+              placeholder="Rechercher..."
+              className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+              onChange={handleSearch}
+              value={searchTerm}
+            />
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Titre</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Date de début</TableHead>
+                <TableHead>Date de fin</TableHead>
+                <TableHead>Choix maximum</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <VotesList votes={votes} />
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter>
+          <PaginationComponent page={page} maxPage={maxPage} href="/dashboard/votes" />
+        </CardFooter>
+      </Card>
+    </TabsContent>
   );
 }
 
 export default function Votes() {
   return (
-    <div className="p-4">
-      <div className="border rounded-lg overflow-hidden">
-        <div className="p-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold">Votes</h1>
-          </div>
-          <Suspense fallback={<div>Chargement...</div>}>
-            <VotesList />
-          </Suspense>
+    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
+      <div className="flex flex-col h-full">
+        <div className="grid flex-1 items-start">
+          <Tabs defaultValue="all">
+            <Suspense>
+              <ShowContent />
+            </Suspense>
+          </Tabs>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

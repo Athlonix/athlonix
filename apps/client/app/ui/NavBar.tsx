@@ -33,7 +33,7 @@ function LogoutUser() {
         window.location.href = '/';
       }
     })
-    .catch((error: Error) => console.log(error));
+    .catch((error: Error) => console.error(error));
 }
 
 export const NavBar: React.FC<NavBarProps> = ({ links }) => {

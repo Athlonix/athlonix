@@ -17,7 +17,7 @@ export async function getUserInfo(): Promise<User> {
   if (!response.ok) {
     throw new Error('Failed to fetch user info');
   }
-  const user = await response.json();
+  const user = (await response.json()) as User;
   localStorage.setItem('user', JSON.stringify(user));
   return user;
 }

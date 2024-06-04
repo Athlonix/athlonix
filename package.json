@@ -17,7 +17,7 @@
     "@repo/biome-config": "workspace:*",
     "@repo/supabase": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "turbo": "^2.0.0"
+    "turbo": "^2.0.1"
   },
   "packageManager": "pnpm@9.1.4",
   "engines": {

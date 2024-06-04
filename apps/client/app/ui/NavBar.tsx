@@ -84,7 +84,7 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
                 <AvatarFallback className="bg-slate-400">{getUserAvatar()}</AvatarFallback>
               </Avatar>
             </Link>
-            {user && checkSubscription(user) === true && (
+            {user !== undefined && checkSubscription(user) === true && (
               <Button className="w-[120px]" asChild>
                 <Link href="/members">Espace membre</Link>
               </Button>

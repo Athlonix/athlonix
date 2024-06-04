@@ -1,5 +1,5 @@
 import '@repo/ui/globals.css';
-import { BarChart, FileSearch, Flame, Home, LineChart, MessageSquareMore, Trophy, Users } from 'lucide-react';
+import { FileSearch, Flame, Home, LineChart, MessageSquareMore, Trophy, Users } from 'lucide-react';
 import Link from 'next/link';
 
 export default function RootLayout({

@@ -41,7 +41,8 @@ ENV NEXT_PUBLIC_ATHLONIX_STORAGE_URL ${NEXT_PUBLIC_ATHLONIX_STORAGE_URL}
 COPY --from=pruner --chown=node:node /app/out/full/ ./
 
 RUN pnpm turbo run build --filter client && \
-    pnpm prune --prod
+    pnpm prune --prod && \
+    pnpm --filter client deploy --prod --ignore-scripts ./out
 
 FROM base AS dev
 WORKDIR /app

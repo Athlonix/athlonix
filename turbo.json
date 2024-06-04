@@ -3,6 +3,7 @@
   "globalDependencies": ["**/.env"],
   "tasks": {
     "build": {
+      "env": ["SUPABASE_DOMAIN"],
       "dependsOn": ["^build"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
@@ -13,6 +14,7 @@
       "dependsOn": ["^lint:check"]
     },
     "dev": {
+      "env": ["SUPABASE_DOMAIN"],
       "cache": false,
       "persistent": true
     },

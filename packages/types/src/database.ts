@@ -1480,6 +1480,7 @@ export type Database = {
           id_referer: number | null;
           invoice: string | null;
           last_name: string;
+          status: Database['public']['Enums']['subscription status'] | null;
           subscription: string | null;
           username: string;
         };
@@ -1494,6 +1495,7 @@ export type Database = {
           id_referer?: number | null;
           invoice?: string | null;
           last_name: string;
+          status?: Database['public']['Enums']['subscription status'] | null;
           subscription?: string | null;
           username: string;
         };
@@ -1508,6 +1510,7 @@ export type Database = {
           id_referer?: number | null;
           invoice?: string | null;
           last_name?: string;
+          status?: Database['public']['Enums']['subscription status'] | null;
           subscription?: string | null;
           username?: string;
         };
@@ -1633,6 +1636,7 @@ export type Database = {
       priority: 'P0' | 'P1' | 'P2' | 'P3';
       reaction: 'like';
       status: 'not started' | 'in progress' | 'completed';
+      'subscription status': 'applied' | 'approved' | 'rejected';
     };
     CompositeTypes: {
       [_ in never]: never;

@@ -40,7 +40,7 @@ async function updateUserInformation(id: number, username: string, first_name: s
 
 export default function UserAccount() {
   const [user, setUser] = useState<User | null>(null);
-  const [subscription, setSubscription] = useState<boolean>(false);
+  const [status, setStatus] = useState<null | 'applied' | 'approved' | 'rejected'>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ export default function UserAccount() {
         return;
       }
       setUser(user);
-      setSubscription(checkSubscription(user));
+      setStatus(checkSubscription(user));
       setLoading(false);
     };
 
@@ -159,7 +159,7 @@ export default function UserAccount() {
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="flex items-center gap-2">
-              {subscription ? (
+              {status === 'approved' && (
                 <div className="flex items-center gap-2">
                   <Badge variant="success">Active</Badge>
                   <span>
@@ -167,22 +167,37 @@ export default function UserAccount() {
                     {user?.date_validity ? new Date(user?.date_validity).toLocaleDateString() : ''}
                   </span>
                 </div>
-              ) : (
+              )}
+              {status === null && (
                 <div className="flex items-center gap-2">
                   <Badge variant="destructive">Inactive</Badge>
                   <span>Votre abonnement a expiré ou est inactif</span>
                 </div>
               )}
+              {status === 'applied' && (
+                <div className="flex items-center gap-2">
+                  <Badge variant="default">En attente</Badge>
+                  <span>Votre demande de souscription est en attente de validation</span>
+                </div>
+              )}
+              {status === 'rejected' && (
+                <div className="flex items-center gap-2">
+                  <Badge variant="destructive">Rejetée</Badge>
+                  <span>Votre demande de souscription a été rejetée</span>
+                </div>
+              )}
             </div>
           </CardContent>
           <CardFooter>
-            {!subscription ? (
-              <Button variant="secondary" className="mr-2">
-                <Link href="https://buy.stripe.com/test_dR6dUnd8E83ggx2001" target="_blank">
-                  Activer mon abonnement
-                </Link>
-              </Button>
-            ) : (
+            {status === null ||
+              (status === 'rejected' && (
+                <Button variant="secondary" className="mr-2">
+                  <Link href="https://buy.stripe.com/test_dR6dUnd8E83ggx2001" target="_blank">
+                    Activer mon abonnement
+                  </Link>
+                </Button>
+              ))}
+            {status === 'approved' && (
               <Button variant="secondary" className="mr-2">
                 <Link href="https://billing.stripe.com/p/login/test_8wMdSB7u77k87D2bII" target="_blank">
                   Editer mes informations

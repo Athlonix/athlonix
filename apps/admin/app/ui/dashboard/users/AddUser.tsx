@@ -1,5 +1,6 @@
 'use client';
 
+import type { User } from '@/app/(dashboard)/dashboard/users/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -20,18 +21,6 @@ import type React from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-type User = {
-  id: number;
-  email: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  id_referer: number | null;
-  date_validity: string | null;
-  created_at: string;
-  roles: { id: number; name: string }[];
-};
 
 interface Props {
   users: User[];
@@ -93,6 +82,8 @@ function AddUser({ users, setUsers }: Props) {
           last_name: values.lastName,
           id_referer: null,
           date_validity: null,
+          subscription: null,
+          status: null,
           created_at: new Date().toISOString(),
           roles: [],
         };

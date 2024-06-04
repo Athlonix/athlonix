@@ -3,9 +3,9 @@
   "private": true,
   "scripts": {
     "clean": "turbo clean && rm -rf node_modules/ .turbo/ pnpm-lock.yaml",
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "test": "turbo test",
+    "build": "turbo build --env-mode=loose",
+    "dev": "turbo dev --env-mode=loose",
+    "test": "turbo test --env-mode=loose",
     "lint": "biome check --write",
     "lint:check": "biome ci",
     "types:check": "turbo types:check",
@@ -17,7 +17,7 @@
     "@repo/biome-config": "workspace:*",
     "@repo/supabase": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "turbo": "^1.13.3"
+    "turbo": "^2.0.1"
   },
   "packageManager": "pnpm@9.1.4",
   "engines": {

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type React from 'react';
-import { getUserAvatar } from '../lib/user/utils';
+import { type User, checkSubscription, getUserAvatar } from '../lib/user/utils';
 
 interface LinkProp {
   name: string;
@@ -38,10 +38,14 @@ function LogoutUser() {
 
 export const NavBar: React.FC<NavBarProps> = ({ links }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [user, setUser] = useState<User>();
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
-    setIsAuthenticated(user !== null);
+    const user = localStorage.getItem('user') as unknown as User;
+    setUser(user);
+    if (user) {
+      setIsAuthenticated(true);
+    }
   }, []);
 
   const navBarElements = links.map((link) => {
@@ -80,6 +84,11 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
                 <AvatarFallback className="bg-slate-400">{getUserAvatar()}</AvatarFallback>
               </Avatar>
             </Link>
+            {user !== undefined && checkSubscription(user) && (
+              <Button className="w-[120px]" asChild>
+                <Link href="/members">Espace membre</Link>
+              </Button>
+            )}
             <Button className="w-[120px] bg-red-900">
               <Link href={''} onClick={() => LogoutUser()}>
                 Se déconnecter

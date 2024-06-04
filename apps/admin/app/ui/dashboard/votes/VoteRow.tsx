@@ -4,6 +4,7 @@ import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
 import DeleteVote from '@/app/ui/dashboard/votes/DeleteVote';
 import EditVote from '@/app/ui/dashboard/votes/EditVote';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
+import Link from 'next/link';
 import { useState } from 'react';
 
 interface Props {
@@ -41,7 +42,9 @@ function VoteRow({ vote }: Props) {
   )}:${String(endDate.getSeconds()).padStart(2, '0')}`;
   return (
     <TableRow key={vote.id}>
-      <TableCell className="font-medium">{title}</TableCell>
+      <TableCell className="font-medium">
+        <Link href={`/dashboard/votes/details?id=${vote.id}`}>{title}</Link>
+      </TableCell>
       <TableCell>{description}</TableCell>
       <TableCell>{formattedStartDate}</TableCell>
       <TableCell>{formattedEndDate}</TableCell>

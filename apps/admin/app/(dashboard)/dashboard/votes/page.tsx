@@ -19,8 +19,7 @@ export type Vote = {
   max_choices: number;
   start_at: string;
   end_at: string;
-  options: { id: number; content: string }[];
-  results: { id_choice: number; count: number }[];
+  results: { id: number; votes: number; content: string }[];
 };
 
 type VoteData = {
@@ -43,7 +42,7 @@ function ShowContent() {
   useEffect(() => {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    const timer = setTimeout(() => {
+    setTimeout(() => {
       const queryParams = new URLSearchParams({
         skip: `${page - 1}`,
         take: '10',
@@ -64,6 +63,7 @@ function ShowContent() {
           return response.json();
         })
         .then((data: VoteData) => {
+          console.log(data.data);
           setVotes(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })
@@ -81,7 +81,7 @@ function ShowContent() {
     <TabsContent value="all">
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Activités</CardTitle>
+          <CardTitle>Gestion des votes</CardTitle>
           <AddVote votes={votes} setVotes={setVotes} />
         </CardHeader>
         <CardContent>

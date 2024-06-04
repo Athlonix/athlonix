@@ -12,7 +12,7 @@
     "formatter": {
       "enabled": true,
       "quoteStyle": "single",
-      "trailingComma": "all",
+      "trailingCommas": "all",
       "semicolons": "always"
     }
   },
@@ -24,7 +24,7 @@
     "rules": {
       "recommended": true,
       "correctness": {
-        "noUnusedImports": "off"
+        "noUnusedImports": "info"
       }
     }
   },

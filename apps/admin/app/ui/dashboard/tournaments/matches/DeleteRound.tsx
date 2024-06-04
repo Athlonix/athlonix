@@ -7,7 +7,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@repo/ui/components/ui/dialog';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 type Round = {
@@ -23,7 +22,6 @@ interface DeleteRoundProps {
 
 function DeleteRound(props: DeleteRoundProps) {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
   function deleteRound(round: Round) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;

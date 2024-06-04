@@ -34,7 +34,7 @@ function AddVote({ votes, setVotes }: Props) {
 
   const formSchema = z.object({
     title: z.string().min(2, { message: 'Le titre doit contenir au moins 2 caractères' }),
-    description: z.string().min(2, { message: 'La description doit contenir au moins 2 caractères' }),
+    description: z.string().optional(),
     start_at: z.string(),
     end_at: z.string(),
     max_choices: z.coerce.number().min(1, { message: 'Le nombre de choix doit être supérieur à 0' }),
@@ -85,10 +85,9 @@ function AddVote({ votes, setVotes }: Props) {
         return response.json();
       })
       .then((data: Vote) => {
-        if (data) {
-          toast.success('Vote créé', { duration: 2000, description: 'Le vote a été créé avec succès' });
-          setVotes([...votes, data]);
-        }
+        toast.success('Vote créé', { duration: 2000, description: 'Le vote a été créé avec succès' });
+        setVotes([...votes, data]);
+        form.reset();
       })
       .catch((error: Error) => {
         toast.error('Erreur', { duration: 2000, description: 'Une erreur est survenue' });
@@ -109,7 +108,7 @@ function AddVote({ votes, setVotes }: Props) {
         <ScrollArea className="max-h-[80vh] p-4">
           <DialogHeader>
             <DialogTitle>Création d'un vote</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="p-2">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(callApi)} method="POST">
                   <div className="grid gap-2">
@@ -188,7 +187,7 @@ function AddVote({ votes, setVotes }: Props) {
                         )}
                       />
                     </div>
-                    <div className="grid">
+                    <div className="grid gap-4">
                       {fields.map((field, index) => (
                         <div key={field.id} className="grid gap-2">
                           <FormField

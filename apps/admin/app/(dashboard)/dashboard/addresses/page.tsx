@@ -67,7 +67,7 @@ function ShowContent() {
           setMaxPage(Math.ceil(data.count / 10));
         })
         .catch((error: Error) => {
-          console.log(error);
+          console.error(error);
         });
     }, 500);
 

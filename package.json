@@ -6,14 +6,14 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "test": "turbo test",
-    "lint": "biome check --apply .",
-    "lint:check": "biome ci .",
+    "lint": "biome check --write",
+    "lint:check": "biome ci",
     "types:check": "turbo types:check",
     "generate:types": "pnpm -F @repo/types run generate:types",
     "pre-commit": "pnpm run lint:check && pnpm run types:check"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.7.3",
+    "@biomejs/biome": "1.8.0",
     "@repo/biome-config": "workspace:*",
     "@repo/supabase": "workspace:*",
     "@repo/typescript-config": "workspace:*",

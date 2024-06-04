@@ -31,7 +31,7 @@ polls.openapi(getAllPolls, async (c) => {
     query.range(from, to);
   }
 
-  const { data, error } = await query;
+  const { count, data, error } = await query;
 
   if (error) {
     return c.json({ error: error.message }, 500);
@@ -42,7 +42,12 @@ polls.openapi(getAllPolls, async (c) => {
     results: poll.results.map((option) => ({ ...option, votes: option.votes.length })),
   }));
 
-  return c.json(format, 200);
+  const responseData = {
+    data: format || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
 });
 
 polls.openapi(getOnePoll, async (c) => {

@@ -317,3 +317,40 @@ export const getUsersActivities = createRoute({
   },
   tags: ['user'],
 });
+
+export const setSubscription = createRoute({
+  method: 'patch',
+  path: '/users/{id}/subscription',
+  summary: 'Set a subscription to a user',
+  description: 'Set a subscription to a user',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            subscription: z.enum(['applied', 'approved', 'rejected']),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+    400: badRequestSchema,
+  },
+  tags: ['user'],
+});

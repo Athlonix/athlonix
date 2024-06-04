@@ -11,7 +11,7 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-type User = {
+export type User = {
   id: number;
   email: string;
   username: string;
@@ -20,6 +20,7 @@ type User = {
   id_referer: number | null;
   date_validity: string | null;
   created_at: string;
+  subscription: 'applied' | 'approved' | 'rejected' | null;
   roles: { id: number; name: string }[];
 };
 
@@ -109,6 +110,7 @@ function ShowContent() {
                 <TableHead>Rôle</TableHead>
                 <TableHead>Date d'éxpiration</TableHead>
                 <TableHead>Date de création</TableHead>
+                <TableHead>Demande de souscription</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>

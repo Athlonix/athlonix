@@ -1,4 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
+import type { PostgrestError } from '@supabase/supabase-js';
 import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -9,6 +10,7 @@ import {
   getOneUser,
   getUsersActivities,
   removeUserRole,
+  setSubscription,
   softDeleteUser,
   updateUser,
   updateUserRole,
@@ -326,4 +328,52 @@ users.openapi(getUsersActivities, async (c) => {
   };
 
   return c.json(responseData, 200);
+});
+
+users.openapi(setSubscription, async (c) => {
+  const { id } = c.req.valid('param');
+  const { subscription } = c.req.valid('json');
+  const roles = c.get('user').roles || [];
+  await checkRole(roles, false, [Role.ADMIN]);
+
+  const { data, error: errorID } = await supabase.from('USERS').select('id, deleted_at').eq('id', id).single();
+
+  if (errorID || !data) {
+    return c.json({ error: 'User not found' }, 404);
+  }
+
+  if (data.deleted_at) {
+    return c.json({ error: 'The user was deleted' }, 400);
+  }
+
+  if (!['applied', 'approved', 'rejected'].includes(subscription)) {
+    return c.json({ error: 'Invalid subscription' }, 400);
+  }
+
+  let error: PostgrestError | null;
+
+  if (subscription === 'approved') {
+    const oneYear = new Date();
+    oneYear.setFullYear(oneYear.getFullYear() + 1);
+    ({ error } = await supabase
+      .from('USERS')
+      .update({ subscription, date_validity: oneYear.toISOString() })
+      .eq('id', id));
+  } else {
+    ({ error } = await supabase.from('USERS').update({ subscription }).eq('id', id));
+  }
+
+  if (error) {
+    return c.json({ error: 'Failed to update subscription' }, 400);
+  }
+
+  if (subscription === 'approved') {
+    const { error } = await supabase.from('USERS_ROLES').insert([{ id_user: id, id_role: 2 }]);
+
+    if (error) {
+      return c.json({ error: 'Failed to update subscription' }, 400);
+    }
+  }
+
+  return c.json({ message: 'Subscription updated' }, 200);
 });

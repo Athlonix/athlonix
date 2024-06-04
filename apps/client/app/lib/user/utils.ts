@@ -21,16 +21,24 @@ export async function getUserInfo(): Promise<User> {
   return user;
 }
 
-export function checkSubscription(user: User): boolean {
+export function checkSubscription(user: User): null | 'applied' | 'approved' | 'rejected' {
   if (user.subscription === null) {
-    return false;
+    return null;
+  }
+
+  if (user.subscription === 'applied') {
+    return 'applied';
+  }
+
+  if (user.subscription === 'rejected') {
+    return 'rejected';
   }
 
   if (user.date_validity === null || new Date(user.date_validity) < new Date()) {
-    return false;
+    return null;
   }
 
-  return true;
+  return 'approved';
 }
 
 export function getUserAvatar(): string {

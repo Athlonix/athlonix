@@ -31,6 +31,7 @@ interface UserProps {
   last_name: string;
   id_referer: number | null;
   date_validity: string | null;
+  subscription: 'applied' | 'approved' | 'rejected' | null;
   created_at: string;
   roles: { id: number; name: string }[];
 }
@@ -47,19 +48,36 @@ const RoleBadge: Record<number, string> = {
   9: 'info',
 };
 
+const SubscriptionBadge: Record<string, { color: string; text: string }> = {
+  applied: {
+    color: 'default',
+    text: 'En attente',
+  },
+  approved: {
+    color: 'success',
+    text: 'Approuvé',
+  },
+  rejected: {
+    color: 'destructive',
+    text: 'Rejeté',
+  },
+};
+
 function UserRow(user: UserProps) {
   const router = useRouter();
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+  const [openSubscription, setOpenSubscription] = useState(false);
 
   const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(user.first_name);
   const [lastName, setLastName] = useState(user.last_name);
   const [roles, setRoles] = useState(user.roles);
+  const [subscribe, setSubscribe] = useState(user.subscription);
 
   const setter = { username: setUsername, firstName: setFirstName, lastName: setLastName, roles: setRoles };
 
-  async function deleteUser() {
+  function deleteUser() {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
     fetch(`${urlApi}/users/${user.id}/soft`, {
       method: 'DELETE',
@@ -87,6 +105,44 @@ function UserRow(user: UserProps) {
       });
 
     setOpenDelete(false);
+  }
+
+  function subscribeUser(status: 'approved' | 'rejected') {
+    const urlApi = process.env.NEXT_PUBLIC_API_URL;
+    fetch(`${urlApi}/users/${user.id}/subscription`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({
+        subscription: status,
+      }),
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
+      .then(() => {
+        const message = status === 'approved' ? 'approuvé' : 'rejeté';
+        toast.success('Succès', { duration: 2000, description: `L'utilisateur a été ${message} avec succès` });
+        setSubscribe(status);
+        if (status === 'approved') {
+          setRoles([
+            ...roles,
+            {
+              id: 2,
+              name: 'Membre',
+            },
+          ]);
+        }
+        setOpenSubscription(false);
+      })
+      .catch((error: Error) => {
+        toast.error('Erreur', { duration: 2000, description: error?.message });
+      });
   }
 
   return (
@@ -127,6 +183,16 @@ function UserRow(user: UserProps) {
         .getMinutes()
         .toString()
         .padStart(2, '0')}`}</TableCell>
+      <TableCell>
+        {subscribe !== null && (
+          <Badge
+            className="m-[2px]"
+            variant={SubscriptionBadge[subscribe]?.color as 'default' | 'destructive' | 'success'}
+          >
+            {SubscriptionBadge[subscribe]?.text}
+          </Badge>
+        )}
+      </TableCell>
       {username !== 'Supprimé' && (
         <TableCell>
           <DropdownMenu>
@@ -159,12 +225,35 @@ function UserRow(user: UserProps) {
                   </DialogContent>
                 </Dialog>
               </Button>
+              {subscribe === 'applied' && (
+                <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+                  <Dialog open={openSubscription} onOpenChange={setOpenSubscription}>
+                    <DialogTrigger className="w-full text-left">Approbation</DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Approbation de l'utilisateur {user.username}</DialogTitle>
+                        <DialogDescription>
+                          <div className="mb-4">Souhaitez vous valider sa demande de souscription ?</div>
+                          <div className="flex w-full justify-end gap-4">
+                            <Button variant="success" onClick={() => subscribeUser('approved')}>
+                              Approuver
+                            </Button>
+                            <Button variant="destructive" onClick={() => subscribeUser('rejected')}>
+                              Rejeter
+                            </Button>
+                          </div>
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+                </Button>
+              )}
               <Button variant="ghost" className="w-full p-0 font-normal pl-2">
                 <Dialog open={openDelete} onOpenChange={setOpenDelete}>
                   <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
-                      <DialogTitle>Edition de l'utilisateur {user.id}</DialogTitle>
+                      <DialogTitle>Edition de l'utilisateur {user.username}</DialogTitle>
                       <DialogDescription>
                         <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet utilisateur ?</div>
                         <div className="flex w-full justify-end gap-4">

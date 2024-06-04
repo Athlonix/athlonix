@@ -39,7 +39,7 @@ export const userSchema = z.object({
   roles: z.object({ id: z.number(), name: z.string() }).array(),
   deleted_at: z.string().datetime().nullable(),
   invoice: z.string().nullable(),
-  subscription: z.string().nullable(),
+  subscription: z.enum(['applied', 'approved', 'rejected']).nullable(),
 });
 
 export const loginResponseSchema = z.object({

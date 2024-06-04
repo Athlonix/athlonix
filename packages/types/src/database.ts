@@ -1480,7 +1480,7 @@ export type Database = {
           id_referer: number | null;
           invoice: string | null;
           last_name: string;
-          subscription: string | null;
+          subscription: Database['public']['Enums']['subscription status'] | null;
           username: string;
         };
         Insert: {
@@ -1494,7 +1494,7 @@ export type Database = {
           id_referer?: number | null;
           invoice?: string | null;
           last_name: string;
-          subscription?: string | null;
+          subscription?: Database['public']['Enums']['subscription status'] | null;
           username: string;
         };
         Update: {
@@ -1508,7 +1508,7 @@ export type Database = {
           id_referer?: number | null;
           invoice?: string | null;
           last_name?: string;
-          subscription?: string | null;
+          subscription?: Database['public']['Enums']['subscription status'] | null;
           username?: string;
         };
         Relationships: [
@@ -1633,6 +1633,7 @@ export type Database = {
       priority: 'P0' | 'P1' | 'P2' | 'P3';
       reaction: 'like';
       status: 'not started' | 'in progress' | 'completed';
+      'subscription status': 'applied' | 'approved' | 'rejected';
     };
     CompositeTypes: {
       [_ in never]: never;

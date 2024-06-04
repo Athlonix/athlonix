@@ -318,11 +318,11 @@ export const getUsersActivities = createRoute({
   tags: ['user'],
 });
 
-export const setSubscription = createRoute({
+export const setStatus = createRoute({
   method: 'patch',
-  path: '/users/{id}/subscription',
-  summary: 'Set a subscription to a user',
-  description: 'Set a subscription to a user',
+  path: '/users/{id}/status',
+  summary: 'Set a subscription status to a user',
+  description: 'Set a subscription status to a user',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
@@ -331,7 +331,7 @@ export const setSubscription = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            subscription: z.enum(['applied', 'approved', 'rejected']),
+            status: z.enum(['applied', 'approved', 'rejected']),
           }),
         },
       },

@@ -47,11 +47,10 @@ export async function handleSubscription(subscription: string, invoice: string, 
   }
 
   const id_user = user.id;
-  const next_year = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toLocaleString();
 
   const { error } = await supabase
     .from('USERS')
-    .update({ invoice, date_validity: next_year })
+    .update({ subscription, invoice })
     .eq('id', id_user)
     .select();
 

@@ -5,6 +5,7 @@ export interface User {
   first_name: string;
   last_name: string;
   subscription: string | null;
+  status: 'applied' | 'approved' | 'rejected' | null;
   date_validity: string | null;
 }
 
@@ -22,15 +23,15 @@ export async function getUserInfo(): Promise<User> {
 }
 
 export function checkSubscription(user: User): null | 'applied' | 'approved' | 'rejected' {
-  if (user.subscription === null) {
+  if (user.status === null) {
     return null;
   }
 
-  if (user.subscription === 'applied') {
+  if (user.status === 'applied') {
     return 'applied';
   }
 
-  if (user.subscription === 'rejected') {
+  if (user.status === 'rejected') {
     return 'rejected';
   }
 

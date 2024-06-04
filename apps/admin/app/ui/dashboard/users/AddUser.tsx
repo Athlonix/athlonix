@@ -83,6 +83,7 @@ function AddUser({ users, setUsers }: Props) {
           id_referer: null,
           date_validity: null,
           subscription: null,
+          status: null,
           created_at: new Date().toISOString(),
           roles: [],
         };

@@ -20,7 +20,8 @@ export type User = {
   id_referer: number | null;
   date_validity: string | null;
   created_at: string;
-  subscription: 'applied' | 'approved' | 'rejected' | null;
+  subscription: string | null;
+  status: 'applied' | 'approved' | 'rejected' | null;
   roles: { id: number; name: string }[];
 };
 

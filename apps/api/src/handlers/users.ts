@@ -10,7 +10,7 @@ import {
   getOneUser,
   getUsersActivities,
   removeUserRole,
-  setSubscription,
+  setStatus,
   softDeleteUser,
   updateUser,
   updateUserRole,
@@ -330,9 +330,9 @@ users.openapi(getUsersActivities, async (c) => {
   return c.json(responseData, 200);
 });
 
-users.openapi(setSubscription, async (c) => {
+users.openapi(setStatus, async (c) => {
   const { id } = c.req.valid('param');
-  const { subscription } = c.req.valid('json');
+  const { status } = c.req.valid('json');
   const roles = c.get('user').roles || [];
   await checkRole(roles, false, [Role.ADMIN]);
 
@@ -346,28 +346,28 @@ users.openapi(setSubscription, async (c) => {
     return c.json({ error: 'The user was deleted' }, 400);
   }
 
-  if (!['applied', 'approved', 'rejected'].includes(subscription)) {
+  if (!['applied', 'approved', 'rejected'].includes(status)) {
     return c.json({ error: 'Invalid subscription' }, 400);
   }
 
   let error: PostgrestError | null;
 
-  if (subscription === 'approved') {
+  if (status === 'approved') {
     const oneYear = new Date();
     oneYear.setFullYear(oneYear.getFullYear() + 1);
     ({ error } = await supabase
       .from('USERS')
-      .update({ subscription, date_validity: oneYear.toISOString() })
+      .update({ status, date_validity: oneYear.toISOString() })
       .eq('id', id));
   } else {
-    ({ error } = await supabase.from('USERS').update({ subscription }).eq('id', id));
+    ({ error } = await supabase.from('USERS').update({ status }).eq('id', id));
   }
 
   if (error) {
-    return c.json({ error: 'Failed to update subscription' }, 400);
+    return c.json({ error: 'Failed to update status' }, 400);
   }
 
-  if (subscription === 'approved') {
+  if (status === 'approved') {
     const { error } = await supabase.from('USERS_ROLES').insert([{ id_user: id, id_role: 2 }]);
 
     if (error) {
@@ -375,5 +375,5 @@ users.openapi(setSubscription, async (c) => {
     }
   }
 
-  return c.json({ message: 'Subscription updated' }, 200);
+  return c.json({ message: 'Status updated' }, 200);
 });

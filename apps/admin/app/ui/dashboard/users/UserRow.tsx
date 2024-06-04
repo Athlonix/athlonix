@@ -31,7 +31,8 @@ interface UserProps {
   last_name: string;
   id_referer: number | null;
   date_validity: string | null;
-  subscription: 'applied' | 'approved' | 'rejected' | null;
+  subscription: string | null;
+  status: 'applied' | 'approved' | 'rejected' | null;
   created_at: string;
   roles: { id: number; name: string }[];
 }
@@ -48,7 +49,7 @@ const RoleBadge: Record<number, string> = {
   9: 'info',
 };
 
-const SubscriptionBadge: Record<string, { color: string; text: string }> = {
+const StatusBadge: Record<string, { color: string; text: string }> = {
   applied: {
     color: 'default',
     text: 'En attente',
@@ -67,13 +68,13 @@ function UserRow(user: UserProps) {
   const router = useRouter();
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
-  const [openSubscription, setOpenSubscription] = useState(false);
+  const [openStatus, setOpenStatus] = useState(false);
 
   const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(user.first_name);
   const [lastName, setLastName] = useState(user.last_name);
   const [roles, setRoles] = useState(user.roles);
-  const [subscribe, setSubscribe] = useState(user.subscription);
+  const [status, setStatus] = useState(user.status);
 
   const setter = { username: setUsername, firstName: setFirstName, lastName: setLastName, roles: setRoles };
 
@@ -107,16 +108,16 @@ function UserRow(user: UserProps) {
     setOpenDelete(false);
   }
 
-  function subscribeUser(status: 'approved' | 'rejected') {
+  function setStatusUser(status: 'approved' | 'rejected') {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
-    fetch(`${urlApi}/users/${user.id}/subscription`, {
+    fetch(`${urlApi}/users/${user.id}/status`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       },
       body: JSON.stringify({
-        subscription: status,
+        status,
       }),
     })
       .then((response) => {
@@ -128,7 +129,7 @@ function UserRow(user: UserProps) {
       .then(() => {
         const message = status === 'approved' ? 'approuvé' : 'rejeté';
         toast.success('Succès', { duration: 2000, description: `L'utilisateur a été ${message} avec succès` });
-        setSubscribe(status);
+        setStatus(status);
         if (status === 'approved') {
           setRoles([
             ...roles,
@@ -138,10 +139,10 @@ function UserRow(user: UserProps) {
             },
           ]);
         }
-        setOpenSubscription(false);
+        setOpenStatus(false);
       })
       .catch((error: Error) => {
-        toast.error('Erreur', { duration: 2000, description: error?.message });
+        toast.error('Erreur', { duration: 20000, description: error?.message });
       });
   }
 
@@ -184,12 +185,12 @@ function UserRow(user: UserProps) {
         .toString()
         .padStart(2, '0')}`}</TableCell>
       <TableCell>
-        {subscribe !== null && (
+        {status !== null && (
           <Badge
             className="m-[2px]"
-            variant={SubscriptionBadge[subscribe]?.color as 'default' | 'destructive' | 'success'}
+            variant={StatusBadge[status]?.color as 'default' | 'destructive' | 'success'}
           >
-            {SubscriptionBadge[subscribe]?.text}
+            {StatusBadge[status]?.text}
           </Badge>
         )}
       </TableCell>
@@ -225,9 +226,9 @@ function UserRow(user: UserProps) {
                   </DialogContent>
                 </Dialog>
               </Button>
-              {subscribe === 'applied' && (
+              {status === 'applied' && (
                 <Button variant="ghost" className="w-full p-0 font-normal pl-2">
-                  <Dialog open={openSubscription} onOpenChange={setOpenSubscription}>
+                  <Dialog open={openStatus} onOpenChange={setOpenStatus}>
                     <DialogTrigger className="w-full text-left">Approbation</DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
@@ -235,10 +236,10 @@ function UserRow(user: UserProps) {
                         <DialogDescription>
                           <div className="mb-4">Souhaitez vous valider sa demande de souscription ?</div>
                           <div className="flex w-full justify-end gap-4">
-                            <Button variant="success" onClick={() => subscribeUser('approved')}>
+                            <Button variant="success" onClick={() => setStatusUser('approved')}>
                               Approuver
                             </Button>
-                            <Button variant="destructive" onClick={() => subscribeUser('rejected')}>
+                            <Button variant="destructive" onClick={() => setStatusUser('rejected')}>
                               Rejeter
                             </Button>
                           </div>

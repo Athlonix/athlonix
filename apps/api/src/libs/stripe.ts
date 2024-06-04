@@ -51,7 +51,7 @@ export async function handleSubscription(subscription: string, invoice: string, 
 
   const { error } = await supabase
     .from('USERS')
-    .update({ subscription, invoice, date_validity: next_year })
+    .update({ invoice, date_validity: next_year })
     .eq('id', id_user)
     .select();
 

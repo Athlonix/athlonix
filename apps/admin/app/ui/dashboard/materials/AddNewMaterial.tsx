@@ -48,7 +48,7 @@ function AddNewMaterial({ materials, addresses, setMaterials }: Props): JSX.Elem
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
-  const usedAddresses = materials.map((material) => material.id_address);
+  const usedAddresses = materials?.map((material) => material.id_address);
 
   const formSchema = z.object({
     id_material: z.coerce.number({ message: 'Le champ est requis' }).min(1, { message: 'Le champ est requis' }),
@@ -157,7 +157,7 @@ function AddNewMaterial({ materials, addresses, setMaterials }: Props): JSX.Elem
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {materials.map((material) => (
+                              {materials?.map((material) => (
                                 <SelectItem key={material.id} value={material.id.toString()}>
                                   {material.name}
                                 </SelectItem>

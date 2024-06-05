@@ -189,14 +189,13 @@ export default function UserAccount() {
             </div>
           </CardContent>
           <CardFooter>
-            {status === null ||
-              (status === 'rejected' && (
+            {(status === null || status === 'rejected') && (
                 <Button variant="secondary" className="mr-2">
                   <Link href="https://buy.stripe.com/test_dR6dUnd8E83ggx2001" target="_blank">
                     Activer mon abonnement
                   </Link>
                 </Button>
-              ))}
+              )}
             {status === 'approved' && (
               <Button variant="secondary" className="mr-2">
                 <Link href="https://billing.stripe.com/p/login/test_8wMdSB7u77k87D2bII" target="_blank">

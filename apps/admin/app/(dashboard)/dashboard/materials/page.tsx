@@ -101,7 +101,7 @@ function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
           <AccordionTrigger>Matériels</AccordionTrigger>
           <AccordionContent>
             <div className="flex flex-col space-y-2">
-              {materials.map((material) => (
+              {materials?.map((material) => (
                 <div key={material.id} className="grid grid-cols-3">
                   <div>{material.name}</div>
                   <div>{material.weight_grams ? `${material.weight_grams} g` : 'Non renseigné'}</div>

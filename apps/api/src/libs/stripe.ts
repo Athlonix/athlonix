@@ -48,7 +48,11 @@ export async function handleSubscription(subscription: string, invoice: string, 
 
   const id_user = user.id;
 
-  const { error } = await supabase.from('USERS').update({ subscription, invoice }).eq('id', id_user).select();
+  const { error } = await supabase
+    .from('USERS')
+    .update({ subscription, invoice, status: 'applied' })
+    .eq('id', id_user)
+    .select();
 
   if (error) {
     return { error: error.message };

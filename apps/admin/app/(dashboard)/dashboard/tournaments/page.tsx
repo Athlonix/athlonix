@@ -1,8 +1,8 @@
 'use client';
 
-import PaginationComponent from '@/app/ui/Pagination';
 import AddTournaments from '@/app/ui/dashboard/tournaments/AddTournaments';
 import TournamentsList from '@/app/ui/dashboard/tournaments/TournamentsList';
+import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';

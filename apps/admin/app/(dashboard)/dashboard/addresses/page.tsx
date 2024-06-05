@@ -1,8 +1,8 @@
 'use client';
 
-import PaginationComponent from '@/app/ui/Pagination';
 import AddAddress from '@/app/ui/dashboard/addresses/AddAddress';
 import AddressesList from '@/app/ui/dashboard/addresses/AddressesList';
+import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';

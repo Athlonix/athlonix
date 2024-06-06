@@ -14,7 +14,7 @@ import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { EditIcon, Eye, Trash2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import React from 'react';
 import { type Files, deleteFile, getAllFiles, saveFile } from './utils';
@@ -130,6 +130,7 @@ export default function Documents() {
           <TableHeader>
             <TableRow>
               <TableHead>Nom</TableHead>
+              <TableHead>Description</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Confidentiel</TableHead>
               <TableHead>Uploaded</TableHead>
@@ -140,6 +141,7 @@ export default function Documents() {
             {files?.data.map((file) => (
               <TableRow key={file.id}>
                 <TableCell>{file.name}</TableCell>
+                <TableCell>{file.description || 'Aucune description'}</TableCell>
                 <TableCell>{fileTypes(file.type)}</TableCell>
                 <TableCell>{file.isAdmin ? 'Oui' : 'Non'}</TableCell>
                 <TableCell>{`${new Date(file.created_at).toLocaleDateString()} ${new Date(
@@ -151,7 +153,7 @@ export default function Documents() {
                 <TableCell className="flex gap-2">
                   <Eye className="cursor-pointer" onClick={() => viewFile(file.id)} />
                   <EditIcon className="cursor-pointer" color="#1f6feb" />
-                  {userId === file.owner && (
+                  {userId !== null && userId === file.owner && (
                     <Trash2
                       className="cursor-pointer"
                       color="#bf0808"

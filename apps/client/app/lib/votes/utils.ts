@@ -1,9 +1,12 @@
+'use server';
+import { cookies } from 'next/headers';
 import type { Vote } from '../type/Votes';
 
 export async function getAllVotes(): Promise<{ data: Vote[]; count: number }> {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = process.env.ATHLONIX_API_URL;
+  const token = cookies().get('access_token')?.value;
   const response = await fetch(`${API_URL}/polls?all=true`, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
+    headers: { Authorization: `Bearer ${token}` },
     cache: 'no-cache',
   });
   if (!response.ok) {

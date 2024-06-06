@@ -1,5 +1,11 @@
 'use client';
-import { type User, checkSubscription, getUserAvatar, getUserInfo } from '@/app/lib/user/utils';
+import {
+  type User,
+  checkSubscriptionStatus,
+  getUserFromDB,
+  saveUserCookie,
+  updateUserInformation,
+} from '@/app/lib/utils';
 import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
@@ -7,36 +13,13 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/c
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { Loader2 } from 'lucide-react';
+import { CircleArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 const Icons = {
   spinner: Loader2,
 };
-
-async function updateUserInformation(id: number, username: string, first_name: string, last_name: string) {
-  fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-    },
-    body: JSON.stringify({
-      username,
-      first_name,
-      last_name,
-    }),
-  })
-    .then(async (response) => await response.json())
-    .then((data: { user: User }) => {
-      if ('error' in data) {
-        return;
-      }
-      localStorage.setItem('user', JSON.stringify(data));
-    })
-    .catch((error: Error) => console.error(error));
-}
 
 export default function UserAccount() {
   const [user, setUser] = useState<User | null>(null);
@@ -45,17 +28,26 @@ export default function UserAccount() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const user = await getUserInfo();
-      if (!user) {
-        return;
-      }
-      setUser(user);
-      setStatus(checkSubscription(user));
+      const user = await getUserFromDB();
+      setUser(user || null);
+      setStatus(await checkSubscriptionStatus(user));
       setLoading(false);
     };
 
     fetchData();
   }, []);
+
+  async function handleUpateUserInformation(user: User) {
+    try {
+      await updateUserInformation(user.id, user.username, user.first_name, user.last_name);
+    } catch (error) {
+      throw new Error('Failed to update file');
+    } finally {
+      toast.success('Informations mises à jour');
+      saveUserCookie(user);
+      setUser(user);
+    }
+  }
 
   if (loading) {
     return (
@@ -82,8 +74,9 @@ export default function UserAccount() {
         </Link>
       </div>
       <header className="flex items-center gap-4 mb-8">
+        <CircleArrowLeft className="w-8 h-8" onClick={() => window.history.back()} cursor={'pointer'} />
         <Avatar className="h-12 w-12">
-          <AvatarFallback>{getUserAvatar()}</AvatarFallback>
+          <AvatarFallback>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
         <div>
           <h1 className="text-2xl font-bold">
@@ -143,8 +136,7 @@ export default function UserAccount() {
                 <Button
                   className="w-[120px] text-center mt-4 rounded-full align-middle"
                   onClick={() => {
-                    updateUserInformation(user.id, user.username, user.first_name, user.last_name);
-                    toast.success('Informations mises à jour');
+                    handleUpateUserInformation(user);
                   }}
                 >
                   Editer

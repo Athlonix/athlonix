@@ -1,12 +1,12 @@
 'use client';
 
+import { type User, checkSubscriptionStatus, getUserFromCookie } from '@/app/lib/utils';
 import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Button } from '@repo/ui/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type React from 'react';
-import { type User, checkSubscription, getUserAvatar } from '../lib/user/utils';
 
 interface LinkProp {
   name: string;
@@ -38,14 +38,21 @@ function LogoutUser() {
 
 export const NavBar: React.FC<NavBarProps> = ({ links }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User | null>(null);
+  const [subscription, setSubscription] = useState<boolean>(false);
 
   useEffect(() => {
-    const user = localStorage.getItem('user') as unknown as User;
-    setUser(user);
-    if (user) {
-      setIsAuthenticated(true);
+    async function checkUser() {
+      const user = await getUserFromCookie();
+      if (user) {
+        setIsAuthenticated(true);
+        setUser(user);
+      }
+      if (user && (await checkSubscriptionStatus(user)) === 'approved') {
+        setSubscription(true);
+      }
     }
+    checkUser();
   }, []);
 
   const navBarElements = links.map((link) => {
@@ -81,10 +88,10 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
           <div className="flex items-center gap-6">
             <Link href="/account">
               <Avatar>
-                <AvatarFallback className="bg-slate-400">{getUserAvatar()}</AvatarFallback>
+                <AvatarFallback className="bg-slate-400">{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
             </Link>
-            {user !== undefined && checkSubscription(user) && (
+            {user !== undefined && subscription && (
               <Button className="w-[120px]" asChild>
                 <Link href="/members">Espace membre</Link>
               </Button>

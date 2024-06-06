@@ -1,5 +1,5 @@
 'use client';
-import { returnUserId } from '@/app/ui/utils';
+import { returnUser } from '@/app/lib/utils';
 import { Button } from '@repo/ui/components/ui/button';
 import { Checkbox } from '@repo/ui/components/ui/checkbox';
 import {
@@ -28,7 +28,8 @@ export default function Documents() {
 
   useEffect(() => {
     const getFIles = async () => {
-      setUserId(await returnUserId());
+      const user = await returnUser();
+      setUserId(user?.id || null);
       const files = await getAllFiles();
       setFiles(files);
     };

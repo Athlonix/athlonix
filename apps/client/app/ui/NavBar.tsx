@@ -1,12 +1,12 @@
 'use client';
 
+import { type User, checkSubscriptionStatus, getUserFromCookie } from '@/app/lib/utils';
 import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Button } from '@repo/ui/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type React from 'react';
-import { type User, checkSubscription, returnUser } from '../lib/utils';
 
 interface LinkProp {
   name: string;
@@ -43,12 +43,12 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
 
   useEffect(() => {
     async function checkUser() {
-      const user = await returnUser();
+      const user = await getUserFromCookie();
       if (user) {
         setIsAuthenticated(true);
         setUser(user);
       }
-      if (user && (await checkSubscription(user)) === 'approved') {
+      if (user && (await checkSubscriptionStatus(user)) === 'approved') {
         setSubscription(true);
       }
     }

@@ -13,7 +13,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/c
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { Loader2 } from 'lucide-react';
+import { CircleArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -74,6 +74,7 @@ export default function UserAccount() {
         </Link>
       </div>
       <header className="flex items-center gap-4 mb-8">
+        <CircleArrowLeft className="w-8 h-8" onClick={() => window.history.back()} cursor={'pointer'} />
         <Avatar className="h-12 w-12">
           <AvatarFallback>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>

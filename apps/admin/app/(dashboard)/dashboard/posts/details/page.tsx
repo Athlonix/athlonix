@@ -1,7 +1,7 @@
 'use client';
 
-import PaginationComponent from '@/app/ui/Pagination';
 import ReportsList from '@/app/ui/dashboard/posts/details/ReportsList';
+import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Button } from '@repo/ui/components/ui/button';
 import {
   Dialog,

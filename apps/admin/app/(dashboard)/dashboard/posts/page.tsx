@@ -1,7 +1,7 @@
 'use client';
 
-import PaginationComponent from '@/app/ui/Pagination';
 import PostsList from '@/app/ui/dashboard/posts/PostsList';
+import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Input } from '@repo/ui/components/ui/input';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';

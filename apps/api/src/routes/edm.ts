@@ -22,7 +22,7 @@ export const documentSchema = z.object({
 
 export const getAllFiles = createRoute({
   method: 'get',
-  path: '/listFiles',
+  path: '/edm/listFiles',
   summary: 'List all files',
   description: 'List all files from EDM bucket',
   security: [{ Bearer: [] }],
@@ -50,7 +50,7 @@ export const getAllFiles = createRoute({
 
 export const downloadFileRoute = createRoute({
   method: 'get',
-  path: '/download/{id}',
+  path: '/edm/download/{id}',
   summary: 'Download a file',
   description: 'Download a file from a bucket',
   security: [{ Bearer: [] }],
@@ -70,7 +70,7 @@ export const downloadFileRoute = createRoute({
 
 export const uploadFileRoute = createRoute({
   method: 'post',
-  path: '/upload',
+  path: '/edm/upload',
   summary: 'Upload a file',
   description: 'Upload a file to a bucket',
   security: [{ Bearer: [] }],
@@ -83,7 +83,15 @@ export const uploadFileRoute = createRoute({
             file: z.instanceof(File),
             name: z.string(),
             description: z.string().optional(),
-            isAdmin: z.boolean(),
+            isAdmin: z
+              .string()
+              .optional()
+              .transform((value) => {
+                if (value === 'true') {
+                  return true;
+                }
+                return false;
+              }),
           }),
         },
       },
@@ -109,19 +117,28 @@ export const uploadFileRoute = createRoute({
 
 export const updateFile = createRoute({
   method: 'patch',
-  path: '/upsert',
-  summary: 'Upsert a file',
-  description: 'Upsert a file to a bucket',
+  path: '/edm/update/{id}',
+  summary: 'Update a file',
+  description: 'Udpdate a file to a bucket',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
+    params: idParamValidator,
     body: {
       content: {
         'multipart/form-data': {
           schema: z.object({
-            file: z.instanceof(File),
-            name: z.string(),
-            isAdmin: z.boolean(),
+            file: z.instanceof(File).optional(),
+            name: z.string().optional(),
+            isAdmin: z
+              .string()
+              .optional()
+              .transform((value) => {
+                if (value === 'true') {
+                  return true;
+                }
+                return false;
+              }),
             description: z.string().optional(),
           }),
         },
@@ -147,7 +164,7 @@ export const updateFile = createRoute({
 
 export const deleteFileRoute = createRoute({
   method: 'delete',
-  path: '/delete',
+  path: '/edm/delete',
   summary: 'Delete a file',
   description: 'Delete a file from a bucket',
   security: [{ Bearer: [] }],
@@ -157,6 +174,7 @@ export const deleteFileRoute = createRoute({
       content: {
         'application/json': {
           schema: z.object({
+            id: z.coerce.number(),
             name: z.string(),
           }),
         },

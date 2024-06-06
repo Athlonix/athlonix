@@ -79,19 +79,33 @@ edm.openapi(updateFile, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
-  const { file, name, description, isAdmin } = c.req.valid('form');
+  const { id } = c.req.valid('param');
+  const { file, description, isAdmin } = c.req.valid('form');
 
+  const { data: doc, error: docError } = await supabase.from('DOCUMENTS').select('name, type').eq('id', id).single();
+
+  if (docError) {
+    return c.json({ error: docError.message }, 500);
+  }
   const { error: updateDoc } = await supabase
     .from('DOCUMENTS')
     .update({ description, isAdmin, updated_at: new Date().toLocaleDateString() })
-    .eq('name', name);
+    .eq('id', id);
   if (updateDoc) {
     return c.json({ error: 'Error updating document' }, 500);
   }
 
-  const { error } = await upsertFile(name, file, 'edm');
-  if (error) {
-    return c.json({ error }, 500);
+  if (file) {
+    const { error } = await upsertFile(doc.name, file, 'edm');
+    if (error) {
+      return c.json({ error }, 500);
+    }
+    if (doc.type !== file.type) {
+      const { error: updateType } = await supabase.from('DOCUMENTS').update({ type: file.type }).eq('id', id);
+      if (updateType) {
+        return c.json({ error: 'Error updating document' }, 500);
+      }
+    }
   }
 
   return c.json({ message: 'File updated' }, 200);
@@ -101,11 +115,12 @@ edm.openapi(deleteFileRoute, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
-  const { name } = c.req.valid('json');
+  const { id, name } = c.req.valid('json');
 
   const { data: isOwner, error: ownerError } = await supabase
     .from('DOCUMENTS')
     .select('owner')
+    .eq('id', id)
     .eq('name', name)
     .single();
 
@@ -117,7 +132,7 @@ edm.openapi(deleteFileRoute, async (c) => {
     return c.json({ error: 'You are not the owner of this document' }, 400);
   }
 
-  const { error: deleteDoc } = await supabase.from('DOCUMENTS').delete().eq('name', name);
+  const { error: deleteDoc } = await supabase.from('DOCUMENTS').delete().eq('id', id).eq('name', name);
   if (deleteDoc) {
     return c.json({ error: 'Error deleting document' }, 500);
   }

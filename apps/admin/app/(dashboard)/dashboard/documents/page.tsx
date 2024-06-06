@@ -1,4 +1,5 @@
 'use client';
+import { returnUserId } from '@/app/ui/utils';
 import { Button } from '@repo/ui/components/ui/button';
 import { Checkbox } from '@repo/ui/components/ui/checkbox';
 import {
@@ -12,16 +13,21 @@ import {
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
-import { useEffect, useState } from 'react';
+import { EditIcon, Eye, Trash2 } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
-import { type Files, getAllFiles, saveFile } from './utils';
+import React from 'react';
+import { type Files, deleteFile, getAllFiles, saveFile } from './utils';
 
 export default function Documents() {
   const [isUploading, setIsUploading] = useState(false);
   const [files, setFiles] = useState<{ data: Files[]; count: number } | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
     const getFIles = async () => {
+      setUserId(await returnUserId());
       const files = await getAllFiles();
       setFiles(files);
     };
@@ -30,25 +36,57 @@ export default function Documents() {
 
   async function handleUpload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const formData = new FormData(event.currentTarget);
     setIsUploading(true);
 
     try {
       await saveFile(formData);
     } catch (error) {
-      console.error(error);
+      throw new Error('Failed to save file');
     } finally {
       setIsUploading(false);
+      setFiles(await getAllFiles());
+      setOpen(false);
     }
   }
+
+  async function viewFile(id: number) {
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+    const token = localStorage.getItem('access_token');
+    const response = await fetch(`${API_URL}/edm/download/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to download file');
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank');
+  }
+
+  function fileTypes(input: string) {
+    switch (input) {
+      case 'application/pdf' || 'application/x-pdf':
+        return 'PDF';
+      case 'application/msword' || 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        return 'Word';
+      case input.includes('image') && input:
+        return 'Image';
+      default:
+        return 'Other';
+    }
+  }
+
   return (
     <div className="flex flex-col h-full">
       <header className="bg-gray-100 dark:bg-gray-800 px-6 py-4 flex items-center justify-between">
         <h1 className="text-xl font-bold">Documents d'Athlonix</h1>
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>Nouveau fichier</Button>
+            <Button>Ajouter un fichier</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -93,6 +131,7 @@ export default function Documents() {
             <TableRow>
               <TableHead>Nom</TableHead>
               <TableHead>Type</TableHead>
+              <TableHead>Confidentiel</TableHead>
               <TableHead>Uploaded</TableHead>
               <TableHead>Updated</TableHead>
             </TableRow>
@@ -101,13 +140,31 @@ export default function Documents() {
             {files?.data.map((file) => (
               <TableRow key={file.id}>
                 <TableCell>{file.name}</TableCell>
-                <TableCell>{file.type}</TableCell>
+                <TableCell>{fileTypes(file.type)}</TableCell>
+                <TableCell>{file.isAdmin ? 'Oui' : 'Non'}</TableCell>
                 <TableCell>{`${new Date(file.created_at).toLocaleDateString()} ${new Date(
                   file.created_at,
                 ).toLocaleTimeString()}`}</TableCell>
                 <TableCell>{`${new Date(file.updated_at).toLocaleDateString()} ${new Date(
                   file.updated_at,
                 ).toLocaleTimeString()}`}</TableCell>
+                <TableCell className="flex gap-2">
+                  <Eye className="cursor-pointer" onClick={() => viewFile(file.id)} />
+                  <EditIcon className="cursor-pointer" color="#1f6feb" />
+                  {userId === file.owner && (
+                    <Trash2
+                      className="cursor-pointer"
+                      color="#bf0808"
+                      onClick={() => {
+                        deleteFile(file.id, file.name);
+                        setFiles({
+                          data: files?.data.filter((f) => f.id !== file.id) || [],
+                          count: files?.count - 1 || 0,
+                        });
+                      }}
+                    />
+                  )}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

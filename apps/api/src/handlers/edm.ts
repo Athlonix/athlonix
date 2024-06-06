@@ -101,11 +101,12 @@ edm.openapi(deleteFileRoute, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
-  const { name } = c.req.valid('json');
+  const { id, name } = c.req.valid('json');
 
   const { data: isOwner, error: ownerError } = await supabase
     .from('DOCUMENTS')
     .select('owner')
+    .eq('id', id)
     .eq('name', name)
     .single();
 
@@ -117,7 +118,7 @@ edm.openapi(deleteFileRoute, async (c) => {
     return c.json({ error: 'You are not the owner of this document' }, 400);
   }
 
-  const { error: deleteDoc } = await supabase.from('DOCUMENTS').delete().eq('name', name);
+  const { error: deleteDoc } = await supabase.from('DOCUMENTS').delete().eq('id', id).eq('name', name);
   if (deleteDoc) {
     return c.json({ error: 'Error deleting document' }, 500);
   }

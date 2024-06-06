@@ -165,6 +165,7 @@ export const deleteFileRoute = createRoute({
       content: {
         'application/json': {
           schema: z.object({
+            id: z.coerce.number(),
             name: z.string(),
           }),
         },

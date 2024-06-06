@@ -1,8 +1,8 @@
 'use client';
 
-import PaginationComponent from '@/app/ui/Pagination';
 import AddVote from '@/app/ui/dashboard/votes/AddVote';
 import VotesList from '@/app/ui/dashboard/votes/VotesList';
+import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';

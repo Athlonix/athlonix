@@ -24,7 +24,10 @@
     "rules": {
       "recommended": true,
       "correctness": {
-        "noUnusedImports": "info"
+        "noUnusedImports": {
+          "fix": "unsafe",
+          "level": "info"
+        }
       }
     }
   },

@@ -8,7 +8,7 @@ function ActivityCard({ activity }: { activity: Activity }) {
     <div className="h-44 p-4 shadow-lg">
       <div className="flex gap-6 h-full">
         <div className="relative w-64 h-36">
-          <Link href="/simon">
+          <Link href={`/activities/details?id=${activity.id}`}>
             <Image
               className="object-cover"
               width={256}
@@ -20,9 +20,11 @@ function ActivityCard({ activity }: { activity: Activity }) {
           </Link>
         </div>
         <div className="h-full max-w-[624px]">
-          <h2 className="truncate cursor-pointer hover:text-slate-400" title={activity.name}>
-            {activity.name}
-          </h2>
+          <Link href={`/activities/details?id=${activity.id}`}>
+            <h2 className="truncate cursor-pointer hover:text-slate-400" title={activity.name}>
+              {activity.name}
+            </h2>
+          </Link>
           <div>
             <p className="font-extralight text-slate-950 leading-5 h-full line-clamp-4 text-justify">
               {activity.description}

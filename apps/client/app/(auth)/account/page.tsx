@@ -1,5 +1,5 @@
 'use client';
-import { type User, checkSubscription, getUserInfo } from '@/app/lib/user/utils';
+import { type User, checkSubscription, getUserInfo, saveCookie, updateUserInformation } from '@/app/lib/user/utils';
 import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
@@ -15,29 +15,6 @@ const Icons = {
   spinner: Loader2,
 };
 
-async function updateUserInformation(id: number, username: string, first_name: string, last_name: string) {
-  fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/${id}`, {
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-    },
-    body: JSON.stringify({
-      username,
-      first_name,
-      last_name,
-    }),
-  })
-    .then(async (response) => await response.json())
-    .then((data: { user: User }) => {
-      if ('error' in data) {
-        return;
-      }
-      localStorage.setItem('user', JSON.stringify(data));
-    })
-    .catch((error: Error) => console.error(error));
-}
-
 export default function UserAccount() {
   const [user, setUser] = useState<User | null>(null);
   const [status, setStatus] = useState<null | 'applied' | 'approved' | 'rejected'>(null);
@@ -46,7 +23,6 @@ export default function UserAccount() {
   useEffect(() => {
     const fetchData = async () => {
       const user = await getUserInfo();
-      console.log(user);
       if (!user) {
         return;
       }
@@ -57,6 +33,18 @@ export default function UserAccount() {
 
     fetchData();
   }, []);
+
+  async function handleUpateUserInformation(user: User) {
+    try {
+      await updateUserInformation(user.id, user.username, user.first_name, user.last_name);
+    } catch (error) {
+      throw new Error('Failed to update file');
+    } finally {
+      toast.success('Informations mises à jour');
+      saveCookie(user);
+      setUser(user);
+    }
+  }
 
   if (loading) {
     return (
@@ -144,8 +132,7 @@ export default function UserAccount() {
                 <Button
                   className="w-[120px] text-center mt-4 rounded-full align-middle"
                   onClick={() => {
-                    updateUserInformation(user.id, user.username, user.first_name, user.last_name);
-                    toast.success('Informations mises à jour');
+                    handleUpateUserInformation(user);
                   }}
                 >
                   Editer

@@ -1,3 +1,5 @@
+'use server';
+import { cookies } from 'next/headers';
 export interface User {
   id: number;
   username: string;
@@ -7,22 +9,24 @@ export interface User {
   subscription: string | null;
   status: 'applied' | 'approved' | 'rejected' | null;
   date_validity: string | null;
+  roles: { id: number; name: string }[];
 }
 
 export async function getUserInfo(): Promise<User> {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+  const API_URL = process.env.ATHLONIX_API_URL;
+  const token = cookies().get('access_token')?.value;
   const response = await fetch(`${API_URL}/users/me`, {
-    headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
+    headers: { Authorization: `Bearer ${token}` },
   });
   if (!response.ok) {
     throw new Error('Failed to fetch user info');
   }
   const user = (await response.json()) as User;
-  localStorage.setItem('user', JSON.stringify(user));
+  cookies().set('user', JSON.stringify(user), { path: '/', secure: true, sameSite: 'strict' });
   return user;
 }
 
-export function checkSubscription(user: User): null | 'applied' | 'approved' | 'rejected' {
+export async function checkSubscription(user: User): Promise<'applied' | 'approved' | 'rejected' | null> {
   if (user.status === null) {
     return null;
   }
@@ -42,10 +46,12 @@ export function checkSubscription(user: User): null | 'applied' | 'approved' | '
   return 'approved';
 }
 
-export function getUserAvatar(): string {
-  const user = JSON.parse(localStorage.getItem('user') as string) as User;
-  if (!user) {
-    return '';
-  }
-  return user?.username.charAt(0).toUpperCase();
+export async function saveCookie(user: User, token: string): Promise<void> {
+  cookies().set('user', JSON.stringify(user), { path: '/', secure: true, sameSite: 'strict' });
+  cookies().set('access_token', token, { path: '/', secure: true, sameSite: 'strict' });
+}
+
+export async function returnUser(): Promise<User | null> {
+  const user = cookies().get('user')?.value;
+  return user ? JSON.parse(user) : null;
 }

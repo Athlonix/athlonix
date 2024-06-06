@@ -1,5 +1,5 @@
 'use client';
-import { type User, checkSubscription, getUserAvatar, getUserInfo } from '@/app/lib/user/utils';
+import { type User, checkSubscription, getUserInfo } from '@/app/lib/user/utils';
 import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
@@ -46,11 +46,12 @@ export default function UserAccount() {
   useEffect(() => {
     const fetchData = async () => {
       const user = await getUserInfo();
+      console.log(user);
       if (!user) {
         return;
       }
       setUser(user);
-      setStatus(checkSubscription(user));
+      setStatus(await checkSubscription(user));
       setLoading(false);
     };
 
@@ -83,7 +84,7 @@ export default function UserAccount() {
       </div>
       <header className="flex items-center gap-4 mb-8">
         <Avatar className="h-12 w-12">
-          <AvatarFallback>{getUserAvatar()}</AvatarFallback>
+          <AvatarFallback>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
         <div>
           <h1 className="text-2xl font-bold">

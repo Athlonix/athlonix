@@ -1,5 +1,6 @@
 'use client';
 
+import { type User, saveCookie } from '@/app/lib/user/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
@@ -40,10 +41,11 @@ export default function LoginForm(): JSX.Element {
       }),
     })
       .then((response) => response.json())
-      .then((data: { user: Record<string, unknown>; token: string }) => {
+      .then(async (data: { user: User; token: string }) => {
         if (data.user && data.token) {
           localStorage.setItem('user', JSON.stringify(data.user));
           localStorage.setItem('access_token', data.token);
+          await saveCookie(data.user, data.token);
           router.push('/?loggedIn=true');
         }
       })

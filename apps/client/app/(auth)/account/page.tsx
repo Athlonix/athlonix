@@ -1,5 +1,11 @@
 'use client';
-import { type User, checkSubscription, getUserInfo, saveCookie, updateUserInformation } from '@/app/lib/user/utils';
+import {
+  type User,
+  checkSubscriptionStatus,
+  getUserFromDB,
+  saveUserCookie,
+  updateUserInformation,
+} from '@/app/lib/utils';
 import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
@@ -22,12 +28,9 @@ export default function UserAccount() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const user = await getUserInfo();
-      if (!user) {
-        return;
-      }
-      setUser(user);
-      setStatus(await checkSubscription(user));
+      const user = await getUserFromDB();
+      setUser(user || null);
+      setStatus(await checkSubscriptionStatus(user));
       setLoading(false);
     };
 
@@ -41,7 +44,7 @@ export default function UserAccount() {
       throw new Error('Failed to update file');
     } finally {
       toast.success('Informations mises à jour');
-      saveCookie(user);
+      saveUserCookie(user);
       setUser(user);
     }
   }

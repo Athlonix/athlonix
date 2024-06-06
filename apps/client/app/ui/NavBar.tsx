@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import type React from 'react';
-import { type User, checkSubscription, returnUser } from '../lib/user/utils';
+import { type User, checkSubscription, returnUser } from '../lib/utils';
 
 interface LinkProp {
   name: string;

@@ -12,7 +12,8 @@ export interface User {
   roles: { id: number; name: string }[];
 }
 
-export async function getUserInfo(): Promise<User> {
+// Always up to date but less performant
+export async function getUserFromDB(): Promise<User> {
   const API_URL = process.env.ATHLONIX_API_URL;
   const token = cookies().get('access_token')?.value;
   const response = await fetch(`${API_URL}/users/me`, {
@@ -22,11 +23,18 @@ export async function getUserInfo(): Promise<User> {
     throw new Error('Failed to fetch user info');
   }
   const user = (await response.json()) as User;
+  // Save user in cookie for faster access
   cookies().set('user', JSON.stringify(user), { path: '/', secure: true, sameSite: 'strict' });
   return user;
 }
 
-export async function checkSubscription(user: User): Promise<'applied' | 'approved' | 'rejected' | null> {
+// Faster but might be outdated
+export async function getUserFromCookie(): Promise<User | null> {
+  const user = cookies().get('user')?.value;
+  return user ? JSON.parse(user) : null;
+}
+
+export async function checkSubscriptionStatus(user: User): Promise<'applied' | 'approved' | 'rejected' | null> {
   if (user.status === null) {
     return null;
   }
@@ -46,19 +54,19 @@ export async function checkSubscription(user: User): Promise<'applied' | 'approv
   return 'approved';
 }
 
-export async function saveCookie(user: User, token?: string): Promise<void> {
+export async function saveUserCookie(user: User, token?: string): Promise<void> {
   cookies().set('user', JSON.stringify(user), { path: '/', secure: true, sameSite: 'strict' });
   if (token) {
     cookies().set('access_token', token, { path: '/', secure: true, sameSite: 'strict' });
   }
 }
 
-export async function returnUser(): Promise<User | null> {
-  const user = cookies().get('user')?.value;
-  return user ? JSON.parse(user) : null;
-}
-
-export async function updateUserInformation(id: number, username: string, first_name: string, last_name: string) {
+export async function updateUserInformation(
+  id: number,
+  username: string,
+  first_name: string,
+  last_name: string,
+): Promise<User | null> {
   const token = cookies().get('access_token')?.value;
   const url = process.env.ATHLONIX_API_URL;
   fetch(`${url}/users/${id}`, {
@@ -79,6 +87,9 @@ export async function updateUserInformation(id: number, username: string, first_
         return;
       }
       cookies().set('user', JSON.stringify(data.user), { path: '/', secure: true, sameSite: 'strict' });
+      return data.user;
     })
     .catch((error: Error) => console.error(error));
+
+  return null;
 }

@@ -75,7 +75,7 @@ stripe.openapi(listDonations, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
   const { startDate, endDate, skip, take, all, search } = c.req.valid('query');
-  const query = supabase.from('DONATIONS').select('*').order('created_at', { ascending: true });
+  const query = supabase.from('DONATIONS').select('*', { count: 'exact' }).order('created_at', { ascending: true });
 
   if (startDate) {
     query.gte('created_at', startDate);
@@ -97,7 +97,7 @@ stripe.openapi(listDonations, async (c) => {
     query.range(from, to);
   }
 
-  const { data, error, count } = await query.range(skip, take);
+  const { data, error, count } = await query;
 
   if (error) {
     return c.json({ error: error.message }, 500);

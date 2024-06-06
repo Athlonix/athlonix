@@ -1,7 +1,7 @@
 import '@repo/ui/globals.css';
 import CollapsedNav from '@/app/ui/CollapsedNav';
 import { cn } from '@repo/ui/lib/utils';
-import { BarChart, File, Flame, Home, LineChart, Package, Users } from 'lucide-react';
+import { BarChart, File, Flame, Home, Landmark, LineChart, Package, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import Link from 'next/link';
@@ -78,10 +78,10 @@ export default function RootLayout({
                     Gestion des tournois
                   </Link>
                   <Link
-                    href="#"
+                    href="/dashboard/donations"
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
                   >
-                    <BarChart className="h-4 w-4" />
+                    <Landmark className="h-4 w-4" />
                     Gestion des donations
                   </Link>
                   <Link

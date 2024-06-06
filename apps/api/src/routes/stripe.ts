@@ -7,6 +7,7 @@ export const donationSchema = z.object({
   id: z.number().min(1),
   amount: z.number().positive(),
   receipt_url: z.string().url(),
+  created_at: z.string().datetime(),
   id_user: z.number().min(1).nullable(),
 });
 

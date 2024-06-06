@@ -117,19 +117,28 @@ export const uploadFileRoute = createRoute({
 
 export const updateFile = createRoute({
   method: 'patch',
-  path: '/edm/upsert',
-  summary: 'Upsert a file',
-  description: 'Upsert a file to a bucket',
+  path: '/edm/update/{id}',
+  summary: 'Update a file',
+  description: 'Udpdate a file to a bucket',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
+    params: idParamValidator,
     body: {
       content: {
         'multipart/form-data': {
           schema: z.object({
-            file: z.instanceof(File),
-            name: z.string(),
-            isAdmin: z.boolean(),
+            file: z.instanceof(File).optional(),
+            name: z.string().optional(),
+            isAdmin: z
+              .string()
+              .optional()
+              .transform((value) => {
+                if (value === 'true') {
+                  return true;
+                }
+                return false;
+              }),
             description: z.string().optional(),
           }),
         },

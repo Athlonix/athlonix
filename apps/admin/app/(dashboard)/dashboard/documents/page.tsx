@@ -17,11 +17,12 @@ import { EditIcon, Eye, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import React from 'react';
-import { type Files, deleteFile, getAllFiles, saveFile } from './utils';
+import { type Files, deleteFile, getAllFiles, saveFile, updateFile } from './utils';
 
 export default function Documents() {
   const [isUploading, setIsUploading] = useState(false);
   const [files, setFiles] = useState<{ data: Files[]; count: number } | null>(null);
+  const [editFile, setEditFile] = useState<Files | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [open, setOpen] = React.useState(false);
 
@@ -43,6 +44,22 @@ export default function Documents() {
       await saveFile(formData);
     } catch (error) {
       throw new Error('Failed to save file');
+    } finally {
+      setIsUploading(false);
+      setFiles(await getAllFiles());
+      setOpen(false);
+    }
+  }
+
+  async function handleEdit(event: FormEvent<HTMLFormElement>, fileId: number) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    setIsUploading(true);
+
+    try {
+      await updateFile(formData, fileId);
+    } catch (error) {
+      throw new Error('Failed to update file');
     } finally {
       setIsUploading(false);
       setFiles(await getAllFiles());
@@ -90,21 +107,37 @@ export default function Documents() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Enregistrer un fichier</DialogTitle>
+              <DialogTitle>{editFile ? 'Modifier' : 'Ajouter'} un fichier</DialogTitle>
             </DialogHeader>
-            <form onSubmit={handleUpload} method="POST">
+            <form onSubmit={editFile ? (e) => handleEdit(e, editFile.id) : handleUpload}>
               <div className="grid gap-4 py-4">
                 <div>
                   <Label htmlFor="file">Fichier</Label>
-                  <Input id="file" type="file" name="file" required />
+                  {editFile ? (
+                    <Input id="file" type="file" name="file" />
+                  ) : (
+                    <Input id="file" type="file" name="file" required />
+                  )}
                 </div>
                 <div>
                   <Label htmlFor="filename">Nom</Label>
-                  <Input id="filename" type="text" name="name" required />
+                  <Input
+                    id="filename"
+                    type="text"
+                    name="name"
+                    required
+                    defaultValue={editFile ? editFile.name : ''}
+                    readOnly={!!editFile}
+                  />
                 </div>
                 <div>
                   <Label htmlFor="description">Description</Label>
-                  <Input id="description" type="text" name="description" />
+                  <Input
+                    id="description"
+                    type="text"
+                    name="description"
+                    defaultValue={editFile ? editFile.description : ''}
+                  />
                 </div>
                 <div className="flex items-center space-x-2">
                   <Label
@@ -113,7 +146,7 @@ export default function Documents() {
                   >
                     Confidentiel
                   </Label>
-                  <Checkbox id="isAdmin" name="isAdmin" />
+                  <Checkbox id="isAdmin" name="isAdmin" defaultChecked={editFile ? editFile.isAdmin : false} />
                 </div>
               </div>
               <DialogFooter>
@@ -152,7 +185,14 @@ export default function Documents() {
                 ).toLocaleTimeString()}`}</TableCell>
                 <TableCell className="flex gap-2">
                   <Eye className="cursor-pointer" onClick={() => viewFile(file.id)} />
-                  <EditIcon className="cursor-pointer" color="#1f6feb" />
+                  <EditIcon
+                    className="cursor-pointer"
+                    color="#1f6feb"
+                    onClick={() => {
+                      setEditFile(file);
+                      setOpen(true);
+                    }}
+                  />
                   {userId !== null && userId === file.owner && (
                     <Trash2
                       className="cursor-pointer"

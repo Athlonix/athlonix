@@ -15,6 +15,11 @@ export type Files = {
 export async function saveFile(form: FormData): Promise<void> {
   const API_URL = process.env.ATHLONIX_API_URL;
   const token = cookies().get('access_token')?.value;
+  if (form.get('isAdmin') === 'on') {
+    form.set('isAdmin', 'true');
+  } else {
+    form.set('isAdmin', 'false');
+  }
   const response = await fetch(`${API_URL}/edm/upload`, {
     method: 'POST',
     headers: {
@@ -54,5 +59,25 @@ export async function deleteFile(id: number, name: string): Promise<void> {
   });
   if (!response.ok) {
     throw new Error('Failed to delete file');
+  }
+}
+
+export async function updateFile(form: FormData, id: number): Promise<void> {
+  const API_URL = process.env.ATHLONIX_API_URL;
+  const token = cookies().get('access_token')?.value;
+  if (form.get('isAdmin') === 'on') {
+    form.set('isAdmin', 'true');
+  } else {
+    form.set('isAdmin', 'false');
+  }
+  const response = await fetch(`${API_URL}/edm/update/${id}`, {
+    method: 'PATCH',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: form,
+  });
+  if (!response.ok) {
+    throw new Error('Failed to update file');
   }
 }

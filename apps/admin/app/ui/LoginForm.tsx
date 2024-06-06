@@ -8,7 +8,7 @@ import { Label } from '@repo/ui/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { saveCookie } from './utils';
+import { saveCookie } from '../lib/utils';
 
 export type User = {
   id: number;

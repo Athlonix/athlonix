@@ -1,6 +1,6 @@
 'use server';
 import { cookies } from 'next/headers';
-import type { User } from './LoginForm';
+import type { User } from '../ui/LoginForm';
 
 export async function saveCookie(user: User, token?: string): Promise<void> {
   cookies().set('user', JSON.stringify(user), { path: '/', secure: true, sameSite: 'strict' });
@@ -9,10 +9,7 @@ export async function saveCookie(user: User, token?: string): Promise<void> {
   }
 }
 
-export async function returnUserId(): Promise<number | null> {
+export async function returnUser(): Promise<User | null> {
   const user = cookies().get('user')?.value;
-  if (!user) {
-    return null;
-  }
-  return JSON.parse(user).id;
+  return user ? JSON.parse(user) : null;
 }

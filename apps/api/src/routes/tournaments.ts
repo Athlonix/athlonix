@@ -13,6 +13,8 @@ export const tournamentSchema = z.object({
   prize: z.string().nullable(),
   id_address: z.number().min(1).nullable(),
   created_at: z.string().datetime(),
+  description: z.string().nullable(),
+  id_sport: z.number().min(1).nullable(),
 });
 
 export const matchSchema = z.object({
@@ -107,6 +109,8 @@ export const createTournament = createRoute({
             rules: z.string().optional(),
             prize: z.string().optional(),
             id_address: z.number().min(1).optional(),
+            description: z.string().optional(),
+            id_sport: z.number().min(1).optional(),
           }),
         },
       },
@@ -146,6 +150,8 @@ export const updateTournament = createRoute({
             rules: z.string().optional(),
             prize: z.string().optional(),
             id_address: z.number().min(1).optional(),
+            description: z.string().optional(),
+            id_sport: z.number().min(1).optional(),
           }),
         },
       },

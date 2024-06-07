@@ -1,5 +1,6 @@
 'use client';
 
+import type { Tournament } from '@/app/(dashboard)/dashboard/tournaments/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -23,18 +24,6 @@ import type React from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-type Tournament = {
-  id: number;
-  created_at: string;
-  default_match_length: number | null;
-  name: string;
-  max_participants: number;
-  team_capacity: number;
-  rules: string | null;
-  prize: string | null;
-  id_address: number | null;
-};
 
 type Address = {
   id: number;

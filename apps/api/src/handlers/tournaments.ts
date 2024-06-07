@@ -105,14 +105,34 @@ tournaments.openapi(createTournament, async (c) => {
 
 tournaments.openapi(updateTournament, async (c) => {
   const { id } = c.req.valid('param');
-  const { name, default_match_length, max_participants, team_capacity, rules, prize, id_address } = c.req.valid('json');
+  const {
+    name,
+    default_match_length,
+    max_participants,
+    team_capacity,
+    rules,
+    prize,
+    id_address,
+    description,
+    id_sport,
+  } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
   const { data, error } = await supabase
     .from('TOURNAMENTS')
-    .update({ name, default_match_length, max_participants, team_capacity, rules, prize, id_address })
+    .update({
+      name,
+      default_match_length,
+      max_participants,
+      team_capacity,
+      rules,
+      prize,
+      id_address,
+      description,
+      id_sport,
+    })
     .eq('id', id)
     .select()
     .single();

@@ -1,3 +1,4 @@
+import type { Address, Sport, Tournament } from '@/app/(dashboard)/dashboard/tournaments/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
@@ -19,31 +20,14 @@ interface Setter {
   id_address: Dispatch<SetStateAction<number | null>>;
   rules: Dispatch<SetStateAction<string | null>>;
   prize: Dispatch<SetStateAction<string | null>>;
+  id_sport: Dispatch<SetStateAction<number | null>>;
+  description: Dispatch<SetStateAction<string | null>>;
 }
-
-type Tournament = {
-  id: number;
-  created_at: string;
-  default_match_length: number | null;
-  name: string;
-  max_participants: number;
-  team_capacity: number;
-  rules: string | null;
-  prize: string | null;
-  id_address: number | null;
-};
-
-type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
 
 interface EditFormProps {
   tournament: Tournament;
   addresses: Address[];
+  sports: Sport[];
   closeDialog: () => void;
   setter: Setter;
 }
@@ -61,9 +45,11 @@ function EditForm(props: EditFormProps): JSX.Element {
     team_capacity: z.coerce
       .number({ message: 'Le champ doit contenir un nombre' })
       .min(1, { message: "La capacité de l'équipe ne peut être inférieur à 1" }),
-    id_address: z.number().min(1).optional(),
+    id_address: z.coerce.number().min(1).optional(),
     rules: z.string().optional(),
     prize: z.string().optional(),
+    description: z.string().optional(),
+    id_sport: z.coerce.number().min(1).optional(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -76,6 +62,8 @@ function EditForm(props: EditFormProps): JSX.Element {
       id_address: props.tournament.id_address ?? undefined,
       rules: props.tournament.rules ?? '',
       prize: props.tournament.prize ?? '',
+      description: props.tournament.description ?? '',
+      id_sport: props.tournament.id_sport ?? undefined,
     },
   });
 
@@ -182,25 +170,13 @@ function EditForm(props: EditFormProps): JSX.Element {
           <div className="grid">
             <FormField
               control={form.control}
-              name="id_address"
+              name="description"
               render={({ field }) => (
                 <FormItem>
-                  <Label className="font-bold">Tournoi</Label>
-                  <Select onValueChange={field.onChange} defaultValue="-1">
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Aucun" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="-1">Aucun</SelectItem>
-                      {props.addresses.map((address) => (
-                        <SelectItem key={address.id} value={address.id.toString()}>
-                          {address.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label className="font-bold">Description</Label>
+                  <FormControl>
+                    <Textarea {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -231,6 +207,66 @@ function EditForm(props: EditFormProps): JSX.Element {
                   <FormControl>
                     <Textarea {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="grid">
+            <FormField
+              control={form.control}
+              name="id_sport"
+              render={({ field }) => (
+                <FormItem>
+                  <Label className="font-bold">Sport</Label>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={props.tournament.id_sport !== null ? props.tournament.id_sport.toString() : '-1'}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Aucun" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="-1">Aucun</SelectItem>
+                      {props.sports.map((sport) => (
+                        <SelectItem key={sport.id} value={sport.id.toString()}>
+                          {sport.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <div className="grid">
+            <FormField
+              control={form.control}
+              name="id_address"
+              render={({ field }) => (
+                <FormItem>
+                  <Label className="font-bold">Adresse</Label>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={props.tournament.id_address !== null ? props.tournament.id_address.toString() : '-1'}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Aucun" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="-1">Aucun</SelectItem>
+                      {props.addresses.map((address) => (
+                        <SelectItem key={address.id} value={address.id.toString()}>
+                          {address.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

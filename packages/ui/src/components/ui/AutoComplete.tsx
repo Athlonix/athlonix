@@ -1,10 +1,10 @@
-import { CommandGroup, CommandInput, CommandItem, CommandList } from '@repo/ui/components/ui/command';
+import { CommandGroup, CommandInput, CommandItem, CommandList } from '@ui/components/ui/command';
 import { Command as CommandPrimitive } from 'cmdk';
 import { type KeyboardEvent, useCallback, useRef, useState } from 'react';
 
-import { Skeleton } from '@repo/ui/components/ui/skeleton';
+import { Skeleton } from '@ui/components/ui/skeleton';
 
-import { cn } from '@repo/ui/lib/utils';
+import { cn } from '@ui/lib/utils';
 import { Check } from 'lucide-react';
 
 export type Option = Record<'value' | 'label', string> & Record<string, string>;

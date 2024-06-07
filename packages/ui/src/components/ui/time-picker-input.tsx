@@ -1,8 +1,8 @@
 'use client';
 
-import { Input } from '@repo/ui/components/ui/input';
+import { Input } from '@ui/components/ui/input';
 
-import { cn } from '@repo/ui/lib/utils';
+import { cn } from '@ui/lib/utils';
 import React from 'react';
 import { type TimePickerType, getArrowByType, getDateByType, setDateByType } from './time-picker-utils';
 

@@ -1,7 +1,7 @@
 import '@repo/ui/globals.css';
 import CollapsedNav from '@/app/ui/CollapsedNav';
 import { cn } from '@repo/ui/lib/utils';
-import { BarChart, File, Flame, Home, Landmark, LineChart, Package, Users } from 'lucide-react';
+import { File, Flame, Home, Landmark, LineChart, Package, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import Link from 'next/link';

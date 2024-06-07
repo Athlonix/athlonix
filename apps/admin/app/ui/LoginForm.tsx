@@ -6,6 +6,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } 
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { saveCookie } from '../lib/utils';
@@ -24,6 +25,7 @@ export type User = {
 export function LoginForm(): JSX.Element {
   const router = useRouter();
   const urlApi = process.env.NEXT_PUBLIC_API_URL;
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const formSchema = z.object({
     email: z.string().email({ message: 'Email invalide' }),
@@ -39,7 +41,7 @@ export function LoginForm(): JSX.Element {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    fetch(`${urlApi}/auth/login`, {
+    const response = await fetch(`${urlApi}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -48,22 +50,22 @@ export function LoginForm(): JSX.Element {
         email: values.email,
         password: values.password,
       }),
-    })
-      .then((response) => response.json())
-      .then(async (data: { user: User; token: string }) => {
-        const roles = data.user.roles;
-        if (roles.some((role: { id: number }) => role.id === 5)) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-          localStorage.setItem('access_token', data.token);
-          await saveCookie(data.user, data.token);
-          router.push('/dashboard');
-        } else {
-          throw new Error("Vous n'avez pas les droits pour accéder à cette page");
-        }
-      })
-      .catch((error: Error) => {
-        console.error(error);
-      });
+    });
+    if (!response.ok) {
+      setErrorMessage('Email ou mot de passe incorrect');
+      return;
+    }
+    const data = await response.json();
+    const roles = data.user.roles;
+
+    if (roles.some((role: { id: number }) => role.id === 5)) {
+      localStorage.setItem('user', JSON.stringify(data.user));
+      localStorage.setItem('access_token', data.token);
+      await saveCookie(data.user, data.token);
+      router.push('/dashboard');
+    } else {
+      setErrorMessage("Vous ne disposez pas des droits d'accès.");
+    }
   }
 
   return (
@@ -73,6 +75,7 @@ export function LoginForm(): JSX.Element {
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4">Dashboard Athlonix</h1>
           </div>
+          {errorMessage && <div className="text-red-500 text-center mb-4">{errorMessage}</div>}
           <div className="grid gap-4">
             <div className="grid gap-2 my-4">
               <FormField

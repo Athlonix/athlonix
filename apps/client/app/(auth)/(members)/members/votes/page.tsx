@@ -1,12 +1,10 @@
 'use client';
 import type { Vote } from '@/app/lib/type/Votes';
-import { type User, checkSubscription } from '@/app/lib/user/utils';
 import { getAllVotes } from '@/app/lib/votes/utils';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
 import { Card } from '@repo/ui/components/ui/card';
 import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const Icons = {
@@ -17,18 +15,9 @@ export default function ListVotes() {
   const [votes, setVotes] = useState<Vote[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'ongoing' | 'finished' | 'not_started'>('all');
-  const [subscriptionChecked, setSubscriptionChecked] = useState(false);
-  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
-      if (!subscriptionChecked) {
-        const user = JSON.parse(localStorage.getItem('user') as string) as User;
-        if (!checkSubscription(user)) {
-          return router.push('/');
-        }
-        setSubscriptionChecked(true);
-      }
       try {
         const result = await getAllVotes();
         setVotes(result.data);
@@ -39,7 +28,7 @@ export default function ListVotes() {
     }
 
     fetchData();
-  }, [subscriptionChecked, router]);
+  }, []);
 
   const filteredVotes = () => {
     switch (filter) {

@@ -8,8 +8,9 @@ import { Label } from '@repo/ui/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { saveCookie } from '../lib/utils';
 
-type User = {
+export type User = {
   id: number;
   email: string;
   username: string;
@@ -49,13 +50,15 @@ export function LoginForm(): JSX.Element {
       }),
     })
       .then((response) => response.json())
-      .then((data: { user: User; token: string }) => {
+      .then(async (data: { user: User; token: string }) => {
         const roles = data.user.roles;
-
         if (roles.some((role: { id: number }) => role.id === 5)) {
           localStorage.setItem('user', JSON.stringify(data.user));
           localStorage.setItem('access_token', data.token);
+          await saveCookie(data.user, data.token);
           router.push('/dashboard');
+        } else {
+          throw new Error("Vous n'avez pas les droits pour accéder à cette page");
         }
       })
       .catch((error: Error) => {
@@ -68,7 +71,7 @@ export function LoginForm(): JSX.Element {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} method="POST" className="max-w-sm w-full">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">Connexion</h1>
+            <h1 className="text-4xl font-bold mb-4">Dashboard Athlonix</h1>
           </div>
           <div className="grid gap-4">
             <div className="grid gap-2 my-4">

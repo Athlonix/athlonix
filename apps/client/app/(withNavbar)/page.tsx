@@ -48,7 +48,7 @@ export default function Page(): JSX.Element {
                 className="object-cover h-full rounded-[96px]"
               />
             </div>
-            <h1 className="font-normal text-[144px] ">Association</h1>
+            <h1 className="font-normal text-[144px]">Association</h1>
           </div>
 
           <div className="flex gap-8 h-44 items-center justify-center">

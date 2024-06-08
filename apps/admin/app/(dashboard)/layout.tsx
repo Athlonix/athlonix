@@ -33,9 +33,6 @@ export default function RootLayout({
                   <Flame className="h-6 w-6" />
                   <span className="">Athlonix</span>
                 </Link>
-                <div className="ml-auto">
-                  <ModeToggle />
-                </div>
               </div>
               <div className="flex-1">
                 <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
@@ -129,6 +126,9 @@ export default function RootLayout({
           </div>
           <div className="flex flex-col h-full">
             <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+              <div className="ml-auto">
+                <ModeToggle />
+              </div>
               <CollapsedNav />
             </header>
             {children}

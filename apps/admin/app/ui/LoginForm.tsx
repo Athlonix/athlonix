@@ -18,7 +18,13 @@ export type User = {
   first_name: string;
   last_name: string;
   id_referer: number | null;
+  id_auth: string | null;
   date_validity: string | null;
+  created_at: string;
+  deleted_at: string | null;
+  invoice: string | null;
+  subscription: string | null;
+  status: 'applied' | 'approved' | 'rejected' | null;
   roles: { id: number; name: string }[];
 };
 
@@ -55,10 +61,15 @@ export function LoginForm(): JSX.Element {
       setErrorMessage('Email ou mot de passe incorrect');
       return;
     }
-    const data = await response.json();
+    const data = (await response.json()) as { user: User; token: string };
     const roles = data.user.roles;
 
-    if (roles.some((role: { id: number }) => role.id === 5)) {
+    if (
+      roles.some((role: { id: number }) => role.id === 5) &&
+      data.user.status === 'approved' &&
+      data.user.date_validity &&
+      new Date(data.user.date_validity) > new Date()
+    ) {
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('access_token', data.token);
       await saveCookie(data.user, data.token);

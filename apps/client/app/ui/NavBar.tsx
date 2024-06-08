@@ -1,9 +1,10 @@
 'use client';
 
-import { type User, checkSubscriptionStatus, getUserFromCookie } from '@/app/lib/utils';
+import { type User, checkSubscriptionStatus, deleteUserCookie, getUserFromCookie } from '@/app/lib/utils';
 import { ModeToggle } from '@repo/ui/components/toggleTheme';
 import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Button } from '@repo/ui/components/ui/button';
+import { LogOut } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -31,6 +32,7 @@ function LogoutUser() {
       response.json();
       if (response.status === 200) {
         localStorage.removeItem('user');
+        deleteUserCookie();
         window.location.href = '/';
       }
     })
@@ -75,18 +77,19 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
         </Link>
       </div>
       <div className="w-full flex items-center justify-between">
-        <ul className="flex gap-4">{navBarElements}</ul>
+        <ul className="flex gap-4 mr-2">{navBarElements}</ul>
         {!isAuthenticated ? (
-          <div>
-            <Button asChild className="w-[140px] mr-4">
+          <div className="flex items-center gap-2">
+            <Button asChild className="w-[120px]">
               <Link href="signup">Devenir membre</Link>
             </Button>
             <Button asChild className="w-[120px]">
               <Link href="login">Se connecter</Link>
             </Button>
+            <ModeToggle />
           </div>
         ) : (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <Link href="/account">
               <Avatar>
                 <AvatarFallback className="bg-slate-400">{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
@@ -97,16 +100,12 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
                 <Link href="/members">Espace membre</Link>
               </Button>
             )}
-            <Button className="w-[120px] bg-red-900">
-              <Link href={''} onClick={() => LogoutUser()}>
-                Se déconnecter
-              </Link>
-            </Button>
+            <Link href={''} onClick={() => LogoutUser()}>
+              <LogOut color="#bf0808" size={24} />
+            </Link>
+            <ModeToggle />
           </div>
         )}
-        <div className="ml-2">
-          <ModeToggle />
-        </div>
       </div>
     </nav>
   );

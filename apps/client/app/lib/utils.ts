@@ -61,6 +61,11 @@ export async function saveUserCookie(user: User, token?: string): Promise<void> 
   }
 }
 
+export async function deleteUserCookie(): Promise<void> {
+  cookies().delete('user');
+  cookies().delete('access_token');
+}
+
 export async function updateUserInformation(
   id: number,
   username: string,

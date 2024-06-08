@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@repo/ui/components/themes';
 import { Toaster } from '@repo/ui/components/ui/sonner';
 import '@repo/ui/globals.css';
 import { cn } from '@repo/ui/lib/utils';
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
         <Toaster richColors closeButton visibleToasts={1} />
       </body>
     </html>

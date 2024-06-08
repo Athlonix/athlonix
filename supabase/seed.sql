@@ -40,11 +40,11 @@ FROM public."USERS"
 WHERE username IN ('johndoe_employee', 'janesmith_employee', 'michaeljohnson_employee', 'patriciabrown_employee', 'robertjones_employee', 'lindagarcia_employee', 'williammartinez_employee', 'elizabethrodriguez_employee', 'charlesdavis_employee', 'barbaralopez_employee', 'josephmiller_employee');
 
 INSERT INTO "public"."POLLS" ("id", "title", "description", "end_at", "id_user", "max_choices", "start_at", "assembly") VALUES
-	(1, 'vote 1', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2024-06-17 17:40:39.258+00', NULL),
+	(1, 'vote 1', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2024-06-17 00:00:00.258+00', NULL),
 	(2, 'vote 2', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2024-07-02 12:40:39.258+00', NULL),
 	(4, 'vote 3', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2024-06-22 00:00:39.258+00', NULL),
-	(6, 'vote 4', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2022-05-02 08:40:sql39+00', NULL),
-	(5, 'vote 5', 'description', '2023-06-04 17:40:39+00', 1, 1, '2024-06-02 10:40:39.258+00', NULL),
+	(6, 'vote 4', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2022-05-02 08:40:00.258+00', NULL),
+	(5, 'vote 5', 'description', '2023-06-04 17:40:39+00', 1, 1, '2024-06-02 00:00:00+00', NULL),
 	(3, 'vote 6', 'description', '2026-10-14 17:40:39+00', 1, 1, '2025-08-09 17:40:39+00', NULL);
 
 

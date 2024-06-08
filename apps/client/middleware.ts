@@ -10,9 +10,6 @@ export function middleware(request: NextRequest) {
   }
 
   const userObj = JSON.parse(user) as User;
-  if (!userObj.roles.some((role: { id: number }) => role.id === 5)) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
 
   if (userObj.status !== 'approved') {
     return NextResponse.redirect(new URL('/', request.url));

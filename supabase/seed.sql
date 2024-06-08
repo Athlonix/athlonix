@@ -20,7 +20,7 @@ VALUES
   (5, 'Autre raison');
 
 INSERT INTO public."USERS" (email, username, first_name, last_name, created_at)
-VALUES 
+VALUES
 ('admin@gmail.com', 'admin', 'Admin', 'Admin', NOW()),
 ('john.doe@example.com', 'johndoe_employee', 'John', 'Doe', NOW()),
 ('jane.smith@example.com', 'janesmith_employee', 'Jane', 'Smith', NOW()),
@@ -39,25 +39,24 @@ SELECT id, 10
 FROM public."USERS"
 WHERE username IN ('johndoe_employee', 'janesmith_employee', 'michaeljohnson_employee', 'patriciabrown_employee', 'robertjones_employee', 'lindagarcia_employee', 'williammartinez_employee', 'elizabethrodriguez_employee', 'charlesdavis_employee', 'barbaralopez_employee', 'josephmiller_employee');
 
-INSERT INTO "public"."POLLS" ("id", "title", "description", "end_at", "id_user", "max_choices", "start_at", "assembly") VALUES
-	(1, 'vote 1', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2024-06-17 00:00:00.258+00', NULL),
-	(2, 'vote 2', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2024-07-02 12:40:39.258+00', NULL),
-	(4, 'vote 3', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2024-06-22 00:00:39.258+00', NULL),
-	(6, 'vote 4', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2022-05-02 08:40:00.258+00', NULL),
-	(5, 'vote 5', 'description', '2023-06-04 17:40:39+00', 1, 1, '2024-06-02 00:00:00+00', NULL),
-	(3, 'vote 6', 'description', '2026-10-14 17:40:39+00', 1, 1, '2025-08-09 17:40:39+00', NULL);
+INSERT INTO "public"."POLLS" ("title", "description", "end_at", "id_user", "max_choices", "start_at", "assembly") VALUES
+  ('vote 1', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2024-06-17 00:00:00.258+00', NULL),
+  ('vote 2', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2024-07-02 12:40:39.258+00', NULL),
+  ('vote 3', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2024-06-22 00:00:39.258+00', NULL),
+  ('vote 4', 'description', '2024-07-02 17:40:39.258+00', 1, 1, '2022-05-02 08:40:00.258+00', NULL),
+  ('vote 5', 'description', '2023-06-04 17:40:39+00', 1, 1, '2024-06-02 00:00:00+00', NULL),
+  ('vote 6', 'description', '2026-10-14 17:40:39+00', 1, 1, '2025-08-09 17:40:39+00', NULL);
 
-
-INSERT INTO "public"."POLLS_OPTIONS" ("id", "content", "id_poll") VALUES
-	(1, 'choix 1', 1),
-	(2, 'choix 2', 1),
-	(3, 'choix 1', 2),
-	(4, 'choix 2', 2),
-	(5, 'choix 1', 3),
-	(6, 'choix 2', 3),
-	(7, 'choix 1', 4),
-	(8, 'choix 2', 4),
-	(9, 'choix 1', 5),
-	(10, 'choix 2', 5),
-	(11, 'choix 1', 6),
-	(12, 'choix 2', 6);
+INSERT INTO "public"."POLLS_OPTIONS" ("content", "id_poll") VALUES
+  ('choice 1', 1),
+  ('choice 2', 1),
+  ('choice 1', 2),
+  ('choice 2', 2),
+  ('choice 1', 3),
+  ('choice 2', 3),
+  ('choice 1', 4),
+  ('choice 2', 4),
+  ('choice 1', 5),
+  ('choice 2', 5),
+  ('choice 1', 6),
+  ('choice 2', 6);

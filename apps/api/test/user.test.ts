@@ -17,10 +17,10 @@ describe('User tests', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        first_name: 'admin',
-        last_name: 'admin',
-        username: 'admin',
-        email: 'admin@gmail.com',
+        first_name: 'admin_user',
+        last_name: 'admin_user',
+        username: 'admin_user',
+        email: 'admin_user@gmail.com',
         password: 'password123456',
       }),
     });
@@ -36,7 +36,7 @@ describe('User tests', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'admin@gmail.com',
+        email: 'admin_user@gmail.com',
         password: 'password123456',
       }),
     });

@@ -1,6 +1,7 @@
 'use client';
 
 import { type User, checkSubscriptionStatus, getUserFromCookie } from '@/app/lib/utils';
+import { ModeToggle } from '@repo/ui/components/toggleTheme';
 import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Button } from '@repo/ui/components/ui/button';
 import Image from 'next/image';
@@ -85,7 +86,7 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
             </Button>
           </div>
         ) : (
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <Link href="/account">
               <Avatar>
                 <AvatarFallback className="bg-slate-400">{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
@@ -103,6 +104,9 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
             </Button>
           </div>
         )}
+        <div className="ml-2">
+          <ModeToggle />
+        </div>
       </div>
     </nav>
   );

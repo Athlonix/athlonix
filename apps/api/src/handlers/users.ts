@@ -27,11 +27,11 @@ export const users = new OpenAPIHono<{ Variables: Variables }>({
 users.openapi(getAllUsers, async (c) => {
   const roles = c.get('user').roles;
   await checkRole(roles, false, [Role.ADMIN]);
-  const { search, all, skip, take } = c.req.valid('query');
+  const { search, all, skip, take, role } = c.req.valid('query');
 
   const query = supabase
     .from('USERS')
-    .select('*, roles:ROLES (id, name)', { count: 'exact' })
+    .select('*, roles:ROLES!inner(id, name)', { count: 'exact' })
     .filter('deleted_at', 'is', null)
     .order('created_at', { ascending: true });
 
@@ -42,6 +42,15 @@ users.openapi(getAllUsers, async (c) => {
   if (!all) {
     const { from, to } = getPagination(skip, take - 1);
     query.range(from, to);
+  }
+
+  if (role) {
+    const { data: roleFound } = await supabase.from('ROLES').select('id').eq('name', role.toUpperCase()).single();
+
+    if (!roleFound) {
+      return c.json({ error: 'Role not found in query' }, 404);
+    }
+    query.eq('ROLES.id', roleFound.id);
   }
 
   const { data, error, count } = await query;

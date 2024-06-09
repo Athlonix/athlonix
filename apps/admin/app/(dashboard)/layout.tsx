@@ -1,10 +1,12 @@
 import '@repo/ui/globals.css';
 import CollapsedNav from '@/app/ui/CollapsedNav';
+import { ModeToggle } from '@repo/ui/components/toggleTheme';
 import { cn } from '@repo/ui/lib/utils';
 import { File, Flame, Home, Landmark, LineChart, Package, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import Link from 'next/link';
+import { Logout } from './logout';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -22,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }): JSX.Element {
   return (
-    <html lang="en">
+    <html lang="fr">
       <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
         <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
           <div className="hidden border-r bg-muted/40 md:block">
@@ -32,6 +34,9 @@ export default function RootLayout({
                   <Flame className="h-6 w-6" />
                   <span className="">Athlonix</span>
                 </Link>
+                <div className="ml-auto">
+                  <Logout />
+                </div>
               </div>
               <div className="flex-1">
                 <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
@@ -125,6 +130,9 @@ export default function RootLayout({
           </div>
           <div className="flex flex-col h-full">
             <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+              <div className="flex items-center gap-4 ml-auto">
+                <ModeToggle />
+              </div>
               <CollapsedNav />
             </header>
             {children}

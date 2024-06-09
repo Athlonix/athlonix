@@ -11,6 +11,7 @@ type Post = {
 function PostsList({ posts }: { posts: Post[] }) {
   return (
     <>
+      {posts.length === 0 && <p className="text-center">Aucun article actuellement.</p>}
       {posts.map((post: Post) => (
         <PostCard key={post.id} post={post} />
       ))}

@@ -12,6 +12,7 @@ import {
 } from '@repo/ui/components/ui/dialog';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { EditIcon, Eye, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -44,11 +45,19 @@ export default function Documents() {
     try {
       await saveFile(formData);
     } catch (error) {
+      toast.error('Erreur', {
+        duration: 2000,
+        description: 'Impossible de sauvegarder le fichier',
+      });
       throw new Error('Failed to save file');
     } finally {
       setIsUploading(false);
       setFiles(await getAllFiles());
       setOpen(false);
+      toast.success('Succès', {
+        duration: 2000,
+        description: 'Le fichier a été sauvegardé avec succès',
+      });
     }
   }
 
@@ -60,11 +69,19 @@ export default function Documents() {
     try {
       await updateFile(formData, fileId);
     } catch (error) {
+      toast.error('Erreur', {
+        duration: 2000,
+        description: 'Impossible de mettre à jour le fichier',
+      });
       throw new Error('Failed to update file');
     } finally {
       setIsUploading(false);
       setFiles(await getAllFiles());
       setOpen(false);
+      toast.success('Succès', {
+        duration: 2000,
+        description: 'Le fichier a été mis à jour avec succès',
+      });
     }
   }
 
@@ -172,6 +189,13 @@ export default function Documents() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {files?.data.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  Aucun documents enregistré.
+                </TableCell>
+              </TableRow>
+            )}
             {files?.data.map((file) => (
               <TableRow key={file.id}>
                 <TableCell>{file.name}</TableCell>

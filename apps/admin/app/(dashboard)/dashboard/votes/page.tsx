@@ -63,7 +63,6 @@ function ShowContent() {
           return response.json();
         })
         .then((data: VoteData) => {
-          console.log(data.data);
           setVotes(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })

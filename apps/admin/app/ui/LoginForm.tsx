@@ -84,7 +84,7 @@ export function LoginForm(): JSX.Element {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} method="POST" className="max-w-sm w-full">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">Dashboard Athlonix</h1>
+            <h1 className="text-4xl font-bold mb-4">Dashboard Admin</h1>
           </div>
           {errorMessage && <div className="text-red-500 text-center mb-4">{errorMessage}</div>}
           <div className="grid gap-4">

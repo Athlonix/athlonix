@@ -74,7 +74,7 @@ function ShowContent() {
   return (
     <>
       <div className="flex items-center gap-5">
-        <h1 className="text-lg font-semibold md:text-2xl">Posts</h1>
+        <h1 className="text-lg font-semibold md:text-2xl">Articles</h1>
         <Input
           type="search"
           placeholder="Rechercher..."

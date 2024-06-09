@@ -1,5 +1,5 @@
 import ReportRow from '@/app/ui/dashboard/posts/details/ReportRow';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 
 type Report = {
   id: number;
@@ -32,6 +32,13 @@ function ReportsList({ reports, reasons }: Props) {
         </TableRow>
       </TableHeader>
       <TableBody>
+        {reports.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={4} className="text-center">
+              Aucun signalement actuellement.
+            </TableCell>
+          </TableRow>
+        )}
         {reports.map((report) => {
           const reason = reasons.find((reason) => reason.id === report.id_reason)?.reason || '';
           return <ReportRow key={report.id} report={report} reason={reason} />;

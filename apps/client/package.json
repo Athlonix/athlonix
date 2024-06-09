@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf .next/ .turbo/ node_modules/",
-    "dev": "next dev --port 3102",
+    "dev": "next dev --turbo --port 3102",
     "build": "next build",
     "start": "next start",
     "lint": "biome check --write .",

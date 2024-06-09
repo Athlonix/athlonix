@@ -5,7 +5,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '@repo/ui/components/ui/pagination';
+} from '@ui/components/ui/pagination';
 
 interface Props {
   page: number;

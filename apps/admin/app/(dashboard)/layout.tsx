@@ -2,6 +2,7 @@ import '@repo/ui/globals.css';
 import CollapsedNav from '@/app/ui/CollapsedNav';
 import { ModeToggle } from '@repo/ui/components/toggleTheme';
 import { cn } from '@repo/ui/lib/utils';
+import { Toaster } from '@ui/components/ui/sonner';
 import {
   Building,
   Dumbbell,
@@ -144,6 +145,7 @@ export default function RootLayout({
             {children}
           </div>
         </div>
+        <Toaster richColors closeButton visibleToasts={1} />
       </body>
     </html>
   );

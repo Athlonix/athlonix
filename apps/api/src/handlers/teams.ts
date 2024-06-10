@@ -69,7 +69,7 @@ activities_teams.openapi(addActivityMember, async (c) => {
 
   const { data: userInTeam } = await supabase
     .from('USERS')
-    .select('*, ACTIVITY_TEAMS') 
+    .select('*, ACTIVITY_TEAMS')
     .eq('ACTIVITY_TEAMS.id_activity', id_activity)
     .eq('ACTIVITY_TEAMS.id_user', id_user)
     .single();

@@ -1,48 +1,13 @@
-'use client';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 
-import { type Assembly, getAssembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+const DynamicAssemblyDetail = dynamic(() => import('./assembly'), { ssr: false });
 
-function AssemblyDetail(): JSX.Element {
-  const searchParams = useSearchParams();
-  const idPoll = searchParams.get('id');
-  const [assembly, setAssembly] = useState<Assembly | null>(null);
-
-  useEffect(() => {
-    const fetchAssembly = async () => {
-      const data = await getAssembly(Number(idPoll));
-      setAssembly(data);
-    };
-    fetchAssembly();
-  }, [idPoll]);
-
-  return (
-    <>
-      <div className="flex items-center gap-5">
-        <h1 className="text-lg font-semibold md:text-2xl">Assemblée Générale: {assembly?.name}</h1>
-      </div>
-      <div className="flex flex-1 rounded-lg border border-dashed shadow-sm p-4" x-chunk="dashboard-02-chunk-1">
-        <div className="grid gap-4 w-full">
-          <div className="flex justify-center flex-col gap-4 p-4">
-            <div>
-              <div>{assembly?.name}</div>
-              <div>{assembly?.date}</div>
-              <div>{assembly?.location}</div>
-              <div>{assembly?.description}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
-
-export default function page() {
+export default function page(): JSX.Element {
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
       <Suspense fallback={<div>Chargement...</div>}>
-        <AssemblyDetail />
+        <DynamicAssemblyDetail />
       </Suspense>
     </main>
   );

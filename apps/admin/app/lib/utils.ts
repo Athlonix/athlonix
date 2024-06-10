@@ -1,6 +1,5 @@
 'use server';
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
 import type { User } from '../ui/LoginForm';
 
 export async function saveCookie(user: User, token?: string): Promise<void> {

@@ -45,6 +45,7 @@ export default function SportsPage(): JSX.Element {
     const sports = await getAllSports();
     setSports(sports.data);
     setCount(sports.count);
+    setOpen(false);
   }
 
   async function handleDeleteSport(id: number) {
@@ -61,6 +62,8 @@ export default function SportsPage(): JSX.Element {
     const sports = await getAllSports();
     setSports(sports.data);
     setCount(sports.count);
+    setEditSport(null);
+    setOpen(false);
   }
 
   if (loading) {
@@ -72,12 +75,12 @@ export default function SportsPage(): JSX.Element {
   }
 
   return (
-    <div>
+    <div className="p-6 space-y-6">
       <header className="bg-gray-100 dark:bg-gray-800 px-6 py-4 flex items-center justify-between">
         <h1 className="text-xl font-bold">Sports</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>Ajouter un sport</Button>
+            <Button>{editSport ? 'Modifier' : 'Ajouter'} un sport</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -145,7 +148,11 @@ export default function SportsPage(): JSX.Element {
             {sports?.map((sport) => (
               <TableRow key={sport.id}>
                 <TableCell>{sport.name}</TableCell>
-                <TableCell>{sport.description ? sport.description : 'Pas de description'}</TableCell>
+                <TableCell>
+                  {sport.description && sport.description.length > 50
+                    ? `${sport.description.slice(0, 50)}...`
+                    : sport.description || 'Pas de description'}
+                </TableCell>
                 <TableCell>{sport.min_players}</TableCell>
                 <TableCell>{sport.max_players ? sport.max_players : 'Pas de nombre maximum'}</TableCell>
                 <TableCell>{sport.image ? 'Oui' : 'Non'}</TableCell>

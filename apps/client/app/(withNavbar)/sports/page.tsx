@@ -65,6 +65,11 @@ export default async function SportsPage() {
               <div>
                 <h3 className="font-semibold text-lg">{sport.name}</h3>
                 {sport.description && <p className="text-sm text-gray-500 dark:text-gray-400">{sport.description}</p>}
+                <div className="mt-4 flex justify-between">
+                  <span className="text-gray-400">
+                    Joueurs: {sport.min_players} - {sport.max_players}
+                  </span>
+                </div>
               </div>
             </CardFooter>
           </Card>

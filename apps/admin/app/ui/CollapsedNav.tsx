@@ -1,6 +1,7 @@
 import { Button } from '@repo/ui/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@repo/ui/components/ui/sheet';
 import {
+  BookUser,
   Building,
   Dumbbell,
   File,
@@ -51,6 +52,13 @@ function CollapsedNav() {
           >
             <File className="h-5 w-5" />
             Documents
+          </Link>
+          <Link
+            href="/dashboard/assemblies"
+            className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+          >
+            <BookUser className="h-4 w-4" />
+            Assemblées Générales
           </Link>
           <Link
             href="/dashboard/posts"

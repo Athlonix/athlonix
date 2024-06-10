@@ -7,9 +7,10 @@ export const assemblySchema = z.object({
   date: z.string().datetime(),
   location: z.number().min(1).nullable(),
   lawsuit: z.string().nullable(),
+  closed: z.boolean().nullable(),
 });
 
-export const insertAssemblySchema = assemblySchema.omit({ id: true });
+export const insertAssemblySchema = assemblySchema.omit({ id: true, lawsuit: true, closed: true });
 export const updateAssemblySchema = assemblySchema.omit({ id: true }).partial();
 
 export const assemblySchemaResponse = z.object({
@@ -27,4 +28,5 @@ export const assemblySchemaResponse = z.object({
     })
     .array(),
   lawsuit: z.string().nullable(),
+  closed: z.boolean().nullable(),
 });

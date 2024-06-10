@@ -129,15 +129,22 @@ export const updateAssembly = createRoute({
   tags: ['assembly'],
 });
 
-export const deleteAssembly = createRoute({
-  method: 'delete',
-  path: '/assemblies/{id}',
-  summary: 'Delete a assembly',
-  description: 'Delete a assembly',
+export const closeAssembly = createRoute({
+  method: 'post',
+  path: '/assemblies/{id}/close',
+  summary: 'Close an assembly',
+  description: 'Close an assembly',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({ lawsuit: z.string() }),
+        },
+      },
+    },
   },
   responses: {
     200: {

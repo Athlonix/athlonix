@@ -94,7 +94,7 @@ export default function SportsPage(): JSX.Element {
                     id="description"
                     type="text"
                     name="description"
-                    defaultValue={editSport ? editSport.description : ''}
+                    defaultValue={editSport?.description ? editSport.description : ''}
                   />
                 </div>
                 <div>
@@ -113,7 +113,7 @@ export default function SportsPage(): JSX.Element {
                     id="max_players"
                     type="number"
                     name="max_players"
-                    defaultValue={editSport ? Number(editSport.max_players) : ''}
+                    defaultValue={editSport?.max_players ? Number(editSport.max_players) : ''}
                   />
                 </div>
                 <div>

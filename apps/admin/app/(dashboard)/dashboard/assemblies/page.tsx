@@ -132,6 +132,7 @@ export default function AssembliesPage(): JSX.Element {
               <TableHead>Date</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Lieu</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -150,6 +151,15 @@ export default function AssembliesPage(): JSX.Element {
                 </TableCell>
                 <TableCell>
                   {assembly.location ? location?.find((loc) => loc.id === assembly.location)?.city : 'En ligne'}
+                </TableCell>
+                <TableCell>
+                  {assembly.closed ? (
+                    <span className="text-red-500">Terminée</span>
+                  ) : new Date(assembly.date).getTime() < Date.now() ? (
+                    <span className="text-green-500">En cour</span>
+                  ) : (
+                    <span className="text-blue-500">Programmer</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">

@@ -16,7 +16,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
 import { Textarea } from '@ui/components/ui/textarea';
-import { Loader2 } from 'lucide-react';
+import { BookOpenText, CircleArrowLeft, HomeIcon, Loader2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { type FormEvent, useEffect, useState } from 'react';
 import { Label } from 'recharts';
@@ -82,7 +82,8 @@ export default function AssemblyDetail(): JSX.Element {
   return (
     <>
       <div className="flex items-center gap-5">
-        <h1 className="text-lg font-semibold md:text-2xl">Assemblée Générale: {assembly?.name}</h1>
+        <CircleArrowLeft className="w-8 h-8" onClick={() => window.history.back()} cursor={'pointer'} />
+        <h1 className="text-lg font-semibold md:text-2xl">{assembly?.name}</h1>
         <div className="ml-auto flex gap-5">
           {!isClosed && (
             <CloseAssemblyDialog
@@ -104,12 +105,18 @@ export default function AssemblyDetail(): JSX.Element {
               <span className="text-blue-500">Débutera le {new Date(assembly?.date ?? 0).toLocaleString()}</span>
             )}
           </div>
-          <div>{`Lieu: ${assembly?.location ? assembly?.location : 'En ligne'}`}</div>
-          <div>{assembly?.description ?? 'Pas de description'}</div>
+          <div className="flex items-center gap-2">
+            <HomeIcon className="w-6 h-6" />
+            {`Lieu: ${assembly?.location ? assembly?.location : 'En ligne'}`}
+          </div>
+          <div className="flex items-center gap-2">
+            <BookOpenText className="w-6 h-6" />
+            {assembly?.description ?? 'Pas de description'}
+          </div>
         </div>
       </div>
       <div className="flex items-center gap-5">
-        <h1 className="text-lg font-semibold md:text-2xl">Membres ({attendees})</h1>
+        <h1 className="text-lg font-semibold md:text-2xl">Membres de l'assemblée ({attendees})</h1>
         {!isClosed && (
           <AddAttendeeDialog
             openAddAttendee={openAddAttendee}
@@ -125,6 +132,7 @@ export default function AssemblyDetail(): JSX.Element {
             <TableRow>
               <TableHead>Nom et Prénom</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -137,6 +145,9 @@ export default function AssemblyDetail(): JSX.Element {
               <TableRow key={member.id}>
                 <TableCell>{`${member.first_name} ${member.last_name}`}</TableCell>
                 <TableCell>{member.email}</TableCell>
+                <TableCell>
+                  <Button className="bg-blue-800">Envoyer la confirmation</Button>
+                </TableCell>
               </TableRow>
             )) ?? []}
           </TableBody>

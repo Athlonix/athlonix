@@ -90,6 +90,9 @@ export default function AssembliesPage(): JSX.Element {
                   id="date"
                   name="date"
                   type="datetime-local"
+                  min={new Date().toISOString().slice(0, 16)}
+                  max={new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().slice(0, 16)}
+                  maxLength={16}
                   defaultValue={editAssembly ? new Date(editAssembly.date).toISOString().slice(0, 16) : ''}
                   required
                 />

@@ -13,13 +13,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@ui/components/ui/dialog';
+import { Label } from '@ui/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
 import { Textarea } from '@ui/components/ui/textarea';
 import { BookOpenText, CircleArrowLeft, HomeIcon, Loader2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { type FormEvent, useEffect, useState } from 'react';
-import { Label } from 'recharts';
 
 const Icons = {
   spinner: Loader2,
@@ -231,8 +231,14 @@ function CloseAssemblyDialog({
         </DialogHeader>
         <form onSubmit={(event) => handleEndAssembly(event)}>
           <div className="grid gap-4 py-4">
-            <Label>Compte rendu de l'assemblée générale</Label>
-            <Textarea id="lawsuit" name="lawsuit" required placeholder="Compte rendu de l'assemblée générale" />
+            <Label htmlFor="lawsuit">Compte rendu de l'assemblée</Label>
+            <Textarea
+              id="lawsuit"
+              name="lawsuit"
+              required
+              placeholder="Compte rendu de l'assemblée générale"
+              minLength={20}
+            />
           </div>
           <DialogFooter>
             <Button type="submit">Terminer</Button>

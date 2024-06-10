@@ -4,6 +4,7 @@ import { ModeToggle } from '@repo/ui/components/toggleTheme';
 import { cn } from '@repo/ui/lib/utils';
 import { Toaster } from '@ui/components/ui/sonner';
 import {
+  BookUser,
   Building,
   Dumbbell,
   File,
@@ -74,6 +75,13 @@ export default function RootLayout({
                   >
                     <File className="h-4 w-4" />
                     Documents
+                  </Link>
+                  <Link
+                    href="/dashboard/assemblies"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  >
+                    <BookUser className="h-4 w-4" />
+                    Assemblées Générales
                   </Link>
                   <Link
                     href="/dashboard/posts"

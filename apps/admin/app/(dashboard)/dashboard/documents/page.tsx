@@ -14,6 +14,7 @@ import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
+import { Textarea } from '@ui/components/ui/textarea';
 import { EditIcon, Eye, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
@@ -150,12 +151,7 @@ export default function Documents() {
                 </div>
                 <div>
                   <Label htmlFor="description">Description</Label>
-                  <Input
-                    id="description"
-                    type="text"
-                    name="description"
-                    defaultValue={editFile ? editFile.description : ''}
-                  />
+                  <Textarea id="description" name="description" defaultValue={editFile ? editFile.description : ''} />
                 </div>
                 <div className="flex items-center space-x-2">
                   <Label

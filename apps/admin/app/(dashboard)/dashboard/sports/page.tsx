@@ -12,6 +12,7 @@ import {
 import { Input } from '@ui/components/ui/input';
 import { Label } from '@ui/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
+import { Textarea } from '@ui/components/ui/textarea';
 import { EditIcon, Loader2, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { type Sports, addSport, deleteSport, getAllSports, updateSport } from './utils';
@@ -90,9 +91,8 @@ export default function SportsPage(): JSX.Element {
                 </div>
                 <div>
                   <Label htmlFor="description">Description</Label>
-                  <Input
+                  <Textarea
                     id="description"
-                    type="text"
                     name="description"
                     defaultValue={editSport?.description ? editSport.description : ''}
                   />

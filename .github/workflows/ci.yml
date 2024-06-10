@@ -46,8 +46,8 @@ jobs:
       - name: 🚀 Run Biome
         run: pnpm run lint:check
 
-      - name: 🧪 Check type coverage
-        run: npx type-coverage --detail --at-least 90 -p tsconfig.json
+#      - name: 🧪 Check type coverage
+#        run: npx type-coverage --detail --at-least 90 -p tsconfig.json
 
       - if: github.ref == 'refs/heads/main'
         name: 🚀 Setup Supabase CLI

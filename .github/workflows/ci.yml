@@ -60,4 +60,4 @@ jobs:
         continue-on-error: true
         run: |
           supabase link --project-ref ${{ env.SUPABASE_PROJECT_ID }}
-          supabase db push -p ${{ env.SUPABASE_DB_PASSWORD }} --include-all
+          supabase db push --include-all --include-seed --password ${{ env.SUPABASE_DB_PASSWORD }}

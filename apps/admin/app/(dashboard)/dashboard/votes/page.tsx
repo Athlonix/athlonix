@@ -10,6 +10,7 @@ import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import { type Assembly, getAssemblies } from '../assemblies/utils';
 
 export type Vote = {
   id: number;
@@ -38,10 +39,16 @@ function ShowContent() {
 
   const [maxPage, setMaxPage] = useState<number>(1);
   const [votes, setVotes] = useState<Vote[]>([]);
+  const [assemblies, setAssemblies] = useState<Assembly[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
+    const fetchAssemblies = async () => {
+      const assemblies = await getAssemblies();
+      assemblies.data.filter((assembly) => assembly.closed === false);
+      setAssemblies(assemblies.data);
+    };
 
     setTimeout(() => {
       const queryParams = new URLSearchParams({
@@ -71,6 +78,7 @@ function ShowContent() {
           console.error(error);
         });
     }, 500);
+    fetchAssemblies();
   }, [page, searchTerm, router]);
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +90,7 @@ function ShowContent() {
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Gestion des votes</CardTitle>
-          <AddVote votes={votes} setVotes={setVotes} />
+          <AddVote votes={votes} setVotes={setVotes} assemblies={assemblies} />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">

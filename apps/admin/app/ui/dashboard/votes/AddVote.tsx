@@ -1,5 +1,6 @@
 'use client';
 
+import type { Assembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
 import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
@@ -27,9 +28,10 @@ import { z } from 'zod';
 interface Props {
   votes: Vote[];
   setVotes: React.Dispatch<React.SetStateAction<Vote[]>>;
+  assemblies: Assembly[];
 }
 
-function AddVote({ votes, setVotes }: Props) {
+function AddVote({ votes, setVotes, assemblies }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -199,13 +201,24 @@ function AddVote({ votes, setVotes }: Props) {
                           <FormItem>
                             <Label className="font-bold">Assemblée générale</Label>
                             <FormControl>
-                              <Select {...field} name="assembly">
+                              <Select name="assembly" required>
                                 <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
-                                  {' '}
-                                  <SelectValue placeholder="Aucune" />
+                                  <SelectValue placeholder="Assemblée" />
                                 </SelectTrigger>
                                 <SelectContent defaultValue={'0'}>
-                                  <SelectItem value={'0'}>Aucune</SelectItem>
+                                  <SelectItem key={0} value={'0'}>
+                                    Aucune assemblée
+                                  </SelectItem>
+                                  {assemblies?.length === 0 && (
+                                    <SelectItem disabled value={'0'}>
+                                      Aucune assemblée n'est disponible
+                                    </SelectItem>
+                                  )}
+                                  {assemblies?.map((assembly) => (
+                                    <SelectItem key={assembly.id} value={String(assembly.id)}>
+                                      {assembly.name}
+                                    </SelectItem>
+                                  ))}
                                 </SelectContent>
                               </Select>
                             </FormControl>

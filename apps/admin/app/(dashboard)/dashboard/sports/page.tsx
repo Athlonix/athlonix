@@ -50,9 +50,8 @@ export default function SportsPage(): JSX.Element {
 
   async function handleDeleteSport(id: number) {
     await deleteSport(id);
-    const sports = await getAllSports();
-    setSports(sports.data);
-    setCount(sports.count);
+    const new_count = count - 1;
+    setCount(new_count);
   }
 
   async function handleUpdateSport(event: React.FormEvent<HTMLFormElement>, id: number) {
@@ -80,7 +79,7 @@ export default function SportsPage(): JSX.Element {
         <h1 className="text-xl font-bold">Sports</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>{editSport ? 'Modifier' : 'Ajouter'} un sport</Button>
+            <Button>Ajouter un sport</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>

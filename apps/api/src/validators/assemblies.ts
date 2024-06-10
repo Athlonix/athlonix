@@ -9,7 +9,7 @@ export const assemblySchema = z.object({
   lawsuit: z.string().nullable(),
 });
 
-export const insertAssemblySchema = assemblySchema.omit({ id: true });
+export const insertAssemblySchema = assemblySchema.omit({ id: true, lawsuit: true });
 export const updateAssemblySchema = assemblySchema.omit({ id: true }).partial();
 
 export const assemblySchemaResponse = z.object({

@@ -98,11 +98,11 @@ assemblies.openapi(createAssembly, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { name, description, date, location, lawsuit } = c.req.valid('json');
+  const { name, description, date, location } = c.req.valid('json');
 
   const { data, error } = await supabase
     .from('ASSEMBLIES')
-    .insert({ name, description, date, location, lawsuit })
+    .insert({ name, description, date, location, lawsuit: null })
     .select('*,location:ADDRESSES(*)')
     .single();
 

@@ -19,6 +19,7 @@ export type Vote = {
   max_choices: number;
   start_at: string;
   end_at: string;
+  assembly: number | null;
   results: { id: number; votes: number; content: string }[];
 };
 

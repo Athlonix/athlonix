@@ -2,6 +2,7 @@
 
 import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
 import { Progress } from '@repo/ui/components/ui/progress';
+import { CircleArrowLeft } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
@@ -45,16 +46,17 @@ function ShowContent() {
   return (
     <>
       <div className="flex items-center gap-5">
-        <h1 className="text-lg font-semibold md:text-2xl">Vote: {title}</h1>
+        <CircleArrowLeft className="w-8 h-8" onClick={() => window.history.back()} cursor={'pointer'} />
+        <h1 className="text-lg font-semibold md:text-2xl">Résultats du vote : {title}</h1>
       </div>
       <div className="flex flex-1 rounded-lg border border-dashed shadow-sm p-4" x-chunk="dashboard-02-chunk-1">
         <div className="grid gap-4 w-full">
           {results.map((result) => (
             <div key={result.id} className="flex justify-center flex-col gap-4 p-4">
               <div>
-                {result.content} ({((result.votes / totalVotes) * 100).toFixed(2)} %)
+                {result.content} | {result.votes || 0} votes ({((result.votes ?? 0 / totalVotes) * 100).toFixed(2)} %)
               </div>
-              <Progress value={(result.votes / totalVotes) * 100} />
+              <Progress value={(result.votes ?? 0 / totalVotes) * 100} />
             </div>
           ))}
         </div>

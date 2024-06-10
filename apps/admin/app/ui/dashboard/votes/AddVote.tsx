@@ -16,6 +16,7 @@ import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { toast } from '@repo/ui/components/ui/sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
@@ -38,6 +39,7 @@ function AddVote({ votes, setVotes }: Props) {
     start_at: z.string(),
     end_at: z.string(),
     max_choices: z.coerce.number().min(1, { message: 'Le nombre de choix doit être supérieur à 0' }),
+    assembly: z.string().optional(),
     options: z.array(
       z.object({ content: z.string().min(2, { message: 'Le choix doit contenir au moins 2 caractères' }) }),
     ),
@@ -51,6 +53,7 @@ function AddVote({ votes, setVotes }: Props) {
       start_at: '',
       end_at: '',
       max_choices: 1,
+      assembly: '0', // 0 = null
       options: [{ content: '' }],
     },
   });
@@ -75,6 +78,7 @@ function AddVote({ votes, setVotes }: Props) {
         start_at: new Date(values.start_at).toISOString(),
         end_at: new Date(values.end_at).toISOString(),
         max_choices: values.max_choices,
+        assembly: values.assembly === '0' ? null : Number(values.assembly),
         options: values.options,
       }),
     })
@@ -187,6 +191,30 @@ function AddVote({ votes, setVotes }: Props) {
                         )}
                       />
                     </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="assembly"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Assemblée générale</Label>
+                            <FormControl>
+                              <Select {...field} name="assembly">
+                                <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
+                                  {' '}
+                                  <SelectValue placeholder="Aucune" />
+                                </SelectTrigger>
+                                <SelectContent defaultValue={'0'}>
+                                  <SelectItem value={'0'}>Aucune</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
                     <div className="grid gap-4">
                       {fields.map((field, index) => (
                         <div key={field.id} className="grid gap-2">

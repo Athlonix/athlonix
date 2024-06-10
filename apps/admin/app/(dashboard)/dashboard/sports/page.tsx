@@ -11,8 +11,8 @@ import {
 } from '@ui/components/ui/dialog';
 import { Input } from '@ui/components/ui/input';
 import { Label } from '@ui/components/ui/label';
-import { Loader2 } from 'lucide-react';
-import Image from 'next/image';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
+import { EditIcon, Loader2, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { type Sports, addSport, deleteSport, getAllSports, updateSport } from './utils';
 
@@ -130,30 +130,49 @@ export default function SportsPage(): JSX.Element {
           </DialogContent>
         </Dialog>
       </header>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {sports?.length === 0 && <p>Aucun sport enregistré</p>}
-        {sports?.map((sport) => (
-          <div key={sport.id} className="bg-white shadow-md rounded-lg p-4">
-            {sport.image && (
-              <Image
-                src={sport.image}
-                alt={sport.name}
-                className="rounded-lg object-cover w-full aspect-video"
-                width={500}
-                height={500}
-              />
-            )}
-            <div className="p-4">
-              <h1 className="text-xl font-semibold">{sport.name}</h1>
-              <p className="mt-2 text-gray-600">{sport.description}</p>
-              <div className="mt-4 flex justify-between">
-                <span className="text-gray-400">
-                  Joueurs: {sport.min_players} - {sport.max_players}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="flex items-center gap-5">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nom</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead>Nombre de joueurs minimum</TableHead>
+              <TableHead>Nombre de joueurs maximum</TableHead>
+              <TableHead>Image</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sports?.map((sport) => (
+              <TableRow key={sport.id}>
+                <TableCell>{sport.name}</TableCell>
+                <TableCell>{sport.description ? sport.description : 'Pas de description'}</TableCell>
+                <TableCell>{sport.min_players}</TableCell>
+                <TableCell>{sport.max_players ? sport.max_players : 'Pas de nombre maximum'}</TableCell>
+                <TableCell>{sport.image ? 'Oui' : 'Non'}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <EditIcon
+                      className="cursor-pointer"
+                      color="#1f6feb"
+                      onClick={() => {
+                        setEditSport(sport);
+                        setOpen(true);
+                      }}
+                    />
+                    <Trash2
+                      className="cursor-pointer"
+                      color="#bf0808"
+                      onClick={() => {
+                        handleDeleteSport(sport.id);
+                        setSports(sports?.filter((s) => s.id !== sport.id));
+                      }}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );

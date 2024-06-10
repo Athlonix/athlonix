@@ -1,12 +1,13 @@
 'use client';
 
-import { type Assembly, getAssembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
-import { getAllMembers } from '@/app/lib/utils';
+import { type Assembly, addAttendee, closeAssembly, getAssembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
+import { getAllMembersForAssembly } from '@/app/lib/utils';
 import type { User } from '@/app/ui/LoginForm';
 import { Button } from '@ui/components/ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -14,8 +15,15 @@ import {
 } from '@ui/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
+import { Textarea } from '@ui/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useState } from 'react';
+import { Label } from 'recharts';
+
+const Icons = {
+  spinner: Loader2,
+};
 
 export default function AssemblyDetail(): JSX.Element {
   const searchParams = useSearchParams();
@@ -24,45 +32,92 @@ export default function AssemblyDetail(): JSX.Element {
   const [attendees, setAttendees] = useState<number>(0);
   const [openAddAttendee, setOpenAddAttendee] = useState<boolean>(false);
   const [members, setMembers] = useState<User[]>([]);
-  const [membersCount, setMembersCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [openCloseAssembly, setOpenCloseAssembly] = useState<boolean>(false);
+  const [isClosed, setIsClosed] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchAssembly = async () => {
       const data = await getAssembly(Number(idPoll));
       setAttendees(data.attendees?.length ?? 0);
       setAssembly(data);
-    };
-    const fetchMembers = async () => {
-      const members = await getAllMembers();
+      setIsClosed(data.closed);
+      const attendeesArray = (data?.attendees ?? []).map((attendee) => attendee.id);
+      const members = await getAllMembersForAssembly(attendeesArray);
       setMembers(members.data);
-      setMembersCount(members.count);
     };
     fetchAssembly();
-    fetchMembers();
+    setLoading(false);
   }, [idPoll]);
 
-  // add members to the assembly
-  // close the assembly -> no more members can be added + lawsuit needs to be added
+  async function handleAddAttendee(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const id_user = Number(formData.get('id_user'));
+    await addAttendee(Number(idPoll), Number(id_user));
+    setOpenAddAttendee(false);
+    const data = await getAssembly(Number(idPoll));
+    setAttendees(data.attendees?.length ?? 0);
+    setAssembly(data);
+  }
+
+  async function handleEndAssembly(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const lawsuit = formData.get('lawsuit') as string;
+    await closeAssembly(Number(idPoll), lawsuit);
+    setOpenCloseAssembly(false);
+    const data = await getAssembly(Number(idPoll));
+    setAssembly(data);
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Icons.spinner className="w-12 h-12 animate-spin text-primary-500" />
+      </div>
+    );
+  }
 
   return (
     <>
       <div className="flex items-center gap-5">
         <h1 className="text-lg font-semibold md:text-2xl">Assemblée Générale: {assembly?.name}</h1>
+        <div className="ml-auto flex gap-5">
+          {!isClosed && (
+            <CloseAssemblyDialog
+              openCloseAssembly={openCloseAssembly}
+              setOpenCloseAssembly={setOpenCloseAssembly}
+              handleEndAssembly={handleEndAssembly}
+            />
+          )}
+        </div>
       </div>
       <div className="grid gap-4 w-full">
         <div className="flex justify-center flex-col gap-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-dashed shadow-sm">
-          <div>{`Cette assemblée se tiendra le ${new Date(assembly?.date ?? '').toLocaleDateString()} à ${new Date(assembly?.date ?? '').toLocaleTimeString()}`}</div>
+          <div>
+            {isClosed ? (
+              <span className="text-red-500">Terminée</span>
+            ) : new Date(assembly?.date ?? 0).getTime() < Date.now() ? (
+              <span className="text-green-500">En cours de déroulement</span>
+            ) : (
+              <span className="text-blue-500">Débutera le {new Date(assembly?.date ?? 0).toLocaleString()}</span>
+            )}
+          </div>
           <div>{`Lieu: ${assembly?.location ? assembly?.location : 'En ligne'}`}</div>
           <div>{assembly?.description ?? 'Pas de description'}</div>
         </div>
       </div>
       <div className="flex items-center gap-5">
         <h1 className="text-lg font-semibold md:text-2xl">Membres ({attendees})</h1>
-        <AddAttendeeDialog
-          openAddAttendee={openAddAttendee}
-          setOpenAddAttendee={setOpenAddAttendee}
-          members={members}
-        />
+        {!isClosed && (
+          <AddAttendeeDialog
+            openAddAttendee={openAddAttendee}
+            setOpenAddAttendee={setOpenAddAttendee}
+            members={members}
+            handleAddAttendee={handleAddAttendee}
+          />
+        )}
       </div>
       <div className="flex items-center gap-5">
         <Table>
@@ -83,7 +138,7 @@ export default function AssemblyDetail(): JSX.Element {
                 <TableCell>{`${member.first_name} ${member.last_name}`}</TableCell>
                 <TableCell>{member.email}</TableCell>
               </TableRow>
-            ))}
+            )) ?? []}
           </TableBody>
         </Table>
       </div>
@@ -95,7 +150,13 @@ function AddAttendeeDialog({
   openAddAttendee,
   setOpenAddAttendee,
   members,
-}: { openAddAttendee: boolean; setOpenAddAttendee: (value: boolean) => void; members: User[] }): JSX.Element {
+  handleAddAttendee,
+}: {
+  openAddAttendee: boolean;
+  setOpenAddAttendee: (value: boolean) => void;
+  members: User[];
+  handleAddAttendee: (event: FormEvent<HTMLFormElement>) => void;
+}) {
   return (
     <Dialog open={openAddAttendee} onOpenChange={setOpenAddAttendee}>
       <DialogTrigger asChild>
@@ -105,9 +166,9 @@ function AddAttendeeDialog({
         <DialogHeader>
           <DialogTitle>Ajouter un membre</DialogTitle>
         </DialogHeader>
-        <form onSubmit={() => {}}>
+        <form onSubmit={(event) => handleAddAttendee(event)}>
           <div className="grid gap-4 py-4">
-            <Select>
+            <Select name="id_user" required>
               <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
                 <SelectValue placeholder="Membre" />
               </SelectTrigger>
@@ -129,6 +190,41 @@ function AddAttendeeDialog({
             <Button type="submit" disabled={members.length === 0}>
               Ajouter
             </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function CloseAssemblyDialog({
+  openCloseAssembly,
+  setOpenCloseAssembly,
+  handleEndAssembly,
+}: {
+  openCloseAssembly: boolean;
+  setOpenCloseAssembly: (value: boolean) => void;
+  handleEndAssembly: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  return (
+    <Dialog open={openCloseAssembly} onOpenChange={setOpenCloseAssembly}>
+      <DialogTrigger asChild>
+        <Button className="bg-red-800">Terminer l'assemblée</Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Terminer l'assemblée</DialogTitle>
+          <DialogDescription>
+            Pour mettre fin à l'assemblée générale, veuillez saisir le compte rendu complet ci dessous.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={(event) => handleEndAssembly(event)}>
+          <div className="grid gap-4 py-4">
+            <Label>Compte rendu de l'assemblée générale</Label>
+            <Textarea id="lawsuit" name="lawsuit" required placeholder="Compte rendu de l'assemblée générale" />
+          </div>
+          <DialogFooter>
+            <Button type="submit">Terminer</Button>
           </DialogFooter>
         </form>
       </DialogContent>

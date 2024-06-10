@@ -2,9 +2,9 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
+  closeAssembly,
   confirmMemberPresence,
   createAssembly,
-  deleteAssembly,
   getAllAssemblies,
   getOneAssembly,
   updateAssembly,
@@ -41,6 +41,7 @@ assemblies.openapi(getOneAssembly, async (c) => {
     location: data.location || null,
     attendees: data.attendees ? data.attendees.flatMap((attendee) => attendee.users || []) : [],
     lawsuit: data.lawsuit || null,
+    closed: data.closed,
   };
 
   return c.json(format, 200);
@@ -88,6 +89,7 @@ assemblies.openapi(getAllAssemblies, async (c) => {
     location: row.location || null,
     attendees: row.attendees ? row.attendees.flatMap((attendee) => attendee.users || []) : [],
     lawsuit: row.lawsuit || null,
+    closed: row.closed,
   }));
 
   return c.json({ data: format, count: count || 0 }, 200);
@@ -117,6 +119,7 @@ assemblies.openapi(createAssembly, async (c) => {
     date: data.date,
     location: data.location || null,
     lawsuit: data.lawsuit || null,
+    closed: data.closed,
   };
 
   return c.json(format, 201);
@@ -128,7 +131,7 @@ assemblies.openapi(updateAssembly, async (c) => {
   await checkRole(roles, false);
 
   const { id } = c.req.valid('param');
-  const { name, description, date, location, lawsuit } = c.req.valid('json');
+  const { name, description, date, location, lawsuit, closed } = c.req.valid('json');
 
   if (date && new Date(date) < new Date()) {
     return c.json({ error: 'Date must be in the future' }, 400);
@@ -142,7 +145,7 @@ assemblies.openapi(updateAssembly, async (c) => {
 
   const { data, error } = await supabase
     .from('ASSEMBLIES')
-    .update({ name, description, date, location, lawsuit })
+    .update({ name, description, date, location, lawsuit, closed: closed || false })
     .eq('id', id)
     .select('*,location:ADDRESSES(*)')
     .single();
@@ -158,17 +161,19 @@ assemblies.openapi(updateAssembly, async (c) => {
     date: data.date,
     location: data.location || null,
     lawsuit: data.lawsuit || null,
+    closed: data.closed,
   };
 
   return c.json(format, 200);
 });
 
-assemblies.openapi(deleteAssembly, async (c) => {
+assemblies.openapi(closeAssembly, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
   const { id } = c.req.valid('param');
+  const { lawsuit } = c.req.valid('json');
 
   const { data: assembly, error: assemblyError } = await supabase.from('ASSEMBLIES').select('id').eq('id', id).single();
 
@@ -176,13 +181,13 @@ assemblies.openapi(deleteAssembly, async (c) => {
     return c.json({ error: 'Assembly not found' }, 404);
   }
 
-  const { error } = await supabase.from('ASSEMBLIES').delete().eq('id', id);
+  const { error } = await supabase.from('ASSEMBLIES').update({ closed: true, lawsuit }).eq('id', id);
 
   if (error) {
-    return c.json({ error: 'Failed to delete assembly' }, 500);
+    return c.json({ error: 'Failed to close assembly' }, 500);
   }
 
-  return c.json({ message: 'Assembly deleted' }, 200);
+  return c.json({ message: 'Assembly closed' }, 200);
 });
 
 assemblies.openapi(confirmMemberPresence, async (c) => {
@@ -212,7 +217,18 @@ assemblies.openapi(confirmMemberPresence, async (c) => {
     return c.json({ error: 'Member subscription expired' }, 400);
   }
 
-  const { error } = await supabase.from('ASSEMBLIES_ATTENDEES').insert({ id_assembly: id, id_user: id_member });
+  const { data: attendee, error: attendeeError } = await supabase
+    .from('ASSEMBLIES_ATTENDEES')
+    .select('id')
+    .eq('id_assembly', id)
+    .eq('id_member', id_member)
+    .single();
+
+  if (attendeeError || attendee) {
+    return c.json({ error: 'Member already confirmed' }, 400);
+  }
+
+  const { error } = await supabase.from('ASSEMBLIES_ATTENDEES').insert({ id_assembly: id, id_member });
 
   if (error) {
     return c.json({ error: 'Failed to confirm member' }, 500);

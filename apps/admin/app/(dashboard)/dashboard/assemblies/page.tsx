@@ -14,11 +14,11 @@ import { Label } from '@ui/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
 import { Textarea } from '@ui/components/ui/textarea';
-import { EditIcon, Trash2 } from 'lucide-react';
+import { EditIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { type Address, getAdresses } from '../addresses/utils';
-import { type Assembly, createAssembly, deleteAssembly, getAssemblies, updateAssembly } from './utils';
+import { type Assembly, createAssembly, getAssemblies, updateAssembly } from './utils';
 
 export default function AssembliesPage(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
@@ -53,12 +53,6 @@ export default function AssembliesPage(): JSX.Element {
     setOpen(false);
   }
 
-  async function handleDeleteAssembly(id: number) {
-    await deleteAssembly(id);
-    const new_count = count - 1;
-    setCount(new_count);
-  }
-
   async function handleUpdateAssembly(event: React.FormEvent<HTMLFormElement>, id: number) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -79,7 +73,7 @@ export default function AssembliesPage(): JSX.Element {
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{editAssembly ? 'Modifier' : 'Ajouter'} un sport</DialogTitle>
+              <DialogTitle>{editAssembly ? 'Modifier' : 'Ajouter'} une assemblée</DialogTitle>
             </DialogHeader>
             <form onSubmit={editAssembly ? (event) => handleUpdateAssembly(event, editAssembly.id) : handleAddAssembly}>
               <div className="grid gap-4 py-4">
@@ -96,10 +90,10 @@ export default function AssembliesPage(): JSX.Element {
                   id="date"
                   name="date"
                   type="datetime-local"
-                  defaultValue={editAssembly ? editAssembly.date : ''}
+                  defaultValue={editAssembly ? new Date(editAssembly.date).toISOString().slice(0, 16) : ''}
                   required
                 />
-                <Select>
+                <Select name="location" required>
                   <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
                     <SelectValue placeholder="Lieu" />
                   </SelectTrigger>
@@ -165,14 +159,6 @@ export default function AssembliesPage(): JSX.Element {
                       onClick={() => {
                         setEditAssembly(assembly);
                         setOpen(true);
-                      }}
-                    />
-                    <Trash2
-                      className="cursor-pointer"
-                      color="#bf0808"
-                      onClick={() => {
-                        handleDeleteAssembly(assembly.id);
-                        setAssemblies(assemblies.filter((a) => a.id !== assembly.id));
                       }}
                     />
                   </div>

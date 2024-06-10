@@ -2,9 +2,9 @@
 
 import { type Assembly, getAssembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
-export default function AssemblyDetail(): JSX.Element {
+function AssemblyDetail(): JSX.Element {
   const searchParams = useSearchParams();
   const idPoll = searchParams.get('id');
   const [assembly, setAssembly] = useState<Assembly | null>(null);
@@ -35,5 +35,15 @@ export default function AssemblyDetail(): JSX.Element {
         </div>
       </div>
     </>
+  );
+}
+
+export default function page() {
+  return (
+    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
+      <Suspense fallback={<div>Chargement...</div>}>
+        <AssemblyDetail />
+      </Suspense>
+    </main>
   );
 }

@@ -1,16 +1,22 @@
 'use server';
 import { cookies } from 'next/headers';
-export interface User {
+
+export type User = {
   id: number;
-  username: string;
   email: string;
+  username: string;
   first_name: string;
   last_name: string;
+  id_referer: number | null;
+  id_auth: string | null;
+  date_validity: string | null;
+  created_at: string;
+  deleted_at: string | null;
+  invoice: string | null;
   subscription: string | null;
   status: 'applied' | 'approved' | 'rejected' | null;
-  date_validity: string | null;
   roles: { id: number; name: string }[];
-}
+};
 
 // Always up to date but less performant
 export async function getUserFromDB(): Promise<User> {
@@ -59,6 +65,11 @@ export async function saveUserCookie(user: User, token?: string): Promise<void> 
   if (token) {
     cookies().set('access_token', token, { path: '/', secure: true, sameSite: 'strict' });
   }
+}
+
+export async function deleteUserCookie(): Promise<void> {
+  cookies().delete('user');
+  cookies().delete('access_token');
 }
 
 export async function updateUserInformation(

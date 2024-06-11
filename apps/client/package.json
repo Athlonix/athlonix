@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf .next/ .turbo/ node_modules/",
-    "dev": "next dev --port 3102",
+    "dev": "next dev --turbo --port 3102",
     "build": "next build",
     "start": "next start",
     "lint": "biome check --write .",
@@ -14,8 +14,9 @@
   "dependencies": {
     "@hookform/resolvers": "^3.6.0",
     "@repo/ui": "workspace:*",
-    "lucide-react": "^0.390.0",
+    "lucide-react": "^0.394.0",
     "next": "^14.2.3",
+    "next-themes": "^0.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.51.5",

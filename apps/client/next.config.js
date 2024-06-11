@@ -5,7 +5,6 @@ module.exports = {
   images: {
     domains: [process.env.SUPABASE_DOMAIN, '127.0.0.1'],
     minimumCacheTTL: 60,
-    formats: ['image/avif', 'image/webp'],
   },
   env: {
     ATHLONIX_STORAGE_URL: process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL,

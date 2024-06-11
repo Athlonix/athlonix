@@ -3,7 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@ui/lib/utils": ["../../packages/ui/src/lib/utils"],
+      "@ui/components/ui/*": ["../../packages/ui/src/components/ui/*"]
     },
     "plugins": [
       {

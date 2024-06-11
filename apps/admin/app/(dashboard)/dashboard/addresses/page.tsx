@@ -10,17 +10,7 @@ import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-
-type Address = {
-  id: number;
-  road: string;
-  postal_code: string;
-  complement: string | null;
-  city: string;
-  number: number;
-  name: string | null;
-  id_lease: number | null;
-};
+import type { Address } from './utils';
 
 type AddressData = {
   data: Address[];

@@ -1,5 +1,6 @@
 'use client';
 
+import type { Assembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
 import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
 import DeleteVote from '@/app/ui/dashboard/votes/DeleteVote';
 import EditVote from '@/app/ui/dashboard/votes/EditVote';
@@ -9,9 +10,11 @@ import { useState } from 'react';
 
 interface Props {
   vote: Vote;
+  setVotes: React.Dispatch<React.SetStateAction<Vote[]>>;
+  assemblies: Assembly[];
 }
 
-function VoteRow({ vote }: Props) {
+function VoteRow({ vote, setVotes, assemblies }: Props) {
   const [title, setTitle] = useState(vote.title);
   const [description, setDescription] = useState(vote.description);
   const [maxChoices, setMaxChoices] = useState(vote.max_choices);
@@ -51,8 +54,8 @@ function VoteRow({ vote }: Props) {
       <TableCell>{maxChoices}</TableCell>
       {title !== 'Supprimé' && (
         <TableCell className="flex gap-2">
-          <EditVote vote={vote} setter={setter} />
-          <DeleteVote vote={vote} setter={setter} />
+          <EditVote vote={vote} setter={setter} assemblies={assemblies} />
+          <DeleteVote vote={vote} setVotes={setVotes} />
         </TableCell>
       )}
     </TableRow>

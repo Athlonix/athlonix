@@ -3,6 +3,12 @@ import Link from 'next/link';
 export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[100dvh] px-4 md:px-6">
+      <div className="absolute top-2 left-0 mt-4 ml-4">
+        <Link href="/" className="flex items-center">
+          <img src="/favicon.ico" alt="Accueil" width="32" height="32" />
+          <h2 className="ml-2 font-bold">Athlonix</h2>
+        </Link>
+      </div>
       <div className="max-w-md text-center space-y-4">
         <h1 className="text-8xl font-bold text-gray-900 dark:text-gray-50">404</h1>
         <h2 className="text-2xl font-semibold">Page introuvable</h2>

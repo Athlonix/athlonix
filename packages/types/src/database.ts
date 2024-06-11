@@ -391,6 +391,7 @@ export type Database = {
       };
       ASSEMBLIES: {
         Row: {
+          closed: boolean;
           date: string;
           description: string | null;
           id: number;
@@ -399,6 +400,7 @@ export type Database = {
           name: string;
         };
         Insert: {
+          closed?: boolean;
           date: string;
           description?: string | null;
           id?: number;
@@ -407,6 +409,7 @@ export type Database = {
           name: string;
         };
         Update: {
+          closed?: boolean;
           date?: string;
           description?: string | null;
           id?: number;

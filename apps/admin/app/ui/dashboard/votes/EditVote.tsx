@@ -55,7 +55,7 @@ function EditVote({ vote, setter, assemblies }: Props) {
       title: vote.title,
       description: vote.description,
       max_choices: vote.max_choices,
-      assembly: String(vote.assembly),
+      assembly: String(vote.assembly) === 'null' ? '0' : String(vote.assembly),
     },
   });
 
@@ -161,11 +161,16 @@ function EditVote({ vote, setter, assemblies }: Props) {
                       <FormItem>
                         <Label className="font-bold">Assemblée générale</Label>
                         <FormControl>
-                          <Select name="assembly" required onValueChange={field.onChange}>
+                          <Select
+                            name="assembly"
+                            required
+                            onValueChange={field.onChange}
+                            defaultValue={field.value || '0'}
+                          >
                             <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
                               <SelectValue {...field} placeholder="Assemblée" />
                             </SelectTrigger>
-                            <SelectContent defaultValue={String(vote.assembly)}>
+                            <SelectContent>
                               <SelectGroup>
                                 <SelectItem key={0} value={'0'}>
                                   Aucune assemblée

@@ -201,11 +201,11 @@ function AddVote({ votes, setVotes, assemblies }: Props) {
                           <FormItem>
                             <Label className="font-bold">Assemblée générale</Label>
                             <FormControl>
-                              <Select name="assembly" required onValueChange={field.onChange}>
+                              <Select name="assembly" required onValueChange={field.onChange} defaultValue="0">
                                 <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
                                   <SelectValue {...field} placeholder="Assemblée" />
                                 </SelectTrigger>
-                                <SelectContent defaultValue={'0'}>
+                                <SelectContent>
                                   <SelectGroup>
                                     <SelectItem key={0} value={'0'}>
                                       Aucune assemblée

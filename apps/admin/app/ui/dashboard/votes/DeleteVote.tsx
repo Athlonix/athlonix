@@ -16,20 +16,12 @@ import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
 
-type Setter = {
-  title: React.Dispatch<React.SetStateAction<string>>;
-  description: React.Dispatch<React.SetStateAction<string>>;
-  maxChoices: React.Dispatch<React.SetStateAction<number>>;
-  startAt: React.Dispatch<React.SetStateAction<string>>;
-  endAt: React.Dispatch<React.SetStateAction<string>>;
-};
-
 interface Props {
   vote: Vote;
-  setter: Setter;
+  setVotes: React.Dispatch<React.SetStateAction<Vote[]>>;
 }
 
-function DeleteVote({ vote, setter }: Props) {
+function DeleteVote({ vote, setVotes }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -49,11 +41,7 @@ function DeleteVote({ vote, setter }: Props) {
         }
       })
       .then(() => {
-        setter.title('Supprimé');
-        setter.description('');
-        setter.maxChoices(0);
-        setter.startAt('');
-        setter.endAt('');
+        setVotes((prevVotes) => prevVotes.filter((v) => v.id !== vote.id));
         toast.success('Le vote a bien été supprimé', { duration: 5000 });
       });
   }

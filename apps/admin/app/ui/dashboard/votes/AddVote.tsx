@@ -17,7 +17,7 @@ import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
@@ -201,24 +201,21 @@ function AddVote({ votes, setVotes, assemblies }: Props) {
                           <FormItem>
                             <Label className="font-bold">Assemblée générale</Label>
                             <FormControl>
-                              <Select name="assembly" required>
+                              <Select name="assembly" required onValueChange={field.onChange}>
                                 <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
-                                  <SelectValue placeholder="Assemblée" />
+                                  <SelectValue {...field} placeholder="Assemblée" />
                                 </SelectTrigger>
                                 <SelectContent defaultValue={'0'}>
-                                  <SelectItem key={0} value={'0'}>
-                                    Aucune assemblée
-                                  </SelectItem>
-                                  {assemblies?.length === 0 && (
-                                    <SelectItem disabled value={'0'}>
-                                      Aucune assemblée n'est disponible
+                                  <SelectGroup>
+                                    <SelectItem key={0} value={'0'}>
+                                      Aucune assemblée
                                     </SelectItem>
-                                  )}
-                                  {assemblies?.map((assembly) => (
-                                    <SelectItem key={assembly.id} value={String(assembly.id)}>
-                                      {assembly.name}
-                                    </SelectItem>
-                                  ))}
+                                    {assemblies?.map((assembly) => (
+                                      <SelectItem key={assembly.id} value={String(assembly.id)}>
+                                        {assembly.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectGroup>
                                 </SelectContent>
                               </Select>
                             </FormControl>

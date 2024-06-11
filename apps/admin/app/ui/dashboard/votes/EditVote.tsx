@@ -1,5 +1,6 @@
 'use client';
 
+import type { Assembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
 import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
@@ -15,6 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/co
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { toast } from '@repo/ui/components/ui/sonner';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
 import { MoreHorizontal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
@@ -33,9 +35,10 @@ type Setter = {
 interface Props {
   vote: Vote;
   setter: Setter;
+  assemblies: Assembly[];
 }
 
-function EditVote({ vote, setter }: Props) {
+function EditVote({ vote, setter, assemblies }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -43,6 +46,7 @@ function EditVote({ vote, setter }: Props) {
     title: z.string().min(2, { message: 'Le titre doit contenir au moins 2 caractères' }),
     description: z.string().optional(),
     max_choices: z.coerce.number().min(1, { message: 'Le nombre de choix doit être supérieur à 0' }),
+    assembly: z.number().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -51,6 +55,7 @@ function EditVote({ vote, setter }: Props) {
       title: vote.title,
       description: vote.description,
       max_choices: vote.max_choices,
+      assembly: vote.assembly,
     },
   });
 
@@ -146,6 +151,37 @@ function EditVote({ vote, setter }: Props) {
                       )}
                     />
                   </div>
+                </div>
+                <div className="grid">
+                  <FormField
+                    control={form.control}
+                    name="assembly"
+                    render={({ field }) => (
+                      <FormItem>
+                        <Label className="font-bold">Assemblée générale</Label>
+                        <FormControl>
+                          <Select name="assembly" required onValueChange={field.onChange}>
+                            <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
+                              <SelectValue {...field} placeholder="Assemblée" />
+                            </SelectTrigger>
+                            <SelectContent defaultValue={String(vote.assembly)}>
+                              <SelectGroup>
+                                <SelectItem key={0} value={'0'}>
+                                  Aucune assemblée
+                                </SelectItem>
+                                {assemblies?.map((assembly) => (
+                                  <SelectItem key={assembly.id} value={String(assembly.id)}>
+                                    {assembly.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
                 <div className="flex gap-4 mt-4">
                   <Button type="submit" className="w-full">

@@ -114,7 +114,7 @@ function ShowContent() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <VotesList votes={votes} assemblies={assemblies} />
+              <VotesList votes={votes} setVotes={setVotes} assemblies={assemblies} />
             </TableBody>
           </Table>
         </CardContent>

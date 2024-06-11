@@ -10,10 +10,11 @@ import { useState } from 'react';
 
 interface Props {
   vote: Vote;
+  setVotes: React.Dispatch<React.SetStateAction<Vote[]>>;
   assemblies: Assembly[];
 }
 
-function VoteRow({ vote, assemblies }: Props) {
+function VoteRow({ vote, setVotes, assemblies }: Props) {
   const [title, setTitle] = useState(vote.title);
   const [description, setDescription] = useState(vote.description);
   const [maxChoices, setMaxChoices] = useState(vote.max_choices);
@@ -54,7 +55,7 @@ function VoteRow({ vote, assemblies }: Props) {
       {title !== 'Supprimé' && (
         <TableCell className="flex gap-2">
           <EditVote vote={vote} setter={setter} assemblies={assemblies} />
-          <DeleteVote vote={vote} setter={setter} />
+          <DeleteVote vote={vote} setVotes={setVotes} />
         </TableCell>
       )}
     </TableRow>

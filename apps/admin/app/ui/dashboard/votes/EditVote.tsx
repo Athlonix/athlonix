@@ -46,7 +46,7 @@ function EditVote({ vote, setter, assemblies }: Props) {
     title: z.string().min(2, { message: 'Le titre doit contenir au moins 2 caractères' }),
     description: z.string().optional(),
     max_choices: z.coerce.number().min(1, { message: 'Le nombre de choix doit être supérieur à 0' }),
-    assembly: z.number().nullable(),
+    assembly: z.string().nullable(),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -55,7 +55,7 @@ function EditVote({ vote, setter, assemblies }: Props) {
       title: vote.title,
       description: vote.description,
       max_choices: vote.max_choices,
-      assembly: vote.assembly,
+      assembly: String(vote.assembly),
     },
   });
 
@@ -72,6 +72,7 @@ function EditVote({ vote, setter, assemblies }: Props) {
         title: values.title,
         description: values.description,
         max_choices: values.max_choices,
+        assembly: values.assembly === '0' ? null : Number(values.assembly),
       }),
     })
       .then((response) => {

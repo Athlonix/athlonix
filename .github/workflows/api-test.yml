@@ -41,12 +41,17 @@ jobs:
 
       - name: ⬆️ Install dependencies
         run: pnpm --color -F api install
+        
+      - name: 🛠️ Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
 
       - name: 🚀 Start Supabase
         run: |
-          pnpx supabase stop --no-backup
-          pnpx supabase start -x imgproxy,studio,storage-api,realtime,inbucket,edge-runtime,logflare
-          output=$(pnpx supabase status -o env --override-name api.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY) &&
+          supabase stop --no-backup
+          supabase start -x imgproxy,studio,storage-api,realtime,inbucket,edge-runtime,logflare
+          output=$(supabase status -o env --override-name api.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY) &&
           echo "$output" > .env.test
 
       - name: 🔐 Export environment variables
@@ -60,4 +65,4 @@ jobs:
           pnpm -F api test
 
       - name: 🧹 Stop supabase
-        run: pnpx supabase stop --no-backup
+        run: supabase stop --no-backup

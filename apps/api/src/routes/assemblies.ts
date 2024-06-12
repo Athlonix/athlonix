@@ -189,3 +189,61 @@ export const confirmMemberPresence = createRoute({
   },
   tags: ['assembly'],
 });
+
+export const generateAssemblyQrCode = createRoute({
+  method: 'get',
+  path: '/assemblies/{id}/qr',
+  summary: 'Generate assembly QR code',
+  description: 'Generate assembly QR code for members to scan and confirm presence',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'image/svg+xml': {
+          schema: z.string(),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['assembly'],
+});
+
+export const handleAssemblyCheckIn = createRoute({
+  method: 'post',
+  path: '/assemblies/check-in',
+  summary: 'Check in assembly',
+  description: 'Check in assembly using QR code',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({ code: z.string() }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+    400: badRequestSchema,
+  },
+  tags: ['assembly'],
+});

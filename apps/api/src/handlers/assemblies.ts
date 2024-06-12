@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
@@ -5,8 +6,10 @@ import {
   closeAssembly,
   confirmMemberPresence,
   createAssembly,
+  generateAssemblyQrCode,
   getAllAssemblies,
   getOneAssembly,
+  handleAssemblyCheckIn,
   updateAssembly,
 } from '../routes/assemblies.js';
 import { checkRole } from '../utils/context.js';
@@ -229,6 +232,92 @@ assemblies.openapi(confirmMemberPresence, async (c) => {
   }
 
   const { error } = await supabase.from('ASSEMBLIES_ATTENDEES').insert({ id_assembly: id, id_member });
+
+  if (error) {
+    return c.json({ error: 'Failed to confirm member' }, 500);
+  }
+
+  return c.json({ message: 'Member confirmed' }, 200);
+});
+
+function getRndInteger(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+assemblies.openapi(generateAssemblyQrCode, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { id } = c.req.valid('param');
+
+  const { data: assembly, error: assemblyError } = await supabase.from('ASSEMBLIES').select('id').eq('id', id).single();
+
+  if (assemblyError || !assembly) {
+    return c.json({ error: 'Assembly not found' }, 404);
+  }
+
+  const hash = crypto
+    .createHash('sha256')
+    .update(`${id}-${getRndInteger(1000, 9999)}`)
+    .digest('hex');
+
+  const { error } = await supabase.from('ASSEMBLIES').update({ code: hash }).eq('id', id);
+
+  if (error) {
+    return c.json({ error: 'Failed to generate QR code' }, 500);
+  }
+
+  const qrCode = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${hash}`;
+
+  return c.json({ qrCode }, 200);
+});
+
+assemblies.openapi(handleAssemblyCheckIn, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true);
+
+  const { code } = c.req.valid('json');
+
+  const { data: assembly, error: assemblyError } = await supabase
+    .from('ASSEMBLIES')
+    .select('id')
+    .eq('code', code)
+    .single();
+
+  if (assemblyError || !assembly) {
+    return c.json({ error: 'Assembly not found' }, 404);
+  }
+
+  const { data: member, error: memberError } = await supabase
+    .from('USERS')
+    .select('id, date_validity')
+    .eq('id', user.id)
+    .single();
+
+  if (memberError || !member) {
+    return c.json({ error: 'Member not found' }, 404);
+  }
+
+  if (member.date_validity && new Date(member.date_validity) < new Date()) {
+    return c.json({ error: 'Member subscription expired' }, 400);
+  }
+
+  const { data: attendee, error: attendeeError } = await supabase
+    .from('ASSEMBLIES_ATTENDEES')
+    .select('id')
+    .eq('id_assembly', assembly.id)
+    .eq('id_member', user.id)
+    .single();
+
+  if (attendeeError || attendee) {
+    return c.json({ error: 'Member already confirmed' }, 400);
+  }
+
+  const { error } = await supabase
+    .from('ASSEMBLIES_ATTENDEES')
+    .insert({ id_assembly: assembly.id, id_member: user.id });
 
   if (error) {
     return c.json({ error: 'Failed to confirm member' }, 500);

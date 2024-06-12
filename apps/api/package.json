@@ -31,7 +31,7 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^20.14.2",
     "@types/swagger-ui-dist": "^3.30.4",
-    "supabase": "^1.176.2",
+    "supabase": "^1.176.4",
     "tsx": "^4.15.2",
     "typescript": "^5.4.5",
     "vitest": "^1.6.0"

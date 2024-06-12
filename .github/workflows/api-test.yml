@@ -45,13 +45,13 @@ jobs:
       - name: 🛠️ Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: latest
+          version: 1.172.2
 
       - name: 🚀 Start Supabase
         run: |
           supabase stop --no-backup
           supabase start -x imgproxy,studio,storage-api,realtime,inbucket,edge-runtime,logflare
-          output=$(supabase status -o env --override-name db.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY) &&
+          output=$(supabase status -o env --override-name api.url=SUPABASE_URL --override-name auth.anon_key=SUPABASE_KEY --override-name auth.service_role_key=SUPABASE_SERVICE_KEY) &&
           echo "$output" > .env.test
 
       - name: 🔐 Export environment variables

@@ -107,3 +107,15 @@ export async function closeAssembly(id: number, lawsuit: string): Promise<void> 
     body: JSON.stringify({ lawsuit }),
   });
 }
+
+export async function getQrcode(id: number): Promise<string> {
+  const urlApi = process.env.ATHLONIX_API_URL;
+  const token = cookies().get('access_token')?.value;
+  const res = await fetch(`${urlApi}/assemblies/${id}/qr`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const data = (await res.json()) as { qrCode: string };
+  return data.qrCode;
+}

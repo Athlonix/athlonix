@@ -1,6 +1,12 @@
 'use client';
 
-import { type Assembly, addAttendee, closeAssembly, getAssembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
+import {
+  type Assembly,
+  addAttendee,
+  closeAssembly,
+  getAssembly,
+  getQrcode,
+} from '@/app/(dashboard)/dashboard/assemblies/utils';
 import { getAllMembersForAssembly } from '@/app/lib/utils';
 import type { User } from '@/app/ui/LoginForm';
 import { Button } from '@ui/components/ui/button';
@@ -35,6 +41,8 @@ export default function AssemblyDetail(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const [openCloseAssembly, setOpenCloseAssembly] = useState<boolean>(false);
   const [isClosed, setIsClosed] = useState<boolean>(false);
+  const [openQrCode, setOpenQrCode] = useState<boolean>(false);
+  const [qrCode, setQrCode] = useState<string>('');
 
   useEffect(() => {
     const fetchAssembly = async () => {
@@ -69,6 +77,16 @@ export default function AssemblyDetail(): JSX.Element {
     setOpenCloseAssembly(false);
     const data = await getAssembly(Number(idPoll));
     setAssembly(data);
+  }
+
+  async function requestQrCode() {
+    if (qrCode) {
+      setOpenQrCode(true);
+      return;
+    }
+    const data = await getQrcode(Number(idPoll));
+    setQrCode(data);
+    setOpenQrCode(true);
   }
 
   if (loading) {
@@ -118,12 +136,20 @@ export default function AssemblyDetail(): JSX.Element {
       <div className="flex items-center gap-5">
         <h1 className="text-lg font-semibold md:text-2xl">Membres de l'assemblée ({attendees})</h1>
         {!isClosed && (
-          <AddAttendeeDialog
-            openAddAttendee={openAddAttendee}
-            setOpenAddAttendee={setOpenAddAttendee}
-            members={members}
-            handleAddAttendee={handleAddAttendee}
-          />
+          <div className="ml-auto flex gap-5">
+            <AddAttendeeDialog
+              openAddAttendee={openAddAttendee}
+              setOpenAddAttendee={setOpenAddAttendee}
+              members={members}
+              handleAddAttendee={handleAddAttendee}
+            />
+            <QrCodeDialog
+              openQrCode={openQrCode}
+              setOpenQrCode={setOpenQrCode}
+              qrCode={qrCode}
+              requestQrCode={requestQrCode}
+            />
+          </div>
         )}
       </div>
       <div className="flex items-center gap-5">
@@ -132,7 +158,6 @@ export default function AssemblyDetail(): JSX.Element {
             <TableRow>
               <TableHead>Nom et Prénom</TableHead>
               <TableHead>Email</TableHead>
-              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -145,9 +170,6 @@ export default function AssemblyDetail(): JSX.Element {
               <TableRow key={member.id}>
                 <TableCell>{`${member.first_name} ${member.last_name}`}</TableCell>
                 <TableCell>{member.email}</TableCell>
-                <TableCell>
-                  <Button className="bg-blue-800">Envoyer la confirmation</Button>
-                </TableCell>
               </TableRow>
             )) ?? []}
           </TableBody>
@@ -244,6 +266,39 @@ function CloseAssemblyDialog({
             <Button type="submit">Terminer</Button>
           </DialogFooter>
         </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function QrCodeDialog({
+  openQrCode,
+  setOpenQrCode,
+  qrCode,
+  requestQrCode,
+}: {
+  openQrCode: boolean;
+  setOpenQrCode: (value: boolean) => void;
+  qrCode: string;
+  requestQrCode: () => void;
+}) {
+  return (
+    <Dialog open={openQrCode} onOpenChange={setOpenQrCode}>
+      <DialogTrigger asChild>
+        <Button className="bg-blue-800" onClick={() => requestQrCode()}>
+          Générer le QR Code
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>QR Code</DialogTitle>
+          <DialogDescription>
+            Pour confirmer votre présence à l'assemblée générale, veuillez scanner le QR Code ci-dessous.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4 justify-center">
+          <img src={qrCode} alt="QR Code" height={200} width={200} />
+        </div>
       </DialogContent>
     </Dialog>
   );

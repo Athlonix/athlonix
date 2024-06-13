@@ -29,6 +29,61 @@ edm.openapi(getAllFiles, async (c) => {
   return c.json({ data: data || [], count: count || 0 }, 200);
 });
 
+edm.openapi(uploadFileRoute, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+  const { file, name, description, isAdmin } = c.req.valid('form');
+
+  const { error } = await uploadFile(name, file, 'edm');
+  if (error) {
+    return c.json({ error }, 500);
+  }
+
+  const { error: insertDoc } = await supabase
+    .from('DOCUMENTS')
+    .insert({ name: name, description: description, owner: user.id, isAdmin, type: file.type });
+  if (insertDoc) {
+    return c.json({ error: 'Error inserting document' }, 500);
+  }
+
+  return c.json({ message: 'File uploaded' }, 200);
+});
+
+edm.openapi(deleteFileRoute, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+  const { id, name } = c.req.valid('json');
+
+  const { data: isOwner, error: ownerError } = await supabase
+    .from('DOCUMENTS')
+    .select('owner')
+    .eq('id', id)
+    .eq('name', name)
+    .single();
+
+  if (ownerError) {
+    return c.json({ error: ownerError.message }, 500);
+  }
+
+  if (isOwner && isOwner.owner !== user.id) {
+    return c.json({ error: 'You are not the owner of this document' }, 400);
+  }
+
+  const { error: deleteDoc } = await supabase.from('DOCUMENTS').delete().eq('id', id).eq('name', name);
+  if (deleteDoc) {
+    return c.json({ error: 'Error deleting document' }, 500);
+  }
+
+  const { error } = await deleteFile(name, 'edm');
+  if (error) {
+    return c.json({ error }, 500);
+  }
+
+  return c.json({ message: 'File deleted' }, 200);
+});
+
 edm.openapi(downloadFileRoute, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
@@ -52,27 +107,6 @@ edm.openapi(downloadFileRoute, async (c) => {
   const buffer = Buffer.from(await file.arrayBuffer());
 
   return c.newResponse(buffer, 200, { 'Content-Type': file.type });
-});
-
-edm.openapi(uploadFileRoute, async (c) => {
-  const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, false);
-  const { file, name, description, isAdmin } = c.req.valid('form');
-
-  const { error } = await uploadFile(name, file, 'edm');
-  if (error) {
-    return c.json({ error }, 500);
-  }
-
-  const { error: insertDoc } = await supabase
-    .from('DOCUMENTS')
-    .insert({ name: name, description: description, owner: user.id, isAdmin, type: file.type });
-  if (insertDoc) {
-    return c.json({ error: 'Error inserting document' }, 500);
-  }
-
-  return c.json({ message: 'File uploaded' }, 200);
 });
 
 edm.openapi(updateFile, async (c) => {
@@ -109,38 +143,4 @@ edm.openapi(updateFile, async (c) => {
   }
 
   return c.json({ message: 'File updated' }, 200);
-});
-
-edm.openapi(deleteFileRoute, async (c) => {
-  const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, false);
-  const { id, name } = c.req.valid('json');
-
-  const { data: isOwner, error: ownerError } = await supabase
-    .from('DOCUMENTS')
-    .select('owner')
-    .eq('id', id)
-    .eq('name', name)
-    .single();
-
-  if (ownerError) {
-    return c.json({ error: ownerError.message }, 500);
-  }
-
-  if (isOwner && isOwner.owner !== user.id) {
-    return c.json({ error: 'You are not the owner of this document' }, 400);
-  }
-
-  const { error: deleteDoc } = await supabase.from('DOCUMENTS').delete().eq('id', id).eq('name', name);
-  if (deleteDoc) {
-    return c.json({ error: 'Error deleting document' }, 500);
-  }
-
-  const { error } = await deleteFile(name, 'edm');
-  if (error) {
-    return c.json({ error }, 500);
-  }
-
-  return c.json({ message: 'File deleted' }, 200);
 });

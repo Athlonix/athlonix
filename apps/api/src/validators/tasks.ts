@@ -12,3 +12,10 @@ export const taskSchema = z.object({
   description: z.string().nullable(),
   id_employee: z.coerce.number().min(1).nullable(),
 });
+
+export const queryAllTasks = z.object({
+  skip: z.coerce.number().int().min(0).default(0),
+  take: z.coerce.number().int().min(1).default(10),
+  start_date: z.string().date(),
+  end_date: z.string().date(),
+});

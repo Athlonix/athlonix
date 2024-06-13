@@ -2,7 +2,33 @@ import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
-import { taskSchema } from '../validators/tasks.js';
+import { queryAllTasks, taskSchema } from '../validators/tasks.js';
+
+export const getAllActivityTasks = createRoute({
+  method: 'get',
+  path: '/activities/{id}/tasks',
+  summary: 'Get all tasks of an activity',
+  description: 'Get all tasks of an activity',
+  request: {
+    params: z.object({ id: z.coerce.number().min(1) }),
+    query: queryAllTasks,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            data: z.array(taskSchema),
+            count: z.number(),
+          }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+  },
+  tags: ['task'],
+});
 
 export const getAllTasks = createRoute({
   method: 'get',

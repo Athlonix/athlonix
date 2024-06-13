@@ -1381,18 +1381,21 @@ export type Database = {
           id: number;
           id_tournament: number;
           name: string;
+          validate: boolean;
         };
         Insert: {
           created_at?: string;
           id?: number;
           id_tournament: number;
           name: string;
+          validate?: boolean;
         };
         Update: {
           created_at?: string;
           id?: number;
           id_tournament?: number;
           name?: string;
+          validate?: boolean;
         };
         Relationships: [
           {

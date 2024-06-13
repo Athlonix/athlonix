@@ -1,4 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
+import { users } from '../handlers/users.js';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
@@ -199,7 +200,10 @@ export const getTournamentTeams = createRoute({
   description: 'Get all teams of a tournament',
   request: {
     params: idParamValidator,
-    query: queryAllSchema,
+    query: z.object({
+      ...queryAllSchema.shape,
+      validate: z.boolean().optional(),
+    }),
   },
   responses: {
     200: {
@@ -212,6 +216,7 @@ export const getTournamentTeams = createRoute({
                 id: z.number(),
                 name: z.string().max(255),
                 created_at: z.string().datetime(),
+                users: z.array(z.object({ id: z.number(), username: z.string().max(255) })),
               }),
             ),
             count: z.number(),
@@ -234,6 +239,7 @@ export const getTournamentTeamsById = createRoute({
     params: z.object({
       id: z.coerce.number(),
       id_team: z.coerce.number(),
+      users: z.array(z.object({ id: z.number(), username: z.string().max(255) })),
     }),
   },
   responses: {
@@ -385,6 +391,29 @@ export const leaveTeam = createRoute({
   path: '/tournaments/{id}/teams/{id_team}/leave',
   summary: 'Leave a team of a tournament',
   description: 'Leave a team of a tournament',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: z.object({
+      id: z.coerce.number(),
+      id_team: z.coerce.number(),
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['tournament'],
+});
+
+export const validateTeam = createRoute({
+  method: 'patch',
+  path: '/tournaments/{id}/teams/{id_team}/validate',
+  summary: 'Validate a team of a tournament',
+  description: 'Validate a team of a tournament',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {

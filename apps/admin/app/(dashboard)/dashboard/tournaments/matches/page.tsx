@@ -1,8 +1,11 @@
 'use client';
 
+import type { Tournament } from '@/app/(dashboard)/dashboard/tournaments/page';
 import AddRound from '@/app/ui/dashboard/tournaments/matches/AddRound';
 import MatchesList from '@/app/ui/dashboard/tournaments/matches/MatchesList';
+import ValidateTeam from '@/app/ui/dashboard/tournaments/matches/ValidateTeam';
 import { toast } from '@repo/ui/components/ui/sonner';
+import { Separator } from '@ui/components/ui/separator';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
@@ -14,9 +17,14 @@ type Round = {
   order: number;
 };
 
-type Team = {
+export type Team = {
   id: number;
   name: string;
+  validate: boolean;
+  users: {
+    id: number;
+    username: string;
+  }[];
 };
 
 type Match = {
@@ -48,6 +56,7 @@ function ShowContent() {
   const [rounds, setRounds] = useState<Round[]>([]);
   const [matches, setMatches] = useState<Match[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [tournament, setTournament] = useState<Tournament>();
 
   const [roundsLoading, setRoundsLoading] = useState(true);
 
@@ -69,6 +78,23 @@ function ShowContent() {
       return;
     }
     hasFetchedData.current = true;
+
+    fetch(`${urlApi}/tournaments/${idTournament}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/login');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setTournament(data);
+      });
 
     fetch(`${urlApi}/tournaments/${idTournament}/teams`, {
       method: 'GET',
@@ -129,12 +155,43 @@ function ShowContent() {
 
   return (
     <>
+      <div className="py-10 rounded-lg border-2 shadow-sm p-4">
+        <div className="w-full">
+          <div className="flex justify-between">
+            <div className="mb-4 font-bold text-lg">Equipes</div>
+          </div>
+          <Separator className="mb-4" />
+          <div className="flex flex-col gap-4">
+            {teams.map((team) => (
+              <div key={team.id} className="flex justify-between items-center">
+                <div
+                  className={`flex gap-4 ${team.users.length === tournament?.team_capacity ? (team.validate ? 'text-green-400' : 'text-orange-400') : ''}`}
+                >
+                  <div className="font-bold">
+                    {team.name} ({team.users.length}/{tournament?.team_capacity})
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  {team.users.length === tournament?.team_capacity && !team.validate && (
+                    <ValidateTeam
+                      team={team}
+                      id_tournament={idTournament ? Number.parseInt(idTournament) : 0}
+                      setter={setTeams}
+                    />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <Separator className="my-4" />
       <div className="flex flex-col gap-4">
         {rounds.map((round) => (
           <MatchesList key={round.id} round={round} matches={matches} teams={teams} idTournament={idTournament || ''} />
         ))}
       </div>
-      <div className="py-10 rounded-lg border border-dashed shadow-sm p-4">
+      <div className="py-10 rounded-lg border-2 shadow-sm p-4">
         <div className="w-full">
           <div className="flex justify-center">
             {roundsLoading ? '' : <AddRound id_tournament={idTournament || ''} order={rounds.length} />}

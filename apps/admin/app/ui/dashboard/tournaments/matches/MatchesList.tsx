@@ -36,7 +36,7 @@ interface MatchesListProps {
 
 function MatchesList(props: MatchesListProps) {
   return (
-    <div className="py-10 rounded-lg border border-dashed shadow-sm p-4">
+    <div className="py-10 rounded-lg border-2 shadow-sm p-4">
       <div className="w-full">
         <div className="flex justify-between">
           <div className="mb-4 font-bold text-lg">{props.round.name}</div>

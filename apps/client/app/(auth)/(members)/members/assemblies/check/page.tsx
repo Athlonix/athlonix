@@ -5,20 +5,31 @@ import { toast } from '@ui/components/ui/sonner';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { confirmMemberPresence } from './utils';
+import { checkIfMemberIsConfirmed, confirmMemberPresence } from './utils';
 
 export default function CheckPage() {
   const [code, setCode] = useState<string>('');
   const [confirmed, setConfirmed] = useState<boolean>(false);
   useEffect(() => {
-    const code = new URLSearchParams(window.location.search).get('code');
-    if (code) {
-      setCode(code);
+    async function fetchData() {
+      const code = new URLSearchParams(window.location.search).get('code');
+      if (code) {
+        setCode(code);
+        const res = await checkIfMemberIsConfirmed(code);
+        if (res) {
+          setConfirmed(true);
+        }
+      }
     }
-  });
+    fetchData();
+  }, []);
 
   async function handleConfirmPresence() {
-    await confirmMemberPresence(code);
+    const res = await confirmMemberPresence(code);
+    if (!res) {
+      toast.error('Erreur lors de la confirmation de votre présence');
+      return;
+    }
     setConfirmed(true);
     toast.success('Votre présence a été confirmée');
   }

@@ -10,44 +10,16 @@ import {
   getAllAssemblies,
   getOneAssembly,
   handleAssemblyCheckIn,
+  isAlreadyConfirmed,
   updateAssembly,
 } from '../routes/assemblies.js';
+import { addUserToAssembly, checkAssemblyAndUser, getAssemblyWithCode } from '../utils/assemblies.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
 
 export const assemblies = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
-});
-
-assemblies.openapi(getOneAssembly, async (c) => {
-  const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, true);
-  const { id } = c.req.valid('param');
-
-  const { data, error } = await supabase
-    .from('ASSEMBLIES')
-    .select('*,attendees:ASSEMBLIES_ATTENDEES(users:USERS(id,first_name,last_name, email))')
-    .eq('id', id)
-    .single();
-
-  if (error || !data) {
-    return c.json({ error: 'Assembly not found' }, 404);
-  }
-
-  const format = {
-    id: data.id,
-    name: data.name,
-    description: data.description || null,
-    date: data.date,
-    location: data.location || null,
-    attendees: data.attendees ? data.attendees.flatMap((attendee) => attendee.users || []) : [],
-    lawsuit: data.lawsuit || null,
-    closed: data.closed,
-  };
-
-  return c.json(format, 200);
 });
 
 assemblies.openapi(getAllAssemblies, async (c) => {
@@ -128,6 +100,82 @@ assemblies.openapi(createAssembly, async (c) => {
   return c.json(format, 201);
 });
 
+assemblies.openapi(handleAssemblyCheckIn, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true);
+
+  const { code } = c.req.valid('json');
+
+  const assembly = await getAssemblyWithCode(code);
+  if ('error' in assembly) {
+    return c.json({ error: assembly.error }, assembly.status);
+  }
+
+  const add = await addUserToAssembly(assembly.id, user.id);
+  if (add !== true && add.error && add.status) {
+    return c.json({ error: add.error }, add.status);
+  }
+
+  return c.json({ message: 'Member confirmed' }, 200);
+});
+
+assemblies.openapi(isAlreadyConfirmed, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true);
+
+  const { code } = c.req.valid('json');
+
+  const assembly = await getAssemblyWithCode(code);
+  if ('error' in assembly) {
+    return c.json({ error: assembly.error }, assembly.status);
+  }
+
+  const { data: attendee, error: attendeeError } = await supabase
+    .from('ASSEMBLIES_ATTENDEES')
+    .select('id')
+    .eq('id_assembly', assembly.id)
+    .eq('id_member', user.id)
+    .single();
+
+  if (attendeeError || attendee) {
+    return c.json({ confirmed: true }, 200);
+  }
+
+  return c.json({ confirmed: false }, 200);
+});
+
+assemblies.openapi(getOneAssembly, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true);
+  const { id } = c.req.valid('param');
+
+  const { data, error } = await supabase
+    .from('ASSEMBLIES')
+    .select('*,attendees:ASSEMBLIES_ATTENDEES(users:USERS(id,first_name,last_name, email))')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Assembly not found' }, 404);
+  }
+
+  const format = {
+    id: data.id,
+    name: data.name,
+    description: data.description || null,
+    date: data.date,
+    location: data.location || null,
+    attendees: data.attendees ? data.attendees.flatMap((attendee) => attendee.users || []) : [],
+    lawsuit: data.lawsuit || null,
+    closed: data.closed,
+  };
+
+  return c.json(format, 200);
+});
+
 assemblies.openapi(updateAssembly, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
@@ -200,41 +248,14 @@ assemblies.openapi(confirmMemberPresence, async (c) => {
 
   const { id, id_member } = c.req.valid('param');
 
-  const { data: assembly, error: assemblyError } = await supabase.from('ASSEMBLIES').select('id').eq('id', id).single();
-
-  if (assemblyError || !assembly) {
-    return c.json({ error: 'Assembly not found' }, 404);
+  const check = await checkAssemblyAndUser(id, id_member);
+  if (check !== true && check.error && check.status) {
+    return c.json({ error: check.error }, check.status);
   }
 
-  const { data: member, error: memberError } = await supabase
-    .from('USERS')
-    .select('id, date_validity')
-    .eq('id', id_member)
-    .single();
-
-  if (memberError || !member) {
-    return c.json({ error: 'Member not found' }, 404);
-  }
-
-  if (member.date_validity && new Date(member.date_validity) < new Date()) {
-    return c.json({ error: 'Member subscription expired' }, 400);
-  }
-
-  const { data: attendee, error: attendeeError } = await supabase
-    .from('ASSEMBLIES_ATTENDEES')
-    .select('id')
-    .eq('id_assembly', id)
-    .eq('id_member', id_member)
-    .single();
-
-  if (attendeeError || attendee) {
-    return c.json({ error: 'Member already confirmed' }, 400);
-  }
-
-  const { error } = await supabase.from('ASSEMBLIES_ATTENDEES').insert({ id_assembly: id, id_member });
-
-  if (error) {
-    return c.json({ error: 'Failed to confirm member' }, 500);
+  const add = await addUserToAssembly(id, id_member);
+  if (add !== true && add.error && add.status) {
+    return c.json({ error: add.error }, add.status);
   }
 
   return c.json({ message: 'Member confirmed' }, 200);
@@ -272,57 +293,4 @@ assemblies.openapi(generateAssemblyQrCode, async (c) => {
   const qrCode = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${urlRedirection}`;
 
   return c.json({ qrCode }, 200);
-});
-
-assemblies.openapi(handleAssemblyCheckIn, async (c) => {
-  const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, true);
-
-  const { code } = c.req.valid('json');
-
-  const { data: assembly, error: assemblyError } = await supabase
-    .from('ASSEMBLIES')
-    .select('id')
-    .eq('code', code)
-    .single();
-
-  if (assemblyError || !assembly) {
-    return c.json({ error: 'Assembly not found' }, 404);
-  }
-
-  const { data: member, error: memberError } = await supabase
-    .from('USERS')
-    .select('id, date_validity')
-    .eq('id', user.id)
-    .single();
-
-  if (memberError || !member) {
-    return c.json({ error: 'Member not found' }, 404);
-  }
-
-  if (member.date_validity && new Date(member.date_validity) < new Date()) {
-    return c.json({ error: 'Member subscription expired' }, 400);
-  }
-
-  const { data: attendee, error: attendeeError } = await supabase
-    .from('ASSEMBLIES_ATTENDEES')
-    .select('id')
-    .eq('id_assembly', assembly.id)
-    .eq('id_member', user.id)
-    .single();
-
-  if (attendeeError || attendee) {
-    return c.json({ error: 'Member already confirmed' }, 400);
-  }
-
-  const { error } = await supabase
-    .from('ASSEMBLIES_ATTENDEES')
-    .insert({ id_assembly: assembly.id, id_member: user.id });
-
-  if (error) {
-    return c.json({ error: 'Failed to confirm member' }, 500);
-  }
-
-  return c.json({ message: 'Member confirmed' }, 200);
 });

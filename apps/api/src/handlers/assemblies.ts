@@ -268,7 +268,8 @@ assemblies.openapi(generateAssemblyQrCode, async (c) => {
     return c.json({ error: 'Failed to generate QR code' }, 500);
   }
 
-  const qrCode = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${hash}`;
+  const urlRedirection = `https://athlonix-client.jayllyz.fr/members/assemblies/check?code=${hash}`;
+  const qrCode = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${urlRedirection}`;
 
   return c.json({ qrCode }, 200);
 });

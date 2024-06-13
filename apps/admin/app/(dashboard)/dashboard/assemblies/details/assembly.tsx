@@ -296,8 +296,8 @@ function QrCodeDialog({
             Pour confirmer votre présence à l'assemblée générale, veuillez scanner le QR Code ci-dessous.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4 flex justify-center">
-          <img src={qrCode} alt="QR Code" />
+        <div className="grid gap-4 py-4 justify-center">
+          <img src={qrCode} alt="QR Code" height={200} width={200} />
         </div>
       </DialogContent>
     </Dialog>

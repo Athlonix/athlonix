@@ -274,19 +274,24 @@ tournaments.openapi(joinTeam, async (c) => {
 
   const { data: tournamentData, error: tournamentsError } = await supabase
     .from('TOURNAMENTS')
-    .select('team_capacity, teams:TEAMS (id)')
+    .select('team_capacity, teams:TEAMS (id, users:USERS_TEAMS (id_user))')
     .eq('id', id)
+    .eq('teams.id', id_team)
     .single();
 
   if (tournamentsError || !tournamentData) {
     return c.json({ error: 'Tournament or team not found' }, 404);
   }
 
-  if (tournamentData.teams.length >= tournamentData.team_capacity) {
+  if (!tournamentData.teams[0]) {
+    return c.json({ error: 'Team not found' }, 404);
+  }
+
+  if (tournamentData.teams[0].users && tournamentData.teams[0].users.length >= tournamentData.team_capacity) {
     return c.json({ error: 'Team is full' }, 400);
   }
 
-  const { data: alreadyJoined, error: alreadyJoinedError } = await supabase
+  const { data: alreadyJoined } = await supabase
     .from('USERS_TEAMS')
     .select()
     .eq('id_user', user.id)
@@ -296,7 +301,7 @@ tournaments.openapi(joinTeam, async (c) => {
     )
     .single();
 
-  if (alreadyJoinedError || alreadyJoined) {
+  if (alreadyJoined) {
     return c.json({ error: 'User already joined a team' }, 400);
   }
 

@@ -1,5 +1,9 @@
 'use client';
 
+import type { Team, Tournament } from '@/app/lib/type/Tournaments';
+import { getTournaments, getTournamentsTeams } from '@/app/lib/utils/tournament';
+import JoinTeam from '@/app/ui/components/tournaments/JoinTeam';
+import LeaveTeam from '@/app/ui/components/tournaments/LeaveTeam';
 import { Button } from '@repo/ui/components/ui/button';
 import { Separator } from '@repo/ui/components/ui/separator';
 import { toast } from '@repo/ui/components/ui/sonner';
@@ -7,42 +11,14 @@ import { User } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-export type Tournament = {
-  id: number;
-  created_at: string;
-  default_match_length: number | null;
-  name: string;
-  max_participants: number;
-  team_capacity: number;
-  rules: string | null;
-  prize: string | null;
-  id_address: number | null;
-  description: string | null;
-  id_sport: number | null;
-};
-
-interface TeamsData {
-  data: Teams[];
-  count: number;
-}
-
-export type Teams = {
-  id: number;
-  name: string;
-  validate: boolean;
-  users: {
-    id: number;
-    username: string;
-  }[];
-};
-
 function ShowContent() {
   const searchParams = useSearchParams();
-  const id = searchParams.get('id') || 1;
+  const id = searchParams.get('id') || '1';
 
   const [currentUser, setCurrentUser] = useState<{ id: number; username: string } | null>(null);
+  const [currentTeam, setCurrentTeam] = useState<number>(0);
   const [tournament, setTournament] = useState<Tournament | null>(null);
-  const [teams, setTeams] = useState<Teams[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -54,42 +30,36 @@ function ShowContent() {
   }, []);
 
   useEffect(() => {
-    const urlApi = process.env.NEXT_PUBLIC_API_URL;
+    const fetchTournament = async () => {
+      const { data, status } = await getTournaments({ id });
+      if (status !== 200) {
+        toast.error('Une erreur est survenue', { duration: 2000 });
+        return;
+      }
+      setTournament(data);
+    };
+    fetchTournament();
 
-    fetch(`${urlApi}/tournaments/${id}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => {
-        if (response.status !== 200) {
-          throw new Error('Erreur lors de la récupération des tournois');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setTournament(data);
-      })
-      .catch((error: Error) => toast.error(error.message, { duration: 5000 }));
+    const fetchTeams = async () => {
+      const { data, status } = await getTournamentsTeams({ id });
+      if (status !== 200) {
+        toast.error('Une erreur est survenue', { duration: 2000 });
+        return;
+      }
 
-    fetch(`${urlApi}/tournaments/${id}/teams`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => {
-        if (response.status !== 200) {
-          throw new Error('Erreur lors de la récupération des équipes');
+      for (const team of data.data) {
+        for (const user of team.users) {
+          if (user.username === currentUser?.username) {
+            setCurrentTeam(team.id);
+            break;
+          }
         }
-        return response.json();
-      })
-      .then((data: TeamsData) => {
-        setTeams(data.data);
-      })
-      .catch((error: Error) => toast.error(error.message, { duration: 5000 }));
-  }, [id]);
+      }
+
+      setTeams(data.data);
+    };
+    fetchTeams();
+  }, [id, currentUser?.username]);
 
   return (
     <>
@@ -140,11 +110,33 @@ function ShowContent() {
             key={team.id}
             className={`grid gap-2 p-4 border-2 ${team.users.length === tournament?.team_capacity ? (team.validate ? 'border-green-400' : 'border-orange-500') : 'border-gray-300'} rounded-sm`}
           >
-            <div className="flex items-center gap-2">
-              <div className="font-bold text-2xl">{team.name},</div>
-              <User width={32} height={32} />
-              <div className="font-bold text-2xl">
-                {team.users.length}/{tournament?.team_capacity}
+            <div className="flex justify-between">
+              <div className="flex items-center gap-2">
+                <div className="font-bold text-2xl">{team.name},</div>
+                <User width={32} height={32} />
+                <div className="font-bold text-2xl">
+                  {team.users.length}/{tournament?.team_capacity}
+                </div>
+              </div>
+              <div>
+                {currentTeam === 0 && (
+                  <JoinTeam
+                    id_tournament={Number.parseInt(id)}
+                    team={team}
+                    setter={setTeams}
+                    username={currentUser?.username}
+                    setCurrentTeam={setCurrentTeam}
+                  />
+                )}
+                {currentTeam === team.id && (
+                  <LeaveTeam
+                    id_tournament={Number.parseInt(id)}
+                    team={team}
+                    setter={setTeams}
+                    username={currentUser?.username}
+                    setCurrentTeam={setCurrentTeam}
+                  />
+                )}
               </div>
             </div>
             <ul>
@@ -158,9 +150,8 @@ function ShowContent() {
           </div>
         ))}
       </div>
-      <Separator className="my-8" />
       <div className="flex justify-center w-full my-4">
-        <Button>Participer</Button>
+        <Button>Créer une équipe</Button>
       </div>
     </>
   );

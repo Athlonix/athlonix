@@ -12,12 +12,14 @@ import {
 export const documentSchema = z.object({
   id: z.number().min(1),
   name: z.string(),
-  description: z.string().nullable(),
+  description: z.string(),
   owner: z.number().min(1),
   isAdmin: z.boolean(),
   updated_at: z.string().datetime(),
   created_at: z.string().datetime(),
   type: z.string(),
+  assembly: z.number().min(1).nullable(),
+  path: z.string(),
 });
 
 export const getAllFiles = createRoute({
@@ -82,7 +84,9 @@ export const uploadFileRoute = createRoute({
           schema: z.object({
             file: z.instanceof(File),
             name: z.string(),
-            description: z.string().optional(),
+            description: z.string(),
+            assembly: z.number().min(1).nullable(),
+            path: z.string(),
             isAdmin: z
               .string()
               .optional()
@@ -130,6 +134,8 @@ export const updateFile = createRoute({
           schema: z.object({
             file: z.instanceof(File).optional(),
             name: z.string().optional(),
+            path: z.string().optional(),
+            assembly: z.number().min(1).nullable().optional(),
             isAdmin: z
               .string()
               .optional()

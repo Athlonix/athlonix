@@ -578,32 +578,38 @@ export type Database = {
       };
       DOCUMENTS: {
         Row: {
+          assembly: number | null;
           created_at: string;
-          description: string | null;
+          description: string;
           id: number;
           isAdmin: boolean;
           name: string;
           owner: number;
+          path: string;
           type: string;
           updated_at: string;
         };
         Insert: {
+          assembly?: number | null;
           created_at?: string;
-          description?: string | null;
+          description: string;
           id?: number;
           isAdmin?: boolean;
           name: string;
           owner: number;
+          path: string;
           type: string;
           updated_at?: string;
         };
         Update: {
+          assembly?: number | null;
           created_at?: string;
-          description?: string | null;
+          description?: string;
           id?: number;
           isAdmin?: boolean;
           name?: string;
           owner?: number;
+          path?: string;
           type?: string;
           updated_at?: string;
         };
@@ -613,6 +619,13 @@ export type Database = {
             columns: ['owner'];
             isOneToOne: false;
             referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_DOCUMENTS_assembly_fkey';
+            columns: ['assembly'];
+            isOneToOne: false;
+            referencedRelation: 'ASSEMBLIES';
             referencedColumns: ['id'];
           },
         ];

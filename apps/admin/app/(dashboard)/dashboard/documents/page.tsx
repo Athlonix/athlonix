@@ -13,35 +13,101 @@ import {
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
+import { Card } from '@ui/components/ui/card';
 import { Textarea } from '@ui/components/ui/textarea';
-import { EditIcon, Eye, Trash2 } from 'lucide-react';
+import { CircleArrowLeft, EditIcon, Eye, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import React from 'react';
 import { type Files, deleteFile, getAllFiles, saveFile, updateFile } from './utils';
 
+function FolderItem({ name, onClick }: { name: string; onClick: () => void }) {
+  return (
+    <Card className="m-2 p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 w-48 h-24" onClick={onClick}>
+      <h2>{name}</h2>
+    </Card>
+  );
+}
+
+function DisplayFolderAndFiles({
+  folder,
+  onFolderClick,
+  files,
+  onFileClick,
+  currrentPath,
+  setEditFile,
+  setOpen,
+}: {
+  folder: { [key: string]: unknown };
+  onFolderClick: (name: string) => void;
+  files?: Files[];
+  onFileClick?: (id: number) => void;
+  currrentPath: string;
+  setEditFile: React.Dispatch<React.SetStateAction<Files | null>>;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+  return (
+    <>
+      {Object.entries(folder).map(([name, value]) => {
+        if (typeof value === 'object') {
+          return <FolderItem key={name} name={name} onClick={() => onFolderClick(name)} />;
+        }
+      })}
+      {files
+        ?.filter((file) => file.path.split('/').slice(0, -1).join('/') === currrentPath)
+        .map((file) => {
+          return (
+            <Card key={file.id} className="m-2 p-2 w-48 h-24 flex items-center justify-between">
+              <p>{file.name}</p>
+              <div className="flex space-x-2">
+                <Eye className="w-6 h-6 cursor-pointer" onClick={() => onFileClick?.(file.id)} />
+                <EditIcon
+                  className="cursor-pointer"
+                  color="#1f6feb"
+                  onClick={() => {
+                    setEditFile(file);
+                    setOpen(true);
+                  }}
+                />
+                <Trash2 className="w-6 h-6 cursor-pointer" onClick={() => deleteFile(file.id, file.name)} />
+              </div>
+            </Card>
+          );
+        })}
+    </>
+  );
+}
+
 export default function Documents() {
   const [isUploading, setIsUploading] = useState(false);
   const [files, setFiles] = useState<{ data: Files[]; count: number } | null>(null);
+  const [folders, setFolders] = useState<{ [key: string]: unknown } | null>(null);
+  const [saveFolder, setSaveFolder] = useState<{ [key: string]: unknown } | null>(null);
+  const [currrentPath, setCurrentPath] = useState<string | null>(null);
+
   const [editFile, setEditFile] = useState<Files | null>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [open, setOpen] = React.useState(false);
 
   useEffect(() => {
-    const getFIles = async () => {
+    const getFiles = async () => {
       const user = await returnUser();
       setUserId(user?.id || null);
       const files = await getAllFiles();
       setFiles(files);
+      setFolders(files.folders);
+      setSaveFolder(files.folders);
     };
-    getFIles();
+    getFiles();
   }, []);
 
   async function handleUpload(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     setIsUploading(true);
+    formData.set('path', currrentPath || '');
+    formData.set('assembly', 'null');
+    formData.set('path', `${currrentPath}/${formData.get('name')}`);
 
     try {
       await saveFile(formData);
@@ -116,6 +182,13 @@ export default function Documents() {
     }
   }
 
+  function onFolderClick(name: string): void {
+    if (folders?.[name]) {
+      setFolders(folders[name] as { [key: string]: unknown });
+      setCurrentPath((prev) => (prev ? `${prev}/${name}` : name));
+    }
+  }
+
   return (
     <div className="flex flex-col h-full">
       <header className="bg-gray-100 dark:bg-gray-800 px-6 py-4 flex items-center justify-between">
@@ -172,66 +245,23 @@ export default function Documents() {
           </DialogContent>
         </Dialog>
       </header>
-      <div className="flex-1 overflow-auto p-6">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nom</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Confidentiel</TableHead>
-              <TableHead>Uploaded</TableHead>
-              <TableHead>Updated</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {files?.data.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center">
-                  Aucun documents enregistré.
-                </TableCell>
-              </TableRow>
-            )}
-            {files?.data.map((file) => (
-              <TableRow key={file.id}>
-                <TableCell>{file.name}</TableCell>
-                <TableCell>{file.description || 'Aucune description'}</TableCell>
-                <TableCell>{fileTypes(file.type)}</TableCell>
-                <TableCell>{file.isAdmin ? 'Oui' : 'Non'}</TableCell>
-                <TableCell>{`${new Date(file.created_at).toLocaleDateString()} ${new Date(
-                  file.created_at,
-                ).toLocaleTimeString()}`}</TableCell>
-                <TableCell>{`${new Date(file.updated_at).toLocaleDateString()} ${new Date(
-                  file.updated_at,
-                ).toLocaleTimeString()}`}</TableCell>
-                <TableCell className="flex gap-2">
-                  <Eye className="cursor-pointer" onClick={() => viewFile(file.id)} />
-                  <EditIcon
-                    className="cursor-pointer"
-                    color="#1f6feb"
-                    onClick={() => {
-                      setEditFile(file);
-                      setOpen(true);
-                    }}
-                  />
-                  {userId !== null && userId === file.owner && (
-                    <Trash2
-                      className="cursor-pointer"
-                      color="#bf0808"
-                      onClick={() => {
-                        deleteFile(file.id, file.name);
-                        setFiles({
-                          data: files?.data.filter((f) => f.id !== file.id) || [],
-                          count: files?.count - 1 || 0,
-                        });
-                      }}
-                    />
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <CircleArrowLeft
+        className="w-8 h-8"
+        onClick={() => {
+          setFolders(saveFolder);
+          setCurrentPath(null);
+        }}
+      />
+      <div className="flex flex-wrap gap-4 p-4">
+        <DisplayFolderAndFiles
+          folder={folders || {}}
+          onFolderClick={(name) => onFolderClick(name)}
+          files={files?.data}
+          onFileClick={(id) => viewFile(id)}
+          currrentPath={currrentPath || ''}
+          setEditFile={setEditFile}
+          setOpen={setOpen}
+        />
       </div>
     </div>
   );

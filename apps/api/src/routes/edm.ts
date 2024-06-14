@@ -85,7 +85,15 @@ export const uploadFileRoute = createRoute({
             file: z.instanceof(File),
             name: z.string(),
             description: z.string(),
-            assembly: z.number().min(1).nullable(),
+            assembly: z
+              .string()
+              .optional()
+              .transform((value) => {
+                if (value === 'null') {
+                  return null;
+                }
+                return Number(value);
+              }),
             path: z.string(),
             isAdmin: z
               .string()
@@ -135,7 +143,15 @@ export const updateFile = createRoute({
             file: z.instanceof(File).optional(),
             name: z.string().optional(),
             path: z.string().optional(),
-            assembly: z.number().min(1).nullable().optional(),
+            assembly: z
+              .string()
+              .optional()
+              .transform((value) => {
+                if (value === 'null') {
+                  return null;
+                }
+                return Number(value);
+              }),
             isAdmin: z
               .string()
               .optional()

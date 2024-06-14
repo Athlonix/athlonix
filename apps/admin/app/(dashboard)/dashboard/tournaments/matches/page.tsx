@@ -2,8 +2,10 @@
 
 import type { Tournament } from '@/app/(dashboard)/dashboard/tournaments/page';
 import AddRound from '@/app/ui/dashboard/tournaments/matches/AddRound';
+import CancelTeam from '@/app/ui/dashboard/tournaments/matches/CancelTeam';
 import MatchesList from '@/app/ui/dashboard/tournaments/matches/MatchesList';
 import ValidateTeam from '@/app/ui/dashboard/tournaments/matches/ValidateTeam';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { Separator } from '@ui/components/ui/separator';
 import { useSearchParams } from 'next/navigation';
@@ -164,16 +166,38 @@ function ShowContent() {
           <div className="flex flex-col gap-4">
             {teams.map((team) => (
               <div key={team.id} className="flex justify-between items-center">
-                <div
-                  className={`flex gap-4 ${team.users.length === tournament?.team_capacity ? (team.validate ? 'text-green-400' : 'text-orange-400') : ''}`}
-                >
-                  <div className="font-bold">
-                    {team.name} ({team.users.length}/{tournament?.team_capacity})
-                  </div>
-                </div>
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value={`${team.name}`}>
+                    <AccordionTrigger>
+                      <div
+                        className={`flex gap-4 ${team.users.length === tournament?.team_capacity ? (team.validate ? 'text-green-400' : 'text-orange-400') : ''}`}
+                      >
+                        <div className="font-bold">
+                          {team.name} ({team.users.length}/{tournament?.team_capacity})
+                        </div>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="flex flex-col gap-4">
+                        {team.users.map((user) => (
+                          <div key={user.id} className="flex flex-row items-center gap-4 ms-4">
+                            <div>{user.username}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
                 <div className="flex gap-4">
                   {team.users.length === tournament?.team_capacity && !team.validate && (
                     <ValidateTeam
+                      team={team}
+                      id_tournament={idTournament ? Number.parseInt(idTournament) : 0}
+                      setter={setTeams}
+                    />
+                  )}
+                  {team.validate && (
+                    <CancelTeam
                       team={team}
                       id_tournament={idTournament ? Number.parseInt(idTournament) : 0}
                       setter={setTeams}

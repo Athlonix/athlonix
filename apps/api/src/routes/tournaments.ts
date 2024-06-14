@@ -432,6 +432,29 @@ export const validateTeam = createRoute({
   tags: ['tournament'],
 });
 
+export const cancelTeam = createRoute({
+  method: 'patch',
+  path: '/tournaments/{id}/teams/{id_team}/cancel',
+  summary: 'Cancel a team of a tournament',
+  description: 'Cancel a team of a tournament',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: z.object({
+      id: z.coerce.number(),
+      id_team: z.coerce.number(),
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['tournament'],
+});
+
 export const getRounds = createRoute({
   method: 'get',
   path: '/tournaments/{id}/rounds',

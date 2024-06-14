@@ -2,6 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
+  cancelTeam,
   createMatch,
   createRound,
   createTeams,
@@ -365,6 +366,38 @@ tournaments.openapi(validateTeam, async (c) => {
   }
 
   return c.json({ message: 'Team validated' }, 200);
+});
+
+tournaments.openapi(cancelTeam, async (c) => {
+  const { id, id_team } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { data: dataTournament, error: errorTournament } = await supabase
+    .from('TOURNAMENTS')
+    .select('teams:TEAMS (id, validate)')
+    .eq('id', id)
+    .eq('teams.id', id_team)
+    .single();
+
+  if (errorTournament || dataTournament.teams.length === 0) {
+    return c.json({ error: 'Tournament or team not found' }, 404);
+  }
+
+  const { data, error } = await supabase
+    .from('TEAMS')
+    .update({ validate: false })
+    .eq('id', id_team)
+    .eq('id_tournament', id)
+    .select()
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Failed to cancel team' }, 500);
+  }
+
+  return c.json({ message: 'Team canceled' }, 200);
 });
 
 tournaments.openapi(getRounds, async (c) => {

@@ -19,7 +19,16 @@ export const documentSchema = z.object({
   created_at: z.string().datetime(),
   type: z.string(),
   assembly: z.number().min(1).nullable(),
-  path: z.string(),
+  folder: z.number().min(1).nullable(),
+});
+
+export const folderSchema = z.object({
+  id: z.number().min(1),
+  name: z.string(),
+  parent: z.number().min(1).nullable(),
+  creator: z.number().min(1),
+  created_at: z.string().datetime(),
+  isAdmin: z.boolean(),
 });
 
 export const getAllFiles = createRoute({
@@ -38,8 +47,10 @@ export const getAllFiles = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            data: z.array(documentSchema),
-            count: z.number(),
+            files: z.array(documentSchema).nullable(),
+            filesCount: z.number(),
+            folders: z.array(folderSchema).nullable(),
+            foldersCount: z.number(),
           }),
         },
       },
@@ -94,7 +105,7 @@ export const uploadFileRoute = createRoute({
                 }
                 return Number(value);
               }),
-            path: z.string(),
+            folder: z.number().min(1).nullable().optional(),
             isAdmin: z
               .string()
               .optional()
@@ -142,7 +153,7 @@ export const updateFile = createRoute({
           schema: z.object({
             file: z.instanceof(File).optional(),
             name: z.string().optional(),
-            path: z.string().optional(),
+            folder: z.number().min(1).nullable().optional(),
             assembly: z
               .string()
               .optional()
@@ -216,6 +227,125 @@ export const deleteFileRoute = createRoute({
     },
     500: serverErrorSchema,
     400: badRequestSchema,
+  },
+  tags: ['edm'],
+});
+
+export const createFolderRoute = createRoute({
+  method: 'post',
+  path: '/edm/folder',
+  summary: 'Create a folder',
+  description: 'Create a folder in a bucket',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            name: z.string(),
+            parent: z.number().min(1).nullable(),
+            isAdmin: z
+              .string()
+              .optional()
+              .transform((value) => {
+                if (value === 'true') {
+                  return true;
+                }
+                return false;
+              }),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    201: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+  },
+  tags: ['edm'],
+});
+
+export const deleteFolderRoute = createRoute({
+  method: 'delete',
+  path: '/edm/folder/{id}',
+  summary: 'Delete a folder',
+  description: 'Delete a folder from a bucket',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    400: badRequestSchema,
+    404: notFoundSchema,
+  },
+  tags: ['edm'],
+});
+
+export const updateFolderRoute = createRoute({
+  method: 'patch',
+  path: '/edm/folder/{id}',
+  summary: 'Update a folder',
+  description: 'Update a folder in a bucket',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            name: z.string(),
+            parent: z.number().min(1).nullable(),
+            isAdmin: z
+              .string()
+              .optional()
+              .transform((value) => {
+                if (value === 'true') {
+                  return true;
+                }
+                return false;
+              }),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            data: folderSchema.nullable(),
+          }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    400: badRequestSchema,
+    404: notFoundSchema,
   },
   tags: ['edm'],
 });

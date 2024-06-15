@@ -1,5 +1,12 @@
 'use client';
 import { returnUser } from '@/app/lib/utils';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from '@repo/ui/components/ui/breadcrumb';
 import { Button } from '@repo/ui/components/ui/button';
 import { Checkbox } from '@repo/ui/components/ui/checkbox';
 import {
@@ -29,6 +36,17 @@ import {
   saveFile,
   updateFile,
 } from './utils';
+
+function getParentFolders(folders: Folders[], folderId: number): Folders[] {
+  const folder = folders.find((f) => f.id === folderId);
+  if (!folder) {
+    return [];
+  }
+  if (!folder.parent) {
+    return [folder];
+  }
+  return [...getParentFolders(folders, folder.parent), folder];
+}
 
 function fileTypes(input: string) {
   switch (input) {
@@ -446,12 +464,34 @@ export default function Documents() {
           />
         </div>
       </header>
-      <CircleArrowLeft
-        className="w-8 h-8"
-        onClick={() => {
-          setCurrentPath(currrentPath ? folders?.find((f) => f.id === currrentPath)?.parent || null : null);
-        }}
-      />
+      <div className="flex items-center space-x-2 p-4">
+        <CircleArrowLeft
+          className="w-8 h-8"
+          onClick={() => {
+            setCurrentPath(currrentPath ? folders?.find((f) => f.id === currrentPath)?.parent || null : null);
+          }}
+        />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink>Documents</BreadcrumbLink>
+            </BreadcrumbItem>
+            {currrentPath !== null && (
+              <>
+                {folders?.map &&
+                  getParentFolders(folders, currrentPath).map((f) => (
+                    <>
+                      <BreadcrumbSeparator key={`separator-${f.id}`} />
+                      <BreadcrumbItem key={f.id}>
+                        <BreadcrumbLink>{f.name}</BreadcrumbLink>
+                      </BreadcrumbItem>
+                    </>
+                  ))}
+              </>
+            )}
+          </BreadcrumbList>
+        </Breadcrumb>
+      </div>
       <div className="flex flex-wrap">
         <DisplayFolderAndFiles
           folder={folders}

@@ -105,7 +105,12 @@ export const uploadFileRoute = createRoute({
                 }
                 return Number(value);
               }),
-            folder: z.number().min(1).nullable().optional(),
+            folder: z.string().transform((value) => {
+              if (value === 'null') {
+                return null;
+              }
+              return Number(value);
+            }),
             isAdmin: z
               .string()
               .optional()
@@ -153,7 +158,12 @@ export const updateFile = createRoute({
           schema: z.object({
             file: z.instanceof(File).optional(),
             name: z.string().optional(),
-            folder: z.number().min(1).nullable().optional(),
+            folder: z.string().transform((value) => {
+              if (value === 'null') {
+                return null;
+              }
+              return Number(value);
+            }),
             assembly: z
               .string()
               .optional()
@@ -245,15 +255,7 @@ export const createFolderRoute = createRoute({
           schema: z.object({
             name: z.string(),
             parent: z.number().min(1).nullable(),
-            isAdmin: z
-              .string()
-              .optional()
-              .transform((value) => {
-                if (value === 'true') {
-                  return true;
-                }
-                return false;
-              }),
+            isAdmin: z.boolean().default(false),
           }),
         },
       },
@@ -318,15 +320,7 @@ export const updateFolderRoute = createRoute({
           schema: z.object({
             name: z.string(),
             parent: z.number().min(1).nullable(),
-            isAdmin: z
-              .string()
-              .optional()
-              .transform((value) => {
-                if (value === 'true') {
-                  return true;
-                }
-                return false;
-              }),
+            isAdmin: z.boolean().default(false),
           }),
         },
       },

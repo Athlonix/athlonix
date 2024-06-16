@@ -473,8 +473,8 @@ export default function Documents() {
         />
         <Breadcrumb>
           <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink>Documents</BreadcrumbLink>
+            <BreadcrumbItem className="cursor-pointer">
+              <BreadcrumbLink onClick={() => setCurrentPath(null)}>Documents</BreadcrumbLink>
             </BreadcrumbItem>
             {currrentPath !== null && (
               <>
@@ -482,8 +482,8 @@ export default function Documents() {
                   getParentFolders(folders, currrentPath).map((f) => (
                     <>
                       <BreadcrumbSeparator key={`separator-${f.id}`} />
-                      <BreadcrumbItem key={f.id}>
-                        <BreadcrumbLink>{f.name}</BreadcrumbLink>
+                      <BreadcrumbItem key={f.id} className="cursor-pointer">
+                        <BreadcrumbLink onClick={() => setCurrentPath(f.id)}>{f.name}</BreadcrumbLink>
                       </BreadcrumbItem>
                     </>
                   ))}

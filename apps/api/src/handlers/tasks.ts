@@ -32,7 +32,7 @@ tasks.openapi(getAllActivityTasks, async (c) => {
 
   const query = supabase
     .from('ACTIVITIES_TASKS')
-    .select('*, employee:USERS(id, username)', { count: 'exact' })
+    .select('*, employee:USERS(id, username),occurence:ACTIVITIES_EXCEPTIONS(date)', { count: 'exact' })
     .in('id_activity_exception', idExceptions);
 
   const { from, to } = getPagination(skip, take - 1);

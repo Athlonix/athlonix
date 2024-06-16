@@ -578,8 +578,10 @@ export type Database = {
       };
       DOCUMENTS: {
         Row: {
+          assembly: number | null;
           created_at: string;
-          description: string | null;
+          description: string;
+          folder: number | null;
           id: number;
           isAdmin: boolean;
           name: string;
@@ -588,8 +590,10 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          assembly?: number | null;
           created_at?: string;
-          description?: string | null;
+          description: string;
+          folder?: number | null;
           id?: number;
           isAdmin?: boolean;
           name: string;
@@ -598,8 +602,10 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          assembly?: number | null;
           created_at?: string;
-          description?: string | null;
+          description?: string;
+          folder?: number | null;
           id?: number;
           isAdmin?: boolean;
           name?: string;
@@ -613,6 +619,20 @@ export type Database = {
             columns: ['owner'];
             isOneToOne: false;
             referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_DOCUMENTS_assembly_fkey';
+            columns: ['assembly'];
+            isOneToOne: false;
+            referencedRelation: 'ASSEMBLIES';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_DOCUMENTS_folder_fkey';
+            columns: ['folder'];
+            isOneToOne: false;
+            referencedRelation: 'FOLDERS';
             referencedColumns: ['id'];
           },
         ];
@@ -674,6 +694,48 @@ export type Database = {
             columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      FOLDERS: {
+        Row: {
+          created_at: string;
+          creator: number;
+          id: number;
+          isAdmin: boolean;
+          name: string;
+          parent: number | null;
+        };
+        Insert: {
+          created_at?: string;
+          creator: number;
+          id?: number;
+          isAdmin?: boolean;
+          name: string;
+          parent?: number | null;
+        };
+        Update: {
+          created_at?: string;
+          creator?: number;
+          id?: number;
+          isAdmin?: boolean;
+          name?: string;
+          parent?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'public_FOLDERS_creator_fkey';
+            columns: ['creator'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_FOLDERS_parent_fkey';
+            columns: ['parent'];
+            isOneToOne: false;
+            referencedRelation: 'FOLDERS';
             referencedColumns: ['id'];
           },
         ];

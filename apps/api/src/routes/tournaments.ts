@@ -239,7 +239,6 @@ export const getTournamentTeamsById = createRoute({
     params: z.object({
       id: z.coerce.number(),
       id_team: z.coerce.number(),
-      users: z.array(z.object({ id: z.number(), username: z.string().max(255) })),
     }),
   },
   responses: {
@@ -251,6 +250,7 @@ export const getTournamentTeamsById = createRoute({
             id: z.number(),
             name: z.string().max(255),
             created_at: z.string().datetime(),
+            users: z.array(z.object({ id: z.number(), username: z.string().max(255) })),
           }),
         },
       },
@@ -289,6 +289,7 @@ export const createTeams = createRoute({
             id: z.number(),
             name: z.string().max(255),
             created_at: z.string().datetime(),
+            users: z.array(z.object({ id: z.number(), username: z.string().max(255) })),
           }),
         },
       },

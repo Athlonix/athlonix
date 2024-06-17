@@ -23,15 +23,17 @@ function LeaveTeam(props: LeaveTeamProps) {
     if (status === 200) {
       toast.success("Vous avez bien quitté l'équipe", { duration: 2000 });
       props.setter((teams: Team[]) => {
-        return teams.map((team: Team) => {
-          if (team.id === props.team.id) {
-            return {
-              ...team,
-              users: team.users.filter((user) => user.username !== props.username),
-            };
-          }
-          return team;
-        });
+        return teams
+          .map((team: Team) => {
+            if (team.id === props.team.id) {
+              return {
+                ...team,
+                users: team.users.filter((user) => user.username !== props.username),
+              };
+            }
+            return team;
+          })
+          .filter((team) => team.users.length > 0);
       });
       props.setCurrentTeam(0);
     } else {

@@ -218,7 +218,7 @@ tournaments.openapi(createTeams, async (c) => {
   const { id } = c.req.valid('param');
   const user = c.get('user');
   const roles = user.roles;
-  await checkRole(roles, false);
+  await checkRole(roles, true);
 
   const { data, error } = await supabase.from('TEAMS').insert({ name, id_tournament: id }).select().single();
 
@@ -226,7 +226,40 @@ tournaments.openapi(createTeams, async (c) => {
     return c.json({ error: 'Failed to create team' }, 400);
   }
 
-  return c.json(data, 201);
+  const { data: dataUsersTeams, error: errorUsersTeams } = await supabase
+    .from('USERS_TEAMS')
+    .insert({
+      id_team: data.id,
+      id_user: user.id,
+    })
+    .select()
+    .single();
+
+  if (errorUsersTeams || !dataUsersTeams) {
+    return c.json({ error: 'Failed to create team' }, 500);
+  }
+
+  const { data: dataUsers, error: errorUsers } = await supabase
+    .from('USERS')
+    .select('id, username')
+    .eq('id', user.id)
+    .single();
+
+  if (errorUsers || !dataUsers) {
+    return c.json({ error: 'Failed to create team' }, 500);
+  }
+
+  const newData = {
+    ...data,
+    users: [
+      {
+        id: user.id,
+        username: dataUsers.username,
+      },
+    ],
+  };
+
+  return c.json(newData, 201);
 });
 
 tournaments.openapi(updateTeam, async (c) => {
@@ -234,7 +267,7 @@ tournaments.openapi(updateTeam, async (c) => {
   const { name } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
-  await checkRole(roles, false);
+  await checkRole(roles, true);
 
   const { data, error } = await supabase
     .from('TEAMS')
@@ -255,7 +288,7 @@ tournaments.openapi(deleteTeam, async (c) => {
   const { id, id_team } = c.req.valid('param');
   const user = c.get('user');
   const roles = user.roles;
-  await checkRole(roles, false);
+  await checkRole(roles, true);
 
   const { error } = await supabase.from('TEAMS').delete().eq('id', id_team).eq('id_tournament', id);
 
@@ -330,6 +363,12 @@ tournaments.openapi(leaveTeam, async (c) => {
 
   if (errorTeam) {
     return c.json({ error: 'Failed to leave team' }, 500);
+  }
+
+  const { data: dataUsers } = await supabase.from('USERS_TEAMS').select('*').eq('id_team', id_team);
+
+  if (!dataUsers || dataUsers.length < 1) {
+    await supabase.from('TEAMS').delete().eq('id', id_team);
   }
 
   return c.json({ message: 'Team left' }, 200);

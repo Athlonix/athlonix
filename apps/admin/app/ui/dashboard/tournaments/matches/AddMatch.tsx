@@ -27,6 +27,7 @@ import { z } from 'zod';
 type Team = {
   id: number;
   name: string;
+  validate: boolean;
 };
 
 interface AddMatchProps {

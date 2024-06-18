@@ -21,7 +21,7 @@ export default function RootLayout({
 }): JSX.Element {
   return (
     <>
-      <div className="flex-grow p-6 md:overflow-y-auto md:p-12 w-full max-w-7xl">
+      <div className="flex-grow p-6 w-full max-w-7xl">
         <header>
           <NavBar links={navLinks} />
         </header>

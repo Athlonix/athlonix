@@ -76,14 +76,14 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_ACTIVITIES_id_address_fkey';
+            foreignKeyName: 'ACTIVITIES_id_address_fkey';
             columns: ['id_address'];
             isOneToOne: false;
             referencedRelation: 'ADDRESSES';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'public_ACTIVITIES_id_sport_fkey';
+            foreignKeyName: 'ACTIVITIES_id_sport_fkey';
             columns: ['id_sport'];
             isOneToOne: false;
             referencedRelation: 'SPORTS';
@@ -1272,6 +1272,7 @@ export type Database = {
           id: number;
           id_comment: number | null;
           id_post: number | null;
+          id_product: number | null;
           id_reason: number;
         };
         Insert: {
@@ -1280,6 +1281,7 @@ export type Database = {
           id?: number;
           id_comment?: number | null;
           id_post?: number | null;
+          id_product?: number | null;
           id_reason: number;
         };
         Update: {
@@ -1288,6 +1290,7 @@ export type Database = {
           id?: number;
           id_comment?: number | null;
           id_post?: number | null;
+          id_product?: number | null;
           id_reason?: number;
         };
         Relationships: [
@@ -1303,6 +1306,13 @@ export type Database = {
             columns: ['id_post'];
             isOneToOne: false;
             referencedRelation: 'POSTS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'REPORTS_id_product_fkey';
+            columns: ['id_product'];
+            isOneToOne: false;
+            referencedRelation: 'PRODUCTS';
             referencedColumns: ['id'];
           },
           {
@@ -1443,18 +1453,21 @@ export type Database = {
           id: number;
           id_tournament: number;
           name: string;
+          validate: boolean;
         };
         Insert: {
           created_at?: string;
           id?: number;
           id_tournament: number;
           name: string;
+          validate?: boolean;
         };
         Update: {
           created_at?: string;
           id?: number;
           id_tournament?: number;
           name?: string;
+          validate?: boolean;
         };
         Relationships: [
           {
@@ -1503,8 +1516,10 @@ export type Database = {
         Row: {
           created_at: string;
           default_match_length: number | null;
+          description: string | null;
           id: number;
           id_address: number | null;
+          id_sport: number | null;
           max_participants: number;
           name: string;
           prize: string | null;
@@ -1514,8 +1529,10 @@ export type Database = {
         Insert: {
           created_at?: string;
           default_match_length?: number | null;
+          description?: string | null;
           id?: number;
           id_address?: number | null;
+          id_sport?: number | null;
           max_participants: number;
           name: string;
           prize?: string | null;
@@ -1525,8 +1542,10 @@ export type Database = {
         Update: {
           created_at?: string;
           default_match_length?: number | null;
+          description?: string | null;
           id?: number;
           id_address?: number | null;
+          id_sport?: number | null;
           max_participants?: number;
           name?: string;
           prize?: string | null;
@@ -1539,6 +1558,13 @@ export type Database = {
             columns: ['id_address'];
             isOneToOne: false;
             referencedRelation: 'TOURNAMENTS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'TOURNAMENTS_id_sport_fkey';
+            columns: ['id_sport'];
+            isOneToOne: false;
+            referencedRelation: 'SPORTS';
             referencedColumns: ['id'];
           },
         ];

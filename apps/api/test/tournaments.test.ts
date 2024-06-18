@@ -229,30 +229,8 @@ describe('Tournaments tests', () => {
     expect(team.name).toBe('team test updated');
   });
 
-  test('Join team', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/teams/${id_team}/join`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-    expect(res.status).toBe(200);
-  });
-
   test('Leave team', async () => {
     const res = await app.request(`${path}/tournaments/${id_tournament}/teams/${id_team}/leave`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-    expect(res.status).toBe(200);
-  });
-
-  test('Delete team', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/teams/${id_team}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

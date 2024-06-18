@@ -13,6 +13,8 @@ export const tournamentSchema = z.object({
   prize: z.string().nullable(),
   id_address: z.number().min(1).nullable(),
   created_at: z.string().datetime(),
+  description: z.string().nullable(),
+  id_sport: z.number().min(1).nullable(),
 });
 
 export const matchSchema = z.object({
@@ -107,6 +109,8 @@ export const createTournament = createRoute({
             rules: z.string().optional(),
             prize: z.string().optional(),
             id_address: z.number().min(1).optional(),
+            description: z.string().optional(),
+            id_sport: z.number().min(1).optional(),
           }),
         },
       },
@@ -146,6 +150,8 @@ export const updateTournament = createRoute({
             rules: z.string().optional(),
             prize: z.string().optional(),
             id_address: z.number().min(1).optional(),
+            description: z.string().optional(),
+            id_sport: z.number().min(1).optional(),
           }),
         },
       },
@@ -193,7 +199,10 @@ export const getTournamentTeams = createRoute({
   description: 'Get all teams of a tournament',
   request: {
     params: idParamValidator,
-    query: queryAllSchema,
+    query: z.object({
+      ...queryAllSchema.shape,
+      validate: z.boolean().optional(),
+    }),
   },
   responses: {
     200: {
@@ -206,6 +215,7 @@ export const getTournamentTeams = createRoute({
                 id: z.number(),
                 name: z.string().max(255),
                 created_at: z.string().datetime(),
+                users: z.array(z.object({ id: z.number(), username: z.string().max(255) })),
               }),
             ),
             count: z.number(),
@@ -239,6 +249,7 @@ export const getTournamentTeamsById = createRoute({
             id: z.number(),
             name: z.string().max(255),
             created_at: z.string().datetime(),
+            users: z.array(z.object({ id: z.number(), username: z.string().max(255) })),
           }),
         },
       },
@@ -277,6 +288,7 @@ export const createTeams = createRoute({
             id: z.number(),
             name: z.string().max(255),
             created_at: z.string().datetime(),
+            users: z.array(z.object({ id: z.number(), username: z.string().max(255) })),
           }),
         },
       },
@@ -379,6 +391,52 @@ export const leaveTeam = createRoute({
   path: '/tournaments/{id}/teams/{id_team}/leave',
   summary: 'Leave a team of a tournament',
   description: 'Leave a team of a tournament',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: z.object({
+      id: z.coerce.number(),
+      id_team: z.coerce.number(),
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['tournament'],
+});
+
+export const validateTeam = createRoute({
+  method: 'patch',
+  path: '/tournaments/{id}/teams/{id_team}/validate',
+  summary: 'Validate a team of a tournament',
+  description: 'Validate a team of a tournament',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: z.object({
+      id: z.coerce.number(),
+      id_team: z.coerce.number(),
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['tournament'],
+});
+
+export const cancelTeam = createRoute({
+  method: 'patch',
+  path: '/tournaments/{id}/teams/{id_team}/cancel',
+  summary: 'Cancel a team of a tournament',
+  description: 'Cancel a team of a tournament',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {

@@ -2,6 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
+  cancelTeam,
   createMatch,
   createRound,
   createTeams,
@@ -24,6 +25,7 @@ import {
   updateRound,
   updateTeam,
   updateTournament,
+  validateTeam,
 } from '../routes/tournaments.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
@@ -105,14 +107,34 @@ tournaments.openapi(createTournament, async (c) => {
 
 tournaments.openapi(updateTournament, async (c) => {
   const { id } = c.req.valid('param');
-  const { name, default_match_length, max_participants, team_capacity, rules, prize, id_address } = c.req.valid('json');
+  const {
+    name,
+    default_match_length,
+    max_participants,
+    team_capacity,
+    rules,
+    prize,
+    id_address,
+    description,
+    id_sport,
+  } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
   const { data, error } = await supabase
     .from('TOURNAMENTS')
-    .update({ name, default_match_length, max_participants, team_capacity, rules, prize, id_address })
+    .update({
+      name,
+      default_match_length,
+      max_participants,
+      team_capacity,
+      rules,
+      prize,
+      id_address,
+      description,
+      id_sport,
+    })
     .eq('id', id)
     .select()
     .single();
@@ -141,7 +163,27 @@ tournaments.openapi(deleteTournament, async (c) => {
 
 tournaments.openapi(getTournamentTeams, async (c) => {
   const { id } = c.req.valid('param');
-  const { data, error, count } = await supabase.from('TEAMS').select('*', { count: 'exact' }).eq('id_tournament', id);
+  const { search, all, skip, take, validate } = c.req.valid('query');
+  const query = supabase
+    .from('TEAMS')
+    .select('*, users:USERS (id, username)', { count: 'exact' })
+    .order('name', { ascending: true })
+    .eq('id_tournament', id);
+
+  if (search) {
+    query.ilike('name', `%${search}%`);
+  }
+
+  if (validate) {
+    query.eq('validate', validate);
+  }
+
+  if (!all) {
+    const { from, to } = getPagination(skip, take - 1);
+    query.range(from, to);
+  }
+
+  const { data, error, count } = await query;
 
   if (error) {
     return c.json({ error: 'Tournament not found' }, 404);
@@ -157,7 +199,12 @@ tournaments.openapi(getTournamentTeams, async (c) => {
 
 tournaments.openapi(getTournamentTeamsById, async (c) => {
   const { id, id_team } = c.req.valid('param');
-  const { data, error } = await supabase.from('TEAMS').select('*').eq('id_tournament', id).eq('id', id_team).single();
+  const { data, error } = await supabase
+    .from('TEAMS')
+    .select('*, users:USERS (id, username)')
+    .eq('id_tournament', id)
+    .eq('id', id_team)
+    .single();
 
   if (error || !data) {
     return c.json({ error: 'Team not found' }, 404);
@@ -171,7 +218,7 @@ tournaments.openapi(createTeams, async (c) => {
   const { id } = c.req.valid('param');
   const user = c.get('user');
   const roles = user.roles;
-  await checkRole(roles, false);
+  await checkRole(roles, true);
 
   const { data, error } = await supabase.from('TEAMS').insert({ name, id_tournament: id }).select().single();
 
@@ -179,7 +226,40 @@ tournaments.openapi(createTeams, async (c) => {
     return c.json({ error: 'Failed to create team' }, 400);
   }
 
-  return c.json(data, 201);
+  const { data: dataUsersTeams, error: errorUsersTeams } = await supabase
+    .from('USERS_TEAMS')
+    .insert({
+      id_team: data.id,
+      id_user: user.id,
+    })
+    .select()
+    .single();
+
+  if (errorUsersTeams || !dataUsersTeams) {
+    return c.json({ error: 'Failed to create team' }, 500);
+  }
+
+  const { data: dataUsers, error: errorUsers } = await supabase
+    .from('USERS')
+    .select('id, username')
+    .eq('id', user.id)
+    .single();
+
+  if (errorUsers || !dataUsers) {
+    return c.json({ error: 'Failed to create team' }, 500);
+  }
+
+  const newData = {
+    ...data,
+    users: [
+      {
+        id: user.id,
+        username: dataUsers.username,
+      },
+    ],
+  };
+
+  return c.json(newData, 201);
 });
 
 tournaments.openapi(updateTeam, async (c) => {
@@ -187,7 +267,7 @@ tournaments.openapi(updateTeam, async (c) => {
   const { name } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
-  await checkRole(roles, false);
+  await checkRole(roles, true);
 
   const { data, error } = await supabase
     .from('TEAMS')
@@ -208,7 +288,7 @@ tournaments.openapi(deleteTeam, async (c) => {
   const { id, id_team } = c.req.valid('param');
   const user = c.get('user');
   const roles = user.roles;
-  await checkRole(roles, false);
+  await checkRole(roles, true);
 
   const { error } = await supabase.from('TEAMS').delete().eq('id', id_team).eq('id_tournament', id);
 
@@ -227,16 +307,35 @@ tournaments.openapi(joinTeam, async (c) => {
 
   const { data: tournamentData, error: tournamentsError } = await supabase
     .from('TOURNAMENTS')
-    .select('team_capacity, teams:TEAMS (id)')
+    .select('team_capacity, teams:TEAMS (id, users:USERS_TEAMS (id_user))')
     .eq('id', id)
+    .eq('teams.id', id_team)
     .single();
 
   if (tournamentsError || !tournamentData) {
     return c.json({ error: 'Tournament or team not found' }, 404);
   }
 
-  if (tournamentData.teams.length >= tournamentData.team_capacity) {
+  if (!tournamentData.teams[0]) {
+    return c.json({ error: 'Team not found' }, 404);
+  }
+
+  if (tournamentData.teams[0].users && tournamentData.teams[0].users.length >= tournamentData.team_capacity) {
     return c.json({ error: 'Team is full' }, 400);
+  }
+
+  const { data: alreadyJoined } = await supabase
+    .from('USERS_TEAMS')
+    .select()
+    .eq('id_user', user.id)
+    .in(
+      'id_team',
+      tournamentData.teams.map((team) => team.id),
+    )
+    .single();
+
+  if (alreadyJoined) {
+    return c.json({ error: 'User already joined a team' }, 400);
   }
 
   const { data, error } = await supabase.from('USERS_TEAMS').insert({ id_team, id_user: user.id }).select().single();
@@ -260,7 +359,89 @@ tournaments.openapi(leaveTeam, async (c) => {
     return c.json({ error: 'Failed to leave team' }, 500);
   }
 
+  const { error: errorTeam } = await supabase.from('TEAMS').update({ validate: false }).eq('id', id_team).single();
+
+  if (errorTeam) {
+    return c.json({ error: 'Failed to leave team' }, 500);
+  }
+
+  const { data: dataUsers } = await supabase.from('USERS_TEAMS').select('*').eq('id_team', id_team);
+
+  if (!dataUsers || dataUsers.length < 1) {
+    await supabase.from('TEAMS').delete().eq('id', id_team);
+  }
+
   return c.json({ message: 'Team left' }, 200);
+});
+
+tournaments.openapi(validateTeam, async (c) => {
+  const { id, id_team } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { data: dataTournament, error: errorTournament } = await supabase
+    .from('TOURNAMENTS')
+    .select('team_capacity, teams:TEAMS (id, validate)')
+    .eq('id', id)
+    .eq('teams.id', id_team)
+    .single();
+
+  if (errorTournament || dataTournament.teams.length === 0) {
+    return c.json({ error: 'Tournament or team not found' }, 404);
+  }
+
+  const { data: dataUsers } = await supabase.from('USERS_TEAMS').select('*').eq('id_team', id_team);
+
+  if (!dataUsers || dataUsers.length < dataTournament.team_capacity) {
+    return c.json({ error: 'Team is not full' }, 400);
+  }
+
+  const { data, error } = await supabase
+    .from('TEAMS')
+    .update({ validate: true })
+    .eq('id', id_team)
+    .eq('id_tournament', id)
+    .select()
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Failed to validate team' }, 500);
+  }
+
+  return c.json({ message: 'Team validated' }, 200);
+});
+
+tournaments.openapi(cancelTeam, async (c) => {
+  const { id, id_team } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { data: dataTournament, error: errorTournament } = await supabase
+    .from('TOURNAMENTS')
+    .select('teams:TEAMS (id, validate)')
+    .eq('id', id)
+    .eq('teams.id', id_team)
+    .single();
+
+  if (errorTournament || dataTournament.teams.length === 0) {
+    return c.json({ error: 'Tournament or team not found' }, 404);
+  }
+
+  const { data, error } = await supabase
+    .from('TEAMS')
+    .update({ validate: false })
+    .eq('id', id_team)
+    .eq('id_tournament', id)
+    .select()
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Failed to cancel team' }, 500);
+  }
+
+  return c.json({ message: 'Team canceled' }, 200);
 });
 
 tournaments.openapi(getRounds, async (c) => {

@@ -11,7 +11,7 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-type Tournament = {
+export type Tournament = {
   id: number;
   created_at: string;
   default_match_length: number | null;
@@ -21,9 +21,16 @@ type Tournament = {
   rules: string | null;
   prize: string | null;
   id_address: number | null;
+  id_sport: number | null;
+  description: string | null;
 };
 
-type Address = {
+export type Sport = {
+  id: number;
+  name: string;
+};
+
+export type Address = {
   id: number;
   road: string;
   number: number;
@@ -31,7 +38,7 @@ type Address = {
   name: string | null;
 };
 
-function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
+function ShowContent({ addresses, sports }: { addresses: Address[]; sports: Sport[] }): JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
   let page = searchParams.get('page') || 1;
@@ -112,7 +119,7 @@ function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TournamentsList tournaments={tournaments} addresses={addresses} />
+              <TournamentsList tournaments={tournaments} addresses={addresses} sports={sports} />
             </TableBody>
           </Table>
         </CardContent>
@@ -128,6 +135,7 @@ function page() {
   const urlApi = process.env.NEXT_PUBLIC_API_URL;
   const router = useRouter();
   const [addresses, setAddresses] = useState<Address[]>([]);
+  const [sports, setSports] = useState<Sport[]>([]);
 
   useEffect(() => {
     fetch(`${urlApi}/addresses`, {
@@ -149,6 +157,26 @@ function page() {
       .catch((error: Error) => {
         console.error(error);
       });
+
+    fetch(`${urlApi}/sports`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((response) => {
+        if (response.status === 403) {
+          router.push('/');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setSports(data.data);
+      })
+      .catch((error: Error) => {
+        console.error(error);
+      });
   }, [router.push, urlApi]);
 
   return (
@@ -157,7 +185,7 @@ function page() {
         <div className="grid flex-1 items-start">
           <Tabs defaultValue="all">
             <Suspense>
-              <ShowContent addresses={addresses} />
+              <ShowContent addresses={addresses} sports={sports} />
             </Suspense>
           </Tabs>
         </div>

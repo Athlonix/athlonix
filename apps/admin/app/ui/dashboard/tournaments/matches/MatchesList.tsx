@@ -1,3 +1,4 @@
+import type { Team } from '@/app/(dashboard)/dashboard/tournaments/matches/page';
 import AddMatch from '@/app/ui/dashboard/tournaments/matches/AddMatch';
 import DeleteMatch from '@/app/ui/dashboard/tournaments/matches/DeleteMatch';
 import DeleteRound from '@/app/ui/dashboard/tournaments/matches/DeleteRound';
@@ -11,11 +12,6 @@ type Round = {
   name: string;
   id_tournament: number;
   order: number;
-};
-
-type Team = {
-  id: number;
-  name: string;
 };
 
 type Match = {
@@ -36,7 +32,7 @@ interface MatchesListProps {
 
 function MatchesList(props: MatchesListProps) {
   return (
-    <div className="py-10 rounded-lg border border-dashed shadow-sm p-4">
+    <div className="py-10 rounded-lg border-2 shadow-sm p-4">
       <div className="w-full">
         <div className="flex justify-between">
           <div className="mb-4 font-bold text-lg">{props.round.name}</div>

@@ -3,6 +3,7 @@ export const navLinks = [
   { name: 'Marketplace', href: '/marketplace' },
   { name: 'Evenements', href: '/blog' },
   { name: 'Activités', href: '/activities' },
+  { name: 'Tournois', href: '/tournaments' },
   { name: 'Sports', href: '/sports' },
   { name: 'Faire un don', href: '/donate' },
   { name: 'A propos', href: '/about' },

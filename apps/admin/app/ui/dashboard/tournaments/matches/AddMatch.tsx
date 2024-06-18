@@ -1,3 +1,4 @@
+import type { Team } from '@/app/(dashboard)/dashboard/tournaments/matches/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import { Button } from '@repo/ui/components/ui/button';
@@ -23,11 +24,6 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-type Team = {
-  id: number;
-  name: string;
-};
 
 interface AddMatchProps {
   idTournament: string;
@@ -259,30 +255,32 @@ function AddMatch(props: AddMatchProps) {
                           <AccordionItem value="role">
                             <AccordionTrigger className="font-bold">Equipes</AccordionTrigger>
                             <AccordionContent>
-                              {props.teams.map((team) => (
-                                <FormField
-                                  key={team.id}
-                                  control={form.control}
-                                  name="id_teams"
-                                  render={({ field }) => {
-                                    return (
-                                      <FormItem key={team.id}>
-                                        <FormControl>
-                                          <Checkbox
-                                            checked={field.value?.includes(team.id)}
-                                            onCheckedChange={(checked) => {
-                                              return checked
-                                                ? field.onChange([...(field.value || []), team.id])
-                                                : field.onChange(field.value?.filter((value) => value !== team.id));
-                                            }}
-                                          />
-                                        </FormControl>
-                                        <FormLabel className="font-normal">{team.name}</FormLabel>
-                                      </FormItem>
-                                    );
-                                  }}
-                                />
-                              ))}
+                              {props.teams
+                                .filter((team) => team.validate)
+                                .map((team) => (
+                                  <FormField
+                                    key={team.id}
+                                    control={form.control}
+                                    name="id_teams"
+                                    render={({ field }) => {
+                                      return (
+                                        <FormItem key={team.id}>
+                                          <FormControl>
+                                            <Checkbox
+                                              checked={field.value?.includes(team.id)}
+                                              onCheckedChange={(checked) => {
+                                                return checked
+                                                  ? field.onChange([...(field.value || []), team.id])
+                                                  : field.onChange(field.value?.filter((value) => value !== team.id));
+                                              }}
+                                            />
+                                          </FormControl>
+                                          <FormLabel className="font-normal">{team.name}</FormLabel>
+                                        </FormItem>
+                                      );
+                                    }}
+                                  />
+                                ))}
                             </AccordionContent>
                           </AccordionItem>
                         </Accordion>

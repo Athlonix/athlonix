@@ -1,3 +1,4 @@
+import type { Address, Sport, Tournament } from '@/app/(dashboard)/dashboard/tournaments/page';
 import EditForm from '@/app/ui/dashboard/tournaments/EditForm';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -21,29 +22,10 @@ import { MoreHorizontal } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
-type Tournament = {
-  id: number;
-  created_at: string;
-  default_match_length: number | null;
-  name: string;
-  max_participants: number;
-  team_capacity: number;
-  rules: string | null;
-  prize: string | null;
-  id_address: number | null;
-};
-
-type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
-
 interface TournamentRowProps {
   tournament: Tournament;
   addresses: Address[];
+  sports: Sport[];
 }
 
 function TournamentRow(props: TournamentRowProps) {
@@ -57,6 +39,8 @@ function TournamentRow(props: TournamentRowProps) {
   const [prize, setPrize] = useState(props.tournament.prize);
   const [idAddress, setIdAddress] = useState(props.tournament.id_address);
   const [defaultMatchLength, setDefaultMatchLength] = useState(props.tournament.default_match_length);
+  const [sport, setSport] = useState(props.tournament.id_sport);
+  const [description, setDescription] = useState(props.tournament.description);
 
   const setter = {
     name: setName,
@@ -66,6 +50,8 @@ function TournamentRow(props: TournamentRowProps) {
     prize: setPrize,
     id_address: setIdAddress,
     default_match_length: setDefaultMatchLength,
+    id_sport: setSport,
+    description: setDescription,
   };
 
   async function deleteTournament() {
@@ -88,6 +74,8 @@ function TournamentRow(props: TournamentRowProps) {
         setRules('');
         setPrize('');
         setIdAddress(null);
+        setSport(null);
+        setDescription('');
       })
       .catch((error: Error) => {
         toast.error('Erreur', { duration: 2000, description: error?.message });
@@ -142,6 +130,7 @@ function TournamentRow(props: TournamentRowProps) {
                             tournament={props.tournament}
                             setter={setter}
                             addresses={props.addresses}
+                            sports={props.sports}
                             closeDialog={() => setOpenEdit(false)}
                           />
                         </DialogDescription>

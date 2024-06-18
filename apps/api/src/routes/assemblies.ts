@@ -161,6 +161,7 @@ export const closeAssembly = createRoute({
   tags: ['assembly'],
 });
 
+// confirm without using a QR code
 export const confirmMemberPresence = createRoute({
   method: 'post',
   path: '/assemblies/{id}/confirm/{id_member}',
@@ -180,6 +181,96 @@ export const confirmMemberPresence = createRoute({
       content: {
         'application/json': {
           schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+    400: badRequestSchema,
+  },
+  tags: ['assembly'],
+});
+
+export const generateAssemblyQrCode = createRoute({
+  method: 'get',
+  path: '/assemblies/{id}/qr',
+  summary: 'Generate assembly QR code',
+  description: 'Generate assembly QR code for members to scan and confirm presence',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'image/svg+xml': {
+          schema: z.string(),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['assembly'],
+});
+
+export const handleAssemblyCheckIn = createRoute({
+  method: 'post',
+  path: '/assemblies/check-in',
+  summary: 'Check in assembly',
+  description: 'Check in assembly using QR code',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({ code: z.string() }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+    400: badRequestSchema,
+  },
+  tags: ['assembly'],
+});
+
+export const isAlreadyConfirmed = createRoute({
+  method: 'post',
+  path: '/assemblies/check-confirm-member',
+  summary: 'Check if member is already confirmed',
+  description: 'Check if member is already confirmed in assembly',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({ code: z.string() }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ confirmed: z.boolean() }),
         },
       },
     },

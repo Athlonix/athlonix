@@ -1,6 +1,15 @@
 'use server';
 import { cookies } from 'next/headers';
 
+export type Folders = {
+  id: number;
+  name: string;
+  parent: number | null;
+  creator: number;
+  isAdmin: boolean;
+  created_at: string;
+};
+
 export type Files = {
   id: number;
   name: string;
@@ -10,6 +19,8 @@ export type Files = {
   updated_at: string;
   created_at: string;
   type: string;
+  assembly: number | null;
+  folder: Folders | null;
 };
 
 export async function saveFile(form: FormData): Promise<void> {
@@ -20,6 +31,7 @@ export async function saveFile(form: FormData): Promise<void> {
   } else {
     form.set('isAdmin', 'false');
   }
+
   const response = await fetch(`${API_URL}/edm/upload`, {
     method: 'POST',
     headers: {
@@ -32,7 +44,12 @@ export async function saveFile(form: FormData): Promise<void> {
   }
 }
 
-export async function getAllFiles(): Promise<{ data: Files[]; count: number }> {
+export async function getAllFiles(): Promise<{
+  files: Files[];
+  countFiles: number;
+  folders: Folders[];
+  countFolders: number;
+}> {
   const API_URL = process.env.ATHLONIX_API_URL;
   const token = cookies().get('access_token')?.value;
   const response = await fetch(`${API_URL}/edm/listFiles?all=true`, {
@@ -43,7 +60,8 @@ export async function getAllFiles(): Promise<{ data: Files[]; count: number }> {
   if (!response.ok) {
     throw new Error('Failed to fetch files');
   }
-  return await response.json();
+  const data = await response.json();
+  return { files: data.files, countFiles: data.filesCount, folders: data.folders, countFolders: data.foldersCount };
 }
 
 export async function deleteFile(id: number, name: string): Promise<void> {
@@ -58,6 +76,7 @@ export async function deleteFile(id: number, name: string): Promise<void> {
     body: JSON.stringify({ id, name }),
   });
   if (!response.ok) {
+    console.log(await response.json());
     throw new Error('Failed to delete file');
   }
 }
@@ -79,5 +98,35 @@ export async function updateFile(form: FormData, id: number): Promise<void> {
   });
   if (!response.ok) {
     throw new Error('Failed to update file');
+  }
+}
+
+export async function addFolder(name: string, parent: number | null, isAdmin: boolean): Promise<void> {
+  const API_URL = process.env.ATHLONIX_API_URL;
+  const token = cookies().get('access_token')?.value;
+  const response = await fetch(`${API_URL}/edm/folder`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ name, parent, isAdmin }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to add folder');
+  }
+}
+
+export async function deleteFolder(id: number): Promise<void> {
+  const API_URL = process.env.ATHLONIX_API_URL;
+  const token = cookies().get('access_token')?.value;
+  const response = await fetch(`${API_URL}/edm/folder/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to delete folder');
   }
 }

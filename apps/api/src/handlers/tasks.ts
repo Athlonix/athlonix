@@ -1,13 +1,55 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { createTask, deleteTask, getAllTasks, getOneTask, updateTask } from '../routes/tasks.js';
+import { createTask, deleteTask, getAllActivityTasks, getAllTasks, getOneTask, updateTask } from '../routes/tasks.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import type { Variables } from '../validators/general.js';
 
 export const tasks = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
+});
+
+tasks.openapi(getAllActivityTasks, async (c) => {
+  const { start_date, end_date, skip, take } = c.req.valid('query');
+  const { id } = c.req.valid('param');
+
+  const activitiesExceptions = supabase
+    .from('ACTIVITIES_EXCEPTIONS')
+    .select('id')
+    .gte('date', start_date)
+    .lte('date', end_date)
+    .eq('id_activity', id)
+    .order('date', { ascending: true });
+
+  const { data: exceptions, error: exceptionsError } = await activitiesExceptions;
+
+  if (exceptionsError) {
+    return c.json({ error: 'Failed to fetch tasks' }, 500);
+  }
+
+  const idExceptions = exceptions.map((e) => e.id);
+
+  const query = supabase
+    .from('ACTIVITIES_TASKS')
+    .select('*, employee:USERS(id, username),occurence:ACTIVITIES_EXCEPTIONS(date)', { count: 'exact' })
+    .in('id_activity_exception', idExceptions);
+
+  const { from, to } = getPagination(skip, take - 1);
+  query.range(from, to);
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
+  const responseData = {
+    data: data || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
 });
 
 tasks.openapi(getAllTasks, async (c) => {

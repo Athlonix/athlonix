@@ -1,3 +1,4 @@
+import type { Team } from '@/app/(dashboard)/dashboard/tournaments/matches/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import { Button } from '@repo/ui/components/ui/button';
@@ -23,12 +24,6 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-type Team = {
-  id: number;
-  name: string;
-  validate: boolean;
-};
 
 interface AddMatchProps {
   idTournament: string;

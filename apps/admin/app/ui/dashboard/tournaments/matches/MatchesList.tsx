@@ -1,3 +1,4 @@
+import type { Team } from '@/app/(dashboard)/dashboard/tournaments/matches/page';
 import AddMatch from '@/app/ui/dashboard/tournaments/matches/AddMatch';
 import DeleteMatch from '@/app/ui/dashboard/tournaments/matches/DeleteMatch';
 import DeleteRound from '@/app/ui/dashboard/tournaments/matches/DeleteRound';
@@ -11,11 +12,6 @@ type Round = {
   name: string;
   id_tournament: number;
   order: number;
-};
-
-type Team = {
-  id: number;
-  name: string;
 };
 
 type Match = {

@@ -1,5 +1,4 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { users } from '../handlers/users.js';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';

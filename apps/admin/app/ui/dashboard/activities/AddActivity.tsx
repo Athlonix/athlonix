@@ -1,5 +1,6 @@
 'use client';
 
+import type { Activity } from '@/app/(dashboard)/dashboard/activities/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import { Button } from '@repo/ui/components/ui/button';
@@ -31,21 +32,6 @@ import type React from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-type Activity = {
-  id: number;
-  name: string;
-  min_participants: number;
-  max_participants: number;
-  id_sport: number | null;
-  id_address: number | null;
-  days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
-  end_date: string;
-  start_date: string;
-  description: string | null;
-  recurrence: 'weekly' | 'monthly' | 'annual';
-  interval: number;
-};
 
 type Sport = {
   id: number;
@@ -95,9 +81,10 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
         .min(1, { message: 'Le champ est requis' }),
       id_sport: z.coerce.number().int().optional(),
       id_address: z.coerce.number().int().optional(),
-      recurrence: z.enum(['weekly', 'monthly', 'annual']),
+      frequency: z.enum(['weekly', 'monthly', 'yearly']),
       days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).optional()),
-      date: z.date(),
+      start_date: z.date(),
+      end_date: z.date(),
       start_time: z.date(),
       end_time: z.date(),
       interval: z.coerce.number({ message: 'Le champ est requis' }).int().min(1, { message: 'Le champ est requis' }),
@@ -107,13 +94,17 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
       message: 'Le nombre minimum de participants doit être inférieur ou égal au nombre maximum de participants',
       path: ['min_participants'],
     })
+    .refine((data) => data.start_date <= data.end_date, {
+      message: 'La date de début ne peut pas être après la date de fin',
+      path: ['start_date'],
+    })
     .refine((data) => data.start_time < data.end_time, {
       message: "L'heure de début ne peut pas être après l'heure de fin",
       path: ['start_time'],
     })
-    .refine((data) => (data.recurrence === 'weekly' ? data.days.length > 0 : true), {
+    .refine((data) => (data.frequency === 'weekly' ? data.days.length > 0 : true), {
       message: 'Vous devez sélectionner au moins un jour pour une récurrence hebdomadaire',
-      path: ['recurrence'],
+      path: ['frequency'],
     });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -125,9 +116,10 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
       max_participants: undefined,
       id_sport: -1,
       id_address: -1,
-      recurrence: undefined,
+      frequency: undefined,
       days: [],
-      date: new Date(),
+      start_date: new Date(),
+      end_date: new Date(),
       start_time: undefined,
       end_time: undefined,
       interval: 1,
@@ -136,15 +128,6 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
 
   async function submit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
-
-    if (values.recurrence === 'weekly') {
-      values.start_time = new Date(values.start_time);
-      values.end_time = new Date(values.end_time);
-    }
-    if (values.recurrence === 'monthly' || values.recurrence === 'annual') {
-      values.start_time = new Date(new Date(values.start_time).setDate(values.date.getDate()));
-      values.end_time = new Date(new Date(values.end_time).setDate(values.date.getDate()));
-    }
 
     fetch(`${urlApi}/activities`, {
       method: 'POST',
@@ -157,18 +140,24 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
         description: values.description,
         min_participants: values.min_participants,
         max_participants: values.max_participants,
-        days: values.days,
-        recurrence: values.recurrence,
+        days_of_week: values.days,
+        frequency: values.frequency,
         interval: values.interval,
-        start_date: values.start_time,
-        end_date: values.end_time,
+        start_date: values.start_date.toISOString().split('T')[0],
+        end_date: values.end_date.toISOString().split('T')[0],
+        start_time: values.start_time.toTimeString().split(' ')[0],
+        end_time: values.end_time.toTimeString().split(' ')[0],
         id_sport: values.id_sport === -1 ? null : values.id_sport ?? null,
         id_address: values.id_address === -1 ? null : values.id_address ?? null,
       }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (response.status === 403) {
           router.push('/');
+        }
+        if (response.status !== 201) {
+          const error = await response.json();
+          throw new Error(error.message);
         }
         return response.json();
       })
@@ -181,7 +170,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
           max_participants: values.max_participants,
           id_sport: values.id_sport === -1 ? null : values.id_sport ?? null,
           id_address: values.id_address === -1 ? null : values.id_address ?? null,
-          days: values.days.filter((day) => day !== undefined) as (
+          days_of_week: values.days.filter((day) => day !== undefined) as (
             | 'monday'
             | 'tuesday'
             | 'wednesday'
@@ -190,18 +179,19 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
             | 'saturday'
             | 'sunday'
           )[],
-          end_date: values.end_time.toISOString(),
-          start_date: values.start_time.toISOString(),
+          end_date: values.end_time?.toISOString().split('T')[0] || '',
+          start_date: values.start_time.toISOString().split('T')[0] || '',
+          end_time: values.end_time.toTimeString().split(' ')[0] || '',
+          start_time: values.start_time.toTimeString().split(' ')[0] || '',
           description: values.description || null,
-          recurrence: values.recurrence,
-          interval: values.interval,
+          frequency: values.frequency,
         };
         if (activities.length < 10) {
           setActivities([...activities, newActivity]);
         }
       })
       .catch((error: Error) => {
-        toast.error('Erreur', { duration: 2000, description: error?.message });
+        toast.error('Erreur', { duration: 20000, description: error?.message });
       });
 
     setOpen(false);
@@ -316,7 +306,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                         name="id_address"
                         render={({ field }) => (
                           <FormItem>
-                            <Label className="font-bold">Activité</Label>
+                            <Label className="font-bold">Adresse</Label>
                             <Select onValueChange={field.onChange} defaultValue="-1">
                               <FormControl>
                                 <SelectTrigger>
@@ -324,7 +314,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
-                                <SelectItem value="-1">Aucun</SelectItem>
+                                <SelectItem value="-1">Aucune</SelectItem>
                                 {addresses.map((address) => (
                                   <SelectItem key={address.id} value={address.id.toString()}>
                                     {address.name}
@@ -340,7 +330,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                     <div className="grid">
                       <FormField
                         control={form.control}
-                        name="recurrence"
+                        name="frequency"
                         render={({ field }) => (
                           <FormItem className="space-y-3">
                             <FormLabel>Fréquence</FormLabel>
@@ -378,10 +368,52 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                     <div className="grid">
                       <FormField
                         control={form.control}
-                        name="date"
+                        name="start_date"
                         render={({ field }) => (
-                          <FormItem id="dateItem" {...(form.watch('recurrence') === 'weekly' ? { hidden: true } : {})}>
-                            <Label className="font-bold">Date</Label>
+                          <FormItem id="dateItem" {...(form.watch('frequency') === 'weekly' ? { hidden: true } : {})}>
+                            <Label className="font-bold">Date de début</Label>
+                            <br />
+                            <Popover>
+                              <FormControl>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className={cn(
+                                      'w-full justify-start text-left font-normal',
+                                      !field.value && 'text-muted-foreground',
+                                    )}
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value ? (
+                                      format(field.value, 'PPP', { locale: fr })
+                                    ) : (
+                                      <span>Choisissez une date</span>
+                                    )}
+                                  </Button>
+                                </PopoverTrigger>
+                              </FormControl>
+                              <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                  locale={fr}
+                                  mode="single"
+                                  selected={field.value ? new Date(field.value) : undefined}
+                                  onSelect={field.onChange}
+                                  initialFocus
+                                />
+                              </PopoverContent>
+                            </Popover>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="end_date"
+                        render={({ field }) => (
+                          <FormItem id="dateItem" {...(form.watch('frequency') === 'weekly' ? { hidden: true } : {})}>
+                            <Label className="font-bold">Date de fin</Label>
                             <br />
                             <Popover>
                               <FormControl>
@@ -504,7 +536,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                         control={form.control}
                         name="days"
                         render={() => (
-                          <FormItem id="daysItem" {...(form.watch('recurrence') !== 'weekly' ? { hidden: true } : {})}>
+                          <FormItem id="daysItem" {...(form.watch('frequency') !== 'weekly' ? { hidden: true } : {})}>
                             <Accordion type="single" collapsible className="w-full">
                               <AccordionItem value="role">
                                 <AccordionTrigger className="font-bold">Jours</AccordionTrigger>
@@ -557,21 +589,6 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                                 </AccordionContent>
                               </AccordionItem>
                             </Accordion>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="grid">
-                      <FormField
-                        control={form.control}
-                        name="interval"
-                        render={({ field }) => (
-                          <FormItem>
-                            <Label className="font-bold">Intervalle</Label>
-                            <FormControl>
-                              <Input {...field} type="number" min={1} />
-                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}

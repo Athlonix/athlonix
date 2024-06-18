@@ -1,3 +1,4 @@
+import type { Activity } from '@/app/(dashboard)/dashboard/activities/page';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import { Button } from '@repo/ui/components/ui/button';
@@ -33,24 +34,8 @@ interface Setter {
   endDate: Dispatch<SetStateAction<string>>;
   startDate: Dispatch<SetStateAction<string>>;
   description: Dispatch<SetStateAction<string | null>>;
-  recurrence: Dispatch<SetStateAction<'weekly' | 'monthly' | 'annual'>>;
-  interval: Dispatch<SetStateAction<number>>;
+  frequency: Dispatch<SetStateAction<'weekly' | 'monthly' | 'yearly'>>;
 }
-
-type Activity = {
-  id: number;
-  name: string;
-  min_participants: number;
-  max_participants: number;
-  id_sport: number | null;
-  id_address: number | null;
-  days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
-  end_date: string;
-  start_date: string;
-  description: string | null;
-  recurrence: 'weekly' | 'monthly' | 'annual';
-  interval: number;
-};
 
 type Sport = {
   id: number;
@@ -99,12 +84,11 @@ function EditForm(props: EditFormProps): JSX.Element {
         .min(1, { message: 'Le champ est requis' }),
       id_sport: z.coerce.number().int().optional(),
       id_address: z.coerce.number().int().optional(),
-      recurrence: z.enum(['weekly', 'monthly', 'annual']),
+      frequency: z.enum(['weekly', 'monthly', 'yearly']),
       days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).optional()),
       date: z.date(),
       start_time: z.date(),
       end_time: z.date(),
-      interval: z.coerce.number({ message: 'Le champ est requis' }).int().min(1, { message: 'Le champ est requis' }),
       description: z.string().optional(),
     })
     .refine((data) => data.min_participants <= data.max_participants, {
@@ -115,9 +99,9 @@ function EditForm(props: EditFormProps): JSX.Element {
       message: "L'heure de début ne peut pas être après l'heure de fin",
       path: ['start_time'],
     })
-    .refine((data) => (data.recurrence === 'weekly' ? data.days.length > 0 : true), {
+    .refine((data) => (data.frequency === 'weekly' ? data.days.length > 0 : true), {
       message: 'Vous devez sélectionner au moins un jour pour une récurrence hebdomadaire',
-      path: ['recurrence'],
+      path: ['frequency'],
     });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -128,12 +112,11 @@ function EditForm(props: EditFormProps): JSX.Element {
       max_participants: props.activity.max_participants,
       id_sport: props.activity.id_sport || -1,
       id_address: props.activity.id_address || -1,
-      recurrence: props.activity.recurrence,
-      days: props.activity.days,
+      frequency: props.activity.frequency,
+      days: props.activity.days_of_week,
       date: new Date(props.activity.start_date),
-      start_time: new Date(props.activity.start_date),
-      end_time: new Date(props.activity.end_date),
-      interval: props.activity.interval,
+      start_time: new Date(`2000-01-01T${props.activity.start_time}`),
+      end_time: new Date(`2000-01-01T${props.activity.end_time}`),
       description: props.activity.description || '',
     },
   });
@@ -154,18 +137,22 @@ function EditForm(props: EditFormProps): JSX.Element {
         description: values.description,
         min_participants: values.min_participants,
         max_participants: values.max_participants,
-        days: values.days,
-        recurrence: values.recurrence,
-        interval: values.interval,
-        start_date: values.start_time,
-        end_date: values.end_time,
+        days_of_week: values.days,
+        frequency: values.frequency,
+        start_date: values.date.toISOString().split('T')[0],
+        end_date: values.date.toISOString().split('T')[0],
+        start_time: values.start_time.toTimeString().split(' ')[0],
+        end_time: values.end_time.toTimeString().split(' ')[0],
         id_sport: values.id_sport === -1 ? null : values.id_sport ?? null,
         id_address: values.id_address === -1 ? null : values.id_address ?? null,
       }),
     })
-      .then((response) => {
+      .then(async (response) => {
         if (response.status === 403) {
           router.push('/');
+        }
+        if (response.status !== 200) {
+          throw new Error((await response.json()).message);
         }
         return response.json();
       })
@@ -188,10 +175,9 @@ function EditForm(props: EditFormProps): JSX.Element {
         | 'sunday'
       )[],
     );
-    props.setter.recurrence(values.recurrence);
-    props.setter.interval(values.interval);
-    props.setter.startDate(values.start_time.toISOString());
-    props.setter.endDate(values.end_time.toISOString());
+    props.setter.frequency(values.frequency);
+    // props.setter.startDate(values.date);
+    // props.setter.endDate(values.end_time);
     props.setter.idSport(values.id_sport === -1 ? null : values.id_sport ?? null);
     props.setter.idAddress(values.id_address === -1 ? null : values.id_address ?? null);
 
@@ -328,7 +314,7 @@ function EditForm(props: EditFormProps): JSX.Element {
             <div className="grid">
               <FormField
                 control={form.control}
-                name="recurrence"
+                name="frequency"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
                     <FormLabel>Fréquence</FormLabel>
@@ -368,7 +354,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 control={form.control}
                 name="date"
                 render={({ field }) => (
-                  <FormItem id="dateItem" {...(form.watch('recurrence') === 'weekly' ? { hidden: true } : {})}>
+                  <FormItem id="dateItem" {...(form.watch('frequency') === 'weekly' ? { hidden: true } : {})}>
                     <Label className="font-bold">Date</Label>
                     <br />
                     <Popover>
@@ -486,7 +472,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 control={form.control}
                 name="days"
                 render={() => (
-                  <FormItem id="daysItem" {...(form.watch('recurrence') !== 'weekly' ? { hidden: true } : {})}>
+                  <FormItem id="daysItem" {...(form.watch('frequency') !== 'weekly' ? { hidden: true } : {})}>
                     <Accordion type="single" collapsible className="w-full">
                       <AccordionItem value="role">
                         <AccordionTrigger className="font-bold">Jours</AccordionTrigger>
@@ -539,21 +525,6 @@ function EditForm(props: EditFormProps): JSX.Element {
                         </AccordionContent>
                       </AccordionItem>
                     </Accordion>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="grid">
-              <FormField
-                control={form.control}
-                name="interval"
-                render={({ field }) => (
-                  <FormItem>
-                    <Label className="font-bold">Intervalle</Label>
-                    <FormControl>
-                      <Input {...field} type="number" />
-                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

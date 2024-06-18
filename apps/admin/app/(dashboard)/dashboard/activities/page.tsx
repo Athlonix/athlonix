@@ -11,19 +11,20 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-type Activity = {
+export type Activity = {
   id: number;
+  name: string;
   min_participants: number;
   max_participants: number;
-  name: string;
   id_sport: number | null;
   id_address: number | null;
-  days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
-  end_date: string;
+  days_of_week: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
   start_date: string;
+  end_date: string;
+  start_time: string;
+  end_time: string;
   description: string | null;
-  recurrence: 'weekly' | 'monthly' | 'annual';
-  interval: number;
+  frequency: 'weekly' | 'monthly' | 'yearly';
 };
 
 type ActivityData = {
@@ -133,7 +134,6 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
                 <TableHead>Adresse</TableHead>
                 <TableHead>Fréquence</TableHead>
                 <TableHead>Dates et heure</TableHead>
-                <TableHead>Intervalle</TableHead>
                 <TableHead>
                   <span className="sr-only">Actions</span>
                 </TableHead>

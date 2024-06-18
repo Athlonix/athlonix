@@ -1,21 +1,7 @@
 'use client';
 
+import type { Activity } from '@/app/(dashboard)/dashboard/activities/page';
 import ActivityRow from '@/app/ui/dashboard/activities/ActivityRow';
-
-type Activity = {
-  id: number;
-  min_participants: number;
-  max_participants: number;
-  name: string;
-  id_sport: number | null;
-  id_address: number | null;
-  days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
-  end_date: string;
-  start_date: string;
-  description: string | null;
-  recurrence: 'weekly' | 'monthly' | 'annual';
-  interval: number;
-};
 
 type Sport = {
   id: number;

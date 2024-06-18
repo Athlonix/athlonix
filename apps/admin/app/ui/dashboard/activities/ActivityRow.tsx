@@ -1,5 +1,6 @@
 'use client';
 
+import type { Activity } from '@/app/(dashboard)/dashboard/activities/page';
 import EditForm from '@/app/ui/dashboard/activities/EditForm';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -36,37 +37,16 @@ type Address = {
   name: string | null;
 };
 
-type Activity = {
-  id: number;
-  min_participants: number;
-  max_participants: number;
-  name: string;
-  id_sport: number | null;
-  id_address: number | null;
-  days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
-  end_date: string;
-  start_date: string;
-  description: string | null;
-  recurrence: 'weekly' | 'monthly' | 'annual';
-  interval: number;
-};
-
 interface ActivityRowProps {
   activity: Activity;
   sports: Sport[];
   addresses: Address[];
 }
 
-const FrenchRecurrence: Record<string, string> = {
+const FrenchFrequency: Record<string, string> = {
   weekly: 'Hebdomadaire',
   monthly: 'Mensuel',
-  annual: 'Annuel',
-};
-
-const FrenchReccurenceNoun: Record<string, string> = {
-  weekly: 'semaine',
-  monthly: 'mois',
-  annual: 'an',
+  yearly: 'Annuel',
 };
 
 const FrenchDays: Record<string, string> = {
@@ -88,12 +68,16 @@ function ActivityRow(props: ActivityRowProps) {
   const [name, setName] = useState(props.activity.name);
   const [idSport, setIdSport] = useState(props.activity.id_sport);
   const [idAddress, setIdAddress] = useState(props.activity.id_address);
-  const [days, setDays] = useState(props.activity.days);
+  const [days, setDays] = useState(props.activity.days_of_week);
   const [endDate, setEndDate] = useState(props.activity.end_date);
   const [startDate, setStartDate] = useState(props.activity.start_date);
+  const [startTime, setStartTime] = useState(props.activity.start_time);
+  const [endTime, setEndTime] = useState(props.activity.end_time);
   const [description, setDescription] = useState(props.activity.description);
-  const [recurrence, setRecurrence] = useState(props.activity.recurrence);
-  const [interval, setInterval] = useState(props.activity.interval);
+  const [frequency, setFrequency] = useState(props.activity.frequency);
+
+  const startDateFormat = new Date(`${startDate}T${startTime}`);
+  const endDateFormat = new Date(`${endDate}T${endTime}`);
 
   const setter = {
     name: setName,
@@ -105,7 +89,7 @@ function ActivityRow(props: ActivityRowProps) {
     endDate: setEndDate,
     startDate: setStartDate,
     description: setDescription,
-    recurrence: setRecurrence,
+    frequency: setFrequency,
     interval: setInterval,
   };
 
@@ -131,7 +115,6 @@ function ActivityRow(props: ActivityRowProps) {
         setEndDate('');
         setStartDate('');
         setDescription('');
-        setInterval(0);
       })
       .catch((error: Error) => {
         toast.error('Erreur', { duration: 2000, description: error?.message });
@@ -174,47 +157,57 @@ function ActivityRow(props: ActivityRowProps) {
               .filter((addressName) => addressName !== null)[0] || ''
           : ''}
       </TableCell>
-      <TableCell>{FrenchRecurrence[recurrence]}</TableCell>
-      {recurrence === 'weekly' && (
+      <TableCell>{FrenchFrequency[frequency]}</TableCell>
+      {frequency === 'weekly' && (
         <TableCell>
           {days.map((day) => FrenchDays[day]).join(', ')} de{' '}
-          {`${new Date(startDate).getHours().toString().padStart(2, '0')}:${new Date(startDate)
+          {`${new Date(`2000-01-01T${startTime}`).getHours().toString().padStart(2, '0')}:${new Date(
+            `2000-01-01T${startTime}`,
+          )
             .getMinutes()
             .toString()
-            .padStart(2, '0')} - ${new Date(endDate).getHours().toString().padStart(2, '0')}:${new Date(endDate)
-            .getMinutes()
-            .toString()
-            .padStart(2, '0')}`}
-        </TableCell>
-      )}
-      {recurrence === 'monthly' && (
-        <TableCell>
-          {`Le ${new Date(startDate).getDate()} de ${new Date(startDate)
-            .getHours()
-            .toString()
-            .padStart(2, '0')}:${new Date(startDate).getMinutes().toString().padStart(2, '0')} - ${new Date(endDate)
-            .getHours()
-            .toString()
-            .padStart(2, '0')}:${new Date(endDate).getMinutes().toString().padStart(2, '0')}`}
-        </TableCell>
-      )}
-      {recurrence === 'annual' && (
-        <TableCell>
-          {`${new Date(startDate).getDate()} ${new Date(startDate).toLocaleString('default', {
-            month: 'long',
-          })} de ${new Date(startDate).getHours().toString().padStart(2, '0')}:${new Date(startDate)
-            .getMinutes()
-            .toString()
-            .padStart(2, '0')} - ${new Date(endDate).getHours().toString().padStart(2, '0')}:${new Date(endDate)
+            .padStart(2, '0')} - ${new Date(`2000-01-01T${endTime}`).getHours().toString().padStart(2, '0')}:${new Date(
+            `2000-01-01T${endTime}`,
+          )
             .getMinutes()
             .toString()
             .padStart(2, '0')}`}
         </TableCell>
       )}
-      <TableCell>
-        {interval} {FrenchReccurenceNoun[recurrence]}
-        {interval > 1 && recurrence !== 'monthly' ? 's' : ''}
-      </TableCell>
+      {frequency === 'monthly' && (
+        <TableCell>
+          {`Du ${startDateFormat.getDate()} de ${startDateFormat
+            .getHours()
+            .toString()
+            .padStart(
+              2,
+              '0',
+            )}:${startDateFormat.getMinutes().toString().padStart(2, '0')} jusqu'au ${endDateFormat.getDate()} à ${endDateFormat
+            .getHours()
+            .toString()
+            .padStart(2, '0')}:${endDateFormat.getMinutes().toString().padStart(2, '0')}`}
+        </TableCell>
+      )}
+      {frequency === 'yearly' && (
+        <TableCell>
+          {`Du ${startDateFormat.getDate()} ${startDateFormat
+            .getMonth()
+            .toString()
+            .padStart(2, '0')} de ${startDateFormat
+            .getHours()
+            .toString()
+            .padStart(
+              2,
+              '0',
+            )}:${startDateFormat.getMinutes().toString().padStart(2, '0')} jusqu'au ${endDateFormat.getDate()} ${endDateFormat
+            .getMonth()
+            .toString()
+            .padStart(2, '0')} ${endDateFormat.getHours().toString().padStart(2, '0')}:${endDateFormat
+            .getMinutes()
+            .toString()
+            .padStart(2, '0')}`}
+        </TableCell>
+      )}
       {name !== 'Supprimé' && (
         <TableCell>
           <DropdownMenu>

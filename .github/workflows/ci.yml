@@ -61,5 +61,12 @@ jobs:
         run: |
           set -x
           supabase link --project-ref ${{ env.SUPABASE_PROJECT_ID }}
+          echo "exit code: $?"
+
+      - if: github.ref == 'refs/heads/main'
+        name: 🚀 Deploy migrations
+        continue-on-error: true
+        run: |
+          set -x
           supabase db push --include-all -p ${{ env.SUPABASE_DB_PASSWORD }}
           echo "exit code: $?"

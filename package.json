@@ -13,7 +13,7 @@
     "pre-commit": "pnpm run lint:check && pnpm run types:check"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.1",
+    "@biomejs/biome": "1.8.2",
     "@repo/biome-config": "workspace:*",
     "@repo/supabase": "workspace:*",
     "@repo/typescript-config": "workspace:*",

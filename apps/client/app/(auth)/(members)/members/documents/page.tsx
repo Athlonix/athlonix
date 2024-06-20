@@ -38,11 +38,11 @@ function fileTypes(input: string) {
 function FolderItem({ name, onClick }: { name: string; onClick: () => void }) {
   return (
     <Card
-      className="m-2 p-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 w-48 h-24 rounded-lg shadow-md border-2 border-gray-200 dark:border-gray-700"
+      className="m-2 p-2 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-800 folder-card w-48 h-24 rounded-lg shadow-md border-2 border-blue-200 dark:border-blue-400"
       onClick={onClick}
     >
       <div className="flex items-center justify-between mb-1">
-        <FolderOpen className="w-8" />
+        <FolderOpen className="w-8 text-blue-400" />
       </div>
       <h2>{name}</h2>
     </Card>
@@ -143,12 +143,15 @@ export default function Documents() {
         <h1 className="text-xl font-bold">Documents d'Athlonix</h1>
       </header>
       <div className="flex items-center space-x-2 p-4">
-        <CircleArrowLeft
-          className="w-8 h-8"
-          onClick={() => {
-            setCurrentPath(currrentPath ? folders?.find((f) => f.id === currrentPath)?.parent || null : null);
-          }}
-        />
+        {currrentPath !== null && (
+          <CircleArrowLeft
+            className="w-8 h-8"
+            cursor={'pointer'}
+            onClick={() => {
+              setCurrentPath(currrentPath ? folders?.find((f) => f.id === currrentPath)?.parent || null : null);
+            }}
+          />
+        )}
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem className="cursor-pointer">

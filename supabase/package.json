@@ -14,6 +14,6 @@
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "supabase": "^1.176.10"
+    "supabase": "^1.178.2"
   }
 }

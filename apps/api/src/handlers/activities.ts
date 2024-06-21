@@ -1,5 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { getOccurences } from '../libs/activities.js';
+import { getOccurencesMonthly, getOccurencesWeekly, getOccurencesYearly } from '../libs/activities.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -13,6 +13,7 @@ import {
   getAllActivitiesExceptions,
   getOneActivity,
   getOneActivityOccurences,
+  getUsersActivity,
   updateActivity,
   validApplication,
 } from '../routes/activities.js';
@@ -67,6 +68,30 @@ activities.openapi(getOneActivity, async (c) => {
   return c.json(data, 200);
 });
 
+activities.openapi(getUsersActivity, async (c) => {
+  const { id } = c.req.valid('param');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { data, error, count } = await supabase
+    .from('ACTIVITIES')
+    .select('*, users:USERS!ACTIVITIES_USERS (id, username)', { count: 'exact' })
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Activity not found' }, 404);
+  }
+
+  const responseData = {
+    data: data.users || [],
+    count: count || 0,
+  };
+
+  return c.json(responseData, 200);
+});
+
 activities.openapi(getOneActivityOccurences, async (c) => {
   const { id: id_activity } = c.req.valid('param');
   let { start_date, end_date } = c.req.valid('query');
@@ -88,7 +113,7 @@ activities.openapi(getOneActivityOccurences, async (c) => {
     return c.json({ error: 'Activity not found' }, 404);
   }
 
-  if (!activityFound.frequency || !activityFound.days_of_week) {
+  if (!activityFound.frequency) {
     return c.json(
       {
         activity: activityFound,
@@ -130,12 +155,29 @@ activities.openapi(getOneActivityOccurences, async (c) => {
     return c.json({ error: 'Error while fetching activity' }, 500);
   }
 
-  const occurences = getOccurences(
-    new Date(start_date),
-    new Date(end_date),
-    activityFound.days_of_week,
-    activitesExceptions,
-  );
+  let occurences: {
+    id_exception: number | null;
+    date: Date;
+    max_participants: number | null;
+    min_participants: number | null;
+  }[] = [];
+
+  if (activityFound.frequency === 'weekly' && activityFound.days_of_week) {
+    occurences = getOccurencesWeekly(
+      new Date(start_date),
+      new Date(end_date),
+      activityFound.days_of_week,
+      activitesExceptions,
+    );
+  }
+
+  if (activityFound.frequency === 'monthly') {
+    occurences = getOccurencesMonthly(new Date(start_date), new Date(end_date), activitesExceptions);
+  }
+
+  if (activityFound.frequency === 'yearly') {
+    occurences = getOccurencesYearly(new Date(start_date), new Date(end_date), activitesExceptions);
+  }
 
   return c.json(
     {

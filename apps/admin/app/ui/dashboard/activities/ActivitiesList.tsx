@@ -1,22 +1,7 @@
 'use client';
 
-import type { Activity } from '@/app/(dashboard)/dashboard/activities/page';
+import type { Activity, Address, Sport } from '@/app/lib/type/Activities';
 import ActivityRow from '@/app/ui/dashboard/activities/ActivityRow';
-
-type Sport = {
-  id: number;
-  name: string;
-  max_participants: number | null;
-  min_participants: number;
-};
-
-type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
 
 interface Props {
   activities: Activity[];

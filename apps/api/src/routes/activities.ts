@@ -58,6 +58,34 @@ export const getOneActivity = createRoute({
   tags: ['activity'],
 });
 
+export const getUsersActivity = createRoute({
+  method: 'get',
+  path: '/activities/{id}/users',
+  summary: 'Get all users of an activity',
+  description: 'Get all users of an activity',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: z.object({ id: z.coerce.number().min(1) }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            data: z.array(z.object({ id: z.number(), username: z.string() })),
+            count: z.number(),
+          }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['activity'],
+});
+
 export const getOneActivityOccurences = createRoute({
   method: 'get',
   path: '/activities/{id}/occurences',

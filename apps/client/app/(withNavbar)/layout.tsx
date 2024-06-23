@@ -1,7 +1,6 @@
 import '@repo/ui/globals.css';
 import type { Metadata } from 'next';
 import { navLinks } from '../lib/navlinks';
-import Footer from '../ui/Footer';
 import { NavBar } from '../ui/NavBar';
 
 export const metadata: Metadata = {

@@ -47,7 +47,7 @@ export default function Footer() {
             <Link href="#" className="text-gray-600 hover:text-gray-900" prefetch={false}>
               Données personnelles
             </Link>
-            <Link href="#" className="text-gray-600 hover:text-gray-900" prefetch={false}>
+            <Link href="/usage" className="text-gray-600 hover:text-gray-900" prefetch={false}>
               Conditions d'utilisation
             </Link>
             <Link href="#" className="text-gray-600 hover:text-gray-900" prefetch={false}>

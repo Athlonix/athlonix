@@ -4,6 +4,7 @@ import '@repo/ui/globals.css';
 import { cn } from '@repo/ui/lib/utils';
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
+import Footer from './ui/Footer';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -22,11 +23,10 @@ export default function RootLayout({
 }): JSX.Element {
   return (
     <html lang="fr">
-      <body
-        className={cn('min-h-screen bg-background font-sans antialiased flex flex-col items-center', fontSans.variable)}
-      >
+      <body className={cn('min-h-screen bg-background font-sans antialiased flex flex-col', fontSans.variable)}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          {children}
+          <div className="flex-grow flex flex-col items-center">{children}</div>
+          <Footer />
         </ThemeProvider>
         <Toaster richColors closeButton visibleToasts={1} />
       </body>

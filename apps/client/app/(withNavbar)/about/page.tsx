@@ -92,7 +92,7 @@ export default function AboutUs() {
           </div>
         </div>
       </section>
-      <section>
+      <section id="faq">
         <FAQ />
       </section>
     </div>

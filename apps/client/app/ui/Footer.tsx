@@ -21,39 +21,65 @@ export default function Footer() {
               <FacebookIcon className="text-blue-600 w-8 h-8" />
               <TwitterIcon className="text-blue-400 w-8 h-8" />
               <InstagramIcon className="text-pink-600 w-8 h-8" />
-              <GithubIcon className="text-gray-600 w-8 h-8" />
+              <Link href="https://github.com/Athlonix/athlonix" prefetch={false}>
+                <GithubIcon className="text-gray-600 w-8 h-8 hover:text-gray-900" />
+              </Link>
             </div>
           </div>
           <div className="space-y-4">
             <h5 className="text-xl font-semibold">Catégories</h5>
             <ul className="space-y-2 text-lg">
-              <li>Sports</li>
-              <li>Entraînements et cours</li>
-              <li>Evénements</li>
-              <li>Tournois</li>
-              <li>Actualités</li>
+              <li className="hover:underline">
+                <Link href="/sports" prefetch={false}>
+                  Sports
+                </Link>
+              </li>
+              <li className="hover:underline">
+                <Link href="#" prefetch={false}>
+                  Cours
+                </Link>
+              </li>
+              <li className="hover:underline">
+                <Link href="#" prefetch={false}>
+                  Evénements
+                </Link>
+              </li>
+              <li className="hover:underline">
+                <Link href="/tournaments" prefetch={false}>
+                  Tournois
+                </Link>
+              </li>
+              <li className="hover:underline">
+                <Link href="/blog" prefetch={false}>
+                  Actualités
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="space-y-4">
             <h5 className="text-xl font-semibold">Support</h5>
             <ul className="space-y-2 text-lg">
-              <li>FAQ</li>
+              <li className="hover:underline">
+                <Link href="/about#faq" prefetch={false}>
+                  FAQ
+                </Link>
+              </li>
               <li>Contactez le support</li>
             </ul>
           </div>
         </div>
         <div className="mt-12 border-t pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex flex-wrap justify-center md:justify-start gap-4">
-            <Link href="#" className="text-gray-600 hover:text-gray-900" prefetch={false}>
+            <Link href="/usage" className="text-gray-600 hover:text-gray-900 hover:underline" prefetch={false}>
               Données personnelles
             </Link>
-            <Link href="/usage" className="text-gray-600 hover:text-gray-900" prefetch={false}>
+            <Link href="/usage" className="text-gray-600 hover:text-gray-900 hover:underline" prefetch={false}>
               Conditions d'utilisation
             </Link>
-            <Link href="#" className="text-gray-600 hover:text-gray-900" prefetch={false}>
+            <Link href="/usage" className="text-gray-600 hover:text-gray-900 hover:underline" prefetch={false}>
               Mentions légales
             </Link>
-            <Link href="/about" className="text-gray-600 hover:text-gray-900" prefetch={false}>
+            <Link href="/about" className="text-gray-600 hover:text-gray-900 hover:underline" prefetch={false}>
               A propos de nous
             </Link>
           </div>

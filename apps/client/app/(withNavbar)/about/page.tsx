@@ -1,3 +1,5 @@
+import FAQ from '@/app/ui/components/Faq';
+
 export default function AboutUs() {
   return (
     <div className="min-h-[100dvh] flex flex-col">
@@ -89,6 +91,9 @@ export default function AboutUs() {
             </div>
           </div>
         </div>
+      </section>
+      <section id="faq">
+        <FAQ />
       </section>
     </div>
   );

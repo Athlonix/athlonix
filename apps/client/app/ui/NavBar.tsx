@@ -69,43 +69,46 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
   });
 
   return (
-    <nav className="flex items-center justify-center mb-8">
-      <div className="absolute top-2 left-0 mt-4 ml-4">
-        <Link href="/" className="flex items-center">
-          <Image src="/favicon.ico" alt="Accueil" width="32" height="32" />
-          <h2 className="ml-2 font-bold">Athlonix</h2>
-        </Link>
-      </div>
-      <div className="w-full flex items-center justify-between">
-        <ul className="flex gap-4 mr-2">{navBarElements}</ul>
-        {!isAuthenticated ? (
-          <div className="flex items-center gap-2">
-            <Button asChild className="w-[120px]">
-              <Link href="signup">Devenir membre</Link>
-            </Button>
-            <Button asChild className="w-[120px]">
-              <Link href="login">Se connecter</Link>
-            </Button>
-            <ModeToggle />
-          </div>
-        ) : (
-          <div className="flex items-center gap-6">
-            <Link href="/account">
-              <Avatar>
-                <AvatarFallback className="bg-slate-400">{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-            </Link>
-            {user !== undefined && subscription && (
-              <Button className="w-[120px]" asChild>
-                <Link href="/members">Espace membre</Link>
+    <nav className="w-full px-4 py-4 mb-8 relative">
+      <div className="max-w-7xl mx-auto flex items-center">
+        <div className="absolute left-0">
+          <Link href="/" className="flex items-center">
+            <Image src="/favicon.ico" alt="Accueil" width="32" height="32" />
+            <h2 className="ml-2 font-bold">Athlonix</h2>
+          </Link>
+        </div>
+        <div className="flex-1 flex justify-center">
+          <ul className="flex gap-4 ml-40 mr-4">{navBarElements}</ul>
+        </div>
+        <div className="flex items-center gap-4">
+          {!isAuthenticated ? (
+            <>
+              <Button asChild variant="ghost">
+                <Link href="signup">Devenir membre</Link>
               </Button>
-            )}
-            <Link href={''} onClick={() => LogoutUser()}>
-              <LogOut color="#bf0808" size={24} />
-            </Link>
-            <ModeToggle />
-          </div>
-        )}
+              <Button asChild variant="ghost">
+                <Link href="login">Se connecter</Link>
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link href="/account">
+                <Avatar>
+                  <AvatarFallback className="bg-slate-400">{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+              </Link>
+              {user !== undefined && subscription && (
+                <Button className="bg-[#1e293b] text-white" asChild>
+                  <Link href="/members">Espace membre</Link>
+                </Button>
+              )}
+              <Button variant="ghost" onClick={() => LogoutUser()} className="hover:bg-slate-400 p-2">
+                <LogOut color="#bf0808" size={24} />
+              </Button>
+            </>
+          )}
+          <ModeToggle />
+        </div>
       </div>
     </nav>
   );

@@ -1,13 +1,8 @@
 import '@repo/ui/globals.css';
 import type { Metadata } from 'next';
-import { Inter as FontSans } from 'next/font/google';
 import { navLinks } from '../lib/navlinks';
+import Footer from '../ui/Footer';
 import { NavBar } from '../ui/NavBar';
-
-const fontSans = FontSans({
-  subsets: ['latin'],
-  variable: '--font-sans',
-});
 
 export const metadata: Metadata = {
   title: 'Athlonix',

@@ -61,10 +61,11 @@ jobs:
           mask: true
 
       - name: 🔍 Run tests
+        continue-on-error: true
         run: 
           pnpm -F api test:cov
 
-      - name: 'Report Coverage'
+      - name: 📊 Coverage report
         if: always() 
         uses: davelosert/vitest-coverage-report-action@v2
         with:

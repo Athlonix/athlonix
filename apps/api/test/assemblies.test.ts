@@ -108,6 +108,31 @@ describe('Activities tests', () => {
     expect(assembly.lawsuit).toBe('assembly_test_updated');
   });
 
+  test('Generate assembly QRcode', async () => {
+    const res = await app.request(`${path}/assemblies/${id_assembly}/qr`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Close assembly', async () => {
+    const res = await app.request(`${path}/assemblies/${id_assembly}/close`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        lawsuit:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+      }),
+    });
+    expect(res.status).toBe(200);
+  });
+
   afterAll(async () => {
     await deleteAdmin(id_admin, id_auth);
   });

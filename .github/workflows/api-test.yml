@@ -62,7 +62,7 @@ jobs:
 
       - name: 🔍 Run tests
         run: 
-          pnpm -F api test
+          pnpm -F api test:cov
 
       - name: 'Report Coverage'
         if: always() 

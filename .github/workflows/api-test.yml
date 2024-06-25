@@ -17,7 +17,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
 
 env:
   FORCE_COLOR: 1
@@ -62,7 +62,14 @@ jobs:
 
       - name: 🔍 Run tests
         run: 
-          pnpm -F api test
+          pnpm -F api test:cov
+
+      - name: 'Report Coverage'
+        if: always() 
+        uses: davelosert/vitest-coverage-report-action@v2
+        with:
+          working-directory: ./apps/api
+          name: 'API Coverage'
 
       - name: 🧹 Stop supabase
         run: supabase stop --no-backup

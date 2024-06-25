@@ -63,6 +63,14 @@ describe('User tests', () => {
     id_auth = user.id_auth;
   });
 
+  test('GET All users /users', async () => {
+    const res = await app.request(`${path}/users`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('GET user /users/{id}', async () => {
     const res = await app.request(`${path}/users/${id_user}`, {
       method: 'GET',
@@ -101,17 +109,52 @@ describe('User tests', () => {
     expect(res.status).toBe(201);
   });
 
-  test('Remove role from user', async () => {
-    const res = await app.request(`${path}/users/${id_user}/roles`, {
-      method: 'DELETE',
+  test('GET user by role /users?role={role}', async () => {
+    const res = await app.request(`${path}/users?role=MODERATOR`, {
+      method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
-      body: JSON.stringify({ id_role: Role.MODERATOR }),
     });
     expect(res.status).toBe(200);
   });
 
-  test('DELETE user /users/{id}', async () => {
-    const res = await app.request(`${path}/users/${id_user}`, {
+  test('Update user role /users/{id}/roles', async () => {
+    const res = await app.request(`${path}/users/${id_user}/roles`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ roles: [Role.ADMIN] }),
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Remove role from user', async () => {
+    const res = await app.request(`${path}/users/${id_user}/roles`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ id_role: Role.ADMIN }),
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Apply for user subscription /users/{id}/status', async () => {
+    const res = await app.request(`${path}/users/${id_user}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ status: 'applied' }),
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Valid user subscription /users/{id}/status', async () => {
+    const res = await app.request(`${path}/users/${id_user}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ status: 'approved' }),
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Soft delete user /users/{id}', async () => {
+    const res = await app.request(`${path}/users/${id_user}/soft`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     });

@@ -7,6 +7,7 @@ const path = `http://localhost:${port}`;
 describe('Auth tests', () => {
   let id_user: number;
   let id_auth: string;
+  let jwt: string;
 
   beforeAll(async () => {
     const res = await app.request(`${path}/auth/signup`, {
@@ -37,6 +38,8 @@ describe('Auth tests', () => {
       }),
     });
     expect(res.status).toBe(200);
+    const user: { token: string } = await res.json();
+    jwt = user.token;
   });
 
   test('POST /auth/login with wrong password', async () => {
@@ -49,6 +52,22 @@ describe('Auth tests', () => {
       }),
     });
     expect(res.status).toBe(401);
+  });
+
+  test('Get /users/me', async () => {
+    const res = await app.request(`${path}/users/me`, {
+      headers: { Authorization: `Bearer ${jwt}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ first_name: 'auth_test' });
+  });
+
+  test('Logout /auth/logout', async () => {
+    const res = await app.request(`${path}/auth/logout`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${jwt}` },
+    });
+    expect(res.status).toBe(200);
   });
 
   afterAll(async () => {

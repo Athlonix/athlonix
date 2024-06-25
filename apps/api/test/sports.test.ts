@@ -75,6 +75,17 @@ describe('Sports tests', () => {
     expect(res.status).toBe(200);
   });
 
+  test('Get sport by id', async () => {
+    const res = await app.request(`${path}/sports/${id_sport}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('Update sport', async () => {
     const res = await app.request(`${path}/sports/${id_sport}`, {
       method: 'PATCH',

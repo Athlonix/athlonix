@@ -45,7 +45,7 @@ jobs:
       - name: 🛠️ Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: 1.172.2
+          version: latest
 
       - name: 🚀 Start Supabase
         run: |

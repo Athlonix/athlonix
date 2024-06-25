@@ -1,3 +1,4 @@
+import app from '../src/index.js';
 import { checkBanned, checkRole } from '../src/utils/context.js';
 import { getPagination } from '../src/utils/pagnination.js';
 
@@ -6,7 +7,7 @@ const path = `http://localhost:${port}`;
 
 describe('Other general tests', () => {
   test('Check health endpoint', async () => {
-    const response = await fetch(`${path}/health`);
+    const response = await app.request(`${path}/health`);
     expect(response.status).toBe(200);
   });
 

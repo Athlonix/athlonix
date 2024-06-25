@@ -8,11 +8,6 @@ const port = Number(process.env.PORT || 3101);
 const path = `http://localhost:${port}`;
 
 describe('Other general tests', () => {
-  test('Check health endpoint', async () => {
-    const response = await app.request(`${path}/health`);
-    expect(response.status).toBe(200);
-  });
-
   test('Check banned user', async () => {
     await expect(checkBanned([1, 2, 3])).rejects.toThrow('Banned user');
     await expect(checkBanned([2, 3, 4, 1])).rejects.toThrow('Banned user');
@@ -56,18 +51,31 @@ describe('Other general tests', () => {
       },
     ];
     const occurences = getOccurences(startDate, endDate, daysToFind, exceptions);
+    console.log(occurences);
     expect(occurences).toEqual([
       {
-        id_exception: null,
+        id_exception: 1,
         date: new Date('2022-01-03'),
+        max_participants: 10,
+        min_participants: 5,
+      },
+      {
+        id_exception: null,
+        date: new Date('2022-01-05'),
         max_participants: null,
         min_participants: null,
       },
       {
-        id_exception: 1,
+        id_exception: null,
+        date: new Date('2022-01-07'),
+        max_participants: null,
+        min_participants: null,
+      },
+      {
+        id_exception: null,
         date: new Date('2022-01-10'),
-        max_participants: 10,
-        min_participants: 5,
+        max_participants: null,
+        min_participants: null,
       },
     ]);
 

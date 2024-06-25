@@ -9,7 +9,7 @@ export const activitySchema = z.object({
   days_of_week: z
     .array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']))
     .nullable(),
-  frequency: z.enum(['weekly', 'monthly', 'yearly', 'daily']).nullable(),
+  frequency: z.enum(['weekly', 'monthly', 'yearly', 'daily']),
   start_date: z.string().date().nullable(),
   end_date: z.string().date().nullable(),
   start_time: z.string().time().nullable(),

@@ -34,7 +34,7 @@ export type Database = {
           description: string | null;
           end_date: string | null;
           end_time: string | null;
-          frequency: Database['public']['Enums']['frequency'] | null;
+          frequency: Database['public']['Enums']['frequency'];
           id: number;
           id_address: number | null;
           id_sport: number | null;
@@ -49,7 +49,7 @@ export type Database = {
           description?: string | null;
           end_date?: string | null;
           end_time?: string | null;
-          frequency?: Database['public']['Enums']['frequency'] | null;
+          frequency: Database['public']['Enums']['frequency'];
           id?: number;
           id_address?: number | null;
           id_sport?: number | null;
@@ -64,7 +64,7 @@ export type Database = {
           description?: string | null;
           end_date?: string | null;
           end_time?: string | null;
-          frequency?: Database['public']['Enums']['frequency'] | null;
+          frequency?: Database['public']['Enums']['frequency'];
           id?: number;
           id_address?: number | null;
           id_sport?: number | null;
@@ -215,18 +215,21 @@ export type Database = {
         Row: {
           active: boolean;
           created_at: string;
+          date: string;
           id_activity: number;
           id_user: number;
         };
         Insert: {
           active?: boolean;
           created_at?: string;
+          date: string;
           id_activity: number;
           id_user: number;
         };
         Update: {
           active?: boolean;
           created_at?: string;
+          date?: string;
           id_activity?: number;
           id_user?: number;
         };

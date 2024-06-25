@@ -179,8 +179,7 @@ function ActivityRow(props: ActivityRowProps) {
       )}
       {frequency === 'yearly' && (
         <TableCell>
-          {`Du ${startDateFormat.getDate()} ${startDateFormat
-            .getMonth()
+          {`Du ${startDateFormat.getDate()} ${(startDateFormat.getMonth() + 1)
             .toString()
             .padStart(2, '0')} de ${startDateFormat
             .getHours()
@@ -188,8 +187,9 @@ function ActivityRow(props: ActivityRowProps) {
             .padStart(
               2,
               '0',
-            )}:${startDateFormat.getMinutes().toString().padStart(2, '0')} jusqu'au ${endDateFormat.getDate()} ${endDateFormat
-            .getMonth()
+            )}:${startDateFormat.getMinutes().toString().padStart(2, '0')} jusqu'au ${endDateFormat.getDate()} ${(
+            endDateFormat.getMonth() + 1
+          )
             .toString()
             .padStart(2, '0')} ${endDateFormat.getHours().toString().padStart(2, '0')}:${endDateFormat
             .getMinutes()

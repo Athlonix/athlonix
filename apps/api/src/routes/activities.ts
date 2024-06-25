@@ -66,7 +66,12 @@ export const getUsersActivity = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    params: z.object({ id: z.coerce.number().min(1) }),
+    params: z.object({
+      id: z.coerce.number().min(1),
+    }),
+    query: z.object({
+      date: z.string().date(),
+    }),
   },
   responses: {
     200: {
@@ -74,7 +79,7 @@ export const getUsersActivity = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            data: z.array(z.object({ id: z.number(), username: z.string() })),
+            data: z.array(z.object({ id: z.number(), username: z.string(), active: z.boolean() })),
             count: z.number(),
           }),
         },
@@ -208,7 +213,10 @@ export const applyToActivity = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    params: idParamValidator,
+    params: z.object({
+      ...idParamValidator.shape,
+      date: z.string().date(),
+    }),
   },
   responses: {
     201: {

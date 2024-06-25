@@ -147,12 +147,12 @@ VALUES ('2022-01-01 08:00:00', 'P0', 'Task 1', 'Task 1 Title', 'completed', 1, 1
        ('2022-01-04 11:00:00', 'P0', 'Task 4', 'Task 4 Title', 'in progress', 4, 4, 4),
        ('2022-01-05 12:00:00', 'P2', 'Task 5', 'Task 5 Title', 'not started', 5, 5, 5);
 
-INSERT INTO public."ACTIVITIES_USERS" (id_activity, created_at, id_user, active)
-VALUES (1, '2022-01-01 08:00:00', 1, true),
-       (2, '2022-01-02 09:00:00', 2, true),
-       (3, '2022-01-03 10:00:00', 3, true),
-       (4, '2022-01-04 11:00:00', 4, true),
-       (5, '2022-01-05 12:00:00', 5, true);
+INSERT INTO public."ACTIVITIES_USERS" (id_activity, created_at, id_user, active, date)
+VALUES (1, '2022-01-01 08:00:00', 1, true, '2022-12-31'),
+       (2, '2022-01-02 09:00:00', 2, true, '2022-12-30'),
+       (3, '2022-01-03 10:00:00', 3, true, '2022-12-29'),
+       (4, '2022-01-04 11:00:00', 4, true, '2022-12-28'),
+       (5, '2022-01-05 12:00:00', 5, true, '2022-12-27');
 
 INSERT INTO public."ACTIVITY_TEAMS" (id_activity, id_user)
 VALUES (1, 1),

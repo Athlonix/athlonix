@@ -90,8 +90,22 @@ export async function getAddresses(): Promise<{ data: { data: Address[]; count: 
   return { data: await res.json(), status: res.status };
 }
 
-export async function getActivityUsers(id: number): Promise<{ data: { data: User[]; count: number }; status: number }> {
-  const res = await fetch(`${urlApi}/activities/${id}/users`, {
+export async function getActivityUsers(
+  id: number,
+  date: string,
+): Promise<{ data: { data: User[]; count: number }; status: number }> {
+  const formattedDate = date.split('T')[0];
+  console.log('date', formattedDate);
+
+  if (!formattedDate) {
+    return { data: { data: [], count: 0 }, status: 400 };
+  }
+
+  const queryParams = new URLSearchParams({
+    date: formattedDate,
+  });
+
+  const res = await fetch(`${urlApi}/activities/${id}/users?${queryParams}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

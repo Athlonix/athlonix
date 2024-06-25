@@ -16,7 +16,7 @@ export type Activity = {
 
 export type Occurence = {
   id_activity: number;
-  date: Date;
+  date: string;
   max_participants: number | null;
   min_participants: number | null;
 };
@@ -44,4 +44,5 @@ export type Address = {
 export type User = {
   id: number;
   username: string;
+  active: boolean;
 };

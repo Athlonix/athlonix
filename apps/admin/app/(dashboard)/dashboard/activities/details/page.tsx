@@ -35,7 +35,9 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
   }
 
   const [activity, setActivities] = useState<ActivityWithOccurences>();
-  const [users, setUsers] = useState<User[]>([]);
+  const [usersSet1, setUsersSet1] = useState<User[]>([]);
+  const [usersSet2, setUsersSet2] = useState<User[]>([]);
+  const [usersSet3, setUsersSet3] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,14 +51,40 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
         toast.error('Une erreur est survenue lors de la récupération des activités', { duration: 2000 });
       }
 
-      const { data: usersData, status: usersStatus } = await getActivityUsers(idActivity);
+      if (data.occurences[0]) {
+        const { data: usersData, status: usersStatus } = await getActivityUsers(idActivity, data.occurences[0].date);
 
-      if (usersStatus === 200) {
-        setUsers(usersData.data);
-      } else if (usersStatus === 403) {
-        router.push('/');
-      } else {
-        toast.error('Une erreur est survenue lors de la récupération des utilisateurs', { duration: 2000 });
+        if (usersStatus === 200) {
+          setUsersSet1(usersData.data);
+        } else if (usersStatus === 403) {
+          router.push('/');
+        } else {
+          toast.error('Une erreur est survenue lors de la récupération des utilisateurs', { duration: 2000 });
+        }
+      }
+
+      if (data.occurences[1]) {
+        const { data: usersData, status: usersStatus } = await getActivityUsers(idActivity, data.occurences[1].date);
+
+        if (usersStatus === 200) {
+          setUsersSet2(usersData.data);
+        } else if (usersStatus === 403) {
+          router.push('/');
+        } else {
+          toast.error('Une erreur est survenue lors de la récupération des utilisateurs', { duration: 2000 });
+        }
+      }
+
+      if (data.occurences[2]) {
+        const { data: usersData, status: usersStatus } = await getActivityUsers(idActivity, data.occurences[2].date);
+
+        if (usersStatus === 200) {
+          setUsersSet3(usersData.data);
+        } else if (usersStatus === 403) {
+          router.push('/');
+        } else {
+          toast.error('Une erreur est survenue lors de la récupération des utilisateurs', { duration: 2000 });
+        }
       }
     };
     fetchData();
@@ -130,18 +158,14 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
         </div>
       </div>
       <Separator className="my-4" />
-      <div className="flex justify-center text-2xl w-full">
-        Participants de la prochaine session ({users.length}/{activity?.activity.max_participants})
-      </div>
-      <div className="grid grid-cols-4 gap-4">
-        {users.map((user) => (
-          <div key={user.id} className="flex items-center justify-center gap-4 border-e-2">
-            <div>{user.username}</div>
-          </div>
-        ))}
-      </div>
       {activity?.activity && activity?.occurences && (
-        <Occurences activity={activity.activity} occurences={activity.occurences} />
+        <Occurences
+          activity={activity.activity}
+          occurences={activity.occurences}
+          users1={usersSet1}
+          users2={usersSet2}
+          users3={usersSet3}
+        />
       )}
     </div>
   );

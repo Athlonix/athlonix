@@ -70,23 +70,37 @@ activities.openapi(getOneActivity, async (c) => {
 
 activities.openapi(getUsersActivity, async (c) => {
   const { id } = c.req.valid('param');
+  const { date } = c.req.valid('query');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error, count } = await supabase
+  const { data, error } = await supabase
     .from('ACTIVITIES')
-    .select('*, users:USERS!ACTIVITIES_USERS (id, username)', { count: 'exact' })
+    .select('*, users:USERS!ACTIVITIES_USERS (id, username), users_activities:ACTIVITIES_USERS(id_user, date, active)')
     .eq('id', id)
     .single();
 
   if (error || !data) {
     return c.json({ error: 'Activity not found' }, 404);
   }
+  const users = data.users
+    .filter(() => {
+      return data.users_activities.find((activity) => activity.date === date);
+    })
+    .map((user) => {
+      const active = data.users_activities.find((a) => a.id_user === user.id);
+
+      return {
+        id: user.id,
+        username: user.username,
+        active: active?.active || false,
+      };
+    });
 
   const responseData = {
-    data: data.users || [],
-    count: count || 0,
+    data: users || [],
+    count: users.length,
   };
 
   return c.json(responseData, 200);
@@ -209,13 +223,13 @@ activities.openapi(createActivity, async (c) => {
 
   await checkRole(roles, false);
 
-  const uniqueEventInvalid: boolean = !frequency && (!start_date || !end_date || !start_time || !end_time);
+  const uniqueEventInvalid: boolean = !start_date || !end_date || !start_time || !end_time;
 
   if (uniqueEventInvalid) {
     return c.json({ error: 'You must provide date and time to create a unique event' }, 400);
   }
 
-  if (frequency && frequency === 'daily' && (!days_of_week || !start_time || !end_time)) {
+  if (frequency === 'daily' && (!days_of_week || !start_time || !end_time)) {
     return c.json({ error: 'You must provide days of week for weekly frequency' }, 400);
   }
 
@@ -308,6 +322,7 @@ activities.openapi(deleteActivity, async (c) => {
 
 activities.openapi(applyToActivity, async (c) => {
   const user = c.get('user');
+  const { date } = c.req.valid('param');
   await checkRole(user.roles, true);
 
   const { id } = c.req.valid('param');
@@ -328,13 +343,16 @@ activities.openapi(applyToActivity, async (c) => {
 
   const { count: participants } = await supabase
     .from('ACTIVITIES_USERS')
-    .select('count(*)', { count: 'exact' })
+    .select('date', { count: 'exact' })
     .eq('id_activity', id)
+    .eq('date', date)
     .eq('active', true);
 
   if (participants && participants >= activity.max_participants) return c.json({ error: 'Activity is full' }, 400);
 
-  const { error: errorApply } = await supabase.from('ACTIVITIES_USERS').insert({ id_activity: id, id_user: user.id });
+  const { error: errorApply } = await supabase
+    .from('ACTIVITIES_USERS')
+    .insert({ id_activity: id, id_user: user.id, date: date });
 
   if (errorApply) return c.json({ error: 'Failed to apply to activity' }, 400);
 

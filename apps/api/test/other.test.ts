@@ -35,10 +35,11 @@ describe('Other general tests', () => {
   test('Check accountRolesValidity', () => {
     expect(accountRolesValidity(null, [])).toEqual([]);
     expect(accountRolesValidity('2022-01-01', [])).toEqual([]);
-    expect(accountRolesValidity('2022-01-01', [{ id_role: 1 }])).toEqual([1]);
+    expect(accountRolesValidity('2022-01-01', [{ id_role: 2 }])).toEqual([]);
     const valid_date = new Date();
     valid_date.setFullYear(valid_date.getFullYear() + 1);
     expect(accountRolesValidity(valid_date.toISOString(), [{ id_role: 2 }])).toEqual([2]);
+    expect(accountRolesValidity(valid_date.toISOString(), [{ id_role: 2 }, { id_role: 3 }])).toEqual([2, 3]);
   });
 
   test('Check getOccurences', () => {

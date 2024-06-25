@@ -38,7 +38,7 @@ so it has no roles but we don't remove user roles from the database.
 
 if date is not null and it's greater than the current date it means that the user subscription is still valid.
 */
-function accountRolesValidity(date: null | string, roles: { id_role: number }[]): number[] {
+export function accountRolesValidity(date: null | string, roles: { id_role: number }[]): number[] {
   if (date === null) return [];
 
   if (date !== null && new Date(date) < new Date()) return [];

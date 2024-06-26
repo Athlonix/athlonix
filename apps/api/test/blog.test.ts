@@ -1,10 +1,6 @@
 import app from '../src/index.js';
-
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
-
-const port = Number(process.env.PORT || 3101);
-const path = `http://localhost:${port}`;
 
 describe('Blog tests', () => {
   let id_user: number;
@@ -14,7 +10,7 @@ describe('Blog tests', () => {
   let id_comment: number;
 
   beforeAll(async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -33,7 +29,7 @@ describe('Blog tests', () => {
     await insertRole(id_user, Role.MEMBER);
     await setValidSubscription(id_user);
 
-    const loginRes = await app.request(`${path}/auth/login`, {
+    const loginRes = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -47,7 +43,7 @@ describe('Blog tests', () => {
   });
 
   test('Create post', async () => {
-    const res = await app.request(`${path}/blog/posts`, {
+    const res = await app.request('/blog/posts', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -66,7 +62,7 @@ describe('Blog tests', () => {
   });
 
   test('Get post', async () => {
-    const res = await app.request(`${path}/blog/posts/${id_post}`, {
+    const res = await app.request(`/blog/posts/${id_post}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -78,7 +74,7 @@ describe('Blog tests', () => {
   });
 
   test('Update post', async () => {
-    const res = await app.request(`${path}/blog/posts/${id_post}`, {
+    const res = await app.request(`/blog/posts/${id_post}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -93,7 +89,7 @@ describe('Blog tests', () => {
   });
 
   test('Comment the post', async () => {
-    const res = await app.request(`${path}/blog/posts/${id_post}/comments`, {
+    const res = await app.request(`/blog/posts/${id_post}/comments`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -109,7 +105,7 @@ describe('Blog tests', () => {
   });
 
   test('Get comments', async () => {
-    const res = await app.request(`${path}/blog/posts/${id_post}/comments`, {
+    const res = await app.request(`/blog/posts/${id_post}/comments`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -119,7 +115,7 @@ describe('Blog tests', () => {
   });
 
   test('Delete comment', async () => {
-    const res = await app.request(`${path}/blog/posts/${id_post}/comments/${id_comment}`, {
+    const res = await app.request(`/blog/posts/${id_post}/comments/${id_comment}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -130,7 +126,7 @@ describe('Blog tests', () => {
   });
 
   test('Delete post', async () => {
-    const res = await app.request(`${path}/blog/posts/${id_post}`, {
+    const res = await app.request(`/blog/posts/${id_post}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

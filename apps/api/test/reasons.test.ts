@@ -2,22 +2,21 @@ import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
-describe('Votes tests', () => {
+describe('Reasons tests', () => {
   let id_user: number;
   let id_auth: string;
   let jwt: string;
-  let id_polls: number;
-  let option_id: number;
+  let id_reason: number;
 
   beforeAll(async () => {
     const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        first_name: 'polls',
-        last_name: 'polls',
-        username: 'polls',
-        email: 'polls@gmail.com',
+        first_name: 'reason',
+        last_name: 'reason',
+        username: 'reason',
+        email: 'reason@gmail.com',
         password: 'password123456',
       }),
     });
@@ -33,7 +32,7 @@ describe('Votes tests', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: 'polls@gmail.com',
+        email: 'reason@gmail.com',
         password: 'password123456',
       }),
     });
@@ -42,107 +41,110 @@ describe('Votes tests', () => {
     jwt = loginUser.token;
   });
 
-  test('Create poll', async () => {
-    const res = await app.request('/polls', {
+  test('Create reason', async () => {
+    const res = await app.request('/reasons', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        title: 'Title test',
-        description: 'Description test',
-        start_at: new Date().toISOString(),
-        end_at: new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString(),
-        max_choices: 2,
-        options: [{ content: 'Option test' }, { content: 'Option test 2' }, { content: 'Option test 3' }],
+        reason: 'Test reason',
       }),
     });
-    expect(res.status).toBe(201);
-    const poll: { id: number } = await res.json();
-    id_polls = poll.id;
+    expect(res.status).toBe(200);
+    const reason = await res.json();
+    expect(reason).toHaveProperty('id');
+    expect(reason).toHaveProperty('reason', 'Test reason');
+    id_reason = reason.id;
   });
 
-  test('Update poll', async () => {
-    const res = await app.request(`/polls/${id_polls}`, {
+  test('Create reason with invalid data', async () => {
+    const res = await app.request('/reasons', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        reason: '',
+      }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  test('Get all reasons', async () => {
+    const res = await app.request('/reasons', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+    const reasons = await res.json();
+    expect(Array.isArray(reasons)).toBe(true);
+    expect(reasons.length).toBeGreaterThan(0);
+  });
+
+  test('Get reason by id', async () => {
+    const res = await app.request(`/reasons/${id_reason}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+    const reason = await res.json();
+    expect(reason).toHaveProperty('id', id_reason);
+    expect(reason).toHaveProperty('reason', 'Test reason');
+  });
+
+  test('Get non-existent reason', async () => {
+    const res = await app.request('/reasons/99999', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(404);
+  });
+
+  test('Update reason', async () => {
+    const res = await app.request(`/reasons/${id_reason}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        title: 'Title test updated',
-        description: 'Description test updated',
+        reason: 'Updated test reason',
       }),
     });
     expect(res.status).toBe(200);
+    const updatedReason = await res.json();
+    expect(updatedReason).toHaveProperty('id', id_reason);
+    expect(updatedReason).toHaveProperty('reason', 'Updated test reason');
   });
 
-  test('Get all polls', async () => {
-    const res = await app.request('/polls', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-    expect(res.status).toBe(200);
-  });
-
-  test('Get poll by id', async () => {
-    const res = await app.request(`/polls/${id_polls}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-    expect(res.status).toBe(200);
-    const result: { results: [{ id: number; votes: number; content: string }] } = await res.json();
-    option_id = result.results[0].id;
-  });
-
-  test('Vote to poll', async () => {
-    const res = await app.request(`/polls/${id_polls}/vote`, {
-      method: 'POST',
+  test('Update non-existent reason', async () => {
+    const res = await app.request('/reasons/99999', {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
-        options: [option_id],
+        reason: 'This should fail',
       }),
     });
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(404);
   });
 
-  test('Vote to poll again not allowed', async () => {
-    const res = await app.request(`/polls/${id_polls}/vote`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwt}`,
-      },
-      body: JSON.stringify({
-        options: [option_id],
-      }),
-    });
-    expect(res.status).toBe(400);
-  });
-
-  test('Get poll results', async () => {
-    const res = await app.request(`/polls/${id_polls}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-    expect(res.status).toBe(200);
-  });
-
-  test('Delete poll', async () => {
-    const res = await app.request(`/polls/${id_polls}`, {
+  test('Delete reason', async () => {
+    const res = await app.request(`/reasons/${id_reason}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -150,6 +152,19 @@ describe('Votes tests', () => {
       },
     });
     expect(res.status).toBe(200);
+    const deletedReason = await res.json();
+    expect(deletedReason).toHaveProperty('message', 'Reason deleted');
+  });
+
+  test('Delete non-existent reason', async () => {
+    const res = await app.request('/reasons/99999', {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(404);
   });
 
   afterAll(async () => {

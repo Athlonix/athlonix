@@ -11,13 +11,13 @@ VALUES
   (9, 'PRESIDENT'),
   (10, 'EMPLOYEE');
 
-INSERT INTO "public"."REASONS" ("id", "reason")
+INSERT INTO "public"."REASONS" ("reason")
 VALUES
-  (1, 'Spam'),
-  (2, 'Insultes ou harcèlement'),
-  (3, 'Informations mensongères ou glorification de la violence'),
-  (4, 'Divulgation d''informations privé permettant d''identifier une personne'),
-  (5, 'Autre raison');
+  ('Spam'),
+  ('Insultes ou harcèlement'),
+  ('Informations mensongères ou glorification de la violence'),
+  ('Divulgation d''informations privé permettant d''identifier une personne'),
+  ('Autre raison');
 
 
 

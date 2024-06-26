@@ -88,17 +88,22 @@ sports.openapi(updateSport, async (c) => {
 
   return c.json(data, 200);
 });
-
 sports.openapi(deleteSport, async (c) => {
   const { id } = c.req.valid('param');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { error } = await supabase.from('SPORTS').delete().eq('id', id);
+  const { data: existingSport, error: fetchError } = await supabase.from('SPORTS').select('id').eq('id', id).single();
 
-  if (error) {
+  if (fetchError || !existingSport) {
     return c.json({ error: 'Sport not found' }, 404);
+  }
+
+  const { error: deleteError } = await supabase.from('SPORTS').delete().eq('id', id);
+
+  if (deleteError) {
+    return c.json({ error: deleteError.message }, 500);
   }
 
   return c.json({ message: `Sport with id ${id} deleted` }, 200);

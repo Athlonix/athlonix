@@ -226,6 +226,7 @@ activities.openapi(updateActivity, async (c) => {
   const { data, error } = await supabase
     .from('ACTIVITIES')
     .update({
+      name,
       description,
       max_participants,
       min_participants,
@@ -255,10 +256,20 @@ activities.openapi(deleteActivity, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { error } = await supabase.from('ACTIVITIES').delete().eq('id', id);
+  const { data: existingActivity, error: fetchError } = await supabase
+    .from('ACTIVITIES')
+    .select('id')
+    .eq('id', id)
+    .single();
 
-  if (error) {
+  if (fetchError || !existingActivity) {
     return c.json({ error: 'Activity not found' }, 404);
+  }
+
+  const { error: deleteError } = await supabase.from('ACTIVITIES').delete().eq('id', id);
+
+  if (deleteError) {
+    return c.json({ error: deleteError.message }, 500);
   }
 
   return c.json({ message: 'Activity deleted' }, 200);
@@ -395,10 +406,20 @@ activities.openapi(deleteActivityExceptions, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { error } = await supabase.from('ACTIVITIES_EXCEPTIONS').delete().eq('id', id);
+  const { data: existingException, error: fetchError } = await supabase
+    .from('ACTIVITIES_EXCEPTIONS')
+    .select('id')
+    .eq('id', id)
+    .single();
 
-  if (error) {
+  if (fetchError || !existingException) {
     return c.json({ error: 'Activity exception not found' }, 404);
+  }
+
+  const { error: deleteError } = await supabase.from('ACTIVITIES_EXCEPTIONS').delete().eq('id', id);
+
+  if (deleteError) {
+    return c.json({ error: deleteError.message }, 500);
   }
 
   return c.json({ message: 'Activity exception deleted' }, 200);

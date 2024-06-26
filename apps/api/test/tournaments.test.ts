@@ -2,9 +2,6 @@ import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
-const port = Number(process.env.PORT || 3101);
-const path = `http://localhost:${port}`;
-
 describe('Tournaments tests', () => {
   let id_user: number;
   let id_auth: string;
@@ -15,7 +12,7 @@ describe('Tournaments tests', () => {
   let id_round: number;
 
   beforeAll(async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -34,7 +31,7 @@ describe('Tournaments tests', () => {
     await insertRole(id_user, Role.MEMBER);
     await setValidSubscription(id_user);
 
-    const loginRes = await app.request(`${path}/auth/login`, {
+    const loginRes = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -48,7 +45,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Create tournament', async () => {
-    const res = await app.request(`${path}/tournaments`, {
+    const res = await app.request('/tournaments', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -67,8 +64,21 @@ describe('Tournaments tests', () => {
     id_tournament = tournament.id;
   });
 
+  test('Get tournament by id', async () => {
+    const res = await app.request(`/tournaments/${id_tournament}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+    const tournament: { id: number } = await res.json();
+    expect(tournament.id).toBe(id_tournament);
+  });
+
   test('Update tournament', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}`, {
+    const res = await app.request(`/tournaments/${id_tournament}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -84,7 +94,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Get all tournaments', async () => {
-    const res = await app.request(`${path}/tournaments`, {
+    const res = await app.request('/tournaments', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -97,7 +107,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Create round', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds`, {
+    const res = await app.request(`/tournaments/${id_tournament}/rounds`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -116,7 +126,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Create match', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}/matches`, {
+    const res = await app.request(`/tournaments/${id_tournament}/rounds/${id_round}/matches`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -135,8 +145,25 @@ describe('Tournaments tests', () => {
     id_match = match.id;
   });
 
+  test('Update match', async () => {
+    const res = await app.request(`/tournaments/${id_tournament}/rounds/${id_round}/matches/${id_match}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        start_time: '2050-05-12T15:44:17.153Z',
+        end_time: '2050-05-13T15:44:17.153Z',
+        id_round,
+        date: new Date().toISOString(),
+      }),
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('Get all matches', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}/matches`, {
+    const res = await app.request(`/tournaments/${id_tournament}/rounds/${id_round}/matches`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -146,8 +173,20 @@ describe('Tournaments tests', () => {
     expect(res.status).toBe(200);
   });
 
+  test('Get match', async () => {
+    const res = await app.request(`/tournaments/${id_tournament}/rounds/${id_round}/matches/${id_match}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toHaveProperty('id', id_match);
+  });
+
   test('Get all rounds', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds`, {
+    const res = await app.request(`/tournaments/${id_tournament}/rounds`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -158,7 +197,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Get round', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}`, {
+    const res = await app.request(`/tournaments/${id_tournament}/rounds/${id_round}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -169,7 +208,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Update round', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}`, {
+    const res = await app.request(`/tournaments/${id_tournament}/rounds/${id_round}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -185,7 +224,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Create team', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/teams`, {
+    const res = await app.request(`/tournaments/${id_tournament}/teams`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -203,7 +242,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Get all teams', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/teams`, {
+    const res = await app.request(`/tournaments/${id_tournament}/teams`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -214,7 +253,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Update team', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/teams/${id_team}`, {
+    const res = await app.request(`/tournaments/${id_tournament}/teams/${id_team}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -230,7 +269,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Leave team', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/teams/${id_team}/leave`, {
+    const res = await app.request(`/tournaments/${id_tournament}/teams/${id_team}/leave`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -241,7 +280,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Delete match', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}/matches/${id_match}`, {
+    const res = await app.request(`/tournaments/${id_tournament}/rounds/${id_round}/matches/${id_match}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -252,7 +291,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Delete round', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}/rounds/${id_round}`, {
+    const res = await app.request(`/tournaments/${id_tournament}/rounds/${id_round}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -263,7 +302,7 @@ describe('Tournaments tests', () => {
   });
 
   test('Delete tournament', async () => {
-    const res = await app.request(`${path}/tournaments/${id_tournament}`, {
+    const res = await app.request(`/tournaments/${id_tournament}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

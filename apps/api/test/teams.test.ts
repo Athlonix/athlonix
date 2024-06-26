@@ -2,9 +2,6 @@ import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
-const port = Number(process.env.PORT || 3101);
-const path = `http://localhost:${port}`;
-
 describe('Teams tests', () => {
   let id_admin: number;
   let id_auth: string;
@@ -16,7 +13,7 @@ describe('Teams tests', () => {
   let id_location: number;
 
   test('Create admin', async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -37,7 +34,7 @@ describe('Teams tests', () => {
   });
 
   test('Login admin', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const res = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -51,7 +48,7 @@ describe('Teams tests', () => {
   });
 
   test('Create sport', async () => {
-    const res = await app.request(`${path}/sports`, {
+    const res = await app.request('/sports', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,7 +68,7 @@ describe('Teams tests', () => {
   });
 
   test('Create location', async () => {
-    const res = await app.request(`${path}/addresses`, {
+    const res = await app.request('/addresses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -99,7 +96,7 @@ describe('Teams tests', () => {
     const start_time = now.toTimeString().split(' ')[0];
     const end_time = end.toTimeString().split(' ')[0];
 
-    const res = await app.request(`${path}/activities`, {
+    const res = await app.request('/activities', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -127,7 +124,7 @@ describe('Teams tests', () => {
   });
 
   test('Create employee', async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -147,7 +144,7 @@ describe('Teams tests', () => {
   });
 
   test('Add employee to activity team', async () => {
-    const res = await app.request(`${path}/activities/${activity_id}/team/${id_user}`, {
+    const res = await app.request(`/activities/${activity_id}/team/${id_user}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
       body: null,
@@ -157,7 +154,7 @@ describe('Teams tests', () => {
   });
 
   test('Get the activity team', async () => {
-    const res = await app.request(`${path}/activities/${activity_id}/team`, {
+    const res = await app.request(`/activities/${activity_id}/team`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -168,7 +165,7 @@ describe('Teams tests', () => {
   });
 
   test('Remove employee from team', async () => {
-    const res = await app.request(`${path}/activities/${activity_id}/team/${id_user}`, {
+    const res = await app.request(`/activities/${activity_id}/team/${id_user}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -179,7 +176,7 @@ describe('Teams tests', () => {
   });
 
   test('Delete activity', async () => {
-    const res = await app.request(`${path}/activities/${activity_id}`, {
+    const res = await app.request(`/activities/${activity_id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -190,7 +187,7 @@ describe('Teams tests', () => {
   });
 
   test('Delete user', async () => {
-    const res = await app.request(`${path}/users/${id_user}`, {
+    const res = await app.request(`/users/${id_user}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -201,7 +198,7 @@ describe('Teams tests', () => {
   });
 
   test('Delete location', async () => {
-    const res = await app.request(`${path}/addresses/${id_location}`, {
+    const res = await app.request(`/addresses/${id_location}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -212,7 +209,7 @@ describe('Teams tests', () => {
   });
 
   test('Delete sport', async () => {
-    const res = await app.request(`${path}/sports/${id_sport}`, {
+    const res = await app.request(`/sports/${id_sport}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

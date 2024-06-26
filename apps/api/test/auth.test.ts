@@ -10,7 +10,7 @@ describe('Auth tests', () => {
   let jwt: string;
 
   beforeAll(async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -29,7 +29,7 @@ describe('Auth tests', () => {
   });
 
   test('POST /auth/login', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const res = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -43,7 +43,7 @@ describe('Auth tests', () => {
   });
 
   test('POST /auth/login with wrong password', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const res = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -55,7 +55,7 @@ describe('Auth tests', () => {
   });
 
   test('Get /users/me', async () => {
-    const res = await app.request(`${path}/users/me`, {
+    const res = await app.request('/users/me', {
       headers: { Authorization: `Bearer ${jwt}` },
     });
     expect(res.status).toBe(200);
@@ -63,7 +63,7 @@ describe('Auth tests', () => {
   });
 
   test('Logout /auth/logout', async () => {
-    const res = await app.request(`${path}/auth/logout`, {
+    const res = await app.request('/auth/logout', {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${jwt}` },
     });

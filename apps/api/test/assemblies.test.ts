@@ -2,9 +2,6 @@ import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
-const port = Number(process.env.PORT || 3101);
-const path = `http://localhost:${port}`;
-
 describe('Activities tests', () => {
   let id_admin: number;
   let id_auth: string;
@@ -13,7 +10,7 @@ describe('Activities tests', () => {
   const next_month = new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString();
 
   test('Create admin', async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -34,7 +31,7 @@ describe('Activities tests', () => {
   });
 
   test('Login admin', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const res = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -48,7 +45,7 @@ describe('Activities tests', () => {
   });
 
   test('Create assembly', async () => {
-    const res = await app.request(`${path}/assemblies`, {
+    const res = await app.request('/assemblies', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +65,7 @@ describe('Activities tests', () => {
   });
 
   test('Get all assemblies', async () => {
-    const res = await app.request(`${path}/assemblies`, {
+    const res = await app.request('/assemblies', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +78,7 @@ describe('Activities tests', () => {
   });
 
   test('Get one assembly', async () => {
-    const res = await app.request(`${path}/assemblies/${id_assembly}`, {
+    const res = await app.request(`/assemblies/${id_assembly}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -93,7 +90,7 @@ describe('Activities tests', () => {
   });
 
   test('Update assembly', async () => {
-    const res = await app.request(`${path}/assemblies/${id_assembly}`, {
+    const res = await app.request(`/assemblies/${id_assembly}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -109,7 +106,7 @@ describe('Activities tests', () => {
   });
 
   test('Generate assembly QRcode', async () => {
-    const res = await app.request(`${path}/assemblies/${id_assembly}/qr`, {
+    const res = await app.request(`/assemblies/${id_assembly}/qr`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${jwt}`,
@@ -119,7 +116,7 @@ describe('Activities tests', () => {
   });
 
   test('Close assembly', async () => {
-    const res = await app.request(`${path}/assemblies/${id_assembly}/close`, {
+    const res = await app.request(`/assemblies/${id_assembly}/close`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

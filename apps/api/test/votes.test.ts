@@ -2,9 +2,6 @@ import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
-const port = Number(process.env.PORT || 3101);
-const path = `http://localhost:${port}`;
-
 describe('Votes tests', () => {
   let id_user: number;
   let id_auth: string;
@@ -13,7 +10,7 @@ describe('Votes tests', () => {
   let option_id: number;
 
   beforeAll(async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -32,7 +29,7 @@ describe('Votes tests', () => {
     await insertRole(id_user, Role.MEMBER);
     await setValidSubscription(id_user);
 
-    const loginRes = await app.request(`${path}/auth/login`, {
+    const loginRes = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -46,7 +43,7 @@ describe('Votes tests', () => {
   });
 
   test('Create poll', async () => {
-    const res = await app.request(`${path}/polls`, {
+    const res = await app.request('/polls', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -66,8 +63,23 @@ describe('Votes tests', () => {
     id_polls = poll.id;
   });
 
+  test('Update poll', async () => {
+    const res = await app.request(`/polls/${id_polls}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        title: 'Title test updated',
+        description: 'Description test updated',
+      }),
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('Get all polls', async () => {
-    const res = await app.request(`${path}/addresses`, {
+    const res = await app.request('/polls', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -78,7 +90,7 @@ describe('Votes tests', () => {
   });
 
   test('Get poll by id', async () => {
-    const res = await app.request(`${path}/polls/${id_polls}`, {
+    const res = await app.request(`/polls/${id_polls}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -91,7 +103,7 @@ describe('Votes tests', () => {
   });
 
   test('Vote to poll', async () => {
-    const res = await app.request(`${path}/polls/${id_polls}/vote`, {
+    const res = await app.request(`/polls/${id_polls}/vote`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -105,7 +117,7 @@ describe('Votes tests', () => {
   });
 
   test('Vote to poll again not allowed', async () => {
-    const res = await app.request(`${path}/polls/${id_polls}/vote`, {
+    const res = await app.request(`/polls/${id_polls}/vote`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -119,7 +131,7 @@ describe('Votes tests', () => {
   });
 
   test('Get poll results', async () => {
-    const res = await app.request(`${path}/polls/${id_polls}`, {
+    const res = await app.request(`/polls/${id_polls}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -130,7 +142,7 @@ describe('Votes tests', () => {
   });
 
   test('Delete poll', async () => {
-    const res = await app.request(`${path}/polls/${id_polls}`, {
+    const res = await app.request(`/polls/${id_polls}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

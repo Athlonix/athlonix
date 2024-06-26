@@ -384,22 +384,18 @@ activities.openapi(validApplication, async (c) => {
   await checkRole(user.roles, false, [Role.ADMIN, Role.MODERATOR]);
 
   const { id } = c.req.valid('param');
-  const { id_user } = c.req.valid('json');
-  const { data: activity, error: errorActivity } = await supabase
-    .from('ACTIVITIES')
-    .select('id, name, end_date')
-    .eq('id', id)
-    .single();
+  const { id_user, date } = c.req.valid('json');
+  const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
-  if (activity.end_date && new Date(activity.end_date) < new Date())
-    return c.json({ error: 'Activity has already ended' }, 400);
+  if (new Date(date) < new Date()) return c.json({ error: 'Activity has already ended' }, 400);
 
   const { count } = await supabase
     .from('ACTIVITIES_USERS')
     .select('count(id)', { count: 'exact' })
     .eq('id_activity', id)
     .eq('id_user', id_user)
+    .eq('date', date)
     .single();
 
   if (count && count === 0) return c.json({ error: 'User did not apply to activity' }, 400);
@@ -408,7 +404,8 @@ activities.openapi(validApplication, async (c) => {
     .from('ACTIVITIES_USERS')
     .update({ active: true })
     .eq('id_activity', id)
-    .eq('id_user', id_user);
+    .eq('id_user', id_user)
+    .eq('date', date);
 
   if (errorValid) return c.json({ error: 'Failed to validate application' }, 400);
 

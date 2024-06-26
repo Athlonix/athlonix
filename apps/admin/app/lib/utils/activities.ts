@@ -95,7 +95,6 @@ export async function getActivityUsers(
   date: string,
 ): Promise<{ data: { data: User[]; count: number }; status: number }> {
   const formattedDate = date.split('T')[0];
-  console.log('date', formattedDate);
 
   if (!formattedDate) {
     return { data: { data: [], count: 0 }, status: 400 };
@@ -111,6 +110,32 @@ export async function getActivityUsers(
       'Content-Type': 'application/json',
       Authorization: `Bearer ${cookies().get('access_token')?.value}`,
     },
+  });
+
+  return { data: await res.json(), status: res.status };
+}
+
+export async function validateUsers(
+  id_activity: number,
+  id_user: number,
+  date: string,
+): Promise<{ data: string; status: number }> {
+  const formattedDate = date.split('T')[0];
+
+  if (!formattedDate) {
+    return { data: '', status: 400 };
+  }
+
+  const res = await fetch(`${urlApi}/activities/${id_activity}/validApply`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${cookies().get('access_token')?.value}`,
+    },
+    body: JSON.stringify({
+      id_user,
+      date: formattedDate,
+    }),
   });
 
   return { data: await res.json(), status: res.status };

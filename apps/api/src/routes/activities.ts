@@ -270,7 +270,7 @@ export const cancelApplication = createRoute({
 });
 
 export const validApplication = createRoute({
-  method: 'post',
+  method: 'patch',
   path: '/activities/{id}/validApply',
   summary: 'Valid application to a activity',
   description: 'Valid application to a activity',
@@ -283,6 +283,7 @@ export const validApplication = createRoute({
         'application/json': {
           schema: z.object({
             id_user: z.coerce.number().min(1),
+            date: z.string().date(),
           }),
         },
       },

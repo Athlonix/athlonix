@@ -165,6 +165,9 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
           users1={usersSet1}
           users2={usersSet2}
           users3={usersSet3}
+          setUsers1={setUsersSet1}
+          setUsers2={setUsersSet2}
+          setUsers3={setUsersSet3}
         />
       )}
     </div>

@@ -1,6 +1,8 @@
 import type { Activity, Occurence, User } from '@/app/lib/type/Activities';
+import ValidateUser from '@/app/ui/dashboard/activities/details/ValidateUser';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/components/ui/tabs';
 import { Separator } from '@ui/components/ui/separator';
+import { type Dispatch, type SetStateAction, useState } from 'react';
 
 function Occurences({
   activity,
@@ -8,7 +10,19 @@ function Occurences({
   users1,
   users2,
   users3,
-}: { activity: Activity; occurences: Occurence[]; users1: User[]; users2: User[]; users3: User[] }) {
+  setUsers1,
+  setUsers2,
+  setUsers3,
+}: {
+  activity: Activity;
+  occurences: Occurence[];
+  users1: User[];
+  users2: User[];
+  users3: User[];
+  setUsers1: Dispatch<SetStateAction<User[]>>;
+  setUsers2: Dispatch<SetStateAction<User[]>>;
+  setUsers3: Dispatch<SetStateAction<User[]>>;
+}) {
   const validatedUser1 = users1.filter((user) => user.active === true);
   const validatedUser2 = users2.filter((user) => user.active === true);
   const validatedUser3 = users3.filter((user) => user.active === true);
@@ -16,6 +30,7 @@ function Occurences({
   const pendingUser1 = users1.filter((user) => user.active === false);
   const pendingUser2 = users2.filter((user) => user.active === false);
   const pendingUser3 = users3.filter((user) => user.active === false);
+
   return (
     <Tabs defaultValue="activity1">
       <div className="flex justify-center my-4">
@@ -51,7 +66,11 @@ function Occurences({
                 <div key={user.id} className="flex justify-center text-lg">
                   <div>{user.username}</div>
                 </div>
-                <div key={user.id}>Validate button here</div>
+                <div key={user.id} className="flex justify-center">
+                  {occurences[0] && (
+                    <ValidateUser user={user} setUser={setUsers1} id_activity={activity.id} date={occurences[0].date} />
+                  )}
+                </div>
               </>
             ))}
           </div>

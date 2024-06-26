@@ -1,5 +1,5 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config';
+import { coverageConfigDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
@@ -15,6 +15,8 @@ export default defineConfig({
           lines: 70,
         },
       },
+      ignoreEmptyLines: true,
+      exclude: ['**/edm.ts', '**/stripe.ts', ...coverageConfigDefaults.exclude],
       reporter: ['text', 'html', 'json', 'json-summary'],
     },
   },

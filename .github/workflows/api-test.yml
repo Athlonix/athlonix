@@ -21,7 +21,6 @@ permissions:
 
 env:
   FORCE_COLOR: 1
-  PORT: 0
 
 jobs:
   api-test:
@@ -69,7 +68,7 @@ jobs:
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           working-directory: ./apps/api
-          name: 'API Coverage'
+          name: API
 
       - name: 🧹 Stop supabase
         run: supabase stop --no-backup

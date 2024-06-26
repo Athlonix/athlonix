@@ -14,8 +14,8 @@ export const getReasons = createRoute({
         'application/json': {
           schema: z.array(
             z.object({
-              id: z.number(),
-              reason: z.string(),
+              id: z.number().min(1),
+              reason: z.string().min(5).max(255),
             }),
           ),
         },
@@ -40,8 +40,8 @@ export const getReasonById = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            id: z.number(),
-            reason: z.string(),
+            id: z.number().min(1),
+            reason: z.string().min(5).max(255),
           }),
         },
       },
@@ -64,7 +64,7 @@ export const createReason = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            reason: z.string(),
+            reason: z.string().min(5).max(255),
           }),
         },
       },
@@ -76,8 +76,8 @@ export const createReason = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            id: z.number(),
-            reason: z.string(),
+            id: z.number().min(1),
+            reason: z.string().min(5).max(255),
           }),
         },
       },
@@ -101,7 +101,7 @@ export const updateReason = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            reason: z.string(),
+            reason: z.string().min(5).max(255),
           }),
         },
       },
@@ -113,8 +113,8 @@ export const updateReason = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            id: z.number(),
-            reason: z.string(),
+            id: z.number().min(1),
+            reason: z.string().min(5).max(255),
           }),
         },
       },

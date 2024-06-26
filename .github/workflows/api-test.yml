@@ -21,6 +21,7 @@ permissions:
 
 env:
   FORCE_COLOR: 1
+  PORT: 0
 
 jobs:
   api-test:

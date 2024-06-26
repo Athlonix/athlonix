@@ -4,7 +4,6 @@ import { accountRolesValidity } from '../src/middlewares/auth.js';
 import { checkBanned, checkRole } from '../src/utils/context.js';
 import { getPagination } from '../src/utils/pagnination.js';
 
-
 describe('Other general tests', () => {
   test('Check health endpoint', async () => {
     const response = await app.request('/health');

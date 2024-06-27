@@ -54,6 +54,7 @@ reports.openapi(createReport, async (c) => {
     .single();
 
   if (error || !data) {
+    console.log('error', error);
     return c.json({ error: 'Failed to create report' }, 400);
   }
 

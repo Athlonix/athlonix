@@ -16,7 +16,7 @@ export default defineConfig({
         },
       },
       ignoreEmptyLines: true,
-      exclude: ['**/edm.ts', '**/stripe.ts', ...coverageConfigDefaults.exclude],
+      exclude: ['**/edm.ts', '**/stripe.ts', '**/storage.ts', ...coverageConfigDefaults.exclude],
       reporter: ['text', 'html', 'json', 'json-summary'],
     },
   },

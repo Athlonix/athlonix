@@ -1,8 +1,17 @@
+import { z } from '@hono/zod-openapi';
+import type { Context } from 'hono';
+import { describe, vi } from 'vitest';
 import app from '../src/index.js';
 import { getOccurences } from '../src/libs/activities.js';
+import { zodErrorHook } from '../src/libs/zodError.js';
 import { accountRolesValidity } from '../src/middlewares/auth.js';
 import { checkBanned, checkRole } from '../src/utils/context.js';
 import { getPagination } from '../src/utils/pagnination.js';
+
+const mockJson = vi.fn();
+const mockContext = {
+  json: mockJson,
+} as unknown as Context;
 
 describe('Other general tests', () => {
   test('Check health endpoint', async () => {
@@ -82,5 +91,33 @@ describe('Other general tests', () => {
 
     const invalid = getOccurences(new Date('2022-01-10'), new Date('2022-01-01'), daysToFind, exceptions);
     expect(invalid).toEqual([]);
+  });
+
+  // Zod error hook
+  it('should return undefined when result is successful', () => {
+    const result = { success: true, data: 'some data' };
+    expect(zodErrorHook(result, mockContext)).toBeUndefined();
+    expect(mockJson).not.toHaveBeenCalled();
+  });
+
+  it('should return a 400 response with error message when there is a Zod error', () => {
+    const schema = z.object({ name: z.string() });
+    const result = {
+      success: false,
+      error: schema.safeParse({ name: 123 }).error,
+    };
+
+    zodErrorHook(result, mockContext);
+
+    expect(mockJson).toHaveBeenCalledWith({ error: expect.any(String) }, 400);
+    expect(mockJson.mock.calls[0][0].error).toContain('Expected string');
+  });
+
+  it('should return a 500 response when there is no specific error', () => {
+    const result = { success: false };
+
+    zodErrorHook(result, mockContext);
+
+    expect(mockJson).toHaveBeenCalledWith({ error: 'Internal server error' }, 500);
   });
 });

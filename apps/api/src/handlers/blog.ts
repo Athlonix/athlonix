@@ -133,18 +133,11 @@ blog.openapi(deletePost, async (c) => {
   const id_user = user.id;
   await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
 
-  const { data: postData, error: postError } = await supabase.from('POSTS').select('*').eq('id', id).single();
-
-  if (postError || !postData) {
-    return c.json({ error: 'Post not found' }, 404);
-  }
-
   const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
   if (roles?.some((role) => allowed.includes(role))) {
     const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
     if (error || count === 0) {
-      console.log('error', error);
       return c.json({ error: 'Post not found' }, 404);
     }
 
@@ -313,8 +306,6 @@ blog.openapi(deleteComment, async (c) => {
       .eq('id_post', id_post);
 
     if (error || count === 0) {
-      console.log('error', error);
-
       return c.json({ error: 'Comment not found' }, 404);
     }
 

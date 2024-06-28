@@ -1,4 +1,4 @@
-import type { Activity } from '@/app/(withNavbar)/activities/page';
+import type { Activity } from '@/app/lib/type/Activities';
 import { CalendarDays, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -43,7 +43,6 @@ function ActivityCard({ activity }: { activity: Activity }) {
               {activity.frequency === 'weekly' && 'Hebdomadaire'}
               {activity.frequency === 'monthly' && 'Mensuel'}
               {activity.frequency === 'yearly' && 'Annuel'}
-              {activity.frequency === 'daily' && 'Journalier'}
             </div>
           </div>
         </div>

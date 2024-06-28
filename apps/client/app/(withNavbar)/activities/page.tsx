@@ -1,5 +1,6 @@
 'use client';
 
+import type { Activity } from '@/app/lib/type/Activities';
 import ActivityCard from '@/app/ui/components/activities/ActivityCard';
 import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Input } from '@repo/ui/components/ui/input';
@@ -7,24 +8,6 @@ import { Separator } from '@repo/ui/components/ui/separator';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-
-export type Activity = {
-  id: number;
-  name: string;
-  min_participants: number;
-  max_participants: number;
-  sport: {
-    id: number;
-    name: string;
-  };
-  id_address: number | null;
-  days: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
-  end_date: string;
-  start_date: string;
-  description: string | null;
-  frequency: 'weekly' | 'monthly' | 'yearly' | 'daily';
-  interval: number;
-};
 
 interface ActivitiesData {
   data: Activity[];

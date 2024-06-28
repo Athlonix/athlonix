@@ -20,6 +20,7 @@ import {
 import { toast } from '@repo/ui/components/ui/sonner';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 
 interface ActivityRowProps {
@@ -114,7 +115,9 @@ function ActivityRow(props: ActivityRowProps) {
 
   return (
     <TableRow key={props.activity.id}>
-      <TableCell className="font-medium">{name}</TableCell>
+      <TableCell className="font-medium">
+        <Link href={`/dashboard/activities/details?id=${props.activity.id}`}>{name}</Link>
+      </TableCell>
       <TableCell>
         {minParticipants} - {maxParticipants}
       </TableCell>

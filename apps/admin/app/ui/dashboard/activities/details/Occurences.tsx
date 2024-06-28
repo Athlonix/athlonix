@@ -2,7 +2,7 @@ import type { Activity, Occurence, User } from '@/app/lib/type/Activities';
 import ValidateUser from '@/app/ui/dashboard/activities/details/ValidateUser';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/components/ui/tabs';
 import { Separator } from '@ui/components/ui/separator';
-import { type Dispatch, type SetStateAction, useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 
 function Occurences({
   activity,
@@ -81,9 +81,32 @@ function Occurences({
           </div>
           <div className="grid grid-cols-3 justify-center">
             {validatedUser2.map((user) => (
-              <div key={user.id} className="flex justify-center">
-                <div>{user.username}</div>
-              </div>
+              <>
+                <div key={user.id} className="flex justify-center">
+                  <div>{user.username}</div>
+                </div>
+                <div key={user.id} className="flex justify-center">
+                  {occurences[1] && (
+                    <ValidateUser user={user} setUser={setUsers2} id_activity={activity.id} date={occurences[1].date} />
+                  )}
+                </div>
+              </>
+            ))}
+          </div>
+          <Separator className="my-4" />
+          <div className="flex text-3xl mb-4 justify-center">En attentes ({pendingUser2.length})</div>
+          <div className="grid grid-cols-2 justify-center gap-4">
+            {pendingUser2.map((user) => (
+              <>
+                <div key={user.id} className="flex justify-center text-lg">
+                  <div>{user.username}</div>
+                </div>
+                <div key={user.id} className="flex justify-center">
+                  {occurences[1] && (
+                    <ValidateUser user={user} setUser={setUsers2} id_activity={activity.id} date={occurences[1].date} />
+                  )}
+                </div>
+              </>
             ))}
           </div>
         </TabsContent>
@@ -93,9 +116,32 @@ function Occurences({
           </div>
           <div className="grid grid-cols-3 justify-center">
             {validatedUser3.map((user) => (
-              <div key={user.id} className="flex justify-center">
-                <div>{user.username}</div>
-              </div>
+              <>
+                <div key={user.id} className="flex justify-center">
+                  <div>{user.username}</div>
+                </div>
+                <div key={user.id} className="flex justify-center">
+                  {occurences[2] && (
+                    <ValidateUser user={user} setUser={setUsers3} id_activity={activity.id} date={occurences[2].date} />
+                  )}
+                </div>
+              </>
+            ))}
+          </div>
+          <Separator className="my-4" />
+          <div className="flex text-3xl mb-4 justify-center">En attentes ({pendingUser3.length})</div>
+          <div className="grid grid-cols-2 justify-center gap-4">
+            {pendingUser3.map((user) => (
+              <>
+                <div key={user.id} className="flex justify-center text-lg">
+                  <div>{user.username}</div>
+                </div>
+                <div key={user.id} className="flex justify-center">
+                  {occurences[2] && (
+                    <ValidateUser user={user} setUser={setUsers3} id_activity={activity.id} date={occurences[2].date} />
+                  )}
+                </div>
+              </>
             ))}
           </div>
         </TabsContent>

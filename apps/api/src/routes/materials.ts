@@ -3,11 +3,11 @@ import authMiddleware from '../middlewares/auth.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
 
 export const materialSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  weight_grams: z.number().nullable(),
-  id_address: z.number(),
-  quantity: z.number(),
+  id: z.number().min(1),
+  name: z.string().min(2),
+  weight_grams: z.number().positive().nullable(),
+  id_address: z.number().min(1),
+  quantity: z.number().positive(),
 });
 
 export const getAllMaterials = createRoute({
@@ -78,7 +78,7 @@ export const createMaterial = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            name: z.string(),
+            name: z.string().min(2),
             weight_grams: z.coerce.number().optional(),
           }),
         },
@@ -113,7 +113,7 @@ export const updateMaterial = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            name: z.string().optional(),
+            name: z.string().min(2).optional(),
             weight_grams: z.coerce.number().optional(),
           }),
         },
@@ -173,8 +173,8 @@ export const changeMaterialQuantity = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            quantity: z.coerce.number(),
-            id_address: z.coerce.number(),
+            quantity: z.coerce.number().positive(),
+            id_address: z.coerce.number().min(1),
           }),
         },
       },
@@ -208,8 +208,8 @@ export const addMaterial = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            id_address: z.coerce.number(),
-            quantity: z.coerce.number(),
+            id_address: z.coerce.number().min(1),
+            quantity: z.coerce.number().positive(),
           }),
         },
       },
@@ -243,7 +243,7 @@ export const removeMaterial = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            id_address: z.coerce.number(),
+            id_address: z.coerce.number().min(1),
           }),
         },
       },

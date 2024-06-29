@@ -279,6 +279,17 @@ describe('Tournaments tests', () => {
     expect(res.status).toBe(200);
   });
 
+  test('Delete team', async () => {
+    const res = await app.request(`/tournaments/${id_tournament}/teams/${id_team}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('Delete match', async () => {
     const res = await app.request(`/tournaments/${id_tournament}/rounds/${id_round}/matches/${id_match}`, {
       method: 'DELETE',

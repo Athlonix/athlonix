@@ -136,16 +136,11 @@ polls.openapi(deletePoll, async (c) => {
   await checkRole(roles, false, [Role.ADMIN]);
 
   const { id } = c.req.valid('param');
-  const { data: existingPoll, error: fetchError } = await supabase.from('POLLS').select('id').eq('id', id).single();
 
-  if (fetchError || !existingPoll) {
+  const { error, count } = await supabase.from('POLLS').delete({ count: 'exact' }).eq('id', id);
+
+  if (error || count === 0) {
     return c.json({ error: 'Poll not found' }, 404);
-  }
-
-  const { error: deleteError } = await supabase.from('POLLS').delete().eq('id', id);
-
-  if (deleteError) {
-    return c.json({ error: deleteError.message }, 500);
   }
 
   return c.json({ message: 'Poll deleted' }, 200);

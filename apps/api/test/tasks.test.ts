@@ -190,6 +190,28 @@ describe('Activities tests', () => {
     id_task = task.id;
   });
 
+  test('Get all activity tasks', async () => {
+    const res = await app.request(`/activities/${activity_id}/tasks?start_date=2024-05-27&end_date=2024-05-27`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res.status).toBe(200);
+
+    const { data } = (await res.json()) as { data: { id: number }[] };
+    expect(data.length).toBeGreaterThan(0);
+  });
+
+  test('Get exception tasks', async () => {
+    const res = await app.request(`/activities_exceptions/${id_activity_exception}/tasks`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res.status).toBe(200);
+
+    const { data } = (await res.json()) as { data: { id: number }[] };
+    expect(data.length).toBeGreaterThan(0);
+  });
+
   test('Get all tasks of exception', async () => {
     const res = await app.request(`/activities_exceptions/${id_activity_exception}/tasks`, {
       method: 'GET',

@@ -256,20 +256,10 @@ activities.openapi(deleteActivity, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data: existingActivity, error: fetchError } = await supabase
-    .from('ACTIVITIES')
-    .select('id')
-    .eq('id', id)
-    .single();
+  const { error, count } = await supabase.from('ACTIVITIES').delete({ count: 'exact' }).eq('id', id);
 
-  if (fetchError || !existingActivity) {
+  if (error || count === 0) {
     return c.json({ error: 'Activity not found' }, 404);
-  }
-
-  const { error: deleteError } = await supabase.from('ACTIVITIES').delete().eq('id', id);
-
-  if (deleteError) {
-    return c.json({ error: deleteError.message }, 500);
   }
 
   return c.json({ message: 'Activity deleted' }, 200);
@@ -315,18 +305,21 @@ activities.openapi(cancelApplication, async (c) => {
   await checkRole(user.roles, true);
 
   const { id } = c.req.valid('param');
+  const { id_user } = c.req.valid('json');
   const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
 
-  const { error: errorCancel } = await supabase
+  const { error: errorCancel, count } = await supabase
     .from('ACTIVITIES_USERS')
-    .delete()
+    .delete({ count: 'exact' })
     .eq('id_activity', id)
-    .eq('id_user', user.id);
+    .eq('id_user', id_user);
 
-  if (errorCancel) return c.json({ error: 'Failed to cancel application' }, 400);
-
+  if (errorCancel || count === 0) {
+    return c.json({ error: 'Failed to cancel application' }, 400);
+  }
+  console.log('Activity canceled');
   return c.json({ message: `Application to activity ${activity.name} canceled` }, 200);
 });
 
@@ -406,20 +399,10 @@ activities.openapi(deleteActivityExceptions, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data: existingException, error: fetchError } = await supabase
-    .from('ACTIVITIES_EXCEPTIONS')
-    .select('id')
-    .eq('id', id)
-    .single();
+  const { error, count } = await supabase.from('ACTIVITIES_EXCEPTIONS').delete({ count: 'exact' }).eq('id', id);
 
-  if (fetchError || !existingException) {
+  if (error || count === 0) {
     return c.json({ error: 'Activity exception not found' }, 404);
-  }
-
-  const { error: deleteError } = await supabase.from('ACTIVITIES_EXCEPTIONS').delete().eq('id', id);
-
-  if (deleteError) {
-    return c.json({ error: deleteError.message }, 500);
   }
 
   return c.json({ message: 'Activity exception deleted' }, 200);

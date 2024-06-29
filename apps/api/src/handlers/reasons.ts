@@ -70,16 +70,10 @@ reasons.openapi(deleteReason, async (c) => {
 
   const { id } = c.req.valid('param');
 
-  const { data: existingReason, error: fetchError } = await supabase.from('REASONS').select('id').eq('id', id).single();
+  const { error, count } = await supabase.from('REASONS').delete({ count: 'exact' }).eq('id', id);
 
-  if (fetchError || !existingReason) {
+  if (error || count === 0) {
     return c.json({ error: 'Reason not found' }, 404);
-  }
-
-  const { error: deleteError } = await supabase.from('REASONS').delete().eq('id', id);
-
-  if (deleteError) {
-    return c.json({ error: deleteError.message }, 500);
   }
 
   return c.json({ message: 'Reason deleted' }, 200);

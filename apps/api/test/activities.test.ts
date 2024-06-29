@@ -124,6 +124,60 @@ describe('Activities tests', () => {
     activity_id = activity.id;
   });
 
+  test('Update activity', async () => {
+    const now = new Date();
+    const end = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+
+    const start_time = now.toTimeString().split(' ')[0];
+    const end_time = end.toTimeString().split(' ')[0];
+
+    const res = await app.request(`/activities/${activity_id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        name: 'Activity test updated',
+        description: 'Description test updated',
+        max_participants: 10,
+        min_participants: 1,
+        days_of_week: ['monday', 'tuesday'],
+        start_date: null,
+        end_date: null,
+        start_time: start_time,
+        end_time: end_time,
+        frequency: 'weekly',
+        id_sport: id_sport,
+        id_address: id_location,
+      }),
+    });
+
+    expect(res.status).toBe(200);
+  });
+
+  test('Get all activities', async () => {
+    const res = await app.request('/activities', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Get activity by id', async () => {
+    const res = await app.request(`/activities/${activity_id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('Get activity occurences', async () => {
     const res = await app.request(`/activities/${activity_id}/occurences?start_date=2024-05-20&end_date=2024-06-02`, {
       method: 'GET',
@@ -154,6 +208,18 @@ describe('Activities tests', () => {
     expect(res.status).toBe(201);
     const activity_exception: { id: number } = await res.json();
     id_activity_exception = activity_exception.id;
+  });
+
+  test('get all Activities Exceptions', async () => {
+    const res = await app.request(`/activities/${activity_id}/exceptions?start_date=2024-05-20&end_date=2024-06-02`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    expect(res.status).toBe(200);
   });
 
   test('Create user', async () => {
@@ -222,6 +288,20 @@ describe('Activities tests', () => {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Cancel apply', async () => {
+    const res = await app.request(`/activities/${activity_id}/apply`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        id_user: id_user,
+      }),
     });
     expect(res.status).toBe(200);
   });

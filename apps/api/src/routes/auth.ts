@@ -60,27 +60,6 @@ export const loginUser = createRoute({
   tags: ['auth'],
 });
 
-export const refreshTokens = createRoute({
-  method: 'post',
-  path: '/refresh',
-  summary: 'Refresh tokens',
-  description: 'Refresh tokens',
-  responses: {
-    200: {
-      description: 'Successful response',
-      content: {
-        'application/json': {
-          schema: z.object({
-            message: z.string(),
-          }),
-        },
-      },
-    },
-    500: serverErrorSchema,
-  },
-  tags: ['auth'],
-});
-
 export const logoutUser = createRoute({
   method: 'delete',
   path: '/logout',

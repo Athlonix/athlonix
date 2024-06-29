@@ -37,13 +37,13 @@ function Page(): JSX.Element {
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
       <div className="flex items-center">
-        <h1 className="text-lg font-semibold md:text-2xl">Statistiques d'Athlonix</h1>
+        <h1 className="text-lg font-semibold md:text-2xl">Statistiques d'Athlonix 📊 </h1>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Membres Totaux</CardTitle>
+            <CardTitle className="text-sm font-medium">Membres Totaux 👥 </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalMembers}</div>
@@ -51,7 +51,7 @@ function Page(): JSX.Element {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Sports</CardTitle>
+            <CardTitle className="text-sm font-medium">Sports ⚽ </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalSports}</div>
@@ -59,7 +59,7 @@ function Page(): JSX.Element {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Activités</CardTitle>
+            <CardTitle className="text-sm font-medium">Activités 🎯 </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalActivities}</div>
@@ -67,7 +67,7 @@ function Page(): JSX.Element {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tournois</CardTitle>
+            <CardTitle className="text-sm font-medium">Tournois 🏆 </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats?.totalTournaments}</div>
@@ -78,7 +78,7 @@ function Page(): JSX.Element {
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Évolution des Membres</CardTitle>
+            <CardTitle>Évolution des Membres 📈 </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -96,7 +96,7 @@ function Page(): JSX.Element {
 
         <Card>
           <CardHeader>
-            <CardTitle>Donations</CardTitle>
+            <CardTitle>Donations 🤝 </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>

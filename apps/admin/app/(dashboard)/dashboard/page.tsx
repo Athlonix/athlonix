@@ -9,6 +9,12 @@ const Icons = {
   spinner: Loader2,
 };
 
+const NoDataMessage = () => (
+  <div className="flex items-center justify-center h-full">
+    <p className="text-gray-500">Aucune donnée disponible</p>
+  </div>
+);
+
 function Page(): JSX.Element {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -46,7 +52,7 @@ function Page(): JSX.Element {
             <CardTitle className="text-sm font-medium">Membres Totaux 👥 </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalMembers}</div>
+            <div className="text-2xl font-bold">{stats?.totalMembers ?? 'N/A'}</div>
           </CardContent>
         </Card>
         <Card>
@@ -54,7 +60,7 @@ function Page(): JSX.Element {
             <CardTitle className="text-sm font-medium">Sports ⚽ </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalSports}</div>
+            <div className="text-2xl font-bold">{stats?.totalSports ?? 'N/A'}</div>
           </CardContent>
         </Card>
         <Card>
@@ -62,7 +68,7 @@ function Page(): JSX.Element {
             <CardTitle className="text-sm font-medium">Activités 🎯 </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalActivities}</div>
+            <div className="text-2xl font-bold">{stats?.totalActivities ?? 'N/A'}</div>
           </CardContent>
         </Card>
         <Card>
@@ -70,7 +76,7 @@ function Page(): JSX.Element {
             <CardTitle className="text-sm font-medium">Tournois 🏆 </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalTournaments}</div>
+            <div className="text-2xl font-bold">{stats?.totalTournaments ?? 'N/A'}</div>
           </CardContent>
         </Card>
       </div>
@@ -81,16 +87,20 @@ function Page(): JSX.Element {
             <CardTitle>Évolution des Membres 📈 </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={stats?.membersByMonth}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="members" fill="#8884d8" />
-              </BarChart>
-            </ResponsiveContainer>
+            {stats?.membersByMonth && stats?.membersByMonth.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={stats?.membersByMonth}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="members" fill="#8884d8" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <NoDataMessage />
+            )}
           </CardContent>
         </Card>
 
@@ -99,16 +109,20 @@ function Page(): JSX.Element {
             <CardTitle>Donations 🤝 </CardTitle>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={stats?.donations}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="amount" fill="#82ca9d" />
-              </BarChart>
-            </ResponsiveContainer>
+            {stats?.donations && stats.donations.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={stats.donations}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="amount" fill="#82ca9d" />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <NoDataMessage />
+            )}
           </CardContent>
         </Card>
       </div>

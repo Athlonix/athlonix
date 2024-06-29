@@ -83,10 +83,10 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
         <div className="flex items-center gap-4">
           {!isAuthenticated ? (
             <>
-              <Button asChild variant="ghost">
+              <Button asChild>
                 <Link href="signup">Devenir membre</Link>
               </Button>
-              <Button asChild variant="ghost">
+              <Button asChild>
                 <Link href="login">Se connecter</Link>
               </Button>
             </>

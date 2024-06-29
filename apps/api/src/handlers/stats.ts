@@ -36,7 +36,7 @@ async function getTotalMembers(): Promise<number> {
   if (error || !count) {
     return 0;
   }
-  return count;
+  return count || 0;
 }
 
 async function getTotalSports(): Promise<number> {
@@ -44,7 +44,7 @@ async function getTotalSports(): Promise<number> {
   if (error || !count) {
     return 0;
   }
-  return count;
+  return count || 0;
 }
 
 async function getTotalActivities(): Promise<number> {
@@ -52,7 +52,7 @@ async function getTotalActivities(): Promise<number> {
   if (error || !count) {
     return 0;
   }
-  return count;
+  return count || 0;
 }
 
 async function getTotalTournaments(): Promise<number> {
@@ -60,20 +60,20 @@ async function getTotalTournaments(): Promise<number> {
   if (error || !count) {
     return 0;
   }
-  return count;
+  return count || 0;
 }
 
 async function getMembersByMonth(): Promise<{ month: string; members: number }[]> {
   const thisYearTimestamp = new Date().getFullYear();
   const today = new Date();
-  const { data, error, count } = await supabase
+  const { data, error } = await supabase
     .from('USERS')
-    .select('created_at', { count: 'exact' })
+    .select('created_at')
     .gte('date_validity', `${today.toISOString()}`)
     .eq('status', 'approved')
     .gte('created_at', `${thisYearTimestamp}-01-01T00:00:00.000Z`)
     .select();
-  if (error || !data || !count) {
+  if (error || !data) {
     return [];
   }
   const months = data.map((user) => {
@@ -91,12 +91,12 @@ async function getMembersByMonth(): Promise<{ month: string; members: number }[]
 
 async function getDonations(): Promise<{ month: string; amount: number }[]> {
   const thisYearTimestamp = new Date().getFullYear();
-  const { data, error, count } = await supabase
+  const { data, error } = await supabase
     .from('DONATIONS')
-    .select('created_at, amount', { count: 'exact' })
+    .select('created_at, amount')
     .gte('created_at', `${thisYearTimestamp}-01-01T00:00:00.000Z`);
 
-  if (error || !data || !count) {
+  if (error || !data) {
     return [];
   }
   const months = data.map((donation) => {

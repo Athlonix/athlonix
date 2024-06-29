@@ -14,7 +14,7 @@ export async function deleteUserCookie(): Promise<void> {
   cookies().delete('access_token');
 }
 
-export async function LogoutUser() {
+export async function LogoutUser(): Promise<void> {
   const urlApi = process.env.ATHLONIX_API_URL;
   const token = cookies().get('access_token')?.value;
   fetch(`${urlApi}/auth/logout`, {
@@ -25,7 +25,6 @@ export async function LogoutUser() {
     },
   })
     .then((response) => {
-      response.json();
       if (response.status === 200) {
         deleteUserCookie();
       }

@@ -1,3 +1,4 @@
+import { createServer } from 'node:http';
 import { serve } from '@hono/node-server';
 import { swaggerUI } from '@hono/swagger-ui';
 import { OpenAPIHono } from '@hono/zod-openapi';
@@ -8,6 +9,7 @@ import { HTTPException } from 'hono/http-exception';
 import { logger } from 'hono/logger';
 import { prettyJSON } from 'hono/pretty-json';
 import { secureHeaders } from 'hono/secure-headers';
+import { Server } from 'socket.io';
 import { activities } from './handlers/activities.js';
 import { assemblies } from './handlers/assemblies.js';
 import { auth } from './handlers/auth.js';

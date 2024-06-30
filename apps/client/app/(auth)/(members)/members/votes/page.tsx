@@ -6,6 +6,7 @@ import { Button } from '@repo/ui/components/ui/button';
 import { Card } from '@repo/ui/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { type Socket, io } from 'socket.io-client';
 
 const Icons = {
   spinner: Loader2,
@@ -15,6 +16,30 @@ export default function ListVotes() {
   const [votes, setVotes] = useState<Vote[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'ongoing' | 'finished' | 'not_started'>('all');
+  const [socket, setSocket] = useState<Socket>();
+
+  useEffect(() => {
+    const socket = io(process.env.NEXT_PUBLIC_SOCKET_ENDPOINT || '');
+    setSocket(socket);
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('receivedVote', (payload) => {
+        console.log(payload);
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off('receivedVote');
+      }
+    };
+  }, [socket]);
 
   useEffect(() => {
     async function fetchData() {

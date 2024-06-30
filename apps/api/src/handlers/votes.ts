@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { io } from '../libs/socket.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import { createPoll, deletePoll, getAllPolls, getOnePoll, updatePoll, voteToPoll } from '../routes/votes.js';
@@ -10,6 +11,13 @@ import { Role, type Variables } from '../validators/general.js';
 export const polls = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
 });
+
+supabase
+  .channel('realtime_votes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'POLLS_VOTES' }, (payload) => {
+    io.emit('receivedVote', payload.new);
+  })
+  .subscribe();
 
 polls.openapi(getAllPolls, async (c) => {
   const user = c.get('user');

@@ -12,6 +12,10 @@ describe('Activities tests', () => {
   let id_location: number;
   let id_activity_exception: number;
   let id_task: number;
+  const now = new Date();
+  const end = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+  const start_date = now.toISOString().split('T')[0];
+  const end_date = end.toISOString().split('T')[0];
 
   test('Create admin', async () => {
     const res = await app.request('/auth/signup', {
@@ -109,8 +113,8 @@ describe('Activities tests', () => {
         max_participants: 10,
         min_participants: 1,
         days_of_week: ['monday', 'tuesday'],
-        start_date: null,
-        end_date: null,
+        start_date: start_date,
+        end_date: end_date,
         start_time: start_time,
         end_time: end_time,
         frequency: 'weekly',

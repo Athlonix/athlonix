@@ -1,6 +1,6 @@
 'use client';
 
-import type { Activity } from '@/app/(dashboard)/dashboard/activities/page';
+import type { Activity, Address, Sport } from '@/app/lib/type/Activities';
 import EditForm from '@/app/ui/dashboard/activities/EditForm';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -20,22 +20,8 @@ import {
 import { toast } from '@repo/ui/components/ui/sonner';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
 import { MoreHorizontal } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
-
-type Sport = {
-  id: number;
-  name: string;
-  max_participants: number | null;
-  min_participants: number;
-};
-
-type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
 
 interface ActivityRowProps {
   activity: Activity;
@@ -86,8 +72,10 @@ function ActivityRow(props: ActivityRowProps) {
     idSport: setIdSport,
     idAddress: setIdAddress,
     days: setDays,
-    endDate: setEndDate,
     startDate: setStartDate,
+    endDate: setEndDate,
+    startTime: setStartTime,
+    endTime: setEndTime,
     description: setDescription,
     frequency: setFrequency,
     interval: setInterval,
@@ -114,6 +102,8 @@ function ActivityRow(props: ActivityRowProps) {
         setDays([]);
         setEndDate('');
         setStartDate('');
+        setStartTime('');
+        setEndTime('');
         setDescription('');
       })
       .catch((error: Error) => {
@@ -125,7 +115,9 @@ function ActivityRow(props: ActivityRowProps) {
 
   return (
     <TableRow key={props.activity.id}>
-      <TableCell className="font-medium">{name}</TableCell>
+      <TableCell className="font-medium">
+        <Link href={`/dashboard/activities/details?id=${props.activity.id}`}>{name}</Link>
+      </TableCell>
       <TableCell>
         {minParticipants} - {maxParticipants}
       </TableCell>
@@ -190,8 +182,7 @@ function ActivityRow(props: ActivityRowProps) {
       )}
       {frequency === 'yearly' && (
         <TableCell>
-          {`Du ${startDateFormat.getDate()} ${startDateFormat
-            .getMonth()
+          {`Du ${startDateFormat.getDate()} ${(startDateFormat.getMonth() + 1)
             .toString()
             .padStart(2, '0')} de ${startDateFormat
             .getHours()
@@ -199,8 +190,9 @@ function ActivityRow(props: ActivityRowProps) {
             .padStart(
               2,
               '0',
-            )}:${startDateFormat.getMinutes().toString().padStart(2, '0')} jusqu'au ${endDateFormat.getDate()} ${endDateFormat
-            .getMonth()
+            )}:${startDateFormat.getMinutes().toString().padStart(2, '0')} jusqu'au ${endDateFormat.getDate()} ${(
+            endDateFormat.getMonth() + 1
+          )
             .toString()
             .padStart(2, '0')} ${endDateFormat.getHours().toString().padStart(2, '0')}:${endDateFormat
             .getMinutes()

@@ -2,7 +2,7 @@ import { z } from '@hono/zod-openapi';
 import type { Context } from 'hono';
 import { describe, vi } from 'vitest';
 import app from '../src/index.js';
-import { getOccurences } from '../src/libs/activities.js';
+import { getOccurencesWeekly } from '../src/libs/activities.js';
 import { zodErrorHook } from '../src/libs/zodError.js';
 import { accountRolesValidity } from '../src/middlewares/auth.js';
 import { checkBanned, checkRole } from '../src/utils/context.js';
@@ -61,7 +61,7 @@ describe('Other general tests', () => {
         min_participants: 5,
       },
     ];
-    const occurences = getOccurences(startDate, endDate, daysToFind, exceptions);
+    const occurences = getOccurencesWeekly(startDate, endDate, daysToFind, exceptions);
     expect(occurences).toEqual([
       {
         id_exception: 1,
@@ -89,7 +89,7 @@ describe('Other general tests', () => {
       },
     ]);
 
-    const invalid = getOccurences(new Date('2022-01-10'), new Date('2022-01-01'), daysToFind, exceptions);
+    const invalid = getOccurencesWeekly(new Date('2022-01-10'), new Date('2022-01-01'), daysToFind, exceptions);
     expect(invalid).toEqual([]);
   });
 

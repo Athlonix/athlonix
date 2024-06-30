@@ -1,61 +1,18 @@
 'use client';
 
+import type { Activity, Address, Sport } from '@/app/lib/type/Activities';
+import { getActivities, getAddresses, getSports } from '@/app/lib/utils/activities';
 import ActivitiesList from '@/app/ui/dashboard/activities/ActivitiesList';
 import AddActivity from '@/app/ui/dashboard/activities/AddActivity';
 import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-
-export type Activity = {
-  id: number;
-  name: string;
-  min_participants: number;
-  max_participants: number;
-  id_sport: number | null;
-  id_address: number | null;
-  days_of_week: ('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[];
-  start_date: string;
-  end_date: string;
-  start_time: string;
-  end_time: string;
-  description: string | null;
-  frequency: 'weekly' | 'monthly' | 'yearly';
-};
-
-type ActivityData = {
-  data: Activity[];
-  count: number;
-};
-
-type Sport = {
-  id: number;
-  name: string;
-  max_participants: number | null;
-  min_participants: number;
-};
-
-type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
-
-type SportData = {
-  data: Sport[];
-  count: number;
-};
-
-type AddressData = {
-  data: Address[];
-  count: number;
-};
 
 function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Address[] }): JSX.Element {
   const searchParams = useSearchParams();
@@ -70,35 +27,17 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
-    const urlApi = process.env.NEXT_PUBLIC_API_URL;
+    const timer = setTimeout(async () => {
+      const { data, status } = await getActivities(page, searchTerm);
 
-    const timer = setTimeout(() => {
-      const queryParams = new URLSearchParams({
-        skip: `${page - 1}`,
-        take: '10',
-        search: searchTerm,
-      });
-
-      fetch(`${urlApi}/activities?${queryParams}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      })
-        .then((response) => {
-          if (response.status === 403) {
-            router.push('/');
-          }
-          return response.json();
-        })
-        .then((data: ActivityData) => {
-          setActivities(data.data);
-          setMaxPage(Math.ceil(data.count / 10));
-        })
-        .catch((error: Error) => {
-          console.error(error);
-        });
+      if (status === 200) {
+        setActivities(data.data);
+        setMaxPage(Math.ceil(data.count / 10));
+      } else if (status === 403) {
+        router.push('/');
+      } else {
+        toast.error('Une erreur est survenue lors de la récupération des activités', { duration: 2000 });
+      }
     }, 500);
 
     return () => clearTimeout(timer);
@@ -158,68 +97,29 @@ export default function Page(): JSX.Element {
   const [addresses, setAddresses] = useState<Address[]>([]);
 
   useEffect(() => {
-    const urlApi = process.env.NEXT_PUBLIC_API_URL;
+    const fetchData = async () => {
+      const { data: sportsData, status: sportsStatus } = await getSports();
 
-    const queryParams = new URLSearchParams({
-      all: 'true',
-    });
+      if (sportsStatus === 200) {
+        setSports(sportsData.data);
+      } else if (sportsStatus === 403) {
+        router.push('/');
+      } else {
+        toast.error('Une erreur est survenue lors de la récupération des sports', { duration: 2000 });
+      }
 
-    fetch(`${urlApi}/sports?${queryParams}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    })
-      .then((response) => {
-        if (response.status === 403) {
-          router.push('/');
-        }
-        return response.json();
-      })
-      .then((data: SportData) => {
-        const sportsArray = data.data.map((sport) => {
-          return {
-            id: sport.id,
-            name: sport.name,
-            max_participants: sport.max_participants,
-            min_participants: sport.min_participants,
-          };
-        });
-        setSports(sportsArray);
-      })
-      .catch((error: Error) => {
-        console.error(error);
-      });
+      const { data: addressesData, status: addressesStatus } = await getAddresses();
 
-    fetch(`${urlApi}/addresses?${queryParams}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    })
-      .then((response) => {
-        if (response.status === 403) {
-          router.push('/');
-        }
-        return response.json();
-      })
-      .then((data: AddressData) => {
-        const addressesArray = data.data.map((address) => {
-          return {
-            id: address.id,
-            road: address.road,
-            number: address.number,
-            complement: address.complement,
-            name: address.name,
-          };
-        });
-        setAddresses(addressesArray);
-      })
-      .catch((error: Error) => {
-        console.error(error);
-      });
+      if (addressesStatus === 200) {
+        setAddresses(addressesData.data);
+      } else if (addressesStatus === 403) {
+        router.push('/');
+      } else {
+        toast.error('Une erreur est survenue lors de la récupération des adresses', { duration: 2000 });
+      }
+    };
+
+    fetchData();
   }, [router]);
 
   return (

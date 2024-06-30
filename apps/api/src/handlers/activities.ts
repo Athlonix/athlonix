@@ -1,5 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import { getOccurences } from '../libs/activities.js';
+import { getOccurencesMonthly, getOccurencesWeekly, getOccurencesYearly } from '../libs/activities.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -13,6 +13,7 @@ import {
   getAllActivitiesExceptions,
   getOneActivity,
   getOneActivityOccurences,
+  getUsersActivity,
   updateActivity,
   validApplication,
 } from '../routes/activities.js';
@@ -67,6 +68,44 @@ activities.openapi(getOneActivity, async (c) => {
   return c.json(data, 200);
 });
 
+activities.openapi(getUsersActivity, async (c) => {
+  const { id } = c.req.valid('param');
+  const { date } = c.req.valid('query');
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, false);
+
+  const { data, error } = await supabase
+    .from('ACTIVITIES')
+    .select('*, users:USERS!ACTIVITIES_USERS (id, username), users_activities:ACTIVITIES_USERS(id_user, date, active)')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
+    return c.json({ error: 'Activity not found' }, 404);
+  }
+  const users = data.users
+    .filter(() => {
+      return data.users_activities.find((activity) => activity.date === date);
+    })
+    .map((user) => {
+      const active = data.users_activities.find((a) => a.id_user === user.id);
+
+      return {
+        id: user.id,
+        username: user.username,
+        active: active?.active || false,
+      };
+    });
+
+  const responseData = {
+    data: users || [],
+    count: users.length,
+  };
+
+  return c.json(responseData, 200);
+});
+
 activities.openapi(getOneActivityOccurences, async (c) => {
   const { id: id_activity } = c.req.valid('param');
   let { start_date, end_date } = c.req.valid('query');
@@ -88,7 +127,7 @@ activities.openapi(getOneActivityOccurences, async (c) => {
     return c.json({ error: 'Activity not found' }, 404);
   }
 
-  if (!activityFound.frequency || !activityFound.days_of_week) {
+  if (!activityFound.frequency) {
     return c.json(
       {
         activity: activityFound,
@@ -130,12 +169,29 @@ activities.openapi(getOneActivityOccurences, async (c) => {
     return c.json({ error: 'Error while fetching activity' }, 500);
   }
 
-  const occurences = getOccurences(
-    new Date(start_date),
-    new Date(end_date),
-    activityFound.days_of_week,
-    activitesExceptions,
-  );
+  let occurences: {
+    id_exception: number | null;
+    date: Date;
+    max_participants: number | null;
+    min_participants: number | null;
+  }[] = [];
+
+  if (activityFound.frequency === 'weekly' && activityFound.days_of_week) {
+    occurences = getOccurencesWeekly(
+      new Date(start_date),
+      new Date(end_date),
+      activityFound.days_of_week,
+      activitesExceptions,
+    );
+  }
+
+  if (activityFound.frequency === 'monthly') {
+    occurences = getOccurencesMonthly(new Date(start_date), new Date(end_date), activitesExceptions);
+  }
+
+  if (activityFound.frequency === 'yearly') {
+    occurences = getOccurencesYearly(new Date(start_date), new Date(end_date), activitesExceptions);
+  }
 
   return c.json(
     {
@@ -167,13 +223,13 @@ activities.openapi(createActivity, async (c) => {
 
   await checkRole(roles, false);
 
-  const uniqueEventInvalid: boolean = !frequency && (!start_date || !end_date || !start_time || !end_time);
+  const uniqueEventInvalid: boolean = !start_date || !end_date || !start_time || !end_time;
 
   if (uniqueEventInvalid) {
     return c.json({ error: 'You must provide date and time to create a unique event' }, 400);
   }
 
-  if (frequency && frequency === 'daily' && (!days_of_week || !start_time || !end_time)) {
+  if (frequency === 'daily' && (!days_of_week || !start_time || !end_time)) {
     return c.json({ error: 'You must provide days of week for weekly frequency' }, 400);
   }
 
@@ -267,14 +323,14 @@ activities.openapi(deleteActivity, async (c) => {
 
 activities.openapi(applyToActivity, async (c) => {
   const user = c.get('user');
+  const { date } = c.req.valid('query');
   await checkRole(user.roles, true);
 
   const { id } = c.req.valid('param');
   const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
-  if (activity.end_date && new Date(activity.end_date) < new Date())
-    return c.json({ error: 'Activity has already ended' }, 400);
+  if (new Date(date) < new Date()) return c.json({ error: 'Activity has already ended' }, 400);
 
   const { count } = await supabase
     .from('ACTIVITIES_USERS')
@@ -287,13 +343,16 @@ activities.openapi(applyToActivity, async (c) => {
 
   const { count: participants } = await supabase
     .from('ACTIVITIES_USERS')
-    .select('count(*)', { count: 'exact' })
+    .select('date', { count: 'exact' })
     .eq('id_activity', id)
+    .eq('date', date)
     .eq('active', true);
 
   if (participants && participants >= activity.max_participants) return c.json({ error: 'Activity is full' }, 400);
 
-  const { error: errorApply } = await supabase.from('ACTIVITIES_USERS').insert({ id_activity: id, id_user: user.id });
+  const { error: errorApply } = await supabase
+    .from('ACTIVITIES_USERS')
+    .insert({ id_activity: id, id_user: user.id, date: date });
 
   if (errorApply) return c.json({ error: 'Failed to apply to activity' }, 400);
 
@@ -328,22 +387,18 @@ activities.openapi(validApplication, async (c) => {
   await checkRole(user.roles, false, [Role.ADMIN, Role.MODERATOR]);
 
   const { id } = c.req.valid('param');
-  const { id_user } = c.req.valid('json');
-  const { data: activity, error: errorActivity } = await supabase
-    .from('ACTIVITIES')
-    .select('id, name, end_date')
-    .eq('id', id)
-    .single();
+  const { id_user, date } = c.req.valid('json');
+  const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
-  if (activity.end_date && new Date(activity.end_date) < new Date())
-    return c.json({ error: 'Activity has already ended' }, 400);
+  if (new Date(date) < new Date()) return c.json({ error: 'Activity has already ended' }, 400);
 
   const { count } = await supabase
     .from('ACTIVITIES_USERS')
     .select('count(id)', { count: 'exact' })
     .eq('id_activity', id)
     .eq('id_user', id_user)
+    .eq('date', date)
     .single();
 
   if (count && count === 0) return c.json({ error: 'User did not apply to activity' }, 400);
@@ -352,7 +407,8 @@ activities.openapi(validApplication, async (c) => {
     .from('ACTIVITIES_USERS')
     .update({ active: true })
     .eq('id_activity', id)
-    .eq('id_user', id_user);
+    .eq('id_user', id_user)
+    .eq('date', date);
 
   if (errorValid) return c.json({ error: 'Failed to validate application' }, 400);
 

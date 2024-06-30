@@ -34,7 +34,7 @@ export type Database = {
           description: string | null;
           end_date: string | null;
           end_time: string | null;
-          frequency: Database['public']['Enums']['frequency'] | null;
+          frequency: Database['public']['Enums']['frequency'];
           id: number;
           id_address: number | null;
           id_sport: number | null;
@@ -49,7 +49,7 @@ export type Database = {
           description?: string | null;
           end_date?: string | null;
           end_time?: string | null;
-          frequency?: Database['public']['Enums']['frequency'] | null;
+          frequency: Database['public']['Enums']['frequency'];
           id?: number;
           id_address?: number | null;
           id_sport?: number | null;
@@ -64,7 +64,7 @@ export type Database = {
           description?: string | null;
           end_date?: string | null;
           end_time?: string | null;
-          frequency?: Database['public']['Enums']['frequency'] | null;
+          frequency?: Database['public']['Enums']['frequency'];
           id?: number;
           id_address?: number | null;
           id_sport?: number | null;
@@ -215,18 +215,21 @@ export type Database = {
         Row: {
           active: boolean;
           created_at: string;
+          date: string;
           id_activity: number;
           id_user: number;
         };
         Insert: {
           active?: boolean;
           created_at?: string;
+          date: string;
           id_activity: number;
           id_user: number;
         };
         Update: {
           active?: boolean;
           created_at?: string;
+          date?: string;
           id_activity?: number;
           id_user?: number;
         };
@@ -511,13 +514,6 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'comments_id_comment_fkey';
-            columns: ['id_response'];
-            isOneToOne: false;
-            referencedRelation: 'COMMENTS';
-            referencedColumns: ['id'];
-          },
-          {
             foreignKeyName: 'public_COMMENTS_id_activity_fkey';
             columns: ['id_activity'];
             isOneToOne: false;
@@ -529,6 +525,13 @@ export type Database = {
             columns: ['id_post'];
             isOneToOne: false;
             referencedRelation: 'POSTS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_COMMENTS_id_response_fkey';
+            columns: ['id_response'];
+            isOneToOne: false;
+            referencedRelation: 'COMMENTS';
             referencedColumns: ['id'];
           },
           {
@@ -1274,6 +1277,7 @@ export type Database = {
           id_post: number | null;
           id_product: number | null;
           id_reason: number;
+          id_user: number;
         };
         Insert: {
           content: string;
@@ -1283,6 +1287,7 @@ export type Database = {
           id_post?: number | null;
           id_product?: number | null;
           id_reason: number;
+          id_user: number;
         };
         Update: {
           content?: string;
@@ -1292,20 +1297,35 @@ export type Database = {
           id_post?: number | null;
           id_product?: number | null;
           id_reason?: number;
+          id_user?: number;
         };
         Relationships: [
           {
-            foreignKeyName: 'REPORTS_id_comment_fkey';
+            foreignKeyName: 'public_REPORTS_id_comment_fkey';
             columns: ['id_comment'];
             isOneToOne: false;
             referencedRelation: 'COMMENTS';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'REPORTS_id_post_fkey';
+            foreignKeyName: 'public_REPORTS_id_post_fkey';
             columns: ['id_post'];
             isOneToOne: false;
             referencedRelation: 'POSTS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_REPORTS_id_reason_fkey';
+            columns: ['id_reason'];
+            isOneToOne: false;
+            referencedRelation: 'REASONS';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'public_REPORTS_id_user_fkey';
+            columns: ['id_user'];
+            isOneToOne: false;
+            referencedRelation: 'USERS';
             referencedColumns: ['id'];
           },
           {
@@ -1313,13 +1333,6 @@ export type Database = {
             columns: ['id_product'];
             isOneToOne: false;
             referencedRelation: 'PRODUCTS';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 'REPORTS_id_reason_fkey';
-            columns: ['id_reason'];
-            isOneToOne: false;
-            referencedRelation: 'REASONS';
             referencedColumns: ['id'];
           },
         ];
@@ -2019,6 +2032,10 @@ export type Database = {
           metadata: Json;
           updated_at: string;
         }[];
+      };
+      operation: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
       };
       search: {
         Args: {

@@ -1,6 +1,6 @@
 'use client';
 
-import type { Activity } from '@/app/(dashboard)/dashboard/activities/page';
+import type { Activity, Address, Sport } from '@/app/lib/type/Activities';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import { Button } from '@repo/ui/components/ui/button';
@@ -32,21 +32,6 @@ import type React from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-type Sport = {
-  id: number;
-  name: string;
-  max_participants: number | null;
-  min_participants: number;
-};
-
-type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
 
 interface Props {
   activities: Activity[];

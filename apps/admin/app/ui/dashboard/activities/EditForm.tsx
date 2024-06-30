@@ -1,4 +1,4 @@
-import type { Activity } from '@/app/(dashboard)/dashboard/activities/page';
+import type { Activity } from '@/app/lib/type/Activities';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import { Button } from '@repo/ui/components/ui/button';
@@ -31,8 +31,10 @@ interface Setter {
   days: Dispatch<
     SetStateAction<('monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday')[]>
   >;
-  endDate: Dispatch<SetStateAction<string>>;
   startDate: Dispatch<SetStateAction<string>>;
+  endDate: Dispatch<SetStateAction<string>>;
+  startTime: Dispatch<SetStateAction<string>>;
+  endTime: Dispatch<SetStateAction<string>>;
   description: Dispatch<SetStateAction<string | null>>;
   frequency: Dispatch<SetStateAction<'weekly' | 'monthly' | 'yearly'>>;
 }
@@ -176,8 +178,10 @@ function EditForm(props: EditFormProps): JSX.Element {
       )[],
     );
     props.setter.frequency(values.frequency);
-    // props.setter.startDate(values.date);
-    // props.setter.endDate(values.end_time);
+    props.setter.startDate(values.date.toISOString().split('T')[0] ?? '');
+    props.setter.endDate(values.end_time.toISOString().split('T')[0] ?? '');
+    props.setter.startTime(values.start_time.toTimeString().split(' ')[0] ?? '');
+    props.setter.endTime(values.end_time.toTimeString().split(' ')[0] ?? '');
     props.setter.idSport(values.id_sport === -1 ? null : values.id_sport ?? null);
     props.setter.idAddress(values.id_address === -1 ? null : values.id_address ?? null);
 

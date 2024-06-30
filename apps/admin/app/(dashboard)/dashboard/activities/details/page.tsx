@@ -2,11 +2,12 @@
 
 import type { ActivityWithOccurences, Address, Sport, User } from '@/app/lib/type/Activities';
 import { getActivityOccurences, getActivityUsers, getAddresses, getSports } from '@/app/lib/utils/activities';
-import Occurences from '@/app/ui/components/activities/Occurences';
+import Occurences from '@/app/ui/dashboard/activities/details/Occurences';
+import { toast } from '@repo/ui/components/ui/sonner';
 import { Badge } from '@ui/components/ui/badge';
 import { Separator } from '@ui/components/ui/separator';
-import { toast } from '@ui/components/ui/sonner';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 const FrenchFrequency: Record<string, string> = {
@@ -25,31 +26,33 @@ const FrenchDays: Record<'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'frid
   sunday: 'Dimanche',
 };
 
-function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Address[] }) {
+function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Address[] }): JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
-  let id = searchParams.get('id') || 1;
-  if (typeof id === 'string') {
-    id = Number.parseInt(id);
+  let idActivity = searchParams.get('id') || 1;
+  if (typeof idActivity === 'string') {
+    idActivity = Number.parseInt(idActivity);
   }
 
-  const [activity, setActivity] = useState<ActivityWithOccurences>();
+  const [activity, setActivities] = useState<ActivityWithOccurences>();
   const [usersSet1, setUsersSet1] = useState<User[]>([]);
   const [usersSet2, setUsersSet2] = useState<User[]>([]);
   const [usersSet3, setUsersSet3] = useState<User[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data, status } = await getActivityOccurences(id);
+      const { data, status } = await getActivityOccurences(idActivity);
 
       if (status === 200) {
-        setActivity(data);
+        setActivities(data);
+      } else if (status === 403) {
+        router.push('/');
       } else {
-        router.push('/activities');
+        toast.error('Une erreur est survenue lors de la récupération des activités', { duration: 2000 });
       }
 
       if (data.occurences[0]) {
-        const { data: usersData, status: usersStatus } = await getActivityUsers(id, data.occurences[0].date);
+        const { data: usersData, status: usersStatus } = await getActivityUsers(idActivity, data.occurences[0].date);
 
         if (usersStatus === 200) {
           setUsersSet1(usersData.data);
@@ -61,7 +64,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
       }
 
       if (data.occurences[1]) {
-        const { data: usersData, status: usersStatus } = await getActivityUsers(id, data.occurences[1].date);
+        const { data: usersData, status: usersStatus } = await getActivityUsers(idActivity, data.occurences[1].date);
 
         if (usersStatus === 200) {
           setUsersSet2(usersData.data);
@@ -73,7 +76,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
       }
 
       if (data.occurences[2]) {
-        const { data: usersData, status: usersStatus } = await getActivityUsers(id, data.occurences[2].date);
+        const { data: usersData, status: usersStatus } = await getActivityUsers(idActivity, data.occurences[2].date);
 
         if (usersStatus === 200) {
           setUsersSet3(usersData.data);
@@ -84,25 +87,19 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
         }
       }
     };
-
     fetchData();
-  }, [id, router]);
+  }, [router, idActivity]);
+
   return (
     <div>
-      <div className="flex justify-center text-3xl font-bold">{activity?.activity.name}</div>
+      <div className="flex justify-center text-4xl w-full">{activity?.activity.name}</div>
       <Separator className="my-4" />
-      <div>
-        {activity?.activity.description?.split('\n').map((i, key) => {
-          return (
-            <div key={i} className=" text-justify mb-4">
-              {i}
-            </div>
-          );
-        })}
-      </div>
-      <Separator className="my-4" />
-      <div className="flex justify-center text-3xl font-bold">Informations</div>
-      <Separator className="my-4" />
+      {activity?.activity.description && (
+        <>
+          <div className="flex justify-center text-lg w-full">{activity.activity.description}</div>
+          <Separator className="my-4" />
+        </>
+      )}
       <div className="grid grid-cols-3">
         <div className="flex gap-4 items-center justify-center border-e-2">
           <Badge className="text-md">Sport :</Badge>
@@ -175,7 +172,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
   );
 }
 
-function page() {
+export default function Page(): JSX.Element {
   const router = useRouter();
   const [sports, setSports] = useState<Sport[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
@@ -207,12 +204,14 @@ function page() {
   }, [router]);
 
   return (
-    <main>
-      <Suspense fallback={<div>Chargement...</div>}>
-        <ShowContent sports={sports} addresses={addresses} />
-      </Suspense>
+    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
+      <div className="flex flex-col h-full">
+        <div className="grid flex-1 items-start">
+          <Suspense>
+            <ShowContent sports={sports} addresses={addresses} />
+          </Suspense>
+        </div>
+      </div>
     </main>
   );
 }
-
-export default page;

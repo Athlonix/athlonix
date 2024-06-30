@@ -15,7 +15,7 @@ interface ACTIVITIES_EXCEPTIONS {
   min_participants: number | null;
 }
 
-export function getOccurences(
+export function getOccurencesWeekly(
   startDate: Date,
   endDate: Date,
   daysToFind: string[],
@@ -44,6 +44,54 @@ export function getOccurences(
 
       occurences.push(occurence);
     }
+  }
+
+  return occurences;
+}
+
+export function getOccurencesMonthly(startDate: Date, endDate: Date, exceptions: ACTIVITIES_EXCEPTIONS[]) {
+  const occurences = [];
+
+  for (let currentDate = startDate; currentDate <= endDate; currentDate.setMonth(currentDate.getMonth() + 1)) {
+    const occurenceException = exceptions.find((e) => new Date(e.date).toDateString() === currentDate.toDateString());
+
+    const occurence = {
+      id_exception: null as number | null,
+      date: new Date(currentDate),
+      max_participants: null as number | null,
+      min_participants: null as number | null,
+    };
+    if (occurenceException) {
+      occurence.id_exception = occurenceException.id;
+      occurence.max_participants = occurenceException.max_participants;
+      occurence.min_participants = occurenceException.min_participants;
+    }
+
+    occurences.push(occurence);
+  }
+
+  return occurences;
+}
+
+export function getOccurencesYearly(startDate: Date, endDate: Date, exceptions: ACTIVITIES_EXCEPTIONS[]) {
+  const occurences = [];
+
+  for (let currentDate = startDate; currentDate <= endDate; currentDate.setFullYear(currentDate.getFullYear() + 1)) {
+    const occurenceException = exceptions.find((e) => new Date(e.date).toDateString() === currentDate.toDateString());
+
+    const occurence = {
+      id_exception: null as number | null,
+      date: new Date(currentDate),
+      max_participants: null as number | null,
+      min_participants: null as number | null,
+    };
+    if (occurenceException) {
+      occurence.id_exception = occurenceException.id;
+      occurence.max_participants = occurenceException.max_participants;
+      occurence.min_participants = occurenceException.min_participants;
+    }
+
+    occurences.push(occurence);
   }
 
   return occurences;

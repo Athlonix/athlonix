@@ -48,12 +48,9 @@ function CreateTeam(props: CreateTeamProps) {
       name: values.name,
     });
 
-    console.log(data, status);
-
     if (status === 201) {
       toast.success("L'équipe a bien été créée", { duration: 2000 });
       props.setTeams((teams: Team[]) => {
-        console.log(teams, data);
         return [...teams, data];
       });
       props.setCurrentTeam(data.id);

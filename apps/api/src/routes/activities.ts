@@ -58,6 +58,39 @@ export const getOneActivity = createRoute({
   tags: ['activity'],
 });
 
+export const getUsersActivity = createRoute({
+  method: 'get',
+  path: '/activities/{id}/users',
+  summary: 'Get all users of an activity',
+  description: 'Get all users of an activity',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: z.object({
+      id: z.coerce.number().min(1),
+    }),
+    query: z.object({
+      date: z.string().date(),
+    }),
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            data: z.array(z.object({ id: z.number(), username: z.string(), active: z.boolean() })),
+            count: z.number(),
+          }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['activity'],
+});
+
 export const getOneActivityOccurences = createRoute({
   method: 'get',
   path: '/activities/{id}/occurences',
@@ -181,6 +214,9 @@ export const applyToActivity = createRoute({
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
+    query: z.object({
+      date: z.string().date(),
+    }),
   },
   responses: {
     201: {
@@ -234,7 +270,7 @@ export const cancelApplication = createRoute({
 });
 
 export const validApplication = createRoute({
-  method: 'post',
+  method: 'patch',
   path: '/activities/{id}/validApply',
   summary: 'Valid application to a activity',
   description: 'Valid application to a activity',
@@ -247,6 +283,7 @@ export const validApplication = createRoute({
         'application/json': {
           schema: z.object({
             id_user: z.coerce.number().min(1),
+            date: z.string().date(),
           }),
         },
       },

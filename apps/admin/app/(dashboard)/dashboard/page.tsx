@@ -95,7 +95,7 @@ function Page(): JSX.Element {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="members" fill="#8884d8" />
+                  <Bar dataKey="members" fill="#8884d8" name={'Membres'} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -117,7 +117,7 @@ function Page(): JSX.Element {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="amount" fill="#82ca9d" />
+                  <Bar dataKey="amount" fill="#82ca9d" name={'Montant (€)'} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (

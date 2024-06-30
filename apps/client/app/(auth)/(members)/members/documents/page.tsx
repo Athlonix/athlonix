@@ -174,13 +174,19 @@ export default function Documents() {
         </Breadcrumb>
       </div>
       <div className="flex flex-wrap">
-        <DisplayFolderAndFiles
-          folder={folders}
-          onFolderClick={onFolderClick}
-          files={files}
-          onFileClick={viewFile}
-          currrentPath={currrentPath}
-        />
+        {(files?.length ?? 0) > 0 || (folders?.length ?? 0) > 0 ? (
+          <DisplayFolderAndFiles
+            folder={folders}
+            onFolderClick={onFolderClick}
+            files={files}
+            onFileClick={viewFile}
+            currrentPath={currrentPath}
+          />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full p-8">
+            <p className="text-gray-500">Aucun document disponible</p>
+          </div>
+        )}
       </div>
     </div>
   );

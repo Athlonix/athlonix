@@ -9,7 +9,11 @@ VALUES
   (7, 'SECRATARY'), 
   (8, 'TREASURER'), 
   (9, 'PRESIDENT'),
-  (10, 'EMPLOYEE');
+  (10, 'EMPLOYEE'),
+  (11, 'VICE-PRESIDENT'),
+  (12, 'COMMUNICATION_OFFICER'),
+  (13, 'PROJECT_MANAGER');
+  
 
 INSERT INTO "public"."REASONS" ("reason")
 VALUES

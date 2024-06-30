@@ -1,4 +1,3 @@
-import { z } from '@hono/zod-openapi';
 import { describe } from 'vitest';
 import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';

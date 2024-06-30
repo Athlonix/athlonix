@@ -1,9 +1,8 @@
 import type { Activity, Occurence, User } from '@/app/lib/type/Activities';
 import JoinActivity from '@/app/ui/components/activities/JoinActivity';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/components/ui/tabs';
-import { useRouter } from 'next/navigation';
 import type { Dispatch, SetStateAction } from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function Occurences({
   activity,
@@ -33,7 +32,7 @@ function Occurences({
       id: JSON.parse(user).id,
       username: JSON.parse(user).username,
       active: false,
-    }
+    };
   }
 
   const validatedUser1 = users1.filter((user) => user.active === true);
@@ -47,7 +46,7 @@ function Occurences({
   const [joined1, setJoined1] = useState<User>();
   const [joined2, setJoined2] = useState<User>();
   const [joined3, setJoined3] = useState<User>();
-  
+
   useEffect(() => {
     setPendingJoin1(users1.find((user) => user.id === userId && user.active === false));
     setPendingJoin2(users2.find((user) => user.id === userId && user.active === false));
@@ -56,7 +55,7 @@ function Occurences({
     setJoined2(users2.find((user) => user.id === userId && user.active === true));
     setJoined3(users3.find((user) => user.id === userId && user.active === true));
   }, [users1, users2, users3, userId]);
-  
+
   return (
     <Tabs defaultValue="activity1">
       <div className="flex justify-center my-4">
@@ -88,9 +87,17 @@ function Occurences({
                 <div>Vous êtes inscrit</div>
               </div>
             )}
-            {activity.max_participants - validatedUser1.length > 0 && occurences[0] && pendingJoin1 === undefined && joined1 === undefined && (
-              <JoinActivity id_activity={activity.id} date={occurences[0].date} user={userData} setPendingJoin={setPendingJoin1} />
-            )}
+            {activity.max_participants - validatedUser1.length > 0 &&
+              occurences[0] &&
+              pendingJoin1 === undefined &&
+              joined1 === undefined && (
+                <JoinActivity
+                  id_activity={activity.id}
+                  date={occurences[0].date}
+                  user={userData}
+                  setPendingJoin={setPendingJoin1}
+                />
+              )}
           </div>
         </TabsContent>
         <TabsContent value="activity2">
@@ -108,9 +115,17 @@ function Occurences({
                 <div>Vous êtes inscrit</div>
               </div>
             )}
-            {activity.max_participants - validatedUser2.length > 0 && occurences[1] && pendingJoin2 === undefined && joined2 === undefined && (
-              <JoinActivity id_activity={activity.id} date={occurences[1].date} user={userData} setPendingJoin={setPendingJoin2} />
-            )}
+            {activity.max_participants - validatedUser2.length > 0 &&
+              occurences[1] &&
+              pendingJoin2 === undefined &&
+              joined2 === undefined && (
+                <JoinActivity
+                  id_activity={activity.id}
+                  date={occurences[1].date}
+                  user={userData}
+                  setPendingJoin={setPendingJoin2}
+                />
+              )}
           </div>
         </TabsContent>
         <TabsContent value="activity3">
@@ -128,9 +143,17 @@ function Occurences({
                 <div>Vous êtes inscrit</div>
               </div>
             )}
-            {activity.max_participants - validatedUser3.length > 0 && occurences[2] && pendingJoin3 === undefined && joined3 === undefined && (
-              <JoinActivity id_activity={activity.id} date={occurences[2].date} user={userData} setPendingJoin={setPendingJoin3} />
-            )}
+            {activity.max_participants - validatedUser3.length > 0 &&
+              occurences[2] &&
+              pendingJoin3 === undefined &&
+              joined3 === undefined && (
+                <JoinActivity
+                  id_activity={activity.id}
+                  date={occurences[2].date}
+                  user={userData}
+                  setPendingJoin={setPendingJoin3}
+                />
+              )}
           </div>
         </TabsContent>
       </div>

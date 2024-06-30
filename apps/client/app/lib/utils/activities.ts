@@ -101,4 +101,4 @@ export async function joinActivity(id: number, date: string): Promise<{ data: Us
   });
 
   return { data: await res.json(), status: res.status };
-};
+}

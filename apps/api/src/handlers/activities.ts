@@ -71,9 +71,6 @@ activities.openapi(getOneActivity, async (c) => {
 activities.openapi(getUsersActivity, async (c) => {
   const { id } = c.req.valid('param');
   const { date } = c.req.valid('query');
-  const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, false);
 
   const { data, error } = await supabase
     .from('ACTIVITIES')

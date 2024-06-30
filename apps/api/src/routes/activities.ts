@@ -63,8 +63,6 @@ export const getUsersActivity = createRoute({
   path: '/activities/{id}/users',
   summary: 'Get all users of an activity',
   description: 'Get all users of an activity',
-  security: [{ Bearer: [] }],
-  middleware: authMiddleware,
   request: {
     params: z.object({
       id: z.coerce.number().min(1),

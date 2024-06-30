@@ -84,10 +84,10 @@ export const NavBar: React.FC<NavBarProps> = ({ links }) => {
           {!isAuthenticated ? (
             <>
               <Button asChild>
-                <Link href="signup">Devenir membre</Link>
+                <Link href="/signup">Devenir membre</Link>
               </Button>
               <Button asChild>
-                <Link href="login">Se connecter</Link>
+                <Link href="/login">Se connecter</Link>
               </Button>
             </>
           ) : (

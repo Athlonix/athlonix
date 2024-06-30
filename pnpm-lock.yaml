@@ -172,6 +172,9 @@ importers:
       react:
         specifier: ^18.3.1
         version: 18.3.1
+      react-chatbotify:
+        specifier: ^1.7.0
+        version: 1.7.0
       react-dom:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
@@ -3382,6 +3385,9 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
+
+  react-chatbotify@1.7.0:
+    resolution: {integrity: sha512-wZCF1++4MP/2fnCxEDkSm2ij1aKlKlvbkF7ikhZYDrJgOLStiJCFVbD2GXgA5bnmgUEib18kfllWmNjR3ZDOMQ==}
 
   react-day-picker@8.10.1:
     resolution: {integrity: sha512-TMx7fNbhLk15eqcMt+7Z7S2KF7mfTId/XJDjKE8f+IUcFn0l08/kI4FiYTL/0yuOLmEcbR4Fwe3GJf/NiiMnPA==}
@@ -7467,6 +7473,8 @@ snapshots:
       '@react-types/shared': 3.23.1(react@18.3.1)
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
+
+  react-chatbotify@1.7.0: {}
 
   react-day-picker@8.10.1(date-fns@3.6.0)(react@18.3.1):
     dependencies:

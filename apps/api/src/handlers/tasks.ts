@@ -162,9 +162,9 @@ tasks.openapi(deleteTask, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { error } = await supabase.from('ACTIVITIES_TASKS').delete().eq('id', id);
+  const { error, count } = await supabase.from('ACTIVITIES_TASKS').delete({ count: 'exact' }).eq('id', id);
 
-  if (error) {
+  if (error || count === 0) {
     return c.json({ error: 'Task not found' }, 404);
   }
 

@@ -3,7 +3,7 @@ import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
 import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { loginUser, logoutUser, refreshTokens, signupUser } from '../routes/auth.js';
+import { loginUser, logoutUser, signupUser } from '../routes/auth.js';
 import { getToken } from '../utils/context.js';
 import type { Variables } from '../validators/general.js';
 
@@ -84,30 +84,6 @@ auth.openapi(loginUser, async (c) => {
   const token = data.session.access_token;
 
   return c.json({ user, token }, 200);
-});
-
-auth.openapi(refreshTokens, async (c) => {
-  const refresh_token = getCookie(c, 'refresh_token');
-  if (!refresh_token) {
-    throw new HTTPException(403, { message: 'No refresh token' });
-  }
-
-  const { data, error } = await supabase.auth.refreshSession({
-    refresh_token,
-  });
-
-  if (error) throw new HTTPException(403, { message: error.message });
-
-  if (data?.session) {
-    setCookie(c, 'refresh_token', data.session.refresh_token, {
-      maxAge: 31536000,
-      httpOnly: true,
-      path: '/',
-      secure: true,
-    });
-  }
-
-  return c.json({ message: 'Token refreshed' }, 200);
 });
 
 auth.openapi(logoutUser, async (c) => {

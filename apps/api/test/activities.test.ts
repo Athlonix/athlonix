@@ -2,9 +2,6 @@ import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
-const port = Number(process.env.PORT || 3101);
-const path = `http://localhost:${port}`;
-
 describe('Activities tests', () => {
   let id_admin: number;
   let id_auth: string;
@@ -17,7 +14,7 @@ describe('Activities tests', () => {
   let id_activity_exception: number;
 
   test('Create admin', async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -38,7 +35,7 @@ describe('Activities tests', () => {
   });
 
   test('Login admin', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const res = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -52,7 +49,7 @@ describe('Activities tests', () => {
   });
 
   test('Create sport', async () => {
-    const res = await app.request(`${path}/sports`, {
+    const res = await app.request('/sports', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +69,7 @@ describe('Activities tests', () => {
   });
 
   test('Create location', async () => {
-    const res = await app.request(`${path}/addresses`, {
+    const res = await app.request('/addresses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,7 +97,7 @@ describe('Activities tests', () => {
     const start_time = now.toTimeString().split(' ')[0];
     const end_time = end.toTimeString().split(' ')[0];
 
-    const res = await app.request(`${path}/activities`, {
+    const res = await app.request('/activities', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -127,24 +124,75 @@ describe('Activities tests', () => {
     activity_id = activity.id;
   });
 
-  test('Get activity occurences', async () => {
-    const res = await app.request(
-      `${path}/activities/${activity_id}/occurences?start_date=2024-05-20&end_date=2024-06-02`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${jwt}`,
-        },
+  test('Update activity', async () => {
+    const now = new Date();
+    const end = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+
+    const start_time = now.toTimeString().split(' ')[0];
+    const end_time = end.toTimeString().split(' ')[0];
+
+    const res = await app.request(`/activities/${activity_id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
       },
-    );
+      body: JSON.stringify({
+        name: 'Activity test updated',
+        description: 'Description test updated',
+        max_participants: 10,
+        min_participants: 1,
+        days_of_week: ['monday', 'tuesday'],
+        start_date: null,
+        end_date: null,
+        start_time: start_time,
+        end_time: end_time,
+        frequency: 'weekly',
+        id_sport: id_sport,
+        id_address: id_location,
+      }),
+    });
+
+    expect(res.status).toBe(200);
+  });
+
+  test('Get all activities', async () => {
+    const res = await app.request('/activities', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Get activity by id', async () => {
+    const res = await app.request(`/activities/${activity_id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Get activity occurences', async () => {
+    const res = await app.request(`/activities/${activity_id}/occurences?start_date=2024-05-20&end_date=2024-06-02`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
     expect(res.status).toBe(200);
     const data = (await res.json()) as { occurences: { id: number }[] };
     expect(data.occurences.length).toBe(4);
   });
 
   test('Create activity exception', async () => {
-    const res = await app.request(`${path}/activities/${activity_id}/exceptions`, {
+    const res = await app.request(`/activities/${activity_id}/exceptions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -162,8 +210,20 @@ describe('Activities tests', () => {
     id_activity_exception = activity_exception.id;
   });
 
+  test('get all Activities Exceptions', async () => {
+    const res = await app.request(`/activities/${activity_id}/exceptions?start_date=2024-05-20&end_date=2024-06-02`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    expect(res.status).toBe(200);
+  });
+
   test('Create user', async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -183,7 +243,7 @@ describe('Activities tests', () => {
   });
 
   test('Login user', async () => {
-    const res = await app.request(`${path}/auth/login`, {
+    const res = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -197,7 +257,7 @@ describe('Activities tests', () => {
   });
 
   test('Apply activity', async () => {
-    const res = await app.request(`${path}/activities/${activity_id}/apply`, {
+    const res = await app.request(`/activities/${activity_id}/apply`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -208,7 +268,7 @@ describe('Activities tests', () => {
   });
 
   test('Valide application', async () => {
-    const res = await app.request(`${path}/activities/${activity_id}/validApply`, {
+    const res = await app.request(`/activities/${activity_id}/validApply`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -222,7 +282,7 @@ describe('Activities tests', () => {
   });
 
   test('Get user activities', async () => {
-    const res = await app.request(`${path}/users/${id_user}/activities`, {
+    const res = await app.request(`/users/${id_user}/activities`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -232,8 +292,22 @@ describe('Activities tests', () => {
     expect(res.status).toBe(200);
   });
 
+  test('Cancel apply', async () => {
+    const res = await app.request(`/activities/${activity_id}/apply`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        id_user: id_user,
+      }),
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('Delete activity exception', async () => {
-    const res = await app.request(`${path}/activities_exceptions/${id_activity_exception}`, {
+    const res = await app.request(`/activities_exceptions/${id_activity_exception}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -244,7 +318,7 @@ describe('Activities tests', () => {
   });
 
   test('Delete activity', async () => {
-    const res = await app.request(`${path}/activities/${activity_id}`, {
+    const res = await app.request(`/activities/${activity_id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -255,7 +329,7 @@ describe('Activities tests', () => {
   });
 
   test('Delete user', async () => {
-    const res = await app.request(`${path}/users/${id_user}`, {
+    const res = await app.request(`/users/${id_user}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -266,7 +340,7 @@ describe('Activities tests', () => {
   });
 
   test('Delete location', async () => {
-    const res = await app.request(`${path}/addresses/${id_location}`, {
+    const res = await app.request(`/addresses/${id_location}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -277,7 +351,7 @@ describe('Activities tests', () => {
   });
 
   test('Delete sport', async () => {
-    const res = await app.request(`${path}/sports/${id_sport}`, {
+    const res = await app.request(`/sports/${id_sport}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

@@ -130,4 +130,26 @@ grant truncate on table "public"."POSTS_VIEWS" to "service_role";
 
 grant update on table "public"."POSTS_VIEWS" to "service_role";
 
+alter table "public"."COMMENTS" drop constraint "public_COMMENTS_id_post_fkey";
 
+alter table "public"."COMMENTS" add constraint "public_COMMENTS_id_post_fkey" FOREIGN KEY (id_post) REFERENCES "POSTS"(id) ON DELETE SET NULL not valid;
+
+alter table "public"."COMMENTS" validate constraint "public_COMMENTS_id_post_fkey";
+
+alter table "public"."COMMENTS" drop constraint "comments_id_comment_fkey";
+
+alter table "public"."COMMENTS" drop constraint "public_COMMENTS_id_activity_fkey";
+
+alter table "public"."COMMENTS" drop constraint "public_COMMENTS_id_user_fkey";
+
+alter table "public"."COMMENTS" add constraint "public_COMMENTS_id_response_fkey" FOREIGN KEY (id_response) REFERENCES "COMMENTS"(id) ON DELETE CASCADE not valid;
+
+alter table "public"."COMMENTS" validate constraint "public_COMMENTS_id_response_fkey";
+
+alter table "public"."COMMENTS" add constraint "public_COMMENTS_id_activity_fkey" FOREIGN KEY (id_activity) REFERENCES "ACTIVITIES"(id) ON DELETE SET NULL not valid;
+
+alter table "public"."COMMENTS" validate constraint "public_COMMENTS_id_activity_fkey";
+
+alter table "public"."COMMENTS" add constraint "public_COMMENTS_id_user_fkey" FOREIGN KEY (id_user) REFERENCES "USERS"(id) ON DELETE CASCADE not valid;
+
+alter table "public"."COMMENTS" validate constraint "public_COMMENTS_id_user_fkey";

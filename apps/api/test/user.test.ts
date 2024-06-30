@@ -2,9 +2,6 @@ import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
-const port = Number(process.env.PORT || 3101);
-const path = `http://localhost:${port}`;
-
 describe('User tests', () => {
   let id_user: number;
   let id_auth: string;
@@ -13,7 +10,7 @@ describe('User tests', () => {
   let jwt: string;
 
   beforeAll(async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -32,7 +29,7 @@ describe('User tests', () => {
     await insertRole(id_admin, Role.MEMBER);
     await setValidSubscription(id_admin);
 
-    const loginRes = await app.request(`${path}/auth/login`, {
+    const loginRes = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -46,7 +43,7 @@ describe('User tests', () => {
   });
 
   test('Create user', async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -63,8 +60,16 @@ describe('User tests', () => {
     id_auth = user.id_auth;
   });
 
+  test('GET All users /users', async () => {
+    const res = await app.request('/users', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('GET user /users/{id}', async () => {
-    const res = await app.request(`${path}/users/${id_user}`, {
+    const res = await app.request(`/users/${id_user}`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     });
@@ -72,7 +77,7 @@ describe('User tests', () => {
   });
 
   test('GET user /users/{id} with wrong id', async () => {
-    const res = await app.request(`${path}/users/20000`, {
+    const res = await app.request('/users/20000', {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     });
@@ -80,7 +85,7 @@ describe('User tests', () => {
   });
 
   test('PATCH user /users/{id}', async () => {
-    const res = await app.request(`${path}/users/${id_user}`, {
+    const res = await app.request(`/users/${id_user}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
       body: JSON.stringify({
@@ -93,7 +98,7 @@ describe('User tests', () => {
   });
 
   test('Add role to user', async () => {
-    const res = await app.request(`${path}/users/${id_user}/roles`, {
+    const res = await app.request(`/users/${id_user}/roles`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
       body: JSON.stringify({ id_role: Role.MODERATOR }),
@@ -101,17 +106,52 @@ describe('User tests', () => {
     expect(res.status).toBe(201);
   });
 
-  test('Remove role from user', async () => {
-    const res = await app.request(`${path}/users/${id_user}/roles`, {
-      method: 'DELETE',
+  test('GET user by role /users?role={role}', async () => {
+    const res = await app.request('/users?role=MODERATOR', {
+      method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
-      body: JSON.stringify({ id_role: Role.MODERATOR }),
     });
     expect(res.status).toBe(200);
   });
 
-  test('DELETE user /users/{id}', async () => {
-    const res = await app.request(`${path}/users/${id_user}`, {
+  test('Update user role /users/{id}/roles', async () => {
+    const res = await app.request(`/users/${id_user}/roles`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ roles: [Role.ADMIN] }),
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Remove role from user', async () => {
+    const res = await app.request(`/users/${id_user}/roles`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ id_role: Role.ADMIN }),
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Apply for user subscription /users/{id}/status', async () => {
+    const res = await app.request(`/users/${id_user}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ status: 'applied' }),
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Valid user subscription /users/{id}/status', async () => {
+    const res = await app.request(`/users/${id_user}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+      body: JSON.stringify({ status: 'approved' }),
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Soft delete user /users/{id}', async () => {
+    const res = await app.request(`/users/${id_user}/soft`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     });

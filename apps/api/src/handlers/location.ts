@@ -92,9 +92,10 @@ location.openapi(deleteAddress, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
   const { id } = c.req.valid('param');
-  const { error } = await supabase.from('ADDRESSES').delete().eq('id', id);
 
-  if (error) {
+  const { error, count } = await supabase.from('ADDRESSES').delete({ count: 'exact' }).eq('id', id);
+
+  if (error || count === 0) {
     return c.json({ error: 'Address not found' }, 404);
   }
 

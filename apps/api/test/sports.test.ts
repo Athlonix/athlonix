@@ -2,9 +2,6 @@ import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
-const port = Number(process.env.PORT || 3101);
-const path = `http://localhost:${port}`;
-
 describe('Sports tests', () => {
   let id_user: number;
   let id_auth: string;
@@ -12,7 +9,7 @@ describe('Sports tests', () => {
   let id_sport: number;
 
   beforeAll(async () => {
-    const res = await app.request(`${path}/auth/signup`, {
+    const res = await app.request('/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -31,7 +28,7 @@ describe('Sports tests', () => {
     await insertRole(id_user, Role.MEMBER);
     await setValidSubscription(id_user);
 
-    const loginRes = await app.request(`${path}/auth/login`, {
+    const loginRes = await app.request('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -45,7 +42,7 @@ describe('Sports tests', () => {
   });
 
   test('Create sport', async () => {
-    const res = await app.request(`${path}/sports`, {
+    const res = await app.request('/sports', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -65,7 +62,29 @@ describe('Sports tests', () => {
   });
 
   test('Get all sports', async () => {
-    const res = await app.request(`${path}/sports?all=true`, {
+    const res = await app.request('/sports?all=true', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Get all sports with pagination and search', async () => {
+    const res = await app.request('/sports?page=1&limit=10&search=sport', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('Get sport by id', async () => {
+    const res = await app.request(`/sports/${id_sport}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -76,7 +95,7 @@ describe('Sports tests', () => {
   });
 
   test('Update sport', async () => {
-    const res = await app.request(`${path}/sports/${id_sport}`, {
+    const res = await app.request(`/sports/${id_sport}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -94,7 +113,7 @@ describe('Sports tests', () => {
   });
 
   test('Delete sport', async () => {
-    const res = await app.request(`${path}/sports/${id_sport}`, {
+    const res = await app.request(`/sports/${id_sport}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -102,6 +121,46 @@ describe('Sports tests', () => {
       },
     });
     expect(res.status).toBe(200);
+  });
+
+  test('Should fail to get sport by id', async () => {
+    const res = await app.request(`/sports/${id_sport}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(404);
+  });
+
+  test('Should fail to update sport', async () => {
+    const res = await app.request(`/sports/${id_sport}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+      body: JSON.stringify({
+        name: 'sport test updated',
+        description: 'nice sport updated',
+        min_players: 1,
+        max_players: 100,
+        image: 'https://www.google.com',
+      }),
+    });
+    expect(res.status).toBe(404);
+  });
+
+  test('Should fail to delete sport', async () => {
+    const res = await app.request(`/sports/${id_sport}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(404);
   });
 
   afterAll(async () => {

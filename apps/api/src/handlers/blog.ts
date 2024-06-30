@@ -112,6 +112,7 @@ blog.openapi(updatePost, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
+
   const { data, error } = await supabase
     .from('POSTS')
     .update({ title, content, cover_image, description, updated_at: new Date().toISOString() })
@@ -130,79 +131,52 @@ blog.openapi(deletePost, async (c) => {
   const { id } = c.req.valid('param');
   const user = c.get('user');
   const roles = user.roles;
-  const id_user = user.id;
-  await checkRole(roles, false, [Role.REDACTOR, Role.MODERATOR]);
+  await checkRole(roles, true, [Role.REDACTOR, Role.MODERATOR]);
 
-  const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
-  if (roles?.some((role) => allowed.includes(role))) {
-    const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
+  const isAdmin = roles?.some((role) => [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR].includes(role));
+  const query = supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
-    if (error || count === 0) {
-      return c.json({ error: 'Post not found' }, 404);
-    }
-
-    return c.json({ message: 'Post deleted successfully' }, 200);
+  if (!isAdmin) {
+    query.eq('id_user', user.id);
   }
 
-  const { error, count } = await supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id).eq('id_user', id_user);
+  const { error, count } = await query;
 
   if (error || count === 0) {
-    return c.json({ error: 'Post not found' }, 404);
+    return c.json({ error: 'Post not found or you do not have permission to delete it' }, 404);
   }
 
-  return c.json({ message: 'Post deleted successfully' }, 200);
+  return c.json({ message: 'Post permanently deleted successfully' }, 200);
 });
 
 blog.openapi(softDeletePost, async (c) => {
   const { id } = c.req.valid('param');
   const user = c.get('user');
   const roles = user.roles;
-  await checkRole(roles, true, [Role.MODERATOR, Role.ADMIN]);
 
-  const allowed = [Role.MODERATOR, Role.ADMIN];
+  const isAdminOrModerator = roles?.some((role) => [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR].includes(role));
 
-  if (roles?.some((role) => allowed.includes(role))) {
-    const { data, error } = await supabase
-      .from('POSTS')
-      .update({
-        content: '[supprimé par un modérateur]',
-        title: '[supprimé par un modérateur]',
-        cover_image: null,
-        description: null,
-        deleted_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .select();
+  const updateData = {
+    content: '[supprimé]',
+    title: '[supprimé]',
+    cover_image: null,
+    description: null,
+    deleted_at: new Date().toISOString(),
+  };
 
-    if (error || !data) {
-      return c.json({ error: 'Post not found' }, 404);
-    }
+  const query = supabase.from('POSTS').update(updateData).eq('id', id);
 
-    return c.json({ message: 'Post deleted successfully' }, 200);
+  if (!isAdminOrModerator) {
+    query.eq('id_user', user.id);
   }
 
-  if (!roles?.some((role) => allowed.includes(role))) {
-    const { data, error } = await supabase
-      .from('POSTS')
-      .update({
-        content: "[supprimé par l'utilisateur]",
-        title: "[supprimé par l'utilisateur]",
-        cover_image: null,
-        description: null,
-        deleted_at: new Date().toISOString(),
-      })
-      .eq('id', id)
-      .eq('id_user', user.id)
-      .select();
+  const { data, error } = await query.select().single();
 
-    if (error || !data) {
-      return c.json({ error: 'Post not found' }, 404);
-    }
-
-    return c.json({ message: 'Post deleted successfully' }, 200);
+  if (error || !data) {
+    return c.json({ error: 'Post not found or you do not have permission to delete it' }, 404);
   }
 
-  return c.json({ error: 'Post not found' }, 404);
+  return c.json({ message: 'Post soft deleted successfully' }, 200);
 });
 
 blog.openapi(commentOnPost, async (c) => {
@@ -297,30 +271,17 @@ blog.openapi(deleteComment, async (c) => {
   const roles = user.roles;
   await checkRole(user.roles, true);
 
-  const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
-  if (roles?.some((role) => allowed.includes(role))) {
-    const { error, count } = await supabase
-      .from('COMMENTS')
-      .delete({ count: 'exact' })
-      .eq('id', id_comment)
-      .eq('id_post', id_post);
+  const isAdmin = roles?.some((role) => [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR].includes(role));
+  const query = supabase.from('COMMENTS').delete({ count: 'exact' }).eq('id', id_comment).eq('id_post', id_post);
 
-    if (error || count === 0) {
-      return c.json({ error: 'Comment not found' }, 404);
-    }
-
-    return c.json({ message: 'Comment deleted successfully' }, 200);
+  if (!isAdmin) {
+    query.eq('id_user', user.id);
   }
 
-  const { error, count } = await supabase
-    .from('COMMENTS')
-    .delete({ count: 'exact' })
-    .eq('id', id_comment)
-    .eq('id_post', id_post)
-    .eq('id_user', user.id);
+  const { error, count } = await query;
 
   if (error || count === 0) {
-    return c.json({ error: 'Comment not found' }, 404);
+    return c.json({ error: 'Comment not found or you do not have permission to delete it' }, 404);
   }
 
   return c.json({ message: 'Comment deleted successfully' }, 200);

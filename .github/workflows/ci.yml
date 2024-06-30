@@ -26,28 +26,16 @@ env:
 jobs:
   ci:
     runs-on: self-hosted
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
       - name: 📦 Checkout Repository
         uses: actions/checkout@v4
 
-      - name: 🛠️ Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: 🛠️ Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - name: ⬆️ Install dependencies
-        run: pnpm --color install
+      - name: 🛠️ Setup Biome
+        uses: biomejs/setup-biome@v2
 
       - name: 🚀 Run Biome
-        run: pnpm run lint:check
-
-#      - name: 🧪 Check type coverage
-#        run: npx type-coverage --detail --at-least 90 -p tsconfig.json
+        run: biome ci
 
       - if: github.ref == 'refs/heads/main'
         name: 🚀 Setup Supabase CLI

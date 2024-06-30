@@ -21,20 +21,20 @@
     "@hono/zod-openapi": "0.14.5",
     "@hono/zod-validator": "^0.2.2",
     "@repo/types": "workspace:*",
-    "@supabase/supabase-js": "^2.43.6",
-    "@vitest/coverage-v8": "^1.6.0",
-    "hono": "^4.4.8",
-    "stripe": "^16.0.0",
+    "@supabase/supabase-js": "^2.44.2",
+    "hono": "^4.4.9",
+    "stripe": "^16.1.0",
     "zod": "^3.23.8",
     "zod-validation-error": "^3.3.0"
   },
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^20.14.8",
+    "@types/node": "^20.14.9",
     "@types/swagger-ui-dist": "^3.30.5",
+    "@vitest/coverage-v8": "^1.6.0",
     "supabase": "^1.178.2",
-    "tsx": "^4.15.7",
+    "tsx": "^4.16.0",
     "typescript": "^5.5.2",
     "vitest": "^1.6.0"
   }

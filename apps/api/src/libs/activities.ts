@@ -23,6 +23,8 @@ export function getOccurencesWeekly(
 ) {
   const occurences = [];
 
+  if (startDate > endDate) return [];
+
   for (let currentDate = startDate; currentDate <= endDate; currentDate.setDate(currentDate.getDate() + 1)) {
     const dayOfWeek = currentDate.getDay();
     if (daysToFind.includes(days.get(dayOfWeek))) {

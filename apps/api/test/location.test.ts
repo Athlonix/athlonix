@@ -77,6 +77,17 @@ describe('Location tests', () => {
     expect(res.status).toBe(200);
   });
 
+  test('Get address by id', async () => {
+    const res = await app.request(`${path}/addresses/${id_location}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('Update address', async () => {
     const res = await app.request(`${path}/addresses/${id_location}`, {
       method: 'PATCH',

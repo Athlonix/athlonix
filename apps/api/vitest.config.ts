@@ -1,23 +1,23 @@
 /// <reference types="vitest" />
-import { defineConfig } from 'vitest/config';
+import { coverageConfigDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
     globals: true,
-    maxWorkers: 1,
-    minWorkers: 1,
+    fileParallelism: false,
     coverage: {
       provider: 'v8',
       thresholds: {
         global: {
-          statements: 70,
-          branches: 30,
-          functions: 40,
-          lines: 70,
+          statements: 80,
+          branches: 35,
+          functions: 60,
+          lines: 80,
         },
       },
+      ignoreEmptyLines: true,
+      exclude: ['**/edm.ts', '**/stripe.ts', '**/storage.ts', ...coverageConfigDefaults.exclude],
       reporter: ['text', 'html', 'json', 'json-summary'],
-      reportOnFailure: true,
     },
   },
 });

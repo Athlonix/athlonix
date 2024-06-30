@@ -38,7 +38,7 @@ reasons.openapi(createReason, async (c) => {
   await checkRole(roles, false, [Role.ADMIN]);
 
   const { reason } = c.req.valid('json');
-  const { data, error } = await supabase.from('REASONS').insert({ reason }).single();
+  const { data, error } = await supabase.from('REASONS').insert({ reason }).select().single();
 
   if (error) {
     return c.json({ error: error.message }, 500);
@@ -54,7 +54,7 @@ reasons.openapi(updateReason, async (c) => {
 
   const { id } = c.req.valid('param');
   const { reason } = c.req.valid('json');
-  const { data, error } = await supabase.from('REASONS').update({ reason }).eq('id', id).single();
+  const { data, error } = await supabase.from('REASONS').update({ reason }).eq('id', id).select().single();
 
   if (error) {
     return c.json({ error: error.message }, 404);
@@ -69,10 +69,11 @@ reasons.openapi(deleteReason, async (c) => {
   await checkRole(roles, false, [Role.ADMIN]);
 
   const { id } = c.req.valid('param');
-  const { error } = await supabase.from('REASONS').delete().eq('id', id);
 
-  if (error) {
-    return c.json({ error: error.message }, 404);
+  const { error, count } = await supabase.from('REASONS').delete({ count: 'exact' }).eq('id', id);
+
+  if (error || count === 0) {
+    return c.json({ error: 'Reason not found' }, 404);
   }
 
   return c.json({ message: 'Reason deleted' }, 200);

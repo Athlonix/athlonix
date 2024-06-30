@@ -212,8 +212,8 @@ edm.openapi(deleteFolderRoute, async (c) => {
   await checkRole(roles, false);
   const { id } = c.req.valid('param');
 
-  const { error } = await supabase.from('FOLDERS').delete().eq('id', id);
-  if (error) {
+  const { error, count } = await supabase.from('FOLDERS').delete({ count: 'exact' }).eq('id', id);
+  if (error || count === 0) {
     return c.json({ error: 'Folder not found' }, 404);
   }
 

@@ -10,16 +10,16 @@ import {
   getMaterialById,
   removeMaterial,
   updateMaterial,
-} from '../routes/material.js';
+} from '../routes/materials.js';
 import { checkRole } from '../utils/context.js';
 import type { Variables } from '../validators/general.js';
 import { Role } from '../validators/general.js';
 
-export const material = new OpenAPIHono<{ Variables: Variables }>({
+export const materials = new OpenAPIHono<{ Variables: Variables }>({
   defaultHook: zodErrorHook,
 });
 
-material.openapi(getAllMaterials, async (c) => {
+materials.openapi(getAllMaterials, async (c) => {
   const { all, search, addresses } = c.req.valid('query');
   const user = c.get('user');
   const roles = user.roles;
@@ -40,17 +40,17 @@ material.openapi(getAllMaterials, async (c) => {
     materialIds = addressData.map((ad) => ad.id_material);
   }
 
-  let query = supabase
+  const query = supabase
     .from('MATERIALS')
     .select('*, addresses:ADDRESSES_MATERIALS (id_address, quantity)', { count: 'exact' })
     .order('id', { ascending: true });
 
   if (search) {
-    query = query.ilike('name', `%${search}%`);
+    query.ilike('name', `%${search}%`);
   }
 
   if (materialIds) {
-    query = query.in('id', materialIds);
+    query.in('id', materialIds);
   }
 
   const { data, error, count } = await query;
@@ -76,7 +76,7 @@ material.openapi(getAllMaterials, async (c) => {
   return c.json(responseData, 200);
 });
 
-material.openapi(getMaterialById, async (c) => {
+materials.openapi(getMaterialById, async (c) => {
   const { id } = c.req.valid('param');
   const user = c.get('user');
   const roles = user.roles;
@@ -88,11 +88,7 @@ material.openapi(getMaterialById, async (c) => {
     .eq('id', id)
     .single();
 
-  if (error || !data) {
-    return c.json({ error: 'Material not found' }, 404);
-  }
-
-  if (!data.addresses[0]) {
+  if (error || !data || !data.addresses[0]) {
     return c.json({ error: 'Material not found' }, 404);
   }
 
@@ -107,7 +103,7 @@ material.openapi(getMaterialById, async (c) => {
   return c.json(formattedData, 200);
 });
 
-material.openapi(createMaterial, async (c) => {
+materials.openapi(createMaterial, async (c) => {
   const { name, weight_grams } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
@@ -122,7 +118,7 @@ material.openapi(createMaterial, async (c) => {
   return c.json(data, 201);
 });
 
-material.openapi(updateMaterial, async (c) => {
+materials.openapi(updateMaterial, async (c) => {
   const { id } = c.req.valid('param');
   const { name, weight_grams } = c.req.valid('json');
   const user = c.get('user');
@@ -136,81 +132,79 @@ material.openapi(updateMaterial, async (c) => {
     .select()
     .single();
 
-  if (error) {
-    return c.json({ error: error.message }, 500);
+  if (error || !data) {
+    return c.json({ error: 'Material not found' }, 404);
   }
 
   return c.json(data, 200);
 });
 
-material.openapi(deleteMaterial, async (c) => {
+materials.openapi(deleteMaterial, async (c) => {
   const { id } = c.req.valid('param');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { error } = await supabase.from('MATERIALS').delete().eq('id', id);
+  const { error, count } = await supabase.from('MATERIALS').delete({ count: 'exact' }).eq('id', id);
 
-  if (error) {
-    return c.json({ error: error.message }, 500);
+  if (error || count === 0) {
+    return c.json({ error: 'Material not found' }, 404);
   }
 
   return c.json({ message: 'Material deleted' }, 200);
 });
 
-material.openapi(changeMaterialQuantity, async (c) => {
+materials.openapi(changeMaterialQuantity, async (c) => {
   const { id } = c.req.valid('param');
   const { quantity, id_address } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from('ADDRESSES_MATERIALS')
     .update({ quantity })
     .eq('id_material', id)
     .eq('id_address', id_address);
 
   if (error) {
-    return c.json({ error: error.message }, 500);
+    return c.json({ error: "Material or address doesn't exist" }, 404);
   }
 
   return c.json({ message: 'Quantity updated' }, 200);
 });
 
-material.openapi(addMaterial, async (c) => {
+materials.openapi(addMaterial, async (c) => {
   const { id } = c.req.valid('param');
   const { id_address, quantity } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { data, error } = await supabase
-    .from('ADDRESSES_MATERIALS')
-    .insert([{ id_material: id, id_address, quantity }]);
+  const { error } = await supabase.from('ADDRESSES_MATERIALS').insert([{ id_material: id, id_address, quantity }]);
 
   if (error) {
-    return c.json({ error: error.message }, 500);
+    return c.json({ error: "Material or address doesn't exist" }, 404);
   }
 
   return c.json({ message: 'Material added' }, 201);
 });
 
-material.openapi(removeMaterial, async (c) => {
+materials.openapi(removeMaterial, async (c) => {
   const { id } = c.req.valid('param');
   const { id_address } = c.req.valid('json');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { error } = await supabase
+  const { error, count } = await supabase
     .from('ADDRESSES_MATERIALS')
-    .delete()
+    .delete({ count: 'exact' })
     .eq('id_material', id)
     .eq('id_address', id_address);
 
-  if (error) {
-    return c.json({ error: error.message }, 500);
+  if (error || count === 0) {
+    return c.json({ error: 'Material not found' }, 404);
   }
 
   return c.json({ message: 'Material removed' }, 200);

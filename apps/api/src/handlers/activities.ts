@@ -282,6 +282,7 @@ activities.openapi(updateActivity, async (c) => {
   const { data, error } = await supabase
     .from('ACTIVITIES')
     .update({
+      name,
       description,
       max_participants,
       min_participants,
@@ -311,9 +312,9 @@ activities.openapi(deleteActivity, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { error } = await supabase.from('ACTIVITIES').delete().eq('id', id);
+  const { error, count } = await supabase.from('ACTIVITIES').delete({ count: 'exact' }).eq('id', id);
 
-  if (error) {
+  if (error || count === 0) {
     return c.json({ error: 'Activity not found' }, 404);
   }
 
@@ -364,18 +365,21 @@ activities.openapi(cancelApplication, async (c) => {
   await checkRole(user.roles, true);
 
   const { id } = c.req.valid('param');
+  const { id_user } = c.req.valid('json');
   const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
 
-  const { error: errorCancel } = await supabase
+  const { error: errorCancel, count } = await supabase
     .from('ACTIVITIES_USERS')
-    .delete()
+    .delete({ count: 'exact' })
     .eq('id_activity', id)
-    .eq('id_user', user.id);
+    .eq('id_user', id_user);
 
-  if (errorCancel) return c.json({ error: 'Failed to cancel application' }, 400);
-
+  if (errorCancel || count === 0) {
+    return c.json({ error: 'Failed to cancel application' }, 400);
+  }
+  console.log('Activity canceled');
   return c.json({ message: `Application to activity ${activity.name} canceled` }, 200);
 });
 
@@ -452,9 +456,9 @@ activities.openapi(deleteActivityExceptions, async (c) => {
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { error } = await supabase.from('ACTIVITIES_EXCEPTIONS').delete().eq('id', id);
+  const { error, count } = await supabase.from('ACTIVITIES_EXCEPTIONS').delete({ count: 'exact' }).eq('id', id);
 
-  if (error) {
+  if (error || count === 0) {
     return c.json({ error: 'Activity exception not found' }, 404);
   }
 

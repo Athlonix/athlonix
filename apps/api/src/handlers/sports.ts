@@ -83,21 +83,20 @@ sports.openapi(updateSport, async (c) => {
     .single();
 
   if (error || !data) {
-    return c.json({ error: 'Failed to update sport' }, 400);
+    return c.json({ error: 'Sport not found' }, 404);
   }
 
   return c.json(data, 200);
 });
-
 sports.openapi(deleteSport, async (c) => {
   const { id } = c.req.valid('param');
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
 
-  const { error } = await supabase.from('SPORTS').delete().eq('id', id);
+  const { error, count } = await supabase.from('SPORTS').delete({ count: 'exact' }).eq('id', id);
 
-  if (error) {
+  if (error || count === 0) {
     return c.json({ error: 'Sport not found' }, 404);
   }
 

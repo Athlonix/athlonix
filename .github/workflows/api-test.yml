@@ -45,7 +45,7 @@ jobs:
       - name: 🛠️ Setup Supabase CLI
         uses: supabase/setup-cli@v1
         with:
-          version: 1.172.2
+          version: latest
 
       - name: 🚀 Start Supabase
         run: |
@@ -64,12 +64,11 @@ jobs:
         run: 
           pnpm -F api test:cov
 
-      - name: 'Report Coverage'
-        if: always() 
+      - name: 📊 Coverage report
         uses: davelosert/vitest-coverage-report-action@v2
         with:
           working-directory: ./apps/api
-          name: 'API Coverage'
+          name: API
 
       - name: 🧹 Stop supabase
         run: supabase stop --no-backup

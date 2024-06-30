@@ -1,7 +1,16 @@
-import ChatBot from 'react-chatbotify';
+'use client';
+
+import { Suspense, lazy, useEffect, useState } from 'react';
 import type { Params } from 'react-chatbotify';
 
+const ChatBot = lazy(() => import('react-chatbotify'));
+
 const AthlonixBot = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  useEffect(() => {
+    setIsLoaded(true);
+  }, []);
+
   const mainOptions = ['Informations sur les sports', 'Adhésion', 'Événements à venir', 'Nous contacter', 'FAQ'];
   const flow = {
     start: {
@@ -152,25 +161,33 @@ const AthlonixBot = () => {
     },
   };
   return (
-    <ChatBot
-      options={{
-        botBubble: {
-          avatar: 'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
-          showAvatar: true,
-        },
-        header: {
-          avatar: 'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
-          title: 'Shrek le sportif',
-        },
-        chatButton: {
-          icon: 'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
-        },
-        theme: {},
-        tooltip: { text: "Besoin d'aide ?" },
-        chatHistory: { storageKey: 'example_faq_bot' },
-      }}
-      flow={flow}
-    />
+    <>
+      {isLoaded && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <ChatBot
+            options={{
+              botBubble: {
+                avatar:
+                  'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
+                showAvatar: true,
+              },
+              header: {
+                avatar:
+                  'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
+                title: 'Shrek le sportif',
+              },
+              chatButton: {
+                icon: 'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
+              },
+              theme: {},
+              tooltip: { text: "Besoin d'aide ?" },
+              chatHistory: { storageKey: 'example_faq_bot' },
+            }}
+            flow={flow}
+          />
+        </Suspense>
+      )}
+    </>
   );
 };
 

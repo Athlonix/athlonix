@@ -167,7 +167,6 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
 }
 
 function page() {
-  const router = useRouter();
   const [sports, setSports] = useState<Sport[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
 
@@ -191,7 +190,7 @@ function page() {
     };
 
     fetchData();
-  }, [router]);
+  }, []);
 
   return (
     <main>

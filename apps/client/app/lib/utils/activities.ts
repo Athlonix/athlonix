@@ -1,7 +1,6 @@
 'use server';
 
 import type { ActivityWithOccurences, Address, Sport, User } from '@/app/lib/type/Activities';
-import { cookies } from 'next/headers';
 
 const urlApi = process.env.ATHLONIX_API_URL;
 

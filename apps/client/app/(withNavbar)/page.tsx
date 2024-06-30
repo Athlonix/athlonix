@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
+import AthlonixBot from '../ui/components/ChatBot';
 
 function ShowToast() {
   const searchParams = useSearchParams();
@@ -104,6 +105,7 @@ export default function Page(): JSX.Element {
         <Suspense>
           <ShowToast />
         </Suspense>
+        <AthlonixBot />
       </main>
     </>
   );

@@ -1,7 +1,6 @@
 import type { Activity, Occurence, User } from '@/app/lib/type/Activities';
 import JoinActivity from '@/app/ui/components/activities/JoinActivity';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/components/ui/tabs';
-import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 
 function Occurences({
@@ -10,18 +9,12 @@ function Occurences({
   users1,
   users2,
   users3,
-  setUsers1,
-  setUsers2,
-  setUsers3,
 }: {
   activity: Activity;
   occurences: Occurence[];
   users1: User[];
   users2: User[];
   users3: User[];
-  setUsers1: Dispatch<SetStateAction<User[]>>;
-  setUsers2: Dispatch<SetStateAction<User[]>>;
-  setUsers3: Dispatch<SetStateAction<User[]>>;
 }) {
   const user = localStorage.getItem('user');
   let userId = 0;
@@ -90,7 +83,8 @@ function Occurences({
             {activity.max_participants - validatedUser1.length > 0 &&
               occurences[0] &&
               pendingJoin1 === undefined &&
-              joined1 === undefined && (
+              joined1 === undefined &&
+              userId !== 0 && (
                 <JoinActivity
                   id_activity={activity.id}
                   date={occurences[0].date}
@@ -118,7 +112,8 @@ function Occurences({
             {activity.max_participants - validatedUser2.length > 0 &&
               occurences[1] &&
               pendingJoin2 === undefined &&
-              joined2 === undefined && (
+              joined2 === undefined &&
+              userId !== 0 && (
                 <JoinActivity
                   id_activity={activity.id}
                   date={occurences[1].date}
@@ -146,7 +141,8 @@ function Occurences({
             {activity.max_participants - validatedUser3.length > 0 &&
               occurences[2] &&
               pendingJoin3 === undefined &&
-              joined3 === undefined && (
+              joined3 === undefined &&
+              userId !== 0 && (
                 <JoinActivity
                   id_activity={activity.id}
                   date={occurences[2].date}

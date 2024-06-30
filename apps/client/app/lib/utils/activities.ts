@@ -18,7 +18,6 @@ export async function getActivityOccurences(id: number): Promise<{ data: Activit
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${cookies().get('access_token')?.value}`,
     },
   });
 
@@ -33,7 +32,6 @@ export async function getSports(): Promise<{ data: { data: Sport[]; count: numbe
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${cookies().get('access_token')?.value}`,
     },
   });
 
@@ -49,7 +47,6 @@ export async function getAddresses(): Promise<{ data: { data: Address[]; count: 
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${cookies().get('access_token')?.value}`,
     },
   });
 
@@ -74,7 +71,6 @@ export async function getActivityUsers(
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${cookies().get('access_token')?.value}`,
     },
   });
 
@@ -96,7 +92,6 @@ export async function joinActivity(id: number, date: string): Promise<{ data: Us
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${cookies().get('access_token')?.value}`,
     },
   });
 

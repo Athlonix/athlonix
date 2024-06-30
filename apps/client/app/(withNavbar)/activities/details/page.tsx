@@ -53,8 +53,6 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
 
         if (usersStatus === 200) {
           setUsersSet1(usersData.data);
-        } else if (usersStatus === 403) {
-          router.push('/');
         } else {
           toast.error('Une erreur est survenue lors de la récupération des utilisateurs', { duration: 2000 });
         }
@@ -65,8 +63,6 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
 
         if (usersStatus === 200) {
           setUsersSet2(usersData.data);
-        } else if (usersStatus === 403) {
-          router.push('/');
         } else {
           toast.error('Une erreur est survenue lors de la récupération des utilisateurs', { duration: 2000 });
         }
@@ -77,8 +73,6 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
 
         if (usersStatus === 200) {
           setUsersSet3(usersData.data);
-        } else if (usersStatus === 403) {
-          router.push('/');
         } else {
           toast.error('Une erreur est survenue lors de la récupération des utilisateurs', { duration: 2000 });
         }
@@ -166,9 +160,6 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
           users1={usersSet1}
           users2={usersSet2}
           users3={usersSet3}
-          setUsers1={setUsersSet1}
-          setUsers2={setUsersSet2}
-          setUsers3={setUsersSet3}
         />
       )}
     </div>
@@ -186,8 +177,6 @@ function page() {
 
       if (sportsStatus === 200) {
         setSports(sportsData.data);
-      } else if (sportsStatus === 403) {
-        router.push('/');
       } else {
         toast.error('Une erreur est survenue lors de la récupération des sports', { duration: 2000 });
       }
@@ -196,8 +185,6 @@ function page() {
 
       if (addressesStatus === 200) {
         setAddresses(addressesData.data);
-      } else if (addressesStatus === 403) {
-        router.push('/');
       } else {
         toast.error('Une erreur est survenue lors de la récupération des adresses', { duration: 2000 });
       }

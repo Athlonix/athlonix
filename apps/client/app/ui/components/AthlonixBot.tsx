@@ -151,7 +151,27 @@ const AthlonixBot = () => {
       path: 'prompt_again',
     },
   };
-  return <ChatBot options={{ theme: {}, chatHistory: { storageKey: 'example_faq_bot' } }} flow={flow} />;
+  return (
+    <ChatBot
+      options={{
+        botBubble: {
+          avatar: 'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
+          showAvatar: true,
+        },
+        header: {
+          avatar: 'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
+          title: 'Shrek le sportif',
+        },
+        chatButton: {
+          icon: 'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
+        },
+        theme: {},
+        tooltip: { text: "Besoin d'aide ?" },
+        chatHistory: { storageKey: 'example_faq_bot' },
+      }}
+      flow={flow}
+    />
+  );
 };
 
 export default AthlonixBot;

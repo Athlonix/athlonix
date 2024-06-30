@@ -139,20 +139,18 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
       )}
       <div className="grid grid-cols-2 gap-4 items-center justify-center">
         <div className="flex items-center justify-center gap-4 border-e-2">
-          <Badge className="text-md">Dates et heure de début :</Badge>
+          <Badge className="text-md">Heure de début :</Badge>
           <div>
             {activity?.activity.start_date && activity?.activity.start_time
-              ? `${activity.activity.start_date.split('-')[1]}/${activity.activity.start_date.split('-')[2]}/${activity.activity.start_date.split('-')[0]}
-            ${activity.activity.start_time.split(':')[0]}:${activity.activity.start_time.split(':')[1]}`
+              ? `${activity.activity.start_time.split(':')[0]}:${activity.activity.start_time.split(':')[1]}`
               : ''}
           </div>
         </div>
         <div className="flex items-center justify-center gap-4">
-          <Badge className="text-md">Dates et heure de fin :</Badge>
+          <Badge className="text-md">Heure de fin :</Badge>
           <div>
             {activity?.activity.end_date && activity?.activity.end_time
-              ? `${activity.activity.end_date.split('-')[1]}/${activity.activity.end_date.split('-')[2]}/${activity.activity.end_date.split('-')[0]}
-            ${activity.activity.end_time.split(':')[0]}:${activity.activity.end_time.split(':')[1]}`
+              ? `${activity.activity.end_time.split(':')[0]}:${activity.activity.end_time.split(':')[1]}`
               : ''}
           </div>
         </div>

@@ -213,8 +213,8 @@ export const applyToActivity = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    params: z.object({
-      ...idParamValidator.shape,
+    params: idParamValidator,
+    query: z.object({
       date: z.string().date(),
     }),
   },

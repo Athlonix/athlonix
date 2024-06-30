@@ -322,14 +322,14 @@ activities.openapi(deleteActivity, async (c) => {
 
 activities.openapi(applyToActivity, async (c) => {
   const user = c.get('user');
-  const { date } = c.req.valid('param');
+  const { date } = c.req.valid('query');
   await checkRole(user.roles, true);
 
   const { id } = c.req.valid('param');
   const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
-  if (activity.end_date && new Date(activity.end_date) < new Date())
+  if (new Date(date) < new Date())
     return c.json({ error: 'Activity has already ended' }, 400);
 
   const { count } = await supabase

@@ -80,3 +80,25 @@ export async function getActivityUsers(
 
   return { data: await res.json(), status: res.status };
 }
+
+export async function joinActivity(id: number, date: string): Promise<{ data: User; status: number }> {
+  const formattedDate = date.split('T')[0];
+
+  if (!formattedDate) {
+    return { data: {} as User, status: 400 };
+  }
+
+  const queryParams = new URLSearchParams({
+    date: formattedDate,
+  });
+
+  const res = await fetch(`${urlApi}/activities/${id}/apply?${queryParams}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${cookies().get('access_token')?.value}`,
+    },
+  });
+
+  return { data: await res.json(), status: res.status };
+};

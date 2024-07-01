@@ -1,12 +1,8 @@
 'use client';
-import { Loader2 } from 'lucide-react';
+import Loading from '@repo/ui/components/ui/loading';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { type Hierarchy, type Role, getHierarchy } from './action';
-
-const Icons = {
-  spinner: Loader2,
-};
 
 const roleToFrench = (role: Role): string => {
   switch (role) {
@@ -80,11 +76,7 @@ export default function AssociationHierarchyTree() {
   }, []);
 
   if (loading || !treeData) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Icons.spinner className="w-12 h-12 animate-spin text-primary-500" />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

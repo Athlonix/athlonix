@@ -1,10 +1,12 @@
 'use client';
 import type { Vote } from '@/app/lib/type/Votes';
-import { getAllVotes } from '@/app/lib/votes/utils';
+import { getAllVotes } from '@/app/lib/utils/votes';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
 import { Card } from '@repo/ui/components/ui/card';
 import Loading from '@repo/ui/components/ui/loading';
+import { Separator } from '@ui/components/ui/separator';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export default function ListVotes() {
@@ -72,32 +74,28 @@ export default function ListVotes() {
           <Card key={vote.id} className="p-4">
             <div className="flex gap-2">
               <h2 className="text-lg font-semibold flex-1">{vote.title}</h2>
+            </div>
+            <Separator />
+            <div className="flex my-4 justify-center gap-4">
               {vote.max_choices > 1 ? (
-                <Badge className="mt-4" variant="info">
-                  Choix multiples
-                </Badge>
+                <Badge variant="info">Choix multiples</Badge>
               ) : (
-                <Badge className="mt-4" variant="info">
-                  Choix unique
-                </Badge>
+                <Badge variant="info">Choix unique</Badge>
               )}
               {new Date(vote.start_at) <= new Date() && new Date(vote.end_at) >= new Date() ? (
-                <Badge className="mt-4" variant="info">
-                  En cours
-                </Badge>
+                <Badge variant="info">En cours</Badge>
               ) : new Date(vote.end_at) < new Date() ? (
-                <Badge className="mt-4" variant="destructive">
-                  Terminé le {new Date(vote.end_at).toLocaleDateString()}
-                </Badge>
+                <Badge variant="destructive">Terminé le {new Date(vote.end_at).toLocaleDateString()}</Badge>
               ) : (
-                <Badge className="mt-4" variant="secondary">
-                  Non commencé
-                </Badge>
+                <Badge variant="secondary">Non commencé</Badge>
               )}
             </div>
-            <p>{vote.description}</p>
+            <Separator />
+            <p className="text-justify">{vote.description}</p>
             {new Date(vote.start_at) <= new Date() && new Date(vote.end_at) >= new Date() && (
-              <Button className="mt-4">Je vote</Button>
+              <Link href={`/members/votes/details?id=${vote.id}`}>
+                <Button className="mt-4">Je vote</Button>
+              </Link>
             )}
             {new Date(vote.end_at) < new Date() && <Button className="mt-4">Voir les résultats</Button>}
             {new Date(vote.start_at) > new Date() && (

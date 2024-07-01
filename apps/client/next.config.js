@@ -9,5 +9,6 @@ module.exports = {
   env: {
     ATHLONIX_STORAGE_URL: process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL,
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_SOCKET_ENDPOINT: process.env.NEXT_PUBLIC_SOCKET_ENDPOINT,
   },
 };

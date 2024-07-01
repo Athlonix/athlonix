@@ -23,6 +23,7 @@
     "@repo/types": "workspace:*",
     "@supabase/supabase-js": "^2.44.2",
     "hono": "^4.4.10",
+    "socket.io": "^4.7.5",
     "stripe": "^16.1.0",
     "zod": "^3.23.8",
     "zod-validation-error": "^3.3.0"

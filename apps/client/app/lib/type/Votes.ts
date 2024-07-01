@@ -1,4 +1,4 @@
-export interface Vote {
+export type Vote = {
   id: number;
   title: string;
   description: string;
@@ -14,4 +14,10 @@ export interface Vote {
       content: string;
     },
   ];
-}
+};
+
+export type PollsVote = {
+  id: number;
+  id_option: number;
+  id_poll: number;
+};

@@ -1,7 +1,12 @@
 'use client';
+import { Loader2 } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import { type Hierarchy, type Role, getHierarchy } from './action';
+
+const Icons = {
+  spinner: Loader2,
+};
 
 const roleToFrench = (role: Role): string => {
   switch (role) {
@@ -61,6 +66,7 @@ const TreeNode: React.FC<{ node: Hierarchy; x: number; y: number; level: number 
 
 export default function AssociationHierarchyTree() {
   const [treeData, setTreeData] = useState<Hierarchy | null>(null);
+  const [loading, setLoading] = useState(true);
   const svgWidth = 1000;
   const svgHeight = 700;
 
@@ -68,18 +74,23 @@ export default function AssociationHierarchyTree() {
     const fetchData = async () => {
       const hierarchy = await getHierarchy();
       setTreeData(hierarchy);
+      setLoading(false);
     };
     fetchData();
   }, []);
 
-  if (!treeData) {
-    return <div>Chargement...</div>;
+  if (loading || !treeData) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <Icons.spinner className="w-12 h-12 animate-spin text-primary-500" />
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col items-center w-full h-full">
       <h2 className="text-3xl font-bold text-gray-800 pt-4">Hiérarchie de l'association</h2>
-      <div className="flex justify-center items-center w-full flex-grow">
+      <div className="flex justify-center items-center w-full">
         <svg width="100%" height="100%" viewBox={`0 0 ${svgWidth} ${svgHeight}`} preserveAspectRatio="xMidYMid meet">
           <title>Association Hierarchy Tree</title>
           <TreeNode node={treeData} x={svgWidth / 2} y={60} level={0} />

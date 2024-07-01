@@ -20,16 +20,13 @@ import {
   DialogTrigger,
 } from '@ui/components/ui/dialog';
 import { Label } from '@ui/components/ui/label';
+import Loading from '@ui/components/ui/loading';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
 import { Textarea } from '@ui/components/ui/textarea';
-import { BookOpenText, CircleArrowLeft, HomeIcon, Loader2 } from 'lucide-react';
+import { BookOpenText, CircleArrowLeft, HomeIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { type FormEvent, useEffect, useState } from 'react';
-
-const Icons = {
-  spinner: Loader2,
-};
 
 export default function AssemblyDetail(): JSX.Element {
   const searchParams = useSearchParams();
@@ -90,11 +87,7 @@ export default function AssemblyDetail(): JSX.Element {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Icons.spinner className="w-12 h-12 animate-spin text-primary-500" />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

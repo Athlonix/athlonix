@@ -375,7 +375,7 @@ activities.openapi(cancelApplication, async (c) => {
   if (errorCancel || count === 0) {
     return c.json({ error: 'Failed to cancel application' }, 400);
   }
-  console.log('Activity canceled');
+
   return c.json({ message: `Application to activity ${activity.name} canceled` }, 200);
 });
 

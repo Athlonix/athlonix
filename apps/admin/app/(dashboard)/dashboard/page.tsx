@@ -1,13 +1,9 @@
 'use client';
 import { type Stats, getStats } from '@/app/lib/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import Loading from '@repo/ui/components/ui/loading';
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-
-const Icons = {
-  spinner: Loader2,
-};
 
 const NoDataMessage = () => (
   <div className="flex items-center justify-center h-full">
@@ -33,11 +29,7 @@ function Page(): JSX.Element {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Icons.spinner className="w-12 h-12 animate-spin text-primary-500" />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

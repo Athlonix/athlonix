@@ -11,15 +11,12 @@ import {
 } from '@ui/components/ui/dialog';
 import { Input } from '@ui/components/ui/input';
 import { Label } from '@ui/components/ui/label';
+import Loading from '@ui/components/ui/loading';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
 import { Textarea } from '@ui/components/ui/textarea';
-import { EditIcon, Loader2, Trash2 } from 'lucide-react';
+import { EditIcon, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { type Sports, addSport, deleteSport, getAllSports, updateSport } from './utils';
-
-const Icons = {
-  spinner: Loader2,
-};
 
 export default function SportsPage(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
@@ -66,11 +63,7 @@ export default function SportsPage(): JSX.Element {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Icons.spinner className="w-12 h-12 animate-spin text-primary-500" />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

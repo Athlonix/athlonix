@@ -1,4 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
+import { RoleEnum, hierarchySchema } from '../libs/hiearchy.js';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema, queryAllUsersSchema } from '../utils/pagnination.js';
 import { userActivities } from '../validators/activities.js';
@@ -71,6 +72,40 @@ export const getMe = createRoute({
       content: {
         'application/json': {
           schema: userSchema,
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});
+
+export const getHierarchy = createRoute({
+  method: 'get',
+  path: '/users/hierarchy',
+  summary: 'Get the hierarchy of the association',
+  description: 'Get the hierarchy of the association',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: hierarchySchema.openapi({
+            type: 'object',
+            properties: {
+              role: { type: 'string', enum: RoleEnum.options },
+              name: { type: 'string' },
+              children: {
+                type: 'array',
+                items: {
+                  $ref: '#/components/schemas/HierarchySchema',
+                },
+              },
+            },
+          }),
         },
       },
     },

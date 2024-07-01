@@ -114,6 +114,14 @@ describe('User tests', () => {
     expect(res.status).toBe(200);
   });
 
+  test('Get athlonix hierarchy /users/hierarchy', async () => {
+    const res = await app.request('/users/hierarchy', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
+    });
+    expect(res.status).toBe(200);
+  });
+
   test('Update user role /users/{id}/roles', async () => {
     const res = await app.request(`/users/${id_user}/roles`, {
       method: 'PUT',

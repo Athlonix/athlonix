@@ -4,14 +4,10 @@ import { getAllVotes } from '@/app/lib/utils/votes';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
 import { Card } from '@repo/ui/components/ui/card';
+import Loading from '@repo/ui/components/ui/loading';
 import { Separator } from '@ui/components/ui/separator';
-import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-const Icons = {
-  spinner: Loader2,
-};
 
 export default function ListVotes() {
   const [votes, setVotes] = useState<Vote[]>([]);
@@ -46,11 +42,7 @@ export default function ListVotes() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Icons.spinner className="w-12 h-12 animate-spin text-primary-500" />
-      </div>
-    );
+    return <Loading />;
   }
 
   return (

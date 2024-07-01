@@ -12,14 +12,11 @@ import { Button } from '@repo/ui/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
+import Loading from '@repo/ui/components/ui/loading';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { CircleArrowLeft, Loader2 } from 'lucide-react';
+import { CircleArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-
-const Icons = {
-  spinner: Loader2,
-};
 
 export default function UserAccount() {
   const [user, setUser] = useState<User | null>(null);
@@ -50,11 +47,7 @@ export default function UserAccount() {
   }
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <Icons.spinner className="w-12 h-12 animate-spin text-primary-500" />
-      </div>
-    );
+    return <Loading />;
   }
 
   if (!user) {

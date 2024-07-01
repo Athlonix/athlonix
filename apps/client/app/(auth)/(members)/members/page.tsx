@@ -1,43 +1,7 @@
+'use client';
 import type React from 'react';
-
-type Role =
-  | 'PRESIDENT'
-  | 'VICE_PRESIDENT'
-  | 'SECRETARY'
-  | 'TREASURER'
-  | 'REDACTOR'
-  | 'PROJECT_MANAGER'
-  | 'COMMUNICATION_OFFICER';
-
-interface TreeNode {
-  role: Role;
-  name: string;
-  children?: TreeNode[];
-}
-
-const treeData: TreeNode = {
-  role: 'PRESIDENT',
-  name: 'Marie Dupont',
-  children: [
-    {
-      role: 'SECRETARY',
-      name: 'Emma Petit',
-      children: [
-        { role: 'REDACTOR', name: 'Nicolas Dubois' },
-        { role: 'PROJECT_MANAGER', name: 'Sophie Lefevre' },
-        { role: 'COMMUNICATION_OFFICER', name: 'Lucie Lefevre' },
-      ],
-    },
-    {
-      role: 'VICE_PRESIDENT',
-      name: 'Thomas Martin',
-    },
-    {
-      role: 'TREASURER',
-      name: 'Antoine Moreau',
-    },
-  ],
-};
+import { useEffect, useState } from 'react';
+import { type Hierarchy, type Role, getHierarchy } from './action';
 
 const roleToFrench = (role: Role): string => {
   switch (role) {
@@ -58,7 +22,7 @@ const roleToFrench = (role: Role): string => {
   }
 };
 
-const TreeNode: React.FC<{ node: TreeNode; x: number; y: number; level: number }> = ({ node, x, y, level }) => {
+const TreeNode: React.FC<{ node: Hierarchy; x: number; y: number; level: number }> = ({ node, x, y, level }) => {
   const childSpacing = 200;
   const levelHeight = 200;
   const nameOffset = 70;
@@ -95,9 +59,22 @@ const TreeNode: React.FC<{ node: TreeNode; x: number; y: number; level: number }
   );
 };
 
-const AssociationHierarchyTree: React.FC = () => {
+export default function AssociationHierarchyTree() {
+  const [treeData, setTreeData] = useState<Hierarchy | null>(null);
   const svgWidth = 1000;
   const svgHeight = 700;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const hierarchy = await getHierarchy();
+      setTreeData(hierarchy);
+    };
+    fetchData();
+  }, []);
+
+  if (!treeData) {
+    return <div>Chargement...</div>;
+  }
 
   return (
     <div className="flex flex-col items-center w-full h-full">
@@ -110,6 +87,4 @@ const AssociationHierarchyTree: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default AssociationHierarchyTree;
+}

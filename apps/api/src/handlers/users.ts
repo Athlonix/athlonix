@@ -1,11 +1,13 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import type { PostgrestError } from '@supabase/supabase-js';
+import { type User, buildHierarchy } from '../libs/hiearchy.js';
 import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
   addUserRole,
   deleteUser,
   getAllUsers,
+  getHierarchy,
   getMe,
   getOneUser,
   getUsersActivities,
@@ -82,6 +84,40 @@ users.openapi(getMe, async (c) => {
   }
 
   return c.json(data, 200);
+});
+
+users.openapi(getHierarchy, async (c) => {
+  const roles = c.get('user').roles;
+  await checkRole(roles, true);
+  const selectedRoles = [
+    'PRESIDENT',
+    'SECRETARY',
+    'VICE_PRESIDENT',
+    'TREASURER',
+    'REDACTOR',
+    'PROJECT_MANAGER',
+    'COMMUNICATION_OFFICER',
+  ];
+
+  const { data, error } = await supabase
+    .from('USERS')
+    .select('*, roles:ROLES!inner(id, name)')
+    .filter('deleted_at', 'is', null)
+    .in('roles.name', selectedRoles);
+
+  console.log(data, roles);
+  if (error || !data) {
+    console.log(error);
+    return c.json({ error: 'Hierarchy not found' }, 404);
+  }
+
+  const hierarchy = buildHierarchy(data as unknown as User[]);
+  console.log(hierarchy);
+  if (!hierarchy) {
+    return c.json({ error: 'Hierarchy not found' }, 404);
+  }
+
+  return c.json(hierarchy, 200);
 });
 
 users.openapi(getOneUser, async (c) => {

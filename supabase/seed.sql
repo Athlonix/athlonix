@@ -5,14 +5,13 @@ VALUES
   (3, 'REDACTOR'), 
   (4, 'MODERATOR'), 
   (5, 'ADMIN'), 
-  (6, 'DIRECTOR'), 
+  (6, 'PRESIDENT'), 
   (7, 'SECRATARY'), 
-  (8, 'TREASURER'), 
-  (9, 'PRESIDENT'),
+  (8, 'TREASURER'),
+  (9, 'VICE-PRESIDENT'), 
   (10, 'EMPLOYEE'),
-  (11, 'VICE-PRESIDENT'),
-  (12, 'COMMUNICATION_OFFICER'),
-  (13, 'PROJECT_MANAGER');
+  (11, 'COMMUNICATION_OFFICER'),
+  (12, 'PROJECT_MANAGER');
   
 
 INSERT INTO "public"."REASONS" ("reason")

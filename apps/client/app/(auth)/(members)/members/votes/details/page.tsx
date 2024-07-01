@@ -18,7 +18,7 @@ function ShowContent() {
   }
 
   const [vote, setVote] = useState<Vote>();
-  const [hasVoted, setHasVoted] = useState(false);
+  const [hasVoted, setHasVoted] = useState<boolean | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,8 +44,8 @@ function ShowContent() {
     <div>
       <div className="flex justify-center text-4xl font-bold mt-4">{vote?.title}</div>
       <Separator className="my-4" />
-      {hasVoted && vote && <VotesResults vote={vote} />}
-      {!hasVoted && vote && <VotesOptions vote={vote} hasVoted={setHasVoted} />}
+      {hasVoted === true && vote && <VotesResults vote={vote} />}
+      {hasVoted === false && vote && <VotesOptions vote={vote} hasVoted={setHasVoted} />}
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { toast } from '@ui/components/ui/sonner';
 import { useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
 
-function VotesOptions({ vote, hasVoted }: { vote: Vote; hasVoted: Dispatch<SetStateAction<boolean>> }) {
+function VotesOptions({ vote, hasVoted }: { vote: Vote; hasVoted: Dispatch<SetStateAction<boolean | null>> }) {
   const [selected, setSelected] = useState<number[]>([]);
 
   function handleSelectOption(id: number) {

@@ -142,7 +142,7 @@ users.openapi(updateUser, async (c) => {
   const roles = c.get('user').roles || [];
   await checkBanned(roles);
 
-  const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
+  const allowed = [Role.MODERATOR, Role.ADMIN, Role.PRESIDENT];
   if (roles?.some((role) => allowed.includes(role))) {
     const { data: dataExist, error: errorExist } = await supabase
       .from('USERS')

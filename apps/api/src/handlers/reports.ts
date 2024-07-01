@@ -66,7 +66,7 @@ reports.openapi(deleteReport, async (c) => {
   const roles = user.roles;
   await checkRole(user.roles, true);
 
-  const allowed = [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR];
+  const allowed = [Role.MODERATOR, Role.ADMIN, Role.PRESIDENT];
   if (roles?.some((role) => allowed.includes(role))) {
     const { error, count } = await supabase.from('REPORTS').delete({ count: 'exact' }).eq('id', id);
 

@@ -211,3 +211,29 @@ export const voteToPoll = createRoute({
   },
   tags: ['poll'],
 });
+
+export const getUserVotedPoll = createRoute({
+  method: 'get',
+  path: '/polls/{id}/voted',
+  summary: 'Get if user voted to a poll',
+  description: 'Get if user voted to a poll',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  request: {
+    params: idParamValidator,
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({ voted: z.boolean() }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    404: notFoundSchema,
+    400: badRequestSchema,
+  },
+  tags: ['poll'],
+});

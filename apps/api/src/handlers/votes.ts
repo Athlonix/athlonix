@@ -3,7 +3,15 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { io } from '../libs/socket.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
-import { createPoll, deletePoll, getAllPolls, getOnePoll, updatePoll, voteToPoll } from '../routes/votes.js';
+import {
+  createPoll,
+  deletePoll,
+  getAllPolls,
+  getOnePoll,
+  getUserVotedPoll,
+  updatePoll,
+  voteToPoll,
+} from '../routes/votes.js';
 import { checkRole } from '../utils/context.js';
 import { getPagination } from '../utils/pagnination.js';
 import { Role, type Variables } from '../validators/general.js';
@@ -233,4 +241,23 @@ polls.openapi(voteToPoll, async (c) => {
   }
 
   return c.json({ message: 'Vote registered' }, 201);
+});
+
+polls.openapi(getUserVotedPoll, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true);
+  const { id } = c.req.valid('param');
+
+  const secret = process.env.SUPABASE_KEY || 'supabase';
+  const toHash = `${user.id}-${id}`;
+  const hash = crypto?.createHmac('sha256', secret).update(toHash).digest('hex');
+
+  const { data, error } = await supabase.from('USERS_VOTES').select('id_poll').eq('id_poll', id).eq('user', hash);
+
+  if (error) {
+    return c.json({ error: 'Failed to retrieve votes' }, 400);
+  }
+
+  return c.json({ voted: data.length > 0 }, 200);
 });

@@ -105,14 +105,11 @@ users.openapi(getHierarchy, async (c) => {
     .filter('deleted_at', 'is', null)
     .in('roles.name', selectedRoles);
 
-  console.log(data, roles);
   if (error || !data) {
-    console.log(error);
     return c.json({ error: 'Hierarchy not found' }, 404);
   }
 
   const hierarchy = buildHierarchy(data as unknown as User[]);
-  console.log(hierarchy);
   if (!hierarchy) {
     return c.json({ error: 'Hierarchy not found' }, 404);
   }

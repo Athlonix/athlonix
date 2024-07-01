@@ -34,7 +34,7 @@ edm.openapi(getAllFiles, async (c) => {
   }
 
   // remove all documents where isAdmin is true if user is not admin
-  const userAdmin = roles.includes(Role.ADMIN) || roles.includes(Role.DIRECTOR);
+  const userAdmin = roles.includes(Role.ADMIN) || roles.includes(Role.PRESIDENT);
   if (!userAdmin && files) {
     files = files.filter((doc) => !doc.isAdmin);
   }
@@ -121,7 +121,7 @@ edm.openapi(downloadFileRoute, async (c) => {
     return c.json({ error: 'File not found' }, 404);
   }
 
-  if (data.isAdmin && !roles.includes(Role.ADMIN) && !roles.includes(Role.DIRECTOR)) {
+  if (data.isAdmin && !roles.includes(Role.ADMIN) && !roles.includes(Role.PRESIDENT)) {
     return c.json({ error: 'You do not have access to this file' }, 403);
   }
 

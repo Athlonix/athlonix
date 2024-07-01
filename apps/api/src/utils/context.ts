@@ -8,7 +8,7 @@ export async function checkRole(user: number[], member: boolean, roles?: Role[])
 
   if (user.includes(Role.BANNED)) throw new HTTPException(403, { message: 'Banned user' });
 
-  if (user.includes(Role.ADMIN) || user.includes(Role.DIRECTOR)) return;
+  if (user.includes(Role.ADMIN) || user.includes(Role.PRESIDENT)) return;
 
   if (member && user.includes(Role.MEMBER)) return;
 

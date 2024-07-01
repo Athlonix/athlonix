@@ -133,7 +133,7 @@ blog.openapi(deletePost, async (c) => {
   const roles = user.roles;
   await checkRole(roles, true, [Role.REDACTOR, Role.MODERATOR]);
 
-  const isAdmin = roles?.some((role) => [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR].includes(role));
+  const isAdmin = roles?.some((role) => [Role.MODERATOR, Role.ADMIN, Role.PRESIDENT].includes(role));
   const query = supabase.from('POSTS').delete({ count: 'exact' }).eq('id', id);
 
   if (!isAdmin) {
@@ -154,7 +154,7 @@ blog.openapi(softDeletePost, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
 
-  const isAdminOrModerator = roles?.some((role) => [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR].includes(role));
+  const isAdminOrModerator = roles?.some((role) => [Role.MODERATOR, Role.ADMIN, Role.PRESIDENT].includes(role));
 
   const updateData = {
     content: '[supprimé]',
@@ -271,7 +271,7 @@ blog.openapi(deleteComment, async (c) => {
   const roles = user.roles;
   await checkRole(user.roles, true);
 
-  const isAdmin = roles?.some((role) => [Role.MODERATOR, Role.ADMIN, Role.DIRECTOR].includes(role));
+  const isAdmin = roles?.some((role) => [Role.MODERATOR, Role.ADMIN, Role.PRESIDENT].includes(role));
   const query = supabase.from('COMMENTS').delete({ count: 'exact' }).eq('id', id_comment).eq('id_post', id_post);
 
   if (!isAdmin) {

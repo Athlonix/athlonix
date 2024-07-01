@@ -17,11 +17,13 @@ export enum Role {
   REDACTOR = 3,
   MODERATOR = 4,
   ADMIN = 5,
-  DIRECTOR = 6,
+  PRESIDENT = 6,
   SECRATARY = 7,
   TREASURER = 8,
-  PRESIDENT = 9,
+  VICE_PRESIDENT = 9,
   EMPLOYEE = 10,
+  COMMUNICATION_OFFICER = 11,
+  PROJECT_MANAGER = 12,
 }
 
 export const serverErrorSchema = {

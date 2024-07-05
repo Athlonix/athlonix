@@ -16,13 +16,13 @@
     "test:cov": "NODE_NO_WARNINGS=1 vitest --coverage.enabled true"
   },
   "dependencies": {
-    "@hono/node-server": "^1.11.4",
+    "@hono/node-server": "^1.12.0",
     "@hono/swagger-ui": "^0.3.0",
-    "@hono/zod-openapi": "0.14.5",
+    "@hono/zod-openapi": "0.14.7",
     "@hono/zod-validator": "^0.2.2",
     "@repo/types": "workspace:*",
     "@supabase/supabase-js": "^2.44.2",
-    "hono": "^4.4.10",
+    "hono": "^4.4.11",
     "socket.io": "^4.7.5",
     "stripe": "^16.1.0",
     "zod": "^3.23.8",
@@ -35,8 +35,8 @@
     "@types/swagger-ui-dist": "^3.30.5",
     "@vitest/coverage-v8": "^1.6.0",
     "supabase": "^1.178.2",
-    "tsx": "^4.16.0",
-    "typescript": "^5.5.2",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3",
     "vitest": "^1.6.0"
   }
 }

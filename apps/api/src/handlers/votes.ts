@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { io } from '../libs/socket.js';
 import { supabase } from '../libs/supabase.js';
+import { getPolls } from '../libs/votes.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
   createPoll,
@@ -36,6 +37,7 @@ polls.openapi(getAllPolls, async (c) => {
   const query = supabase
     .from('POLLS')
     .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))', { count: 'exact' })
+    .is('parent_poll', null)
     .order('id', { ascending: true });
 
   if (search) {
@@ -53,13 +55,36 @@ polls.openapi(getAllPolls, async (c) => {
     return c.json({ error: error.message }, 500);
   }
 
+  const { data: subData, error: subError } = await supabase
+    .from('POLLS')
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))')
+    .not('parent_poll', 'is', null)
+    .order('id', { ascending: true });
+
+  if (subError) {
+    return c.json({ error: subError.message }, 500);
+  }
+
   const format = data.map((poll) => ({
     ...poll,
     results: poll.results.map((option) => ({ ...option, votes: option.votes.length })),
   }));
 
+  const subFormat = subData.map((poll) => ({
+    ...poll,
+    results: poll.results.map((option) => ({ ...option, votes: option.votes.length })),
+  }));
+
+  const finalData = format.map((poll) => {
+    const subPolls = subFormat.filter((subPoll) => subPoll.parent_poll === poll.id);
+    return {
+      ...poll,
+      sub_polls: subPolls,
+    };
+  });
+
   const responseData = {
-    data: format || [],
+    data: finalData || [],
     count: count || 0,
   };
 
@@ -71,6 +96,7 @@ polls.openapi(getOnePoll, async (c) => {
   const roles = user.roles;
   await checkRole(roles, true);
   const { id } = c.req.valid('param');
+  const { hidden } = c.req.valid('query');
 
   const { data, error } = await supabase
     .from('POLLS')
@@ -82,9 +108,33 @@ polls.openapi(getOnePoll, async (c) => {
     return c.json({ error: 'Poll not found' }, 404);
   }
 
-  const format = data.results.map((option) => ({ ...option, votes: option.votes.length }));
+  const { data: subData, error: subError } = await supabase
+    .from('POLLS')
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))')
+    .not('parent_poll', 'is', null)
+    .order('id', { ascending: true });
 
-  return c.json({ ...data, results: format }, 200);
+  if (subError) {
+    return c.json({ error: subError.message }, 500);
+  }
+
+  const format = data.results.map((option) => ({ ...option, votes: option.votes.length }));
+  const subFormat = subData.map((poll) => ({
+    ...poll,
+    results: poll.results.map((option) => ({ ...option, votes: option.votes.length })),
+  }));
+
+  const finalData = {
+    ...data,
+    results: format,
+    sub_polls: subFormat.filter((poll) => poll.parent_poll === data.id),
+  };
+
+  if (hidden) {
+    return c.json(getPolls(finalData), 200);
+  }
+
+  return c.json(finalData, 200);
 });
 
 polls.openapi(createPoll, async (c) => {
@@ -92,7 +142,19 @@ polls.openapi(createPoll, async (c) => {
   const roles = user.roles;
   const id_user = user.id;
   await checkRole(roles, false, [Role.ADMIN]);
-  const { title, description, start_at, end_at, max_choices, options, assembly } = c.req.valid('json');
+  const {
+    title,
+    description,
+    start_at,
+    end_at,
+    max_choices,
+    options,
+    assembly,
+    parent_poll,
+    round,
+    keep,
+    end_condition,
+  } = c.req.valid('json');
 
   if (!options || options.length < 2) {
     return c.json({ error: 'Poll must have at least 2 options' }, 400);
@@ -100,7 +162,19 @@ polls.openapi(createPoll, async (c) => {
 
   const { data, error } = await supabase
     .from('POLLS')
-    .insert({ title, description, start_at, end_at, max_choices, id_user, assembly })
+    .insert({
+      title,
+      description,
+      start_at,
+      end_at,
+      max_choices,
+      id_user,
+      assembly,
+      parent_poll,
+      round,
+      keep,
+      end_condition,
+    })
     .select()
     .single();
 

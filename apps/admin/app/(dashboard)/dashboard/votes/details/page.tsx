@@ -54,9 +54,9 @@ function ShowContent() {
           {results.map((result) => (
             <div key={result.id} className="flex justify-center flex-col gap-4 p-4">
               <div>
-                {result.content} | {result.votes || 0} votes ({((result.votes ?? 0 / totalVotes) * 100).toFixed(2)} %)
+                {result.content} | {result.votes || 0} votes ({(((result.votes ?? 0) / totalVotes) * 100).toFixed(2)} %)
               </div>
-              <Progress value={(result.votes ?? 0 / totalVotes) * 100} />
+              <Progress value={((result.votes ?? 0) / totalVotes) * 100} />
             </div>
           ))}
         </div>

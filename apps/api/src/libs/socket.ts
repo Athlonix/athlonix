@@ -11,9 +11,11 @@ export const io: SocketIOServer = new SocketIOServer(httpServer, {
 });
 
 io.on('connection', async (socket) => {
-  console.log(socket.id, 'connected');
+  console.info(socket.id, 'connected');
 });
 
-httpServer.listen(3103, () => {
-  console.log('listening on *:3103');
+const SOCKET_PORT = Number(process.env.SOCKET_PORT || 3103);
+
+httpServer.listen(SOCKET_PORT, () => {
+  console.info('Socket server is running on port 3103');
 });

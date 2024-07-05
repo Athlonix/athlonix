@@ -83,8 +83,6 @@ polls.openapi(getAllPolls, async (c) => {
     };
   });
 
-  console.log(hidden);
-
   if (hidden) {
     const filteredSubPolls = finalData.map((poll) => getPolls(poll));
     return c.json({ data: filteredSubPolls || [], count: count || 0 }, 200);

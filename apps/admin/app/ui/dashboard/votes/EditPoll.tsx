@@ -1,7 +1,7 @@
 'use client';
 
 import type { Assembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
-import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
+import type { Poll } from '@/app/lib/type/Votes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -26,19 +26,19 @@ import { z } from 'zod';
 
 type Setter = {
   title: React.Dispatch<React.SetStateAction<string>>;
-  description: React.Dispatch<React.SetStateAction<string>>;
+  description: React.Dispatch<React.SetStateAction<string | null>>;
   maxChoices: React.Dispatch<React.SetStateAction<number>>;
   startAt: React.Dispatch<React.SetStateAction<string>>;
   endAt: React.Dispatch<React.SetStateAction<string>>;
 };
 
 interface Props {
-  vote: Vote;
+  poll: Poll;
   setter: Setter;
   assemblies: Assembly[];
 }
 
-function EditVote({ vote, setter, assemblies }: Props) {
+function EditPoll({ poll, setter, assemblies }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -52,17 +52,17 @@ function EditVote({ vote, setter, assemblies }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: vote.title,
-      description: vote.description,
-      max_choices: vote.max_choices,
-      assembly: String(vote.assembly) === 'null' ? '0' : String(vote.assembly),
+      title: poll.title,
+      description: poll.description || '',
+      max_choices: poll.max_choices,
+      assembly: String(poll.assembly) === 'null' ? '0' : String(poll.assembly),
     },
   });
 
   async function submitEdit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    fetch(`${urlApi}/polls/${vote.id}`, {
+    fetch(`${urlApi}/polls/${poll.id}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ function EditVote({ vote, setter, assemblies }: Props) {
         }
         return response.json();
       })
-      .then((data: Vote) => {
+      .then((data: Poll) => {
         setter.title(data.title);
         setter.description(data.description);
         setter.maxChoices(data.max_choices);
@@ -206,4 +206,4 @@ function EditVote({ vote, setter, assemblies }: Props) {
   );
 }
 
-export default EditVote;
+export default EditPoll;

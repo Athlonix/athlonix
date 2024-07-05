@@ -32,7 +32,7 @@ polls.openapi(getAllPolls, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, true);
-  const { all, search, skip, take } = c.req.valid('query');
+  const { all, search, skip, take, hidden } = c.req.valid('query');
 
   const query = supabase
     .from('POLLS')
@@ -82,6 +82,13 @@ polls.openapi(getAllPolls, async (c) => {
       sub_polls: subPolls,
     };
   });
+
+  console.log(hidden);
+
+  if (hidden) {
+    const filteredSubPolls = finalData.map((poll) => getPolls(poll));
+    return c.json({ data: filteredSubPolls || [], count: count || 0 }, 200);
+  }
 
   const responseData = {
     data: finalData || [],

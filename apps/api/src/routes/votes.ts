@@ -106,7 +106,13 @@ export const getAllPolls = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    query: queryAllSchema,
+    query: z.object({
+      ...queryAllSchema.shape,
+      hidden: z
+        .enum(['true', 'false'])
+        .transform((value) => value === 'true')
+        .default('true'),
+    }),
   },
   responses: {
     200: {
@@ -134,7 +140,12 @@ export const getOnePoll = createRoute({
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
-    query: z.object({ hidden: z.boolean().optional().default(true) }),
+    query: z.object({
+      hidden: z
+        .enum(['true', 'false'])
+        .transform((value) => value === 'true')
+        .default('true'),
+    }),
   },
   responses: {
     200: {

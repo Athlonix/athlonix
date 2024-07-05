@@ -1,7 +1,7 @@
 'use client';
 
 import type { Assembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
-import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
+import type { Poll } from '@/app/lib/type/Votes';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -26,12 +26,12 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 interface Props {
-  votes: Vote[];
-  setVotes: React.Dispatch<React.SetStateAction<Vote[]>>;
+  polls: Poll[];
+  setPolls: React.Dispatch<React.SetStateAction<Poll[]>>;
   assemblies: Assembly[];
 }
 
-function AddVote({ votes, setVotes, assemblies }: Props) {
+function AddPoll({ polls, setPolls, assemblies }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -90,9 +90,9 @@ function AddVote({ votes, setVotes, assemblies }: Props) {
         }
         return response.json();
       })
-      .then((data: Vote) => {
+      .then((data: Poll) => {
         toast.success('Vote créé', { duration: 2000, description: 'Le vote a été créé avec succès' });
-        setVotes([...votes, data]);
+        setPolls([...polls, data]);
         form.reset();
       })
       .catch((error: Error) => {
@@ -279,4 +279,4 @@ function AddVote({ votes, setVotes, assemblies }: Props) {
   );
 }
 
-export default AddVote;
+export default AddPoll;

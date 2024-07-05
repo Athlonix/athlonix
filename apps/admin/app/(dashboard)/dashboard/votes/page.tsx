@@ -1,7 +1,8 @@
 'use client';
 
-import AddVote from '@/app/ui/dashboard/votes/AddVote';
-import VotesList from '@/app/ui/dashboard/votes/VotesList';
+import type { Poll } from '@/app/lib/type/Votes';
+import AddPoll from '@/app/ui/dashboard/votes/AddPoll';
+import PollsList from '@/app/ui/dashboard/votes/PollsList';
 import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Input } from '@repo/ui/components/ui/input';
@@ -12,20 +13,8 @@ import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { type Assembly, getAssemblies } from '../assemblies/utils';
 
-export type Vote = {
-  id: number;
-  title: string;
-  description: string;
-  id_user: number;
-  max_choices: number;
-  start_at: string;
-  end_at: string;
-  assembly: number | null;
-  results: { id: number; votes: number; content: string }[];
-};
-
 type VoteData = {
-  data: Vote[];
+  data: Poll[];
   count: number;
 };
 
@@ -38,7 +27,7 @@ function ShowContent() {
   }
 
   const [maxPage, setMaxPage] = useState<number>(1);
-  const [votes, setVotes] = useState<Vote[]>([]);
+  const [polls, setPolls] = useState<Poll[]>([]);
   const [assemblies, setAssemblies] = useState<Assembly[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
@@ -71,7 +60,7 @@ function ShowContent() {
           return response.json();
         })
         .then((data: VoteData) => {
-          setVotes(data.data);
+          setPolls(data.data);
           setMaxPage(Math.ceil(data.count / 10));
         })
         .catch((error: Error) => {
@@ -90,7 +79,7 @@ function ShowContent() {
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Gestion des votes</CardTitle>
-          <AddVote votes={votes} setVotes={setVotes} assemblies={assemblies} />
+          <AddPoll polls={polls} setPolls={setPolls} assemblies={assemblies} />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">
@@ -106,7 +95,6 @@ function ShowContent() {
             <TableHeader>
               <TableRow>
                 <TableHead>Titre</TableHead>
-                <TableHead>Description</TableHead>
                 <TableHead>Date de début</TableHead>
                 <TableHead>Date de fin</TableHead>
                 <TableHead>Choix maximum</TableHead>
@@ -114,7 +102,7 @@ function ShowContent() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <VotesList votes={votes} setVotes={setVotes} assemblies={assemblies} />
+              <PollsList polls={polls} setPolls={setPolls} assemblies={assemblies} />
             </TableBody>
           </Table>
         </CardContent>

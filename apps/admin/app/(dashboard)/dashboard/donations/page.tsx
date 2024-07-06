@@ -9,11 +9,11 @@ import { type Donates, getAllDonations } from './functions';
 const chartConfig = {
   donations: {
     label: 'Donations',
-    color: '#2563eb',
+    color: '#3b82f6',
   },
-  members: {
-    label: 'Membres',
-    color: '#10b981',
+  montant: {
+    label: 'Montant',
+    color: '#8b5cf6',
   },
 } satisfies ChartConfig;
 
@@ -123,7 +123,7 @@ const Donations = () => {
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Legend />
-                <Bar dataKey="dons" fill="#3b82f6" name="Donations" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="dons" fill="var(--color-donations)" name="Donations" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ChartContainer>
           </CardContent>
@@ -141,7 +141,7 @@ const Donations = () => {
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Legend />
-                <Bar dataKey="total" fill="#8b5cf6" name="Montant" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="total" fill="var(--color-montant)" name="Montant" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ChartContainer>
           </CardContent>

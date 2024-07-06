@@ -1,9 +1,11 @@
 'use client';
 import { type Stats, getStats } from '@/app/lib/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
+
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from '@repo/ui/components/ui/chart';
 import Loading from '@repo/ui/components/ui/loading';
 import { useEffect, useState } from 'react';
-import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, CartesianGrid, Legend, XAxis, YAxis } from 'recharts';
 
 const NoDataMessage = () => (
   <div className="flex items-center justify-center h-full">
@@ -11,7 +13,18 @@ const NoDataMessage = () => (
   </div>
 );
 
-function Page(): JSX.Element {
+const chartConfig = {
+  donations: {
+    label: 'Donations',
+    color: '#2563eb',
+  },
+  members: {
+    label: 'Membres',
+    color: '#10b981',
+  },
+} satisfies ChartConfig;
+
+function StatisticPage(): JSX.Element {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -80,16 +93,16 @@ function Page(): JSX.Element {
           </CardHeader>
           <CardContent>
             {stats?.membersByMonth && stats?.membersByMonth.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats?.membersByMonth}>
+              <ChartContainer className="w-full h-300" config={chartConfig}>
+                <BarChart data={stats?.membersByMonth} accessibilityLayer={true}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
+                  <XAxis dataKey="month" tickMargin={10} />
                   <YAxis />
-                  <Tooltip />
+                  <ChartTooltip content={<ChartTooltipContent />} />
                   <Legend />
-                  <Bar dataKey="members" fill="#8884d8" name={'Membres'} />
+                  <Bar dataKey="members" name={'Membres'} fill="var(--color-members)" radius={4} width={2} />
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             ) : (
               <NoDataMessage />
             )}
@@ -102,16 +115,16 @@ function Page(): JSX.Element {
           </CardHeader>
           <CardContent>
             {stats?.donations && stats.donations.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats.donations}>
+              <ChartContainer className="w-full h-300" config={chartConfig}>
+                <BarChart data={stats.donations} accessibilityLayer={true}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" />
                   <YAxis />
-                  <Tooltip />
+                  <ChartTooltip content={<ChartTooltipContent />} />
                   <Legend />
-                  <Bar dataKey="amount" fill="#82ca9d" name={'Montant (€)'} />
+                  <Bar dataKey="amount" name={'Montant (€)'} fill="var(--color-donations)" radius={4} />
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             ) : (
               <NoDataMessage />
             )}
@@ -122,4 +135,4 @@ function Page(): JSX.Element {
   );
 }
 
-export default Page;
+export default StatisticPage;

@@ -853,35 +853,25 @@ export type Database = {
         Row: {
           created_at: string;
           id: number;
-          id_receiver: number;
           id_sender: number;
-          mesage: string | null;
+          message: string;
           updated_at: string | null;
         };
         Insert: {
           created_at?: string;
           id?: number;
-          id_receiver: number;
           id_sender: number;
-          mesage?: string | null;
+          message: string;
           updated_at?: string | null;
         };
         Update: {
           created_at?: string;
           id?: number;
-          id_receiver?: number;
           id_sender?: number;
-          mesage?: string | null;
+          message?: string;
           updated_at?: string | null;
         };
         Relationships: [
-          {
-            foreignKeyName: 'public_MESSAGES_id_receiver_fkey';
-            columns: ['id_receiver'];
-            isOneToOne: false;
-            referencedRelation: 'USERS';
-            referencedColumns: ['id'];
-          },
           {
             foreignKeyName: 'public_MESSAGES_id_sender_fkey';
             columns: ['id_sender'];

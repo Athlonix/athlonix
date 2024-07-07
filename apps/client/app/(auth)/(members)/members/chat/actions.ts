@@ -16,7 +16,7 @@ export async function getMessages(): Promise<{ data: Message[]; count: number }>
     return { data: [], count: 0 };
   }
   const token = cookies().get('access_token')?.value;
-  const urlApi = process.env.ATHLONIX_API_URL;
+  const urlApi = process.env.ATHLONIX_API_URL as string;
 
   const res = await fetch(`${urlApi}/messages?all=true`, {
     method: 'GET',
@@ -25,7 +25,12 @@ export async function getMessages(): Promise<{ data: Message[]; count: number }>
       Authorization: `Bearer ${token}`,
     },
   });
-  return res.json();
+
+  if (!res.ok) {
+    throw new Error('Failed to fetch messages');
+  }
+
+  return await res.json();
 }
 
 export async function sendMessage(message: { id_sender: number; message: string }): Promise<Message | null> {
@@ -40,7 +45,7 @@ export async function sendMessage(message: { id_sender: number; message: string 
     },
     body: JSON.stringify(message),
   });
-  return res.json();
+  return await res.json();
 }
 
 export async function updateMessage(id: number, message: string): Promise<Message | null> {
@@ -55,7 +60,7 @@ export async function updateMessage(id: number, message: string): Promise<Messag
     },
     body: JSON.stringify({ message }),
   });
-  return res.json();
+  return await res.json();
 }
 
 export async function deleteMessage(id: number): Promise<void> {

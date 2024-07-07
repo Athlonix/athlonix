@@ -35,6 +35,7 @@ export default function ChatView() {
   useEffect(() => {
     const fetchMessages = async () => {
       const messages = await getMessages();
+      if (!messages) return;
       setMessages(messages);
     };
     fetchMessages();
@@ -54,7 +55,7 @@ export default function ChatView() {
     if (message) {
       setMessages((prev) => ({
         ...prev,
-        data: prev.data.map((m) => (m.id === message.id ? message : m)),
+        data: prev?.data.map((m) => (m.id === message.id ? message : m)),
       }));
       setEditingId(null);
       editForm.reset();
@@ -66,7 +67,7 @@ export default function ChatView() {
     await deleteMessage(messageId);
     setMessages((prev) => ({
       ...prev,
-      data: prev.data.filter((m) => m.id !== messageId),
+      data: prev?.data.filter((m) => m.id !== messageId),
     }));
   };
 

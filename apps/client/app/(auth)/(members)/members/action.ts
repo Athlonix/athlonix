@@ -17,8 +17,11 @@ export interface Hierarchy {
 }
 
 export async function getHierarchy(): Promise<Hierarchy> {
-  const API_URL = process.env.ATHLONIX_API_URL;
+  const API_URL = process.env.ATHLONIX_API_URL as string;
   const token = cookies().get('access_token')?.value;
+  if (!token) {
+    throw new Error('No token found');
+  }
   const response = await fetch(`${API_URL}/users/hierarchy`, {
     headers: { Authorization: `Bearer ${token}` },
   });

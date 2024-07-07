@@ -16,6 +16,7 @@ import { edm } from './handlers/edm.js';
 import { health } from './handlers/health.js';
 import { location } from './handlers/location.js';
 import { materials } from './handlers/materials.js';
+import { messages } from './handlers/messages.js';
 import { reasons } from './handlers/reasons.js';
 import { reports } from './handlers/reports.js';
 import { sports } from './handlers/sports.js';
@@ -70,6 +71,7 @@ app.route('/', tasks);
 app.route('/', edm);
 app.route('/', stats);
 app.route('/', materials);
+app.route('/', messages);
 
 app.doc('/doc', (c: Context) => ({
   openapi: '3.0.0',

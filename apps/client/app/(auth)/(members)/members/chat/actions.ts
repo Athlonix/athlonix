@@ -62,11 +62,15 @@ export async function deleteMessage(id: number): Promise<void> {
   const token = cookies().get('access_token')?.value;
   const urlApi = process.env.ATHLONIX_API_URL;
 
-  await fetch(`${urlApi}/messages/${id}`, {
+  const res = await fetch(`${urlApi}/messages/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
+
+  if (!res.ok) {
+    throw new Error('Failed to delete message');
+  }
 }

@@ -3,10 +3,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@ui/components/ui/form';
+import { Trash2 } from 'lucide-react';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-import { type Message, getMessages, sendMessage, updateMessage } from './actions';
+import { type Message, deleteMessage, getMessages, sendMessage, updateMessage } from './actions';
 
 const messageSchema = z.object({
   message: z
@@ -60,21 +61,39 @@ export default function ChatView() {
     }
   });
 
+  const handleDelete = async (messageId: number) => {
+    if (!window.confirm('Voulez-vous vraiment supprimer ce message ?')) return;
+    await deleteMessage(messageId);
+    setMessages((prev) => ({
+      ...prev,
+      data: prev.data.filter((m) => m.id !== messageId),
+    }));
+  };
+
   const startEditing = (message: Message) => {
     setEditingId(message.id);
     editForm.reset({ message: message.message });
   };
 
   return (
-    <div className="flex flex-col h-[900px] bg-gray-100 dark:bg-zinc-900 rounded-lg overflow-hidden">
+    <div className="flex flex-col h-[800px] bg-gray-100 dark:bg-zinc-900 rounded-lg overflow-hidden">
       <main className="flex-1 overflow-auto p-4 space-y-2" style={{ scrollBehavior: 'smooth' }}>
         {messages?.data.map((message) => (
           <div key={message.id} className={`flex ${message.id_sender === id ? 'justify-end' : 'justify-start'}`}>
             <div
-              className={`max-w-[70%] rounded-lg p-2 ${
+              className={`relative max-w-[70%] rounded-lg p-2 ${
                 message.id_sender === id ? 'bg-blue-500 text-white' : 'bg-white dark:bg-zinc-700 dark:text-white'
               }`}
             >
+              {message.id_sender === id && (
+                <button
+                  className="absolute top-1 right-1 text-red-400 hover:text-red-800"
+                  onClick={() => handleDelete(message.id)}
+                  type="button"
+                >
+                  <Trash2 size={16} />
+                </button>
+              )}
               <span className={`text-xs ${message.id_sender === id ? 'text-white' : 'text-black'}`}>
                 {message.name}
               </span>

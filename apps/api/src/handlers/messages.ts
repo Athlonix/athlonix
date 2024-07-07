@@ -24,7 +24,16 @@ messages.openapi(getAllMessages, async (c) => {
   const roles = user.roles;
   await checkRole(roles, true);
 
-  const query = supabase.from('MESSAGES').select('*', { count: 'exact' }).order('created_at', { ascending: true });
+  const query = supabase
+    .from('MESSAGES')
+    .select(
+      `
+      *,
+      sender:USERS(username)
+    `,
+      { count: 'exact' },
+    )
+    .order('created_at', { ascending: true });
 
   if (search) {
     query.ilike('message', `%${search}%`);
@@ -41,7 +50,19 @@ messages.openapi(getAllMessages, async (c) => {
     return c.json({ error: error.message }, 500);
   }
 
-  return c.json({ data, count: count || 0 }, 200);
+  const { data: users, error: errorUsers } = await supabase.from('USERS').select('id, username');
+
+  if (errorUsers) {
+    return c.json({ error: errorUsers.message }, 500);
+  }
+
+  const finalData = data.map((message) => ({
+    ...message,
+    name: message.sender?.username || 'Unknown',
+    sender: undefined,
+  }));
+
+  return c.json({ data: finalData, count: count || 0 }, 200);
 });
 
 messages.openapi(createMessage, async (c) => {

@@ -11,3 +11,8 @@ export const messageSchema = z.object({
 export const updateMessageSchema = z.object({
   message: z.string().min(1),
 });
+
+export const messageResponseSchema = z.object({
+  data: z.array(messageSchema.extend({ name: z.string() })),
+  count: z.number(),
+});

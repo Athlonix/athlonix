@@ -2,7 +2,7 @@ import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
-import { messageSchema, updateMessageSchema } from '../validators/messages.js';
+import { messageResponseSchema, messageSchema, updateMessageSchema } from '../validators/messages.js';
 
 export const getAllMessages = createRoute({
   method: 'get',
@@ -19,10 +19,7 @@ export const getAllMessages = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: z.object({
-            data: z.array(messageSchema),
-            count: z.number(),
-          }),
+          schema: messageResponseSchema,
         },
       },
     },
@@ -42,7 +39,7 @@ export const createMessage = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: messageSchema,
+          schema: messageSchema.omit({ id: true, created_at: true, updated_at: true }),
         },
       },
     },

@@ -102,7 +102,7 @@ describe('Messages tests', () => {
         Authorization: `Bearer ${jwt}`,
       },
     });
-    expect(res.status).toBe(204);
+    expect(res.status).toBe(200);
   });
 
   test('Should fail to update messages', async () => {

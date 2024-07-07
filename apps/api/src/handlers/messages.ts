@@ -93,7 +93,7 @@ messages.openapi(updateMessage, async (c) => {
     .single();
 
   if (error) {
-    return c.json({ error: error.message }, 500);
+    return c.json({ error: 'Message not found' }, 404);
   }
 
   return c.json(data, 200);

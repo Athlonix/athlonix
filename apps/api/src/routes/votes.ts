@@ -48,9 +48,9 @@ export const createPollSchema = z.object({
   max_choices: z.number().min(1),
   assembly: z.number().min(1).nullable().optional(),
   parent_poll: z.number().optional(),
-  round: z.number(),
+  round: z.number().optional(),
   keep: z.number().optional(),
-  end_condition: z.enum(['simple', 'absolute', 'two-third', 'unanimous']),
+  end_condition: z.enum(['simple', 'absolute', 'two-third', 'unanimous']).optional(),
   options: z.array(z.object({ content: z.string() })),
 });
 

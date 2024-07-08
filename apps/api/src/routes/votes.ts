@@ -110,8 +110,8 @@ export const getAllPolls = createRoute({
       ...queryAllSchema.shape,
       hidden: z
         .enum(['true', 'false'])
-        .transform((value) => value === 'true')
-        .default('true'),
+        .default('true')
+        .transform((value) => value === 'true'),
     }),
   },
   responses: {
@@ -143,8 +143,8 @@ export const getOnePoll = createRoute({
     query: z.object({
       hidden: z
         .enum(['true', 'false'])
-        .transform((value) => value === 'true')
-        .default('true'),
+        .default('true')
+        .transform((value) => value === 'true'),
     }),
   },
   responses: {

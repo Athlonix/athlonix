@@ -77,7 +77,7 @@ async function getMembersByMonth(): Promise<{ month: string; members: number }[]
     return [];
   }
   const months = data.map((user) => {
-    return new Date(user.created_at).toLocaleString('default', { month: 'long' });
+    return new Date(user.created_at).toLocaleString('fr', { month: 'long' });
   });
   const uniqueMonths = [...new Set(months)];
   const membersByMonth = uniqueMonths.map((month) => {
@@ -100,12 +100,12 @@ async function getDonations(): Promise<{ month: string; amount: number }[]> {
     return [];
   }
   const months = data.map((donation) => {
-    return new Date(donation.created_at).toLocaleString('default', { month: 'long' });
+    return new Date(donation.created_at).toLocaleString('fr', { month: 'long' });
   });
   const uniqueMonths = [...new Set(months)];
   const donationsByMonth = uniqueMonths.map((month) => {
     const amount = data
-      .filter((donation) => new Date(donation.created_at).toLocaleString('default', { month: 'long' }) === month)
+      .filter((donation) => new Date(donation.created_at).toLocaleString('fr', { month: 'long' }) === month)
       .reduce((acc, donation) => acc + donation.amount, 0);
     return {
       month,

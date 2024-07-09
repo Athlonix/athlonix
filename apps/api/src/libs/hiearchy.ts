@@ -37,6 +37,9 @@ export interface User {
 export function buildHierarchy(users: User[]): TreeNode {
   const userMap = new Map<string, User>();
   for (const user of users) {
+    if (!user.roles) {
+      continue;
+    }
     userMap.set(String(user.id), user);
   }
 
@@ -64,14 +67,12 @@ export function buildHierarchy(users: User[]): TreeNode {
     ],
   };
 
-  const findAndSetUser = (node: TreeNode | undefined, roleName: Role_name) => {
+  const findAndSetUser = (node: TreeNode | undefined, roleName: Role_name): void => {
     if (!node) {
       return;
     }
     const user = users.find((u) => u.roles.some((role) => role.name === roleName));
-    if (user) {
-      node.name = `${user.first_name} ${user.last_name}`;
-    }
+    node.name = user ? `${user.first_name} ${user.last_name}` : 'N/A';
   };
 
   findAndSetUser(treeData, 'PRESIDENT');

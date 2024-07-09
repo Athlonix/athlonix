@@ -36,7 +36,7 @@ polls.openapi(getAllPolls, async (c) => {
 
   const query = supabase
     .from('POLLS')
-    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))', { count: 'exact' })
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option), id_original)', { count: 'exact' })
     .is('parent_poll', null)
     .order('id', { ascending: true });
 
@@ -57,7 +57,7 @@ polls.openapi(getAllPolls, async (c) => {
 
   const { data: subData, error: subError } = await supabase
     .from('POLLS')
-    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))')
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option), id_original)')
     .not('parent_poll', 'is', null)
     .order('id', { ascending: true });
 
@@ -105,7 +105,7 @@ polls.openapi(getOnePoll, async (c) => {
 
   const { data, error } = await supabase
     .from('POLLS')
-    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))', { count: 'exact' })
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option), id_original)', { count: 'exact' })
     .eq('id', id)
     .single();
 
@@ -115,7 +115,7 @@ polls.openapi(getOnePoll, async (c) => {
 
   const { data: subData, error: subError } = await supabase
     .from('POLLS')
-    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))')
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option), id_original)')
     .not('parent_poll', 'is', null)
     .order('id', { ascending: true });
 
@@ -187,21 +187,51 @@ polls.openapi(createPoll, async (c) => {
     return c.json({ error: 'Failed to create poll' }, 400);
   }
 
-  const { data: optionsData, error: optionsError } = await supabase
-    .from('POLLS_OPTIONS')
-    .insert(
-      options.map((option: { content: string }) => ({
-        content: option.content,
-        id_poll: data.id,
-      })),
-    )
-    .select();
+  let optionsData: {
+    content: string | null;
+    id: number;
+    id_original: number | null;
+    id_poll: number;
+  }[];
 
-  if (optionsError || !optionsData) {
-    return c.json({ error: 'Failed to create options' }, 400);
+  if (parent_poll) {
+    const { data: retrievedData, error } = await supabase
+      .from('POLLS_OPTIONS')
+      .insert(
+        options.map((option) => ({
+          id_original: option.id_original,
+          id_poll: data.id,
+        })),
+      )
+      .select();
+
+    if (error || !retrievedData) {
+      return c.json({ error: 'Failed to create options' }, 400);
+    }
+    optionsData = retrievedData;
+  } else {
+    const { data: retrievedData, error } = await supabase
+      .from('POLLS_OPTIONS')
+      .insert(
+        options.map((option) => ({
+          content: option.content,
+          id_poll: data.id,
+        })),
+      )
+      .select();
+
+    if (error || !retrievedData) {
+      return c.json({ error: 'Failed to create options' }, 400);
+    }
+    optionsData = retrievedData;
   }
 
-  return c.json(data, 201);
+  const returnedJson = {
+    ...data,
+    results: optionsData.map(({ id_poll, ...rest }) => ({ ...rest, votes: 0 })),
+  };
+
+  return c.json(returnedJson, 201);
 });
 
 polls.openapi(updatePoll, async (c) => {

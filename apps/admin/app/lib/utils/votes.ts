@@ -1,6 +1,6 @@
 'use server';
 
-import type { FullPoll } from '@/app/lib/type/Votes';
+import type { CreatePoll, FullPoll } from '@/app/lib/type/Votes';
 import { cookies } from 'next/headers';
 
 const urlApi = process.env.ATHLONIX_API_URL;
@@ -40,4 +40,39 @@ export async function getOnePoll(id: number, hidden: boolean): Promise<{ data: F
   });
 
   return { data: await res.json(), status: res.status };
+}
+
+export async function createPoll(poll: CreatePoll): Promise<{ data: FullPoll; status: number }> {
+  const res = await fetch(`${urlApi}/polls`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${cookies().get('access_token')?.value}`,
+    },
+    body: JSON.stringify({
+      title: poll.title,
+      start_at: new Date(poll.start_at).toISOString(),
+      end_at: new Date(poll.end_at).toISOString(),
+      end_condition: poll.end_condition,
+      keep: poll.keep,
+      max_choices: poll.max_choices,
+      round: poll.round,
+      parent_poll: poll.parent_poll,
+      options: poll.options,
+    }),
+  });
+
+  return { data: await res.json(), status: res.status };
+}
+
+export async function deleteRound(id: number): Promise<{ status: number }> {
+  const res = await fetch(`${urlApi}/polls/${id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${cookies().get('access_token')?.value}`,
+    },
+  });
+
+  return { status: res.status };
 }

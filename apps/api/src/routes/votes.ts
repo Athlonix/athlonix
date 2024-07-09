@@ -17,7 +17,12 @@ export const pollsSchema = z.object({
   id_user: z.number().positive(),
   assembly: z.number().min(1).nullable(),
   results: z.array(
-    z.object({ id: z.number().positive(), votes: z.number().positive(), content: z.string().nullable() }),
+    z.object({
+      id: z.number().positive(),
+      votes: z.number().positive(),
+      content: z.string().nullable(),
+      id_original: z.number().nullable(),
+    }),
   ),
 });
 
@@ -51,7 +56,7 @@ export const createPollSchema = z.object({
   round: z.number().optional(),
   keep: z.number().optional(),
   end_condition: z.enum(['simple', 'absolute', 'two-third', 'unanimous']).optional(),
-  options: z.array(z.object({ content: z.string() })),
+  options: z.array(z.object({ content: z.string(), id_original: z.number().optional() })),
 });
 
 export const pollsOptionSchema = z.object({
@@ -88,7 +93,7 @@ export const createPoll = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: pollsSchema.omit({ results: true }),
+          schema: pollsSchema,
         },
       },
     },

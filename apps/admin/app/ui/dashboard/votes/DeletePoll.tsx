@@ -42,7 +42,7 @@ function DeletePoll({ poll, setPolls }: Props) {
       })
       .then(() => {
         setPolls((prevPolls) => prevPolls.filter((v) => v.id !== poll.id));
-        toast.success('Le poll a bien été supprimé', { duration: 5000 });
+        toast.success('Le vote a bien été supprimé', { duration: 5000 });
       });
   }
 

@@ -2,7 +2,10 @@
 
 import type { FullPoll, Vote } from '@/app/lib/type/Votes';
 import { getOnePoll } from '@/app/lib/utils/votes';
+import AddRound from '@/app/ui/dashboard/votes/AddRound';
+import DeleteRound from '@/app/ui/dashboard/votes/DeleteRound';
 import { Progress } from '@repo/ui/components/ui/progress';
+import { Button } from '@ui/components/ui/button';
 import { CircleArrowLeft } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -12,7 +15,6 @@ function ShowContent() {
   const router = useRouter();
   const idPoll = searchParams.get('id');
   const [poll, setPoll] = useState<FullPoll>();
-  const [title, setTitle] = useState<string>('');
   const [totalVotes, setTotalVotes] = useState<number>(0);
 
   useEffect(() => {
@@ -29,8 +31,6 @@ function ShowContent() {
       if (status !== 200) {
         router.push('/dashboard/votes');
       }
-
-      setTitle(data.title);
       setPoll(data);
       setTotalVotes(data.results.reduce((acc, result) => acc + result.votes, 0));
     };
@@ -40,16 +40,18 @@ function ShowContent() {
 
   return (
     <>
-      <div>
-        {poll?.sub_polls.map((poll) => (
-          <div key={poll.id}>{poll.title}</div>
-        ))}
-      </div>
       <div className="flex items-center gap-5">
         <CircleArrowLeft className="w-8 h-8" onClick={() => window.history.back()} cursor={'pointer'} />
-        <h1 className="text-lg font-semibold md:text-2xl">Résultats du vote : {title}</h1>
+        <h1 className="text-lg font-semibold md:text-2xl">Résultats du vote {poll?.title}</h1>
       </div>
-      <div className="flex flex-1 rounded-lg border border-dashed shadow-sm p-4" x-chunk="dashboard-02-chunk-1">
+      <div className="flex flex-col rounded-lg border border-solid shadow-sm p-4" x-chunk="dashboard-02-chunk-1">
+        <h3 className="flex justify-center text-3xl items-center gap-2">
+          <div>
+            {poll?.round}
+            <sup>e</sup>
+          </div>
+          Tour
+        </h3>
         <div className="grid gap-4 w-full">
           {poll?.results.map((result) => (
             <div key={result.id} className="flex justify-center flex-col gap-4 p-4">
@@ -60,6 +62,45 @@ function ShowContent() {
             </div>
           ))}
         </div>
+      </div>
+      {poll?.sub_polls.map((subPoll) => {
+        const slicedResults = subPoll?.results.sort((a: Vote, b: Vote) => b.votes - a.votes).slice(0, subPoll.keep);
+        const subPollTotalVotes = slicedResults.reduce((total, result) => total + (result.votes ?? 0), 0);
+
+        return (
+          <div
+            key={subPoll.id}
+            className="flex flex-col rounded-lg border border-solid shadow-sm p-4"
+            x-chunk="dashboard-02-chunk-1"
+          >
+            <h3 className="flex justify-center text-3xl items-center gap-2">
+              <div>
+                {subPoll?.round}
+                <sup>e</sup>
+              </div>
+              Tour
+            </h3>
+            <div className="grid gap-4 w-full">
+              {slicedResults.map((result) => (
+                <div key={result.id} className="flex justify-center flex-col gap-4 p-4">
+                  <div>
+                    {poll?.results.find((pollResult) => pollResult.id === result.id_original)?.content} |{' '}
+                    {result.votes || 0} votes ({(((result.votes ?? 0) / subPollTotalVotes) * 100).toFixed(2)}%)
+                  </div>
+                  <Progress value={((result.votes ?? 0) / subPollTotalVotes) * 100} />
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+      <div className="flex flex-col rounded-lg border border-solid shadow-sm p-4 gap-4">
+        {poll && (
+          <div className="flex justify-center gap-4">
+            <AddRound poll={poll} setPoll={setPoll} />
+            <DeleteRound poll={poll} setPoll={setPoll} />
+          </div>
+        )}
       </div>
     </>
   );

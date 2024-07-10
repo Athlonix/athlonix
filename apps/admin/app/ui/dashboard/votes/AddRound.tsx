@@ -49,7 +49,6 @@ function AddRound({ poll, setPoll }: Props) {
 
   const formSchema = z
     .object({
-      title: z.string().min(2, { message: 'Le titre doit contenir au moins 2 caractères' }),
       start_at: z.string(),
       end_at: z.string(),
       end_condition: z.enum(['simple', 'absolute', 'two-third', 'unanimous']),
@@ -68,7 +67,6 @@ function AddRound({ poll, setPoll }: Props) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: '',
       start_at: '',
       end_at: '',
       max_choices: 1,
@@ -80,6 +78,7 @@ function AddRound({ poll, setPoll }: Props) {
   async function callApi(values: z.infer<typeof formSchema>) {
     const { data, status } = await createPoll({
       ...values,
+      title: `${poll.title}`,
       description: null,
       assembly: null,
       round: poll.sub_polls.length + 2,
@@ -109,26 +108,11 @@ function AddRound({ poll, setPoll }: Props) {
       <DialogContent>
         <ScrollArea className="max-h-[80vh] p-4">
           <DialogHeader>
-            <DialogTitle>Création d'un vote</DialogTitle>
+            <DialogTitle>Création d'un tour</DialogTitle>
             <DialogDescription className="p-2">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(callApi)} method="POST">
                   <div className="grid gap-2">
-                    <div className="grid">
-                      <FormField
-                        control={form.control}
-                        name="title"
-                        render={({ field }) => (
-                          <FormItem>
-                            <Label className="font-bold">Titre</Label>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
                     <div className="grid">
                       <FormField
                         control={form.control}

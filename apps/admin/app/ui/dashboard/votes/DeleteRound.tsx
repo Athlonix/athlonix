@@ -29,6 +29,7 @@ function DeleteRound({ poll, setPoll }: Props) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
     const lastId = poll.sub_polls[poll.sub_polls.length - 1]?.id;
     if (!lastId) {
+      toast.error('Aucun tour à supprimer', { duration: 5000 });
       return;
     }
 

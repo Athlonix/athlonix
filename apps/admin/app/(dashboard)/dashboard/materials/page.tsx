@@ -8,7 +8,6 @@ import MaterialsList from '@/app/ui/dashboard/materials/MaterialsList';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import { Input } from '@repo/ui/components/ui/input';
 import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
-import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
@@ -39,7 +38,6 @@ type AddressData = {
 };
 
 function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
-  const searchParams = useSearchParams();
   const router = useRouter();
 
   const [materials, setMaterials] = useState<Material[]>([]);

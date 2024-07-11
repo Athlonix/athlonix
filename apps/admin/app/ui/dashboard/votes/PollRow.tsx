@@ -1,25 +1,25 @@
 'use client';
 
 import type { Assembly } from '@/app/(dashboard)/dashboard/assemblies/utils';
-import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
-import DeleteVote from '@/app/ui/dashboard/votes/DeleteVote';
-import EditVote from '@/app/ui/dashboard/votes/EditVote';
+import type { Poll } from '@/app/lib/type/Votes';
+import DeletePoll from '@/app/ui/dashboard/votes/DeletePoll';
+import EditPoll from '@/app/ui/dashboard/votes/EditPoll';
 import { TableCell, TableRow } from '@repo/ui/components/ui/table';
 import Link from 'next/link';
 import { useState } from 'react';
 
 interface Props {
-  vote: Vote;
-  setVotes: React.Dispatch<React.SetStateAction<Vote[]>>;
+  poll: Poll;
+  setPolls: React.Dispatch<React.SetStateAction<Poll[]>>;
   assemblies: Assembly[];
 }
 
-function VoteRow({ vote, setVotes, assemblies }: Props) {
-  const [title, setTitle] = useState(vote.title);
-  const [description, setDescription] = useState(vote.description);
-  const [maxChoices, setMaxChoices] = useState(vote.max_choices);
-  const [startAt, setStartAt] = useState(vote.start_at);
-  const [endAt, setEndAt] = useState(vote.end_at);
+function PollRow({ poll, setPolls, assemblies }: Props) {
+  const [title, setTitle] = useState(poll.title);
+  const [description, setDescription] = useState(poll.description);
+  const [maxChoices, setMaxChoices] = useState(poll.max_choices);
+  const [startAt, setStartAt] = useState(poll.start_at);
+  const [endAt, setEndAt] = useState(poll.end_at);
 
   const setter = {
     title: setTitle,
@@ -44,22 +44,21 @@ function VoteRow({ vote, setVotes, assemblies }: Props) {
     '0',
   )}:${String(endDate.getSeconds()).padStart(2, '0')}`;
   return (
-    <TableRow key={vote.id}>
+    <TableRow key={poll.id} className="">
       <TableCell className="font-medium">
-        <Link href={`/dashboard/votes/details?id=${vote.id}`}>{title}</Link>
+        <Link href={`/dashboard/votes/details?id=${poll.id}`}>{title}</Link>
       </TableCell>
-      <TableCell>{description}</TableCell>
       <TableCell>{formattedStartDate}</TableCell>
       <TableCell>{formattedEndDate}</TableCell>
       <TableCell>{maxChoices}</TableCell>
       {title !== 'Supprimé' && (
         <TableCell className="flex gap-2">
-          <EditVote vote={vote} setter={setter} assemblies={assemblies} />
-          <DeleteVote vote={vote} setVotes={setVotes} />
+          <EditPoll poll={poll} setter={setter} assemblies={assemblies} />
+          <DeletePoll poll={poll} setPolls={setPolls} />
         </TableCell>
       )}
     </TableRow>
   );
 }
 
-export default VoteRow;
+export default PollRow;

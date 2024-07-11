@@ -1,6 +1,6 @@
 'use client';
 
-import type { Vote } from '@/app/(dashboard)/dashboard/votes/page';
+import type { Poll } from '@/app/lib/type/Votes';
 import { Button } from '@repo/ui/components/ui/button';
 import {
   Dialog,
@@ -17,18 +17,18 @@ import type React from 'react';
 import { useState } from 'react';
 
 interface Props {
-  vote: Vote;
-  setVotes: React.Dispatch<React.SetStateAction<Vote[]>>;
+  poll: Poll;
+  setPolls: React.Dispatch<React.SetStateAction<Poll[]>>;
 }
 
-function DeleteVote({ vote, setVotes }: Props) {
+function DeletePoll({ poll, setPolls }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
   function deletePoll() {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    fetch(`${urlApi}/polls/${vote.id}`, {
+    fetch(`${urlApi}/polls/${poll.id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ function DeleteVote({ vote, setVotes }: Props) {
         }
       })
       .then(() => {
-        setVotes((prevVotes) => prevVotes.filter((v) => v.id !== vote.id));
+        setPolls((prevPolls) => prevPolls.filter((v) => v.id !== poll.id));
         toast.success('Le vote a bien été supprimé', { duration: 5000 });
       });
   }
@@ -73,4 +73,4 @@ function DeleteVote({ vote, setVotes }: Props) {
   );
 }
 
-export default DeleteVote;
+export default DeletePoll;

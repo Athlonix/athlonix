@@ -110,7 +110,7 @@ describe('Other general tests', () => {
     zodErrorHook(result, mockContext);
 
     expect(mockJson).toHaveBeenCalledWith({ error: expect.any(String) }, 400);
-    expect(mockJson.mock.calls[0][0].error).toContain('Expected string');
+    expect(mockJson?.mock.calls[0]?.[0]?.error).toContain('Expected string');
   });
 
   it('should return a 500 response when there is no specific error', () => {

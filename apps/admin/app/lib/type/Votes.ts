@@ -25,8 +25,16 @@ export type FullPoll = Poll & {
   sub_polls: Poll[];
 };
 
-export type PollsVote = {
-  id: number;
-  id_option: number;
-  id_poll: number;
+export type CreatePoll = {
+  title: string;
+  description: string | null;
+  start_at: string;
+  end_at: string;
+  max_choices: number;
+  assembly: number | null;
+  parent_poll: number | null;
+  round: number;
+  keep: number;
+  end_condition: 'simple' | 'absolute' | 'two-third' | 'unanimous';
+  options: { content: string | null; id_original: number | null }[];
 };

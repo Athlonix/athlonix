@@ -2,6 +2,7 @@ import crypto from 'node:crypto';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { io } from '../libs/socket.js';
 import { supabase } from '../libs/supabase.js';
+import { getPolls } from '../libs/votes.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
   createPoll,
@@ -27,15 +28,45 @@ supabase
   })
   .subscribe();
 
+polls.openapi(getUserVotedPoll, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true);
+
+  const { data: dataPoll, error: errorPoll } = await supabase.from('POLLS').select('id');
+  if (errorPoll || !dataPoll) {
+    return c.json({ error: 'Failed to retrieve polls' }, 400);
+  }
+
+  const secret = process.env.SUPABASE_KEY || 'supabase';
+  const hashedUser: string[] = [];
+
+  for (const poll of dataPoll) {
+    const toHash = `${user.id}-${poll.id}`;
+    const hash = crypto?.createHmac('sha256', secret).update(toHash).digest('hex');
+    hashedUser.push(hash);
+  }
+
+  const { data, error } = await supabase.from('USERS_VOTES').select('id_poll').in('user', hashedUser);
+
+  if (error || !data) {
+    return c.json({ error: 'Failed to retrieve votes' }, 400);
+  }
+  const ids = data.map((vote) => vote.id_poll);
+
+  return c.json({ voted: ids }, 200);
+});
+
 polls.openapi(getAllPolls, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, true);
-  const { all, search, skip, take } = c.req.valid('query');
+  const { all, search, skip, take, hidden } = c.req.valid('query');
 
   const query = supabase
     .from('POLLS')
-    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))', { count: 'exact' })
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option), id_original)', { count: 'exact' })
+    .is('parent_poll', null)
     .order('id', { ascending: true });
 
   if (search) {
@@ -53,13 +84,41 @@ polls.openapi(getAllPolls, async (c) => {
     return c.json({ error: error.message }, 500);
   }
 
+  const { data: subData, error: subError } = await supabase
+    .from('POLLS')
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option), id_original)')
+    .not('parent_poll', 'is', null)
+    .order('id', { ascending: true });
+
+  if (subError) {
+    return c.json({ error: subError.message }, 500);
+  }
+
   const format = data.map((poll) => ({
     ...poll,
     results: poll.results.map((option) => ({ ...option, votes: option.votes.length })),
   }));
 
+  const subFormat = subData.map((poll) => ({
+    ...poll,
+    results: poll.results.map((option) => ({ ...option, votes: option.votes.length })),
+  }));
+
+  const finalData = format.map((poll) => {
+    const subPolls = subFormat.filter((subPoll) => subPoll.parent_poll === poll.id);
+    return {
+      ...poll,
+      sub_polls: subPolls,
+    };
+  });
+
+  if (hidden) {
+    const filteredSubPolls = finalData.map((poll) => getPolls(poll));
+    return c.json({ data: filteredSubPolls || [], count: count || 0 }, 200);
+  }
+
   const responseData = {
-    data: format || [],
+    data: finalData || [],
     count: count || 0,
   };
 
@@ -71,10 +130,11 @@ polls.openapi(getOnePoll, async (c) => {
   const roles = user.roles;
   await checkRole(roles, true);
   const { id } = c.req.valid('param');
+  const { hidden } = c.req.valid('query');
 
   const { data, error } = await supabase
     .from('POLLS')
-    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option))', { count: 'exact' })
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option), id_original)', { count: 'exact' })
     .eq('id', id)
     .single();
 
@@ -82,9 +142,33 @@ polls.openapi(getOnePoll, async (c) => {
     return c.json({ error: 'Poll not found' }, 404);
   }
 
-  const format = data.results.map((option) => ({ ...option, votes: option.votes.length }));
+  const { data: subData, error: subError } = await supabase
+    .from('POLLS')
+    .select('*, results:POLLS_OPTIONS (id, content, votes:POLLS_VOTES (id_option), id_original)')
+    .not('parent_poll', 'is', null)
+    .order('id', { ascending: true });
 
-  return c.json({ ...data, results: format }, 200);
+  if (subError) {
+    return c.json({ error: subError.message }, 500);
+  }
+
+  const format = data.results.map((option) => ({ ...option, votes: option.votes.length }));
+  const subFormat = subData.map((poll) => ({
+    ...poll,
+    results: poll.results.map((option) => ({ ...option, votes: option.votes.length })),
+  }));
+
+  const finalData = {
+    ...data,
+    results: format,
+    sub_polls: subFormat.filter((poll) => poll.parent_poll === data.id),
+  };
+
+  if (hidden) {
+    return c.json(getPolls(finalData), 200);
+  }
+
+  return c.json(finalData, 200);
 });
 
 polls.openapi(createPoll, async (c) => {
@@ -92,7 +176,19 @@ polls.openapi(createPoll, async (c) => {
   const roles = user.roles;
   const id_user = user.id;
   await checkRole(roles, false, [Role.ADMIN]);
-  const { title, description, start_at, end_at, max_choices, options, assembly } = c.req.valid('json');
+  const {
+    title,
+    description,
+    start_at,
+    end_at,
+    max_choices,
+    options,
+    assembly,
+    parent_poll,
+    round,
+    keep,
+    end_condition,
+  } = c.req.valid('json');
 
   if (!options || options.length < 2) {
     return c.json({ error: 'Poll must have at least 2 options' }, 400);
@@ -100,7 +196,19 @@ polls.openapi(createPoll, async (c) => {
 
   const { data, error } = await supabase
     .from('POLLS')
-    .insert({ title, description, start_at, end_at, max_choices, id_user, assembly })
+    .insert({
+      title,
+      description,
+      start_at,
+      end_at,
+      max_choices,
+      id_user,
+      assembly,
+      parent_poll,
+      round,
+      keep,
+      end_condition,
+    })
     .select()
     .single();
 
@@ -108,21 +216,51 @@ polls.openapi(createPoll, async (c) => {
     return c.json({ error: 'Failed to create poll' }, 400);
   }
 
-  const { data: optionsData, error: optionsError } = await supabase
-    .from('POLLS_OPTIONS')
-    .insert(
-      options.map((option: { content: string }) => ({
-        content: option.content,
-        id_poll: data.id,
-      })),
-    )
-    .select();
+  let optionsData: {
+    content: string | null;
+    id: number;
+    id_original: number | null;
+    id_poll: number;
+  }[];
 
-  if (optionsError || !optionsData) {
-    return c.json({ error: 'Failed to create options' }, 400);
+  if (parent_poll) {
+    const { data: retrievedData, error } = await supabase
+      .from('POLLS_OPTIONS')
+      .insert(
+        options.map((option) => ({
+          id_original: option.id_original,
+          id_poll: data.id,
+        })),
+      )
+      .select();
+
+    if (error || !retrievedData) {
+      return c.json({ error: 'Failed to create options' }, 400);
+    }
+    optionsData = retrievedData;
+  } else {
+    const { data: retrievedData, error } = await supabase
+      .from('POLLS_OPTIONS')
+      .insert(
+        options.map((option) => ({
+          content: option.content,
+          id_poll: data.id,
+        })),
+      )
+      .select();
+
+    if (error || !retrievedData) {
+      return c.json({ error: 'Failed to create options' }, 400);
+    }
+    optionsData = retrievedData;
   }
 
-  return c.json(data, 201);
+  const returnedJson = {
+    ...data,
+    results: optionsData.map(({ id_poll, ...rest }) => ({ ...rest, votes: 0 })),
+  };
+
+  return c.json(returnedJson, 201);
 });
 
 polls.openapi(updatePoll, async (c) => {
@@ -241,23 +379,4 @@ polls.openapi(voteToPoll, async (c) => {
   }
 
   return c.json({ message: 'Vote registered' }, 201);
-});
-
-polls.openapi(getUserVotedPoll, async (c) => {
-  const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, true);
-  const { id } = c.req.valid('param');
-
-  const secret = process.env.SUPABASE_KEY || 'supabase';
-  const toHash = `${user.id}-${id}`;
-  const hash = crypto?.createHmac('sha256', secret).update(toHash).digest('hex');
-
-  const { data, error } = await supabase.from('USERS_VOTES').select('id_poll').eq('id_poll', id).eq('user', hash);
-
-  if (error) {
-    return c.json({ error: 'Failed to retrieve votes' }, 400);
-  }
-
-  return c.json({ voted: data.length > 0 }, 200);
 });

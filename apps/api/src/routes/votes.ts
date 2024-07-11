@@ -7,12 +7,42 @@ export const pollsSchema = z.object({
   id: z.number().positive(),
   title: z.string().max(50),
   description: z.string().max(255).nullable(),
+  parent_poll: z.number().nullable(),
+  round: z.number(),
+  keep: z.number().nullable(),
+  end_condition: z.enum(['simple', 'absolute', 'two-third', 'unanimous']),
   start_at: z.string().datetime(),
   end_at: z.string().datetime(),
   max_choices: z.number().min(1),
   id_user: z.number().positive(),
   assembly: z.number().min(1).nullable(),
-  results: z.array(z.object({ id: z.number().positive(), votes: z.number().positive(), content: z.string() })),
+  results: z.array(
+    z.object({
+      id: z.number().positive(),
+      votes: z.number().positive(),
+      content: z.string().nullable(),
+      id_original: z.number().nullable(),
+    }),
+  ),
+});
+
+export const fullPollsSchema = z.object({
+  id: z.number().positive(),
+  title: z.string().max(50),
+  description: z.string().max(255).nullable(),
+  parent_poll: z.number().nullable(),
+  round: z.number(),
+  keep: z.number().nullable(),
+  end_condition: z.enum(['simple', 'absolute', 'two-third', 'unanimous']),
+  start_at: z.string().datetime(),
+  end_at: z.string().datetime(),
+  max_choices: z.number().min(1),
+  id_user: z.number().positive(),
+  assembly: z.number().min(1).nullable(),
+  results: z.array(
+    z.object({ id: z.number().positive(), votes: z.number().positive(), content: z.string().nullable() }),
+  ),
+  sub_polls: z.array(pollsSchema),
 });
 
 export const createPollSchema = z.object({
@@ -22,13 +52,18 @@ export const createPollSchema = z.object({
   end_at: z.string().datetime(),
   max_choices: z.number().min(1),
   assembly: z.number().min(1).nullable().optional(),
-  options: z.array(z.object({ content: z.string() })),
+  parent_poll: z.number().optional(),
+  round: z.number().optional(),
+  keep: z.number().optional(),
+  end_condition: z.enum(['simple', 'absolute', 'two-third', 'unanimous']).optional(),
+  options: z.array(z.object({ content: z.string(), id_original: z.number().optional() })),
 });
 
 export const pollsOptionSchema = z.object({
   id: z.number(),
-  content: z.string(),
+  content: z.string().nullable(),
   id_poll: z.number(),
+  id_original: z.number().nullable(),
 });
 
 export const voteSchema = z.object({
@@ -58,7 +93,7 @@ export const createPoll = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: pollsSchema.omit({ results: true }),
+          schema: pollsSchema,
         },
       },
     },
@@ -76,7 +111,13 @@ export const getAllPolls = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    query: queryAllSchema,
+    query: z.object({
+      ...queryAllSchema.shape,
+      hidden: z
+        .enum(['true', 'false'])
+        .default('true')
+        .transform((value) => value === 'true'),
+    }),
   },
   responses: {
     200: {
@@ -84,7 +125,7 @@ export const getAllPolls = createRoute({
       content: {
         'application/json': {
           schema: z.object({
-            data: z.array(pollsSchema),
+            data: z.array(fullPollsSchema),
             count: z.number(),
           }),
         },
@@ -104,13 +145,19 @@ export const getOnePoll = createRoute({
   middleware: authMiddleware,
   request: {
     params: idParamValidator,
+    query: z.object({
+      hidden: z
+        .enum(['true', 'false'])
+        .default('true')
+        .transform((value) => value === 'true'),
+    }),
   },
   responses: {
     200: {
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: pollsSchema,
+          schema: fullPollsSchema,
         },
       },
     },
@@ -214,20 +261,17 @@ export const voteToPoll = createRoute({
 
 export const getUserVotedPoll = createRoute({
   method: 'get',
-  path: '/polls/{id}/voted',
+  path: '/polls/voted',
   summary: 'Get if user voted to a poll',
   description: 'Get if user voted to a poll',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
-  request: {
-    params: idParamValidator,
-  },
   responses: {
     200: {
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: z.object({ voted: z.boolean() }),
+          schema: z.object({ voted: z.array(z.number()) }),
         },
       },
     },

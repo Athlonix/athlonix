@@ -82,8 +82,12 @@ function ShowContent() {
           </TabsList>
         </div>
         <TabsContent value={poll.id.toString()}>
-          {hasVoted.includes(poll.id) && <VotesResults poll={poll} round={poll.round} />}
-          {!hasVoted.includes(poll.id) && <VotesOptions poll={poll} hasVoted={setHasVoted} round={poll.round} />}
+          {(hasVoted.includes(poll.id) || new Date(poll.end_at) < new Date()) && (
+            <VotesResults poll={poll} round={poll.round} />
+          )}
+          {!hasVoted.includes(poll.id) && new Date(poll.end_at) > new Date() && (
+            <VotesOptions poll={poll} hasVoted={setHasVoted} round={poll.round} />
+          )}
         </TabsContent>
         {poll.sub_polls.map((subPoll) => (
           <TabsContent key={subPoll.id} value={subPoll.id.toString()}>

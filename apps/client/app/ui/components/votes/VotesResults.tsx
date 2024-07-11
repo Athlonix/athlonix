@@ -24,7 +24,7 @@ function VotesResults({ poll: voteInit, round }: { poll: FullPoll; round: number
 
   useEffect(() => {
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_ENDPOINT || '');
-    console.log(socket endpoint :", socket);
+    console.log('socket endpoint :', socket);
     setSocket(socket);
 
     return () => {

@@ -49,11 +49,11 @@ function VotesOptions({
           {poll.results.map((result) => (
             <div key={result.id}>
               <Button
-                className="w-full text-3xl py-10"
+                className="w-full text-2xl py-10 break-words"
                 variant={selected.includes(result.id) ? 'success' : 'default'}
                 onClick={() => handleSelectOption(result.id)}
               >
-                {result.content}
+                <span style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{result.content}</span>
               </Button>
             </div>
           ))}
@@ -106,11 +106,12 @@ function VotesOptions({
         {slicedResults.map((result) => (
           <div key={result.id}>
             <Button
-              className="w-full text-3xl py-10"
+              className="w-full text-2xl py-10 break-words"
               variant={selected.includes(result.id as number) ? 'success' : 'default'}
               onClick={() => handleSelectOption(result.id as number)}
+              style={{ whiteSpace: 'normal', wordWrap: 'break-word' }}
             >
-              {result.content}
+              <span style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>{result.content}</span>
             </Button>
           </div>
         ))}

@@ -11,7 +11,7 @@ export const io: SocketIOServer = new SocketIOServer(httpServer, {
 });
 
 io.on('connection', async (socket) => {
-  console.info(socket.id, 'connected');
+  console.log(socket.id, 'connected');
 });
 
 const SOCKET_PORT = Number(process.env.SOCKET_PORT || 3103);

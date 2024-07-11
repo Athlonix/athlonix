@@ -10,4 +10,8 @@ spec:
       port: 3101
       targetPort: 3101
       nodePort: 31001
+    - protocol: TCP
+      port: 3103
+      targetPort: 3103
+      nodePort: 31003
   type: NodePort

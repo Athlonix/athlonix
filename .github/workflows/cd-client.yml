@@ -91,6 +91,7 @@ jobs:
             |
             PORT=3102
             NEXT_PUBLIC_API_URL=https://athlonix-api.jayllyz.fr
+            NEXT_PUBLIC_SOCKET_ENDPOINT=https://athlonix-api.jayllyz.fr:3103
             NEXT_PUBLIC_ATHLONIX_STORAGE_URL=${{ env.SUPABASE_STORAGE_URL }}
             SUPABASE_DOMAIN=${{ env.SUPABASE_DOMAIN }}
 

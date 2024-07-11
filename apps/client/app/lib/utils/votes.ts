@@ -1,22 +1,20 @@
 'use server';
 import { cookies } from 'next/headers';
-import type { Vote } from '../type/Votes';
+import type { FullPoll } from '../type/Votes';
 
 const urlApi = process.env.ATHLONIX_API_URL;
 
-export async function getAllVotes(): Promise<{ data: Vote[]; count: number }> {
+export async function getAllVotes(): Promise<{ data: { data: FullPoll[]; count: number }; status: number }> {
   const token = cookies().get('access_token')?.value;
-  const response = await fetch(`${urlApi}/polls?all=true`, {
+  const response = await fetch(`${urlApi}/polls`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: 'no-cache',
   });
-  if (!response.ok) {
-    throw new Error('Failed to fetch votes');
-  }
-  return await response.json();
+
+  return { data: await response.json(), status: response.status };
 }
 
-export async function getVote(id: number): Promise<{ data: Vote; status: number }> {
+export async function getVote(id: number): Promise<{ data: FullPoll; status: number }> {
   const token = cookies().get('access_token')?.value;
   const response = await fetch(`${urlApi}/polls/${id}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -26,9 +24,9 @@ export async function getVote(id: number): Promise<{ data: Vote; status: number 
   return { data: await response.json(), status: response.status };
 }
 
-export async function getUserVoted(id: number): Promise<{ data: { voted: boolean }; status: number }> {
+export async function getUserVoted(): Promise<{ data: { voted: number[] }; status: number }> {
   const token = cookies().get('access_token')?.value;
-  const response = await fetch(`${urlApi}/polls/${id}/voted`, {
+  const response = await fetch(`${urlApi}/polls/voted`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: 'no-cache',
   });

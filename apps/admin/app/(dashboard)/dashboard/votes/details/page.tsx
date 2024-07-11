@@ -5,7 +5,7 @@ import { getOnePoll } from '@/app/lib/utils/votes';
 import AddRound from '@/app/ui/dashboard/votes/AddRound';
 import DeleteRound from '@/app/ui/dashboard/votes/DeleteRound';
 import { Progress } from '@repo/ui/components/ui/progress';
-import { Button } from '@ui/components/ui/button';
+import Loading from '@ui/components/ui/loading';
 import { CircleArrowLeft } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -38,11 +38,21 @@ function ShowContent() {
     fetchData();
   }, [router, idPoll]);
 
+  if (!poll) return <Loading />;
+
+  const originalValue = poll.results.map((result) => {
+    return {
+      id: result.id,
+      content: result.content,
+      votes: result.votes,
+    };
+  });
+
   return (
     <>
       <div className="flex items-center gap-5">
         <CircleArrowLeft className="w-8 h-8" onClick={() => window.history.back()} cursor={'pointer'} />
-        <h1 className="text-lg font-semibold md:text-2xl">Résultats du vote {poll?.title}</h1>
+        <h1 className="text-lg font-semibold md:text-2xl">Résultats du vote : {poll?.title}</h1>
       </div>
       <div className="flex flex-col rounded-lg border border-solid shadow-sm p-4" x-chunk="dashboard-02-chunk-1">
         <h3 className="flex justify-center text-3xl items-center gap-2">
@@ -63,9 +73,25 @@ function ShowContent() {
           ))}
         </div>
       </div>
-      {poll?.sub_polls.map((subPoll) => {
-        const slicedResults = subPoll?.results.sort((a: Vote, b: Vote) => b.votes - a.votes).slice(0, subPoll.keep);
-        const subPollTotalVotes = slicedResults.reduce((total, result) => total + (result.votes ?? 0), 0);
+      {poll.sub_polls.map((subPoll, index) => {
+        const previousSubPoll = index > 0 ? poll.sub_polls[index - 1] : poll;
+        const toKeep = previousSubPoll?.results.sort((a: Vote, b: Vote) => b.votes - a.votes).slice(0, subPoll.keep);
+
+        const slicedResults = toKeep?.map((result) => {
+          if (!result.id_original)
+            return {
+              ...result,
+              votes: subPoll.results.find((subPollResult) => subPollResult.id_original === result.id)?.votes,
+              id_original: result.id,
+            };
+          return {
+            id: result.id,
+            content: originalValue.find((original) => original.id === result.id_original)?.content,
+            id_original: result.id_original,
+            votes: subPoll.results.find((subPollResult) => subPollResult.id_original === result.id_original)?.votes,
+          };
+        });
+        const subPollTotalVotes = slicedResults?.reduce((total, result) => total + (result.votes ?? 0), 0);
 
         return (
           <div
@@ -81,13 +107,13 @@ function ShowContent() {
               Tour
             </h3>
             <div className="grid gap-4 w-full">
-              {slicedResults.map((result) => (
+              {slicedResults?.map((result) => (
                 <div key={result.id} className="flex justify-center flex-col gap-4 p-4">
                   <div>
                     {poll?.results.find((pollResult) => pollResult.id === result.id_original)?.content} |{' '}
-                    {result.votes || 0} votes ({(((result.votes ?? 0) / subPollTotalVotes) * 100).toFixed(2)}%)
+                    {result.votes || 0} votes ({(((result.votes ?? 0) / (subPollTotalVotes ?? 1)) * 100).toFixed(2)}%)
                   </div>
-                  <Progress value={((result.votes ?? 0) / subPollTotalVotes) * 100} />
+                  <Progress value={((result.votes ?? 0) / (subPollTotalVotes ?? 1)) * 100} />
                 </div>
               ))}
             </div>
@@ -109,7 +135,7 @@ function ShowContent() {
 function page() {
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 h-full">
-      <Suspense fallback={<div>Chargement...</div>}>
+      <Suspense fallback={<Loading />}>
         <ShowContent />
       </Suspense>
     </main>

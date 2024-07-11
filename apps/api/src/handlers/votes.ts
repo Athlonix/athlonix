@@ -28,6 +28,35 @@ supabase
   })
   .subscribe();
 
+polls.openapi(getUserVotedPoll, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles;
+  await checkRole(roles, true);
+
+  const { data: dataPoll, error: errorPoll } = await supabase.from('POLLS').select('id');
+  if (errorPoll || !dataPoll) {
+    return c.json({ error: 'Failed to retrieve polls' }, 400);
+  }
+
+  const secret = process.env.SUPABASE_KEY || 'supabase';
+  const hashedUser: string[] = [];
+
+  for (const poll of dataPoll) {
+    const toHash = `${user.id}-${poll.id}`;
+    const hash = crypto?.createHmac('sha256', secret).update(toHash).digest('hex');
+    hashedUser.push(hash);
+  }
+
+  const { data, error } = await supabase.from('USERS_VOTES').select('id_poll').in('user', hashedUser);
+
+  if (error || !data) {
+    return c.json({ error: 'Failed to retrieve votes' }, 400);
+  }
+  const ids = data.map((vote) => vote.id_poll);
+
+  return c.json({ voted: ids }, 200);
+});
+
 polls.openapi(getAllPolls, async (c) => {
   const user = c.get('user');
   const roles = user.roles;
@@ -350,23 +379,4 @@ polls.openapi(voteToPoll, async (c) => {
   }
 
   return c.json({ message: 'Vote registered' }, 201);
-});
-
-polls.openapi(getUserVotedPoll, async (c) => {
-  const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, true);
-  const { id } = c.req.valid('param');
-
-  const secret = process.env.SUPABASE_KEY || 'supabase';
-  const toHash = `${user.id}-${id}`;
-  const hash = crypto?.createHmac('sha256', secret).update(toHash).digest('hex');
-
-  const { data, error } = await supabase.from('USERS_VOTES').select('id_poll').eq('id_poll', id).eq('user', hash);
-
-  if (error) {
-    return c.json({ error: 'Failed to retrieve votes' }, 400);
-  }
-
-  return c.json({ voted: data.length > 0 }, 200);
 });

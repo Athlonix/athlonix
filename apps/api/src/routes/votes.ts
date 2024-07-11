@@ -261,20 +261,17 @@ export const voteToPoll = createRoute({
 
 export const getUserVotedPoll = createRoute({
   method: 'get',
-  path: '/polls/{id}/voted',
+  path: '/polls/voted',
   summary: 'Get if user voted to a poll',
   description: 'Get if user voted to a poll',
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
-  request: {
-    params: idParamValidator,
-  },
   responses: {
     200: {
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: z.object({ voted: z.boolean() }),
+          schema: z.object({ voted: z.array(z.number()) }),
         },
       },
     },

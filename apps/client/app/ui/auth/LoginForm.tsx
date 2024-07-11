@@ -6,6 +6,7 @@ import { Button } from '@repo/ui/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
+import { toast } from '@repo/ui/components/ui/sonner';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -50,6 +51,7 @@ export default function LoginForm(): JSX.Element {
         }
       })
       .catch((error: Error) => {
+        toast.error('Email ou mot de passe incorrect', { duration: 5000 });
         console.error(error);
       });
   }

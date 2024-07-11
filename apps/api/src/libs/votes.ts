@@ -24,16 +24,20 @@ export function getPolls(poll: FullPoll) {
     sub_polls: [],
   };
 
-  const today = new Date();
-
-  if (!filterMajority(returnedPoll)) {
+  if (!filterMajority(returnedPoll, true).result) {
     return returnedPoll;
   }
 
   const filtered_sub_polls = [];
+  let getNext = true;
+
   for (const sub_poll of poll.sub_polls) {
     filtered_sub_polls.push(sub_poll);
-    if (!filterMajority(sub_poll)) break;
+    const returned = filterMajority(sub_poll, getNext);
+    getNext = returned.next;
+    if (!returned.result) {
+      break;
+    }
   }
 
   return {
@@ -42,26 +46,34 @@ export function getPolls(poll: FullPoll) {
   };
 }
 
-function filterMajority(poll: Poll) {
-  if (new Date(poll.start_at) > new Date()) return false;
+function filterMajority(poll: Poll, getNext: boolean) {
+  if (new Date(poll.start_at) > new Date()) {
+    if (getNext === false) return { result: false, next: getNext };
+    return { result: true, next: false };
+  }
 
-  if (poll.end_condition === 'simple') return true;
+  if (poll.end_condition === 'simple') return { result: true, next: getNext };
 
   if (poll.end_condition === 'absolute') {
-    if (new Date(poll.end_at) > new Date()) return true;
-    if (poll.results.filter((result) => result.votes > poll.max_choices / 2).length > 0) return false;
-    return true;
+    if (new Date(poll.end_at) > new Date()) return { result: true, next: getNext };
+    if (poll.results.filter((result) => result.votes > poll.max_choices / 2).length > 0)
+      return { result: false, next: getNext };
+    return { result: true, next: getNext };
   }
 
   if (poll.end_condition === 'two-third') {
-    if (new Date(poll.end_at) > new Date()) return true;
-    if (poll.results.filter((result) => result.votes > (poll.max_choices / 3) * 2).length > 0) return false;
-    return true;
+    if (new Date(poll.end_at) > new Date()) return { result: true, next: getNext };
+    if (poll.results.filter((result) => result.votes > (poll.max_choices / 3) * 2).length > 0)
+      return { result: false, next: getNext };
+    return { result: true, next: getNext };
   }
 
   if (poll.end_condition === 'unanimous') {
-    if (new Date(poll.end_at) > new Date()) return true;
-    if (poll.results.filter((result) => result.votes !== poll.max_choices).length > 0) return false;
-    return true;
+    if (new Date(poll.end_at) > new Date()) return { result: true, next: getNext };
+    if (poll.results.filter((result) => result.votes !== poll.max_choices).length > 0)
+      return { result: false, next: getNext };
+    return { result: true, next: getNext };
   }
+
+  return { result: true, next: getNext };
 }

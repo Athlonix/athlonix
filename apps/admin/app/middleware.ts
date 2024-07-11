@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  console.log('middleware');
   const user = cookies().get('user')?.value;
   if (!user) {
     return NextResponse.redirect(new URL('/', request.url));

@@ -35,7 +35,6 @@ function VotesResults({ poll: voteInit, round }: { poll: FullPoll; round: number
   useEffect(() => {
     if (socket) {
       socket.on('receivedVote', (payload: PollsVote) => {
-        console.log('receivedVote!')
         let currentPoll = poll;
         if (round > 1) {
           currentPoll = poll.sub_polls[round - 2] as FullPoll;

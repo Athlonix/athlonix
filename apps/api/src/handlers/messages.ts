@@ -13,8 +13,35 @@ export const messages = new OpenAPIHono<{ Variables: Variables }>({
 
 supabase
   .channel('realtime_messages')
-  .on('postgres_changes', { event: '*', schema: 'public', table: 'MESSAGES' }, (payload) => {
-    io.emit('receivedMessage', payload.new);
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'MESSAGES' }, async (payload) => {
+    const dataMessage = {
+      new: {
+        ...payload.new,
+        name: '',
+      },
+      old: {
+        ...payload.old,
+        name: '',
+      },
+      event: payload.eventType,
+    };
+    if (payload.eventType !== 'DELETE') {
+      const { data, error } = await supabase
+        .from('USERS')
+        .select('username')
+        .eq('id', (payload.new as { id_sender: number }).id_sender)
+        .single();
+
+      if (error || !data) {
+        console.error(error);
+        return;
+      }
+
+      dataMessage.new.name = data.username;
+    }
+    console.log(dataMessage);
+
+    io.emit('receivedMessage', dataMessage);
   })
   .subscribe();
 

@@ -1,14 +1,6 @@
 'use server';
+import type { Message } from '@/app/lib/type/Messages';
 import { cookies } from 'next/headers';
-
-export type Message = {
-  id: number;
-  message: string;
-  id_sender: number;
-  created_at: string;
-  updated_at: string | null;
-  name: string;
-};
 
 export async function getMessages(): Promise<{ data: Message[]; count: number }> {
   const user = cookies().get('user');

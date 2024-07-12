@@ -39,7 +39,6 @@ supabase
 
       dataMessage.new.name = data.username;
     }
-    console.log(dataMessage);
 
     io.emit('receivedMessage', dataMessage);
   })

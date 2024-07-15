@@ -1,37 +1,31 @@
 'use client';
 
+import type { User } from '@/app/lib/type/User';
+import { returnUser, saveCookie } from '@/app/lib/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
 import { Input } from '@repo/ui/components/ui/input';
 import { Label } from '@repo/ui/components/ui/label';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { saveCookie } from '../lib/utils';
-
-export type User = {
-  id: number;
-  email: string;
-  username: string;
-  first_name: string;
-  last_name: string;
-  id_referer: number | null;
-  id_auth: string | null;
-  date_validity: string | null;
-  created_at: string;
-  deleted_at: string | null;
-  invoice: string | null;
-  subscription: string | null;
-  status: 'applied' | 'approved' | 'rejected' | null;
-  roles: { id: number; name: string }[];
-};
 
 export function LoginForm(): JSX.Element {
   const router = useRouter();
   const urlApi = process.env.NEXT_PUBLIC_API_URL;
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkCookie = async () => {
+      const user = await returnUser();
+      if (user) {
+        router.push('/dashboard');
+      }
+    };
+    checkCookie();
+  }, [router]);
 
   const formSchema = z.object({
     email: z.string().email({ message: 'Email invalide' }),

@@ -61,9 +61,9 @@ export async function checkSubscriptionStatus(user: User): Promise<'applied' | '
 }
 
 export async function saveUserCookie(user: User, token?: string): Promise<void> {
-  cookies().set('user', JSON.stringify(user), { path: '/', secure: true, sameSite: 'strict' });
+  cookies().set('user', JSON.stringify(user), { path: '/', secure: true, sameSite: 'strict', maxAge: 604800 });
   if (token) {
-    cookies().set('access_token', token, { path: '/', secure: true, sameSite: 'strict' });
+    cookies().set('access_token', token, { path: '/', secure: true, sameSite: 'strict', maxAge: 604800 });
   }
 }
 

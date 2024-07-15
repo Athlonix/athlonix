@@ -68,14 +68,7 @@ auth.openapi(loginUser, async (c) => {
   if (user.deleted_at !== null) throw new HTTPException(404, { message: 'User has been deleted' });
 
   setCookie(c, 'access_token', data?.session.access_token, {
-    maxAge: 31536000, // 1 year
-    httpOnly: true,
-    path: '/',
-    secure: true,
-  });
-
-  setCookie(c, 'refresh_token', data?.session.refresh_token, {
-    maxAge: 31536000,
+    maxAge: 604800, // Same as session
     httpOnly: true,
     path: '/',
     secure: true,
@@ -91,8 +84,7 @@ auth.openapi(logoutUser, async (c) => {
   if (token) {
     const token = getCookie(c, 'access_token') as string;
     await supAdmin.auth.admin.signOut(token);
-    if (getCookie(c, 'refresh_token') && getCookie(c, 'access_token')) {
-      deleteCookie(c, 'refresh_token');
+    if (getCookie(c, 'access_token')) {
       deleteCookie(c, 'access_token');
     }
   }

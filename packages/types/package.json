@@ -2,8 +2,8 @@
   "name": "@repo/types",
   "version": "0.0.0",
   "private": true,
-  "main": "src/supabase.ts",
-  "types": "src/supabase.ts",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
   "scripts": {
     "clean": "rm -rf node_modules",
     "generate:types": "(cd ../../supabase/ && pnpm supabase gen types typescript --local > ../packages/types/src/database.ts) && biome check --write .",

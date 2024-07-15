@@ -214,7 +214,7 @@ export default function SignupForm(): JSX.Element {
                       )}
                     />
                   </div>
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
                     S'inscrire
                   </Button>
                 </div>

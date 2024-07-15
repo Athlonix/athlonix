@@ -7,8 +7,8 @@ import {
   getAssembly,
   getQrcode,
 } from '@/app/(dashboard)/dashboard/assemblies/utils';
+import type { User } from '@/app/lib/type/User';
 import { getAllMembersForAssembly } from '@/app/lib/utils';
-import type { User } from '@/app/ui/LoginForm';
 import { Button } from '@ui/components/ui/button';
 import {
   Dialog,

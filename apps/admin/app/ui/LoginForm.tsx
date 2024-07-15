@@ -114,7 +114,7 @@ export function LoginForm(): JSX.Element {
                 )}
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
               Connexion
             </Button>
           </div>

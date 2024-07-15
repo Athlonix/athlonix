@@ -21,7 +21,7 @@ COPY . .
 
 RUN turbo prune api --docker
 
-FROM base as deps
+FROM base AS deps
 WORKDIR /app
 
 COPY /apps/api/tsconfig.json .

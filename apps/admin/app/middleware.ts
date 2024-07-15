@@ -1,4 +1,4 @@
-import type { User } from '@/app/ui/LoginForm';
+import type { User } from '@/app/lib/type/User';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';

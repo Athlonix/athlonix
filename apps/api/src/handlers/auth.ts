@@ -1,6 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { deleteCookie, getCookie, setCookie } from 'hono/cookie';
 import { HTTPException } from 'hono/http-exception';
+import { sendWelcomeEmail } from '../libs/email.js';
 import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import { loginUser, logoutUser, signupUser } from '../routes/auth.js';
@@ -46,6 +47,10 @@ auth.openapi(signupUser, async (c) => {
 
   if (insertError) {
     return c.json({ error: 'Error while creating user' }, 400);
+  }
+
+  if (process.env.ENABLE_EMAILS === 'true') {
+    await sendWelcomeEmail({ email: user.email, first_name: user.first_name });
   }
 
   return c.json(user, 201);

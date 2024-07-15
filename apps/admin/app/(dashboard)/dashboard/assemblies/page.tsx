@@ -12,6 +12,7 @@ import {
 import { Input } from '@ui/components/ui/input';
 import { Label } from '@ui/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
+import { toast } from '@ui/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
 import { Textarea } from '@ui/components/ui/textarea';
 import { EditIcon } from 'lucide-react';
@@ -46,10 +47,15 @@ export default function AssembliesPage(): JSX.Element {
   async function handleAddAssembly(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    await createAssembly(formData);
-    const assemblies = await getAssemblies();
-    setAssemblies(assemblies.data);
-    setCount(assemblies.count);
+    try {
+      await createAssembly(formData);
+      const assemblies = await getAssemblies();
+      setAssemblies(assemblies.data);
+      setCount(assemblies.count);
+      toast.success("L'assemblée a été créée avec succès");
+    } catch (_error) {
+      toast.error("Erreur lors de la création de l'assemblée");
+    }
     setOpen(false);
   }
 
@@ -119,7 +125,7 @@ export default function AssembliesPage(): JSX.Element {
                 />
               </div>
               <DialogFooter>
-                <Button type="submit" disabled={loading}>
+                <Button type="submit" disabled={loading || !location}>
                   Enregistrer
                 </Button>
               </DialogFooter>

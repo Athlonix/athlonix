@@ -48,12 +48,16 @@ export async function createAssembly(formData: FormData): Promise<void> {
   const data = {
     name: formData.get('name'),
     description: formData.get('description'),
-    date: formData.get('date'),
+    date: new Date(formData.get('date') as string).toISOString(),
     location: Number(formData.get('location')) || null,
     lawsuit: null,
   };
   const token = cookies().get('access_token')?.value;
-  await fetch(`${urlApi}/assemblies`, {
+  if (!token) {
+    throw new Error('No token found');
+  }
+
+  const resp = await fetch(`${urlApi}/assemblies`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -61,6 +65,10 @@ export async function createAssembly(formData: FormData): Promise<void> {
     },
     body: JSON.stringify(data),
   });
+
+  if (!resp.ok) {
+    throw new Error('Failed to create assembly');
+  }
 }
 
 export async function updateAssembly(formData: FormData, id: number): Promise<void> {

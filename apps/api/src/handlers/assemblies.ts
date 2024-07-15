@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { sendNewAssemblyEmail } from '../libs/email.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -96,6 +97,10 @@ assemblies.openapi(createAssembly, async (c) => {
     lawsuit: data.lawsuit || null,
     closed: data.closed,
   };
+
+  if (process.env.ENABLE_EMAILS === 'true') {
+    await sendNewAssemblyEmail(format.name, format.date, format.location);
+  }
 
   return c.json(format, 201);
 });

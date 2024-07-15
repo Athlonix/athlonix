@@ -18,7 +18,7 @@ COPY . .
 
 RUN turbo prune admin --docker
 
-FROM base as deps
+FROM base AS deps
 WORKDIR /app
 
 COPY --from=pruner /app/out/json/ .

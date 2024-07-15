@@ -1,9 +1,11 @@
+'use client';
 import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
+import { toast } from '@ui/components/ui/sonner';
 import Link from 'next/link';
 import type { SVGProps } from 'react';
 
-export default function Footer() {
+export default function Footer(): JSX.Element {
   return (
     <footer className="bg-primary-foreground py-12 mt-12 border-b-slate-800 border-t-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -11,16 +13,21 @@ export default function Footer() {
           <div className="space-y-4">
             <h5 className="text-xl font-semibold">Newsletter</h5>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Input placeholder="Votre email" className="border p-2 flex-grow" />
-              <Button className="bg-accent text-accent-foreground px-4 py-2">S'abonner</Button>
+              <Input placeholder="Votre email" className="border p-2 flex-grow" type="email" />
+              <Button
+                className="bg-accent text-accent-foreground px-4 py-2"
+                onClick={() => toast.success('Inscription réussie')}
+              >
+                S'inscrire
+              </Button>
             </div>
           </div>
           <div className="space-y-4">
             <h5 className="text-xl font-semibold">Nous suivre</h5>
             <div className="flex space-x-6">
-              <FacebookIcon className="text-blue-600 w-8 h-8" />
-              <TwitterIcon className="text-blue-400 w-8 h-8" />
-              <InstagramIcon className="text-pink-600 w-8 h-8" />
+              <FacebookIcon className="text-blue-600 w-8 h-8" cursor={'pointer'} />
+              <TwitterIcon className="text-blue-400 w-8 h-8" cursor={'pointer'} />
+              <InstagramIcon className="text-pink-600 w-8 h-8" cursor={'pointer'} />
               <Link href="https://github.com/Athlonix/athlonix" prefetch={false}>
                 <GithubIcon className="text-gray-600 w-8 h-8 hover:text-gray-900" />
               </Link>
@@ -92,7 +99,7 @@ export default function Footer() {
   );
 }
 
-function FacebookIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+function FacebookIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>): JSX.Element {
   return (
     <svg
       {...props}
@@ -112,7 +119,7 @@ function FacebookIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) 
   );
 }
 
-function GithubIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+function GithubIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>): JSX.Element {
   return (
     <svg
       {...props}
@@ -133,7 +140,7 @@ function GithubIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   );
 }
 
-function InstagramIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
+function InstagramIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>): JSX.Element {
   return (
     <svg
       {...props}

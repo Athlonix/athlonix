@@ -28,7 +28,7 @@ export default function RootLayout({
           <div className="flex-grow flex flex-col items-center">{children}</div>
           <Footer />
         </ThemeProvider>
-        <Toaster richColors closeButton visibleToasts={1} />
+        <Toaster richColors closeButton visibleToasts={1} position="bottom-center" />
       </body>
     </html>
   );

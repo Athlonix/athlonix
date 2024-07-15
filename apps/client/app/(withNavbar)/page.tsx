@@ -1,25 +1,9 @@
 'use client';
 
 import { Button } from '@repo/ui/components/ui/button';
-import { Toaster, toast } from '@repo/ui/components/ui/sonner';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect } from 'react';
 import AthlonixBot from '../ui/components/AthlonixBot';
-
-function ShowToast() {
-  const searchParams = useSearchParams();
-  const search = searchParams.get('loggedIn');
-
-  useEffect(() => {
-    if (search === 'true') {
-      toast.info('Bon retour !', { duration: 2000, description: 'Vous êtes connecté !' });
-    }
-  }, [search]);
-
-  return <Toaster />;
-}
 
 export default function Page(): JSX.Element {
   return (
@@ -102,9 +86,6 @@ export default function Page(): JSX.Element {
           </div>
         </section>
 
-        <Suspense>
-          <ShowToast />
-        </Suspense>
         <AthlonixBot />
       </main>
     </>

@@ -30,7 +30,7 @@ export async function getUserFromDB(): Promise<User> {
   }
   const user = (await response.json()) as User;
   // Save user in cookie for faster access
-  cookies().set('user', JSON.stringify(user), { path: '/', secure: true, sameSite: 'strict' });
+  await saveUserCookie(user);
   return user;
 }
 
@@ -93,11 +93,11 @@ export async function updateUserInformation(
     }),
   })
     .then(async (response) => await response.json())
-    .then((data: { user: User }) => {
+    .then(async (data: { user: User }) => {
       if ('error' in data) {
         return;
       }
-      cookies().set('user', JSON.stringify(data.user), { path: '/', secure: true, sameSite: 'strict' });
+      await saveUserCookie(data.user);
       return data.user;
     })
     .catch((error: Error) => console.error(error));

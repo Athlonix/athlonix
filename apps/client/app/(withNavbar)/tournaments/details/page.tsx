@@ -81,7 +81,9 @@ function ShowContent() {
       )}
       <Separator className="my-8" />
       <div className="flex justify-center">
-        <div className="bg-slate-600 rounded-lg p-2">Pour vous inscrire, veuillez vous rendre sur l'espace membre.</div>
+        <div className="dark:bg-slate-600 bg-slate-300 rounded-lg p-2">
+          Pour vous inscrire, veuillez vous rendre sur l'espace membre.
+        </div>
       </div>
     </>
   );

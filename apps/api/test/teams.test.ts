@@ -126,7 +126,6 @@ describe('Teams tests', () => {
     const res = await app.request('/activities', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
       body: formData,

@@ -1,6 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { getOccurencesMonthly, getOccurencesWeekly, getOccurencesYearly } from '../libs/activities.js';
-import { uploadFile } from '../libs/storage.js';
+import { deleteFile, uploadFile } from '../libs/storage.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -322,6 +322,8 @@ activities.openapi(deleteActivity, async (c) => {
   if (error || count === 0) {
     return c.json({ error: 'Activity not found' }, 404);
   }
+
+  await deleteFile(`activities/activity_${id}`, 'image');
 
   return c.json({ message: 'Activity deleted' }, 200);
 });

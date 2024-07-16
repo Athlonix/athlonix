@@ -262,25 +262,27 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                               </div>
                             )}
                             <FormControl>
-                              <Button size="lg" type="button">
-                                <input
-                                  type="file"
-                                  className="hidden"
-                                  id="fileInput"
-                                  accept="image/*"
-                                  onBlur={field.onBlur}
-                                  name={field.name}
-                                  onChange={(e) => {
-                                    field.onChange(e.target.files);
-                                    setSelectedImage(e.target.files?.[0] || null);
-                                  }}
-                                  ref={field.ref}
-                                />
-                                <label htmlFor="fileInput" className="inline-flex items-center">
-                                  <Paperclip />
-                                  <span className="whitespace-nowrap">Choisir une image</span>
-                                </label>
-                              </Button>
+                              <div>
+                                <Button size="lg" type="button">
+                                  <input
+                                    type="file"
+                                    className="hidden"
+                                    id="fileInput"
+                                    accept="image/*"
+                                    onBlur={field.onBlur}
+                                    name={field.name}
+                                    onChange={(e) => {
+                                      field.onChange(e.target.files);
+                                      setSelectedImage(e.target.files?.[0] || null);
+                                    }}
+                                    ref={field.ref}
+                                  />
+                                  <label htmlFor="fileInput" className="inline-flex items-center">
+                                    <Paperclip />
+                                    <span className="whitespace-nowrap">Choisir une image</span>
+                                  </label>
+                                </Button>
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>

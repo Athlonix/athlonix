@@ -2,8 +2,12 @@ import type { Activity } from '@/app/lib/type/Activities';
 import { CalendarDays, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 function ActivityCard({ activity, member }: { activity: Activity; member: boolean }) {
+  const [imageError, setImageError] = useState(false);
+  const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/activities/activity_${activity.id}`;
+  const placeholder = '/placeholder.jpg';
   return (
     <div className="h-44 p-4 shadow-lg">
       <div className="flex gap-6 h-full">
@@ -13,9 +17,10 @@ function ActivityCard({ activity, member }: { activity: Activity; member: boolea
               className="object-cover"
               width={256}
               height={144}
-              src={'/placeholder.jpg'}
+              src={imageError ? placeholder : imageUrl}
               style={{ width: '256px', height: '144px' }}
-              alt={'placeholder'}
+              alt={activity.name}
+              onError={() => setImageError(true)}
             />
           </Link>
         </div>

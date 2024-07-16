@@ -4,18 +4,24 @@ import type { ActivityWithOccurences } from '@/app/lib/type/Activities';
 import { getActivityOccurences } from '@/app/lib/utils/activities';
 import { Separator } from '@ui/components/ui/separator';
 import { toast } from '@ui/components/ui/sonner';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 function ShowContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [imageError, setImageError] = useState(false);
+
   let id = searchParams.get('id') || 1;
   if (typeof id === 'string') {
     id = Number.parseInt(id);
   }
 
   const [activity, setActivity] = useState<ActivityWithOccurences>();
+
+  const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/activities/activity_${activity?.activity.id}`;
+  const placeholder = '/placeholder.jpg';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,8 +41,20 @@ function ShowContent() {
     fetchData();
   }, [id, router]);
   return (
-    <div>
+    <div className="my-12">
       <div className="flex justify-center text-3xl font-bold">{activity?.activity.name}</div>
+      <Separator className="my-4" />
+      <div className="flex justify-center">
+        <Image
+          className="object-cover rounded-sm"
+          width={1000}
+          height={1000}
+          src={imageError ? placeholder : imageUrl}
+          alt={activity?.activity.name || ''}
+          style={{ width: '40vw', height: 'auto' }}
+          onError={() => setImageError(true)}
+        />
+      </div>
       <Separator className="my-4" />
       <div>
         {activity?.activity.description?.split('\n').map((i, key) => {

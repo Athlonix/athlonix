@@ -5,7 +5,8 @@ import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Input } from '@repo/ui/components/ui/input';
 import { Separator } from '@repo/ui/components/ui/separator';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { useRouter, useSearchParams } from 'next/navigation';
+import Loading from '@ui/components/ui/loading';
+import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 export type Tournament = {
@@ -27,7 +28,6 @@ interface TournamentsData {
 
 function ShowContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   let page = searchParams.get('page') || 1;
   if (typeof page === 'string') {
     page = Number.parseInt(page);
@@ -36,6 +36,7 @@ function ShowContent() {
   const [maxPage, setMaxPage] = useState<number>(1);
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -62,6 +63,7 @@ function ShowContent() {
         .then((data: TournamentsData) => {
           setTournaments(data.data);
           setMaxPage(Math.ceil(data.count / 10));
+          setLoading(false);
         })
         .catch((error: Error) => toast.error(error.message, { duration: 5000 }));
     }, 500);
@@ -72,6 +74,10 @@ function ShowContent() {
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <>
@@ -103,7 +109,7 @@ function ShowContent() {
 function page() {
   return (
     <main>
-      <Suspense fallback={<div>Chargement...</div>}>
+      <Suspense fallback={<Loading />}>
         <ShowContent />
       </Suspense>
     </main>

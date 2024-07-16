@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
@@ -99,26 +101,35 @@ describe('Teams tests', () => {
     const start_time = now.toTimeString().split(' ')[0];
     const end_time = end.toTimeString().split(' ')[0];
 
+    const formData = new FormData();
+    formData.append('name', 'Activity test');
+    formData.append('description', 'Description test');
+    formData.append('max_participants', '10');
+    formData.append('min_participants', '1');
+    const daysOfWeek = ['monday', 'tuesday'];
+    for (const day of daysOfWeek) {
+      formData.append('days_of_week[]', day);
+    }
+    formData.append('start_date', String(start_date));
+    formData.append('end_date', String(end_date));
+    formData.append('start_time', String(start_time));
+    formData.append('end_time', String(end_time));
+    formData.append('frequency', 'weekly');
+    formData.append('id_sport', String(id_sport));
+    formData.append('id_address', String(id_location));
+
+    const imagePath = path.join(__dirname, 'files', 'mock_image.png');
+    const imageBuffer = fs.readFileSync(imagePath);
+    const imageBlob = new Blob([imageBuffer], { type: 'image/png' });
+    formData.append('image', imageBlob, 'mock_image.png');
+
     const res = await app.request('/activities', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
-      body: JSON.stringify({
-        name: 'Activity test',
-        description: 'Description test',
-        max_participants: 10,
-        min_participants: 1,
-        days_of_week: ['monday', 'tuesday'],
-        start_date: start_date,
-        end_date: end_date,
-        start_time: start_time,
-        end_time: end_time,
-        frequency: 'weekly',
-        id_sport: id_sport,
-        id_address: id_location,
-      }),
+      body: formData,
     });
 
     expect(res.status).toBe(201);

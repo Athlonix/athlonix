@@ -144,7 +144,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
     if (values.id_address !== -1) formData.append('id_address', String(values.id_address) ?? null);
     for (const day of values.days) {
       if (day) {
-        formData.append('days_of_week', day);
+        formData.append('days_of_week[]', day);
       }
     }
     formData.append('image', values.image[0]);

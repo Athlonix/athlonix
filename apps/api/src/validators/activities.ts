@@ -18,6 +18,24 @@ export const activitySchema = z.object({
   id_address: z.coerce.number().nullable(),
 });
 
+export const createActivitySchema = z.object({
+  name: z.string().max(50),
+  description: z.string().max(255).nullable(),
+  max_participants: z.coerce.number().min(1),
+  min_participants: z.coerce.number().min(1),
+  days_of_week: z
+    .array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']))
+    .nullable(),
+  frequency: z.enum(['weekly', 'monthly', 'yearly', 'daily']),
+  start_date: z.string().date().nullable(),
+  end_date: z.string().date().nullable(),
+  start_time: z.string().time().nullable(),
+  end_time: z.string().time().nullable(),
+  id_sport: z.coerce.number().nullable(),
+  id_address: z.coerce.number().nullable(),
+  image: z.any(),
+});
+
 export const activitySchemaReponse = z.object({
   id: z.coerce.number(),
   name: z.string().max(50),

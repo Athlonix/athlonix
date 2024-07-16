@@ -26,7 +26,7 @@ import { TimePicker } from '@repo/ui/components/ui/time-picker';
 import { cn } from '@repo/ui/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Calendar as CalendarIcon, PlusCircle } from 'lucide-react';
+import { Calendar as CalendarIcon, Paperclip, PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
@@ -40,8 +40,12 @@ interface Props {
   sports: Sport[];
 }
 
+const MAX_FILE_SIZE = 1024 * 1024 * 5;
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
 function AddActivity({ activities, setActivities, addresses, sports }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const router = useRouter();
   const frenchDays = [
     { id: 'monday', name: 'Lundi' },
@@ -74,6 +78,14 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
       end_time: z.date(),
       interval: z.coerce.number({ message: 'Le champ est requis' }).int().min(1, { message: 'Le champ est requis' }),
       description: z.string().optional(),
+      image: z
+        .any()
+        .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, {
+          message: `L'image doit faire moins de ${MAX_FILE_SIZE / 1000000} Mo`,
+        })
+        .refine((files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type), {
+          message: "L'image doit être au format jpeg, png ou wepb",
+        }),
     })
     .refine((data) => data.min_participants <= data.max_participants, {
       message: 'Le nombre minimum de participants doit être inférieur ou égal au nombre maximum de participants',
@@ -108,11 +120,14 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
       start_time: undefined,
       end_time: undefined,
       interval: 1,
+      image: undefined,
     },
   });
 
   async function submit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
+
+    console.log(selectedImage);
 
     fetch(`${urlApi}/activities`, {
       method: 'POST',
@@ -134,6 +149,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
         end_time: values.end_time.toTimeString().split(' ')[0],
         id_sport: values.id_sport === -1 ? null : values.id_sport ?? null,
         id_address: values.id_address === -1 ? null : values.id_address ?? null,
+        image: values.image[0],
       }),
     })
       .then(async (response) => {
@@ -222,6 +238,44 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                             <Label className="font-bold">Description</Label>
                             <FormControl>
                               <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="image"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Image</Label>
+                            {selectedImage && (
+                              <div>
+                                <img src={URL.createObjectURL(selectedImage)} alt="Selected" />
+                              </div>
+                            )}
+                            <FormControl>
+                              <Button size="lg" type="button">
+                                <input
+                                  type="file"
+                                  className="hidden"
+                                  id="fileInput"
+                                  accept="image/*"
+                                  onBlur={field.onBlur}
+                                  name={field.name}
+                                  onChange={(e) => {
+                                    field.onChange(e.target.files);
+                                    setSelectedImage(e.target.files?.[0] || null);
+                                  }}
+                                  ref={field.ref}
+                                />
+                                <label htmlFor="fileInput" className="inline-flex items-center">
+                                  <Paperclip />
+                                  <span className="whitespace-nowrap">Choisir une image</span>
+                                </label>
+                              </Button>
                             </FormControl>
                             <FormMessage />
                           </FormItem>

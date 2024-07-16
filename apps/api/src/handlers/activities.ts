@@ -1,5 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { getOccurencesMonthly, getOccurencesWeekly, getOccurencesYearly } from '../libs/activities.js';
+import { uploadFile } from '../libs/storage.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -213,7 +214,12 @@ activities.openapi(createActivity, async (c) => {
     end_time,
     id_sport,
     id_address,
+    image,
   } = c.req.valid('json');
+
+  if (image === null) {
+    return c.json({ error: 'You must provide an image' }, 400);
+  }
 
   const user = c.get('user');
   const roles = user.roles;
@@ -252,6 +258,13 @@ activities.openapi(createActivity, async (c) => {
   if (error || !data) {
     return c.json({ error: 'Failed to create activity' }, 500);
   }
+
+  const updatedImage = { ...image, type: 'image' };
+
+  console.log(image);
+  // console.log('updatedImage', updatedImage);
+
+  await uploadFile(`activities/activity_${data.id}`, updatedImage, 'image');
 
   return c.json(data, 201);
 });

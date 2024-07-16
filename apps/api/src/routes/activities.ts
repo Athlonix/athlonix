@@ -6,6 +6,7 @@ import {
   activityOccurencesSchema,
   activitySchema,
   activitySchemaReponse,
+  createActivitySchema,
   queryActivitiesExceptionSchema,
 } from '../validators/activities.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
@@ -125,7 +126,7 @@ export const createActivity = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: activitySchema.omit({ id: true }),
+          schema: createActivitySchema,
         },
       },
     },

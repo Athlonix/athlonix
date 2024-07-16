@@ -1,9 +1,9 @@
-import type { Database } from '@repo/types';
+import type { Tables } from '@repo/types';
 import { Resend } from 'resend';
 import { supabase } from './supabase.js';
 
-type location = Database['public']['Tables']['ADDRESSES']['Row'];
-type user = Database['public']['Tables']['USERS']['Row'];
+type location = Tables<'ADDRESSES'>;
+type user = Tables<'USERS'>;
 
 async function getApprovedMembers(): Promise<user[] | null> {
   const selectedRoles = ['MEMBER'];

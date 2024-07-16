@@ -6,7 +6,7 @@
   "types": "src/index.ts",
   "scripts": {
     "clean": "rm -rf node_modules",
-    "generate:types": "(cd ../../supabase/ && pnpm supabase gen types typescript --local > ../packages/types/src/database.ts) && biome check --write .",
+    "generate:types": "(cd ../../supabase/ && pnpm supabase gen types --lang=typescript --local > ../packages/types/src/database.ts) && biome check --write .",
     "lint": "biome check --write ."
   },
   "devDependencies": {

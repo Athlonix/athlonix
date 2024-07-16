@@ -24,7 +24,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
   }
 
   const [maxPage, setMaxPage] = useState<number>(1);
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<Activity[] | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
@@ -48,7 +48,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
     setSearchTerm(event.target.value);
   };
 
-  if (activities.length === 0) {
+  if (!activities) {
     return <Loading />;
   }
 

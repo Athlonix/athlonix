@@ -113,6 +113,10 @@ function ActivityRow(props: ActivityRowProps) {
     setOpenDelete(false);
   }
 
+  if (name === 'Supprimé') {
+    return null;
+  }
+
   return (
     <TableRow key={props.activity.id}>
       <TableCell className="font-medium">

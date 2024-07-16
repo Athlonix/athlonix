@@ -35,7 +35,7 @@ import { z } from 'zod';
 
 interface Props {
   activities: Activity[];
-  setActivities: React.Dispatch<React.SetStateAction<Activity[]>>;
+  setActivities: React.Dispatch<React.SetStateAction<Activity[] | null>>;
   addresses: Address[];
   sports: Sport[];
 }

@@ -127,30 +127,34 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
   async function submit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    console.log(selectedImage);
+    const formData = new FormData();
+    formData.append('name', values.name);
+    if (values.description) {
+      formData.append('description', values.description);
+    }
+    formData.append('min_participants', values.min_participants.toString());
+    formData.append('max_participants', values.max_participants.toString());
+    formData.append('frequency', values.frequency);
+    formData.append('interval', values.interval.toString());
+    formData.append('start_date', values.start_date.toISOString().split('T')[0] || '');
+    formData.append('end_date', values.end_date.toISOString().split('T')[0] || '');
+    formData.append('start_time', values.start_time.toTimeString().split(' ')[0] || '');
+    formData.append('end_time', values.end_time.toTimeString().split(' ')[0] || '');
+    if (values.id_sport !== -1) formData.append('id_sport', String(values.id_sport) ?? null);
+    if (values.id_address !== -1) formData.append('id_address', String(values.id_address) ?? null);
+    for (const day of values.days) {
+      if (day) {
+        formData.append('days_of_week', day);
+      }
+    }
+    formData.append('image', values.image[0]);
 
     fetch(`${urlApi}/activities`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       },
-      body: JSON.stringify({
-        name: values.name,
-        description: values.description,
-        min_participants: values.min_participants,
-        max_participants: values.max_participants,
-        days_of_week: values.days,
-        frequency: values.frequency,
-        interval: values.interval,
-        start_date: values.start_date.toISOString().split('T')[0],
-        end_date: values.end_date.toISOString().split('T')[0],
-        start_time: values.start_time.toTimeString().split(' ')[0],
-        end_time: values.end_time.toTimeString().split(' ')[0],
-        id_sport: values.id_sport === -1 ? null : values.id_sport ?? null,
-        id_address: values.id_address === -1 ? null : values.id_address ?? null,
-        image: values.image[0],
-      }),
+      body: formData,
     })
       .then(async (response) => {
         if (response.status === 403) {
@@ -158,6 +162,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
         }
         if (response.status !== 201) {
           const error = await response.json();
+          console.log(error);
           throw new Error(error.message);
         }
         return response.json();

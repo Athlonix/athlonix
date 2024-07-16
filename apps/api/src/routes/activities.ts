@@ -125,7 +125,7 @@ export const createActivity = createRoute({
   request: {
     body: {
       content: {
-        'application/json': {
+        'multipart/form-data': {
           schema: createActivitySchema,
         },
       },

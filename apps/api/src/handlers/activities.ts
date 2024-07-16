@@ -215,7 +215,7 @@ activities.openapi(createActivity, async (c) => {
     id_sport,
     id_address,
     image,
-  } = c.req.valid('json');
+  } = c.req.valid('form');
 
   if (image === null) {
     return c.json({ error: 'You must provide an image' }, 400);
@@ -259,12 +259,7 @@ activities.openapi(createActivity, async (c) => {
     return c.json({ error: 'Failed to create activity' }, 500);
   }
 
-  const updatedImage = { ...image, type: 'image' };
-
-  console.log(image);
-  // console.log('updatedImage', updatedImage);
-
-  await uploadFile(`activities/activity_${data.id}`, updatedImage, 'image');
+  await uploadFile(`activities/activity_${data.id}`, image, 'image');
 
   return c.json(data, 201);
 });

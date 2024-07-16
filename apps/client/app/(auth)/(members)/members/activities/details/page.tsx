@@ -29,6 +29,15 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const user = localStorage.getItem('user');
+      if (!user) {
+        router.push('/login');
+      }
+    }
+  }, [router]);
+
   let id = searchParams.get('id') || 1;
   if (typeof id === 'string') {
     id = Number.parseInt(id);
@@ -49,6 +58,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
       if (status !== 200) {
         toast.error("Erreur lors de la récupération de l'activité", { duration: 5000 });
       }
+      setActivity(data);
 
       if (data.occurences[0]) {
         const { data: usersData, status: usersStatus } = await getActivityUsers(id, data.occurences[0].date);

@@ -1,13 +1,9 @@
 'use client';
 
-import type { Team, Tournament } from '@/app/lib/type/Tournaments';
-import { getTournaments, getTournamentsTeams } from '@/app/lib/utils/tournament';
-import CreateTeam from '@/app/ui/components/tournaments/CreateTeam';
-import JoinTeam from '@/app/ui/components/tournaments/JoinTeam';
-import LeaveTeam from '@/app/ui/components/tournaments/LeaveTeam';
+import type { Tournament } from '@/app/lib/type/Tournaments';
+import { getTournaments } from '@/app/lib/utils/tournament';
 import { Separator } from '@repo/ui/components/ui/separator';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -31,19 +27,7 @@ function ShowContent() {
     id_sport: 0,
   };
 
-  const [currentUser, setCurrentUser] = useState<{ id: number; username: string } | null>(null);
   const [tournament, setTournament] = useState<Tournament>(placeholder);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const user = localStorage.getItem('user');
-      if (user) {
-        setCurrentUser(JSON.parse(user));
-      } else {
-        router.push('/login');
-      }
-    }
-  }, [router]);
 
   useEffect(() => {
     const fetchTournament = async () => {

@@ -1,5 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { getOccurencesMonthly, getOccurencesWeekly, getOccurencesYearly } from '../libs/activities.js';
+import { deleteFile, uploadFile } from '../libs/storage.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -213,7 +214,12 @@ activities.openapi(createActivity, async (c) => {
     end_time,
     id_sport,
     id_address,
-  } = c.req.valid('json');
+    image,
+  } = c.req.valid('form');
+
+  if (image === null) {
+    return c.json({ error: 'You must provide an image' }, 400);
+  }
 
   const user = c.get('user');
   const roles = user.roles;
@@ -252,6 +258,8 @@ activities.openapi(createActivity, async (c) => {
   if (error || !data) {
     return c.json({ error: 'Failed to create activity' }, 500);
   }
+
+  await uploadFile(`activities/activity_${data.id}`, image, 'image');
 
   return c.json(data, 201);
 });
@@ -314,6 +322,8 @@ activities.openapi(deleteActivity, async (c) => {
   if (error || count === 0) {
     return c.json({ error: 'Activity not found' }, 404);
   }
+
+  await deleteFile(`activities/activity_${id}`, 'image');
 
   return c.json({ message: 'Activity deleted' }, 200);
 });

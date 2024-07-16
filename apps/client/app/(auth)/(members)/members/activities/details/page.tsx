@@ -6,6 +6,7 @@ import Occurences from '@/app/ui/components/activities/Occurences';
 import { Badge } from '@ui/components/ui/badge';
 import { Separator } from '@ui/components/ui/separator';
 import { toast } from '@ui/components/ui/sonner';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
@@ -28,6 +29,7 @@ const FrenchDays: Record<'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'frid
 function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Address[] }) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -48,6 +50,9 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
   const [usersSet1, setUsersSet1] = useState<User[]>([]);
   const [usersSet2, setUsersSet2] = useState<User[]>([]);
   const [usersSet3, setUsersSet3] = useState<User[]>([]);
+
+  const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/activities/activity_${activity?.activity.id}`;
+  const placeholder = '/placeholder.jpg';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,8 +100,20 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
     fetchData();
   }, [id, router]);
   return (
-    <div>
+    <div className="my-12">
       <div className="flex justify-center text-3xl font-bold">{activity?.activity.name}</div>
+      <Separator className="my-4" />
+      <div className="flex justify-center">
+        <Image
+          className="object-cover rounded-sm"
+          width={1000}
+          height={1000}
+          src={imageError ? placeholder : imageUrl}
+          alt={activity?.activity.name || ''}
+          style={{ width: '40vw', height: 'auto' }}
+          onError={() => setImageError(true)}
+        />
+      </div>
       <Separator className="my-4" />
       <div>
         {activity?.activity.description?.split('\n').map((i, key) => {

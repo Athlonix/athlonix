@@ -7,7 +7,7 @@ import type { SVGProps } from 'react';
 
 export default function Footer(): JSX.Element {
   return (
-    <footer className="bg-primary-foreground py-12 mt-12 border-b-slate-800 border-t-4">
+    <footer className="bg-primary-foreground py-12 border-b-slate-800 border-t-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div className="space-y-4">

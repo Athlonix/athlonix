@@ -28,11 +28,11 @@ function LogoutUser() {
       Authorization: `Bearer ${localStorage.getItem('access_token')}`,
     },
   })
-    .then((response) => {
-      response.json();
+    .then(async (response) => {
       if (response.status === 200) {
         localStorage.removeItem('user');
-        deleteUserCookie();
+        localStorage.removeItem('access_token');
+        await deleteUserCookie();
         window.location.href = '/';
       }
     })

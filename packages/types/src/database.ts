@@ -921,13 +921,9 @@ export type Database = {
           assembly: number | null;
           description: string | null;
           end_at: string;
-          end_condition: Database['public']['Enums']['majorities'];
           id: number;
           id_user: number;
-          keep: number;
           max_choices: number;
-          parent_poll: number | null;
-          round: number;
           start_at: string;
           title: string;
         };
@@ -935,13 +931,9 @@ export type Database = {
           assembly?: number | null;
           description?: string | null;
           end_at: string;
-          end_condition?: Database['public']['Enums']['majorities'];
           id?: number;
           id_user: number;
-          keep?: number;
           max_choices?: number;
-          parent_poll?: number | null;
-          round?: number;
           start_at: string;
           title: string;
         };
@@ -949,24 +941,13 @@ export type Database = {
           assembly?: number | null;
           description?: string | null;
           end_at?: string;
-          end_condition?: Database['public']['Enums']['majorities'];
           id?: number;
           id_user?: number;
-          keep?: number;
           max_choices?: number;
-          parent_poll?: number | null;
-          round?: number;
           start_at?: string;
           title?: string;
         };
         Relationships: [
-          {
-            foreignKeyName: 'POLLS_parent_poll_fkey';
-            columns: ['parent_poll'];
-            isOneToOne: false;
-            referencedRelation: 'POLLS';
-            referencedColumns: ['id'];
-          },
           {
             foreignKeyName: 'public_POLLS_assembly_fkey';
             columns: ['assembly'];
@@ -985,31 +966,21 @@ export type Database = {
       };
       POLLS_OPTIONS: {
         Row: {
-          content: string | null;
+          content: string;
           id: number;
-          id_original: number | null;
           id_poll: number;
         };
         Insert: {
-          content?: string | null;
+          content: string;
           id?: number;
-          id_original?: number | null;
           id_poll: number;
         };
         Update: {
-          content?: string | null;
+          content?: string;
           id?: number;
-          id_original?: number | null;
           id_poll?: number;
         };
         Relationships: [
-          {
-            foreignKeyName: 'POLLS_OPTIONS_id_original_fkey';
-            columns: ['id_original'];
-            isOneToOne: false;
-            referencedRelation: 'POLLS_OPTIONS';
-            referencedColumns: ['id'];
-          },
           {
             foreignKeyName: 'public_POLLS_OPTIONS_id_poll_fkey';
             columns: ['id_poll'];
@@ -1766,7 +1737,6 @@ export type Database = {
     Enums: {
       days: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
       frequency: 'weekly' | 'monthly' | 'yearly' | 'daily';
-      majorities: 'simple' | 'absolute' | 'two-third' | 'unanimous';
       priority: 'P0' | 'P1' | 'P2' | 'P3';
       reaction: 'like';
       status: 'not started' | 'in progress' | 'completed';
@@ -2052,6 +2022,10 @@ export type Database = {
           metadata: Json;
           updated_at: string;
         }[];
+      };
+      operation: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
       };
       search: {
         Args: {

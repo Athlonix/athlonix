@@ -59,14 +59,14 @@ export async function addUserToAssembly(
   id_assembly: number,
   id_member: number,
 ): Promise<{ error: string; status: 500 | 400 } | true> {
-  const { data: attendee, error: attendeeError } = await supabase
+  const { data: attendee } = await supabase
     .from('ASSEMBLIES_ATTENDEES')
     .select('id')
     .eq('id_assembly', id_assembly)
     .eq('id_member', id_member)
     .single();
 
-  if (attendeeError || attendee) {
+  if (attendee) {
     return { error: 'Member already confirmed', status: 400 };
   }
 

@@ -76,7 +76,6 @@ export async function deleteFile(id: number, name: string): Promise<void> {
     body: JSON.stringify({ id, name }),
   });
   if (!response.ok) {
-    console.log(await response.json());
     throw new Error('Failed to delete file');
   }
 }

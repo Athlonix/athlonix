@@ -2,8 +2,8 @@ import { z } from '@hono/zod-openapi';
 
 export const assemblySchema = z.object({
   id: z.number().min(1),
-  name: z.string(),
-  description: z.string().nullable(),
+  name: z.string().min(2),
+  description: z.string().min(2).nullable(),
   date: z.string().datetime(),
   location: z.number().min(1).nullable(),
   lawsuit: z.string().nullable(),

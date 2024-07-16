@@ -62,10 +62,16 @@ export default function AssembliesPage(): JSX.Element {
   async function handleUpdateAssembly(event: React.FormEvent<HTMLFormElement>, id: number) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    await updateAssembly(formData, id);
-    const assemblies = await getAssemblies();
-    setAssemblies(assemblies.data);
-    setCount(assemblies.count);
+    try {
+      await updateAssembly(formData, id);
+      const assemblies = await getAssemblies();
+      setAssemblies(assemblies.data);
+      setCount(assemblies.count);
+      setOpen(false);
+      toast.success("L'assemblée a été modifiée avec succès");
+    } catch (_error) {
+      toast.error("Erreur lors de la modification de l'assemblée");
+    }
     setOpen(false);
   }
 
@@ -88,6 +94,7 @@ export default function AssembliesPage(): JSX.Element {
                   id="name"
                   name="name"
                   defaultValue={editAssembly ? editAssembly.name : ''}
+                  minLength={5}
                   required
                   placeholder="Titre de l'assemblée générale"
                 />
@@ -102,11 +109,11 @@ export default function AssembliesPage(): JSX.Element {
                   defaultValue={editAssembly ? new Date(editAssembly.date).toISOString().slice(0, 16) : ''}
                   required
                 />
-                <Select name="location" required>
+                <Select name="location" required defaultValue={editAssembly ? String(editAssembly.location) : '0'}>
                   <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
                     <SelectValue placeholder="Lieu" />
                   </SelectTrigger>
-                  <SelectContent defaultValue={editAssembly?.location ? String(editAssembly.location) : '0'}>
+                  <SelectContent>
                     {location?.map((loc) => (
                       <SelectItem key={loc.id} value={String(loc.id)}>
                         {loc.road} {loc.number}, {loc.city}
@@ -133,6 +140,7 @@ export default function AssembliesPage(): JSX.Element {
           </DialogContent>
         </Dialog>
       </header>
+
       <div className="flex items-center gap-5">
         <Table>
           <TableHeader>
@@ -145,6 +153,14 @@ export default function AssembliesPage(): JSX.Element {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {assemblies?.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                  Aucune assemblée générale programmée
+                </TableCell>
+              </TableRow>
+            )}
+
             {assemblies?.map((assembly) => (
               <TableRow key={assembly.id} className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                 <TableCell>

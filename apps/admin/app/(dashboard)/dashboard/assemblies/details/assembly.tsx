@@ -22,11 +22,13 @@ import {
 import { Label } from '@ui/components/ui/label';
 import Loading from '@ui/components/ui/loading';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
+import { toast } from '@ui/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
 import { Textarea } from '@ui/components/ui/textarea';
 import { BookOpenText, CircleArrowLeft, HomeIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { type FormEvent, useEffect, useState } from 'react';
+import { type Address, getOneAddress } from '../../addresses/utils';
 
 export default function AssemblyDetail(): JSX.Element {
   const searchParams = useSearchParams();
@@ -40,30 +42,53 @@ export default function AssemblyDetail(): JSX.Element {
   const [isClosed, setIsClosed] = useState<boolean>(false);
   const [openQrCode, setOpenQrCode] = useState<boolean>(false);
   const [qrCode, setQrCode] = useState<string>('');
+  const [started, setStarted] = useState<boolean>(false);
+  const [location, setLocation] = useState<Address | null>(null);
 
   useEffect(() => {
     const fetchAssembly = async () => {
-      const data = await getAssembly(Number(idPoll));
-      setAttendees(data.attendees?.length ?? 0);
-      setAssembly(data);
-      setIsClosed(data.closed);
-      const attendeesArray = (data?.attendees ?? []).map((attendee) => attendee.id);
-      const members = await getAllMembersForAssembly(attendeesArray);
-      setMembers(members.data);
+      try {
+        setLoading(true);
+        const data = await getAssembly(Number(idPoll));
+        setAssembly(data);
+        setAttendees(data.attendees?.length ?? 0);
+        setIsClosed(data.closed);
+
+        const attendeesArray = (data?.attendees ?? []).map((attendee) => attendee.id);
+        const membersData = await getAllMembersForAssembly(attendeesArray);
+        setMembers(membersData.data);
+
+        setStarted(new Date().getTime() > new Date(data.date).getTime());
+
+        if (data.location) {
+          const locationData = await getOneAddress(Number(data.location));
+          setLocation(locationData);
+        }
+      } catch (_error) {
+        toast.error("Une erreur est survenue lors du chargement des données de l'assemblée");
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchAssembly();
-    setLoading(false);
+
+    if (idPoll) {
+      fetchAssembly();
+    }
   }, [idPoll]);
 
   async function handleAddAttendee(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const id_user = Number(formData.get('id_user'));
-    await addAttendee(Number(idPoll), Number(id_user));
-    setOpenAddAttendee(false);
-    const data = await getAssembly(Number(idPoll));
-    setAttendees(data.attendees?.length ?? 0);
-    setAssembly(data);
+    try {
+      await addAttendee(Number(idPoll), id_user);
+      setOpenAddAttendee(false);
+      const data = await getAssembly(Number(idPoll));
+      setAttendees(data.attendees?.length ?? 0);
+      setAssembly(data);
+    } catch (_error) {
+      toast.error("Erreur lors de l'ajout du membre");
+    }
   }
 
   async function handleEndAssembly(event: React.FormEvent<HTMLFormElement>) {
@@ -96,7 +121,7 @@ export default function AssemblyDetail(): JSX.Element {
         <CircleArrowLeft className="w-8 h-8" onClick={() => window.history.back()} cursor={'pointer'} />
         <h1 className="text-lg font-semibold md:text-2xl">{assembly?.name}</h1>
         <div className="ml-auto flex gap-5">
-          {!isClosed && (
+          {!isClosed && started && (
             <CloseAssemblyDialog
               openCloseAssembly={openCloseAssembly}
               setOpenCloseAssembly={setOpenCloseAssembly}
@@ -110,7 +135,7 @@ export default function AssemblyDetail(): JSX.Element {
           <div>
             {isClosed ? (
               <span className="text-red-500">Terminée</span>
-            ) : new Date(assembly?.date ?? 0).getTime() < Date.now() ? (
+            ) : started ? (
               <span className="text-green-500">En cours de déroulement</span>
             ) : (
               <span className="text-blue-500">Débutera le {new Date(assembly?.date ?? 0).toLocaleString()}</span>
@@ -118,7 +143,7 @@ export default function AssemblyDetail(): JSX.Element {
           </div>
           <div className="flex items-center gap-2">
             <HomeIcon className="w-6 h-6" />
-            {`Lieu: ${assembly?.location ? assembly?.location : 'En ligne'}`}
+            {location ? `${location.road} ${location.city} ${location.postal_code}` : 'En ligne'}
           </div>
           <div className="flex items-center gap-2">
             <BookOpenText className="w-6 h-6" />
@@ -126,48 +151,64 @@ export default function AssemblyDetail(): JSX.Element {
           </div>
         </div>
       </div>
-      <div className="flex items-center gap-5">
-        <h1 className="text-lg font-semibold md:text-2xl">Membres de l'assemblée ({attendees})</h1>
-        {!isClosed && (
-          <div className="ml-auto flex gap-5">
-            <AddAttendeeDialog
-              openAddAttendee={openAddAttendee}
-              setOpenAddAttendee={setOpenAddAttendee}
-              members={members}
-              handleAddAttendee={handleAddAttendee}
-            />
-            <QrCodeDialog
-              openQrCode={openQrCode}
-              setOpenQrCode={setOpenQrCode}
-              qrCode={qrCode}
-              requestQrCode={requestQrCode}
-            />
+      {!started && (
+        <div className="grid gap-4 w-full">
+          <div className="flex justify-center flex-col gap-4 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg border border-dashed shadow-sm">
+            <div className="flex items-center gap-2">
+              <span>
+                Une fois l'assemblée générale commencée, vous pourrez générer un QR Code pour confirmer la présence des
+                membres.
+              </span>
+            </div>
           </div>
-        )}
-      </div>
-      <div className="flex items-center gap-5">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nom et Prénom</TableHead>
-              <TableHead>Email</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {attendees === 0 && (
-              <TableRow>
-                <TableCell colSpan={2}>Aucun membre n'a encore été ajouté à cette assemblée</TableCell>
-              </TableRow>
+        </div>
+      )}
+      {started && (
+        <>
+          <div className="flex items-center gap-5">
+            <h1 className="text-lg font-semibold md:text-2xl">Membres de l'assemblée ({attendees})</h1>
+            {!isClosed && (
+              <div className="ml-auto flex gap-5">
+                <AddAttendeeDialog
+                  openAddAttendee={openAddAttendee}
+                  setOpenAddAttendee={setOpenAddAttendee}
+                  members={members}
+                  handleAddAttendee={handleAddAttendee}
+                />
+                <QrCodeDialog
+                  openQrCode={openQrCode}
+                  setOpenQrCode={setOpenQrCode}
+                  qrCode={qrCode}
+                  requestQrCode={requestQrCode}
+                />
+              </div>
             )}
-            {assembly?.attendees?.map((member) => (
-              <TableRow key={member.id}>
-                <TableCell>{`${member.first_name} ${member.last_name}`}</TableCell>
-                <TableCell>{member.email}</TableCell>
-              </TableRow>
-            )) ?? []}
-          </TableBody>
-        </Table>
-      </div>
+          </div>
+          <div className="flex items-center gap-5">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nom et Prénom</TableHead>
+                  <TableHead>Email</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {attendees === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={2}>Aucun membre n'a encore été ajouté à cette assemblée</TableCell>
+                  </TableRow>
+                )}
+                {assembly?.attendees?.map((member) => (
+                  <TableRow key={member.id}>
+                    <TableCell>{`${member.first_name} ${member.last_name}`}</TableCell>
+                    <TableCell>{member.email}</TableCell>
+                  </TableRow>
+                )) ?? []}
+              </TableBody>
+            </Table>
+          </div>
+        </>
+      )}
     </>
   );
 }

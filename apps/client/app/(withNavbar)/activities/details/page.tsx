@@ -2,6 +2,7 @@
 
 import type { ActivityWithOccurences } from '@/app/lib/type/Activities';
 import { getActivityOccurences } from '@/app/lib/utils/activities';
+import Loading from '@ui/components/ui/loading';
 import { Separator } from '@ui/components/ui/separator';
 import { toast } from '@ui/components/ui/sonner';
 import Image from 'next/image';
@@ -67,7 +68,9 @@ function ShowContent() {
       </div>
       <Separator className="my-4" />
       <div className="flex justify-center">
-        <div className="bg-slate-600 rounded-lg p-2">Pour vous inscrire, veuillez vous rendre sur l'espace membre.</div>
+        <div className="bg-slate-600 text-white rounded-lg p-2">
+          Pour vous inscrire, veuillez vous rendre sur l'espace membre.
+        </div>
       </div>
     </div>
   );
@@ -76,7 +79,7 @@ function ShowContent() {
 function page() {
   return (
     <main>
-      <Suspense fallback={<div>Chargement...</div>}>
+      <Suspense fallback={<Loading />}>
         <ShowContent />
       </Suspense>
     </main>

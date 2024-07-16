@@ -4,6 +4,7 @@ import type { Tournament } from '@/app/lib/type/Tournaments';
 import { getTournaments } from '@/app/lib/utils/tournament';
 import { Separator } from '@repo/ui/components/ui/separator';
 import { toast } from '@repo/ui/components/ui/sonner';
+import Loading from '@ui/components/ui/loading';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -81,7 +82,9 @@ function ShowContent() {
       )}
       <Separator className="my-8" />
       <div className="flex justify-center">
-        <div className="bg-slate-600 rounded-lg p-2">Pour vous inscrire, veuillez vous rendre sur l'espace membre.</div>
+        <div className="bg-slate-600 text-white rounded-lg p-2">
+          Pour vous inscrire, veuillez vous rendre sur l'espace membre.
+        </div>
       </div>
     </>
   );
@@ -90,7 +93,7 @@ function ShowContent() {
 function page() {
   return (
     <main>
-      <Suspense fallback={<div>Chargement...</div>}>
+      <Suspense fallback={<Loading />}>
         <ShowContent />
       </Suspense>
     </main>

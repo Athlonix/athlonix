@@ -7,13 +7,9 @@ import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Input } from '@repo/ui/components/ui/input';
 import { Separator } from '@repo/ui/components/ui/separator';
 import { toast } from '@repo/ui/components/ui/sonner';
+import Loading from '@ui/components/ui/loading';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-
-interface ActivitiesData {
-  data: Activity[];
-  count: number;
-}
 
 function ShowContent() {
   const searchParams = useSearchParams();
@@ -25,6 +21,7 @@ function ShowContent() {
   const [maxPage, setMaxPage] = useState<number>(1);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -36,6 +33,7 @@ function ShowContent() {
 
       setActivities(data.data);
       setMaxPage(Math.ceil(data.count / 10));
+      setLoading(false);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -44,6 +42,10 @@ function ShowContent() {
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <>
@@ -75,7 +77,7 @@ function ShowContent() {
 function page() {
   return (
     <main>
-      <Suspense fallback={<div>Chargement...</div>}>
+      <Suspense fallback={<Loading />}>
         <ShowContent />
       </Suspense>
     </main>

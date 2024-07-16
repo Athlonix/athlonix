@@ -2,6 +2,7 @@
 
 import type { ActivityWithOccurences } from '@/app/lib/type/Activities';
 import { getActivityOccurences } from '@/app/lib/utils/activities';
+import Loading from '@ui/components/ui/loading';
 import { Separator } from '@ui/components/ui/separator';
 import { toast } from '@ui/components/ui/sonner';
 import Image from 'next/image';
@@ -78,7 +79,7 @@ function ShowContent() {
 function page() {
   return (
     <main>
-      <Suspense fallback={<div>Chargement...</div>}>
+      <Suspense fallback={<Loading />}>
         <ShowContent />
       </Suspense>
     </main>

@@ -30,7 +30,9 @@ import { polls } from './handlers/votes.js';
 
 const app = new OpenAPIHono();
 
-app.use('*', logger());
+if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') {
+  app.use('*', logger());
+}
 app.use('*', prettyJSON());
 app.use('*', secureHeaders());
 app.use('*', compress());

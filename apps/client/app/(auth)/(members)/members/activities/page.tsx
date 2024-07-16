@@ -7,7 +7,7 @@ import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
 import { Input } from '@repo/ui/components/ui/input';
 import { Separator } from '@repo/ui/components/ui/separator';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 interface ActivitiesData {
@@ -17,6 +17,7 @@ interface ActivitiesData {
 
 function ShowContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   let page = searchParams.get('page') || 1;
   if (typeof page === 'string') {
     page = Number.parseInt(page);
@@ -62,7 +63,7 @@ function ShowContent() {
       </div>
       <div className="grid gap-4">
         {activities.map((activity) => (
-          <ActivityCard key={activity.id} activity={activity} member={false} />
+          <ActivityCard key={activity.id} activity={activity} member={true} />
         ))}
       </div>
       <div className="mt-8">

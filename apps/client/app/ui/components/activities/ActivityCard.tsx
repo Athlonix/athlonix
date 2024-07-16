@@ -3,7 +3,7 @@ import { CalendarDays, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
-function ActivityCard({ activity }: { activity: Activity }) {
+function ActivityCard({ activity, member }: { activity: Activity; member: boolean }) {
   return (
     <div className="h-44 p-4 shadow-lg">
       <div className="flex gap-6 h-full">
@@ -20,7 +20,9 @@ function ActivityCard({ activity }: { activity: Activity }) {
           </Link>
         </div>
         <div className="h-full max-w-[624px]">
-          <Link href={`/activities/details?id=${activity.id}`}>
+          <Link
+            href={member ? `/members/activities/details?id=${activity.id}` : `/activities/details?id=${activity.id}`}
+          >
             <h2 className="truncate cursor-pointer hover:text-slate-400" title={activity.name}>
               {activity.name}
             </h2>

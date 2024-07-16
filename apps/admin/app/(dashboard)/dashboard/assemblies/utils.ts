@@ -76,31 +76,37 @@ export async function updateAssembly(formData: FormData, id: number): Promise<vo
   const data = {
     name: formData.get('name'),
     description: formData.get('description'),
-    date: formData.get('date'),
+    date: new Date(formData.get('date') as string).toISOString(),
     location: Number(formData.get('location')) || null,
     lawsuit: formData.get('lawsuit') || null,
   };
   const token = cookies().get('access_token')?.value;
-  await fetch(`${urlApi}/assemblies/${id}`, {
-    method: 'PUT',
+  const res = await fetch(`${urlApi}/assemblies/${id}`, {
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(data),
   });
+  if (!res.ok) {
+    throw new Error('Failed to update assembly');
+  }
 }
 
 export async function addAttendee(id_assembly: number, id_user: number): Promise<void> {
   const urlApi = process.env.ATHLONIX_API_URL;
   const token = cookies().get('access_token')?.value;
-  await fetch(`${urlApi}/assemblies/${id_assembly}/confirm/${id_user}`, {
+  const resp = await fetch(`${urlApi}/assemblies/${id_assembly}/confirm/${id_user}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
+  if (!resp.ok) {
+    throw new Error('Failed to add attendee');
+  }
 }
 
 export async function closeAssembly(id: number, lawsuit: string): Promise<void> {

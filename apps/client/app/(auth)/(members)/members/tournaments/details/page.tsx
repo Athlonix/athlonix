@@ -44,6 +44,7 @@ function ShowContent() {
         setCurrentUser(JSON.parse(user));
       } else {
         router.push('/login');
+        return;
       }
     }
   }, [router]);

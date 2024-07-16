@@ -34,6 +34,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
       const user = localStorage.getItem('user');
       if (!user) {
         router.push('/login');
+        return;
       }
     }
   }, [router]);

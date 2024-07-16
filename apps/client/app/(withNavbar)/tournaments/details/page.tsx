@@ -34,9 +34,11 @@ function ShowContent() {
       const { data, status } = await getTournaments({ id });
       if (status === 404) {
         router.push('/not-found');
+        return;
       }
       if (status !== 200) {
         toast.error('Erreur lors de la récupération du tournoi', { duration: 5000 });
+        return;
       }
       setTournament(data);
     };

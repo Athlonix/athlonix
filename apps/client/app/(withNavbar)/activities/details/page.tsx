@@ -23,9 +23,11 @@ function ShowContent() {
 
       if (status === 404) {
         router.push('/not-found');
+        return;
       }
       if (status !== 200) {
         toast.error("Erreur lors de la récupération de l'activité", { duration: 5000 });
+        return;
       }
       setActivity(data);
     };

@@ -112,10 +112,7 @@ describe('Activities tests', () => {
     formData.append('description', 'Description test');
     formData.append('max_participants', '10');
     formData.append('min_participants', '1');
-    const daysOfWeek = ['monday', 'tuesday'];
-    for (const day of daysOfWeek) {
-      formData.append('days_of_week[]', day);
-    }
+    formData.append('days_of_week', JSON.stringify(['monday', 'tuesday']));
     formData.append('start_date', String(start_date));
     formData.append('end_date', String(end_date));
     formData.append('start_time', String(start_time));

@@ -35,7 +35,7 @@ import { z } from 'zod';
 
 interface Props {
   activities: Activity[];
-  setActivities: React.Dispatch<React.SetStateAction<Activity[]>>;
+  setActivities: React.Dispatch<React.SetStateAction<Activity[] | null>>;
   addresses: Address[];
   sports: Sport[];
 }
@@ -142,11 +142,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
     formData.append('end_time', values.end_time.toTimeString().split(' ')[0] || '');
     if (values.id_sport !== -1) formData.append('id_sport', String(values.id_sport) ?? null);
     if (values.id_address !== -1) formData.append('id_address', String(values.id_address) ?? null);
-    for (const day of values.days) {
-      if (day) {
-        formData.append('days_of_week[]', day);
-      }
-    }
+    formData.append('days_of_week', JSON.stringify(values.days));
     formData.append('image', values.image[0]);
 
     fetch(`${urlApi}/activities`, {

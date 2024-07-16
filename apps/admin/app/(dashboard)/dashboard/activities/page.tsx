@@ -10,6 +10,7 @@ import { Input } from '@repo/ui/components/ui/input';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
+import Loading from '@ui/components/ui/loading';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -23,7 +24,7 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
   }
 
   const [maxPage, setMaxPage] = useState<number>(1);
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<Activity[] | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
@@ -46,6 +47,10 @@ function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Addres
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
   };
+
+  if (!activities) {
+    return <Loading />;
+  }
 
   return (
     <TabsContent value="all">

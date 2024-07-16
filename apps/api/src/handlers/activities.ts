@@ -243,7 +243,7 @@ activities.openapi(createActivity, async (c) => {
       description,
       max_participants,
       min_participants,
-      days_of_week,
+      days_of_week: JSON.parse(days_of_week || '[]'),
       frequency,
       start_date,
       end_date,

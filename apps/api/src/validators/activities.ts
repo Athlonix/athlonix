@@ -23,9 +23,7 @@ export const createActivitySchema = z.object({
   description: z.string().max(255).optional(),
   max_participants: z.coerce.number().min(1),
   min_participants: z.coerce.number().min(1),
-  days_of_week: z
-    .array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']))
-    .optional(),
+  days_of_week: z.string().optional(),
   frequency: z.enum(['weekly', 'monthly', 'yearly', 'daily']),
   start_date: z.string().date().optional(),
   end_date: z.string().date().optional(),

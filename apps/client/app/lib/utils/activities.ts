@@ -1,8 +1,28 @@
 'use server';
 
-import type { ActivityWithOccurences, Address, Sport, User } from '@/app/lib/type/Activities';
+import type { Activity, ActivityWithOccurences, Address, Sport, User } from '@/app/lib/type/Activities';
 
 const urlApi = process.env.ATHLONIX_API_URL;
+
+export async function getActivities(
+  page: number,
+  search: string,
+): Promise<{ data: { data: Activity[]; count: number }; status: number }> {
+  const queryParams = new URLSearchParams({
+    skip: `${page - 1}`,
+    take: '10',
+    search,
+  });
+
+  const res = await fetch(`${urlApi}/activities?${queryParams}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  return { data: await res.json(), status: res.status };
+}
 
 export async function getActivityOccurences(id: number): Promise<{ data: ActivityWithOccurences; status: number }> {
   const startDate = new Date().toISOString().split('T')[0] ?? '';

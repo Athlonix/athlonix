@@ -20,5 +20,22 @@ export async function getAdresses(): Promise<{ data: Address[]; count: number }>
       Authorization: `Bearer ${token}`,
     },
   });
-  return res.json();
+  if (!res.ok) {
+    throw new Error('Addresses not found');
+  }
+  return await res.json();
+}
+
+export async function getOneAddress(id: number): Promise<Address> {
+  const urlApi = process.env.ATHLONIX_API_URL;
+  const token = cookies().get('access_token')?.value;
+  const res = await fetch(`${urlApi}/addresses/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) {
+    throw new Error('Address not found');
+  }
+  return await res.json();
 }

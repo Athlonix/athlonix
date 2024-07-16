@@ -24,15 +24,18 @@ import { type Assembly, createAssembly, getAssemblies, updateAssembly } from './
 export default function AssembliesPage(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const [assemblies, setAssemblies] = useState<Assembly[] | null>(null);
+  const [filteredAssemblies, setFilteredAssemblies] = useState<Assembly[] | null>(null);
   const [count, setCount] = useState<number>(0);
   const [open, setOpen] = useState<boolean>(false);
   const [editAssembly, setEditAssembly] = useState<Assembly | null>(null);
   const [location, setLocation] = useState<Address[] | null>(null);
+  const [filter, setFilter] = useState<string>('all');
 
   useEffect(() => {
     const fetchAssemblies = async () => {
       const assemblies = await getAssemblies();
       setAssemblies(assemblies.data);
+      setFilteredAssemblies(assemblies.data);
       setCount(assemblies.count);
     };
     const fetchLocations = async () => {
@@ -43,6 +46,12 @@ export default function AssembliesPage(): JSX.Element {
     fetchLocations();
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (assemblies) {
+      filterAssemblies(filter);
+    }
+  }, [assemblies, filter]);
 
   async function handleAddAssembly(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,12 +71,41 @@ export default function AssembliesPage(): JSX.Element {
   async function handleUpdateAssembly(event: React.FormEvent<HTMLFormElement>, id: number) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    await updateAssembly(formData, id);
-    const assemblies = await getAssemblies();
-    setAssemblies(assemblies.data);
-    setCount(assemblies.count);
+    try {
+      await updateAssembly(formData, id);
+      const assemblies = await getAssemblies();
+      setAssemblies(assemblies.data);
+      setCount(assemblies.count);
+      setOpen(false);
+      toast.success("L'assemblée a été modifiée avec succès");
+    } catch (_error) {
+      toast.error("Erreur lors de la modification de l'assemblée");
+    }
     setOpen(false);
   }
+
+  const filterAssemblies = (status: string) => {
+    if (!assemblies) return;
+
+    const now = new Date();
+    let filtered: Assembly[];
+
+    switch (status) {
+      case 'scheduled':
+        filtered = assemblies.filter((a) => new Date(a.date) > now && !a.closed);
+        break;
+      case 'inProgress':
+        filtered = assemblies.filter((a) => new Date(a.date) <= now && !a.closed);
+        break;
+      case 'finished':
+        filtered = assemblies.filter((a) => a.closed);
+        break;
+      default:
+        filtered = assemblies;
+    }
+
+    setFilteredAssemblies(filtered);
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -75,7 +113,7 @@ export default function AssembliesPage(): JSX.Element {
         <h1 className="text-xl font-bold">Assemblées Générales</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>Programmer une assemblée</Button>
+            <Button onClick={() => setEditAssembly(null)}>Programmer une assemblée</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -88,6 +126,7 @@ export default function AssembliesPage(): JSX.Element {
                   id="name"
                   name="name"
                   defaultValue={editAssembly ? editAssembly.name : ''}
+                  minLength={5}
                   required
                   placeholder="Titre de l'assemblée générale"
                 />
@@ -102,11 +141,11 @@ export default function AssembliesPage(): JSX.Element {
                   defaultValue={editAssembly ? new Date(editAssembly.date).toISOString().slice(0, 16) : ''}
                   required
                 />
-                <Select name="location" required>
+                <Select name="location" required defaultValue={editAssembly ? String(editAssembly.location) : '0'}>
                   <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
                     <SelectValue placeholder="Lieu" />
                   </SelectTrigger>
-                  <SelectContent defaultValue={editAssembly?.location ? String(editAssembly.location) : '0'}>
+                  <SelectContent>
                     {location?.map((loc) => (
                       <SelectItem key={loc.id} value={String(loc.id)}>
                         {loc.road} {loc.number}, {loc.city}
@@ -133,6 +172,21 @@ export default function AssembliesPage(): JSX.Element {
           </DialogContent>
         </Dialog>
       </header>
+
+      <div className="flex items-center justify-between mb-4">
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger className="rounded-lg bg-background text-black border border-gray-300 w-[200px]">
+            <SelectValue placeholder="Filtrer par statut" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Toutes les assemblées</SelectItem>
+            <SelectItem value="scheduled">Programmées</SelectItem>
+            <SelectItem value="inProgress">En cours</SelectItem>
+            <SelectItem value="finished">Terminées</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="flex items-center gap-5">
         <Table>
           <TableHeader>
@@ -145,7 +199,15 @@ export default function AssembliesPage(): JSX.Element {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {assemblies?.map((assembly) => (
+            {assemblies?.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                  Aucune assemblée générale programmée
+                </TableCell>
+              </TableRow>
+            )}
+
+            {filteredAssemblies?.map((assembly) => (
               <TableRow key={assembly.id} className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
                 <TableCell>
                   <Link href={`/dashboard/assemblies/details?id=${assembly.id}`}>{assembly.name}</Link>

@@ -106,21 +106,23 @@ function ActivityDetails() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center space-x-2">
               <Calendar className="h-5 w-5 text-muted-foreground" />
-              <span>Jours : {sessionInfo ? formatDaysOfWeek(sessionInfo.days_of_week) : 'Non spécifié'}</span>
+              <span className="font-semibold mr-2">Jours : </span>
+              <span>{sessionInfo ? formatDaysOfWeek(sessionInfo.days_of_week) : 'Non spécifié'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <Clock className="h-5 w-5 text-muted-foreground" />
-              <span>
-                Horaire : {sessionInfo ? `${sessionInfo.start_time} - ${sessionInfo.end_time}` : 'Non spécifié'}
-              </span>
+              <span className="font-semibold">Horaires : </span>
+              <span>{sessionInfo ? `${sessionInfo.start_time} - ${sessionInfo.end_time}` : 'Non spécifié'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <Repeat className="h-5 w-5 text-muted-foreground" />
-              <span>Fréquence : {sessionInfo ? formatFrequency(sessionInfo.frequency) : 'Non spécifié'}</span>
+              <span className="font-semibold mr-2">Fréquence : </span>
+              <span>{sessionInfo ? formatFrequency(sessionInfo.frequency) : 'Non spécifié'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-muted-foreground" />
-              <span>Limite : {activity.activity.max_participants || 'Non spécifié'} participants</span>
+              <span className="font-semibold mr-2">Limite : </span>
+              <span>{activity.activity.max_participants || 'Non spécifié'} participants</span>
             </div>
           </div>
 

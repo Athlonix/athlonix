@@ -1,6 +1,6 @@
 import { ModeToggle } from '@repo/ui/components/toggleTheme';
 import '@repo/ui/globals.css';
-import { FileSearch, Flame, Home, LineChart, MessageSquareMore, Trophy, Users } from 'lucide-react';
+import { BookUser, FileSearch, Flame, Home, LineChart, MessageSquareMore, Trophy, Users } from 'lucide-react';
 import Link from 'next/link';
 
 export default function RootLayout({
@@ -61,6 +61,13 @@ export default function RootLayout({
               >
                 <LineChart className="h-4 w-4" />
                 Votes
+              </Link>
+              <Link
+                href="/members/assemblies"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground"
+              >
+                <BookUser className="h-4 w-4" />
+                Assemblée générale
               </Link>
             </nav>
           </div>

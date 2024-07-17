@@ -1,31 +1,34 @@
 'use client';
 
 import type { ActivityWithOccurences } from '@/app/lib/type/Activities';
+import { checkSubscriptionStatus, getUserFromCookie } from '@/app/lib/utils';
 import { getActivityOccurences } from '@/app/lib/utils/activities';
-import Loading from '@ui/components/ui/loading';
-import { Separator } from '@ui/components/ui/separator';
-import { toast } from '@ui/components/ui/sonner';
+import { Button } from '@repo/ui/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
+import { Separator } from '@repo/ui/components/ui/separator';
+import { Skeleton } from '@repo/ui/components/ui/skeleton';
+import { toast } from '@repo/ui/components/ui/sonner';
+import { Calendar, Clock, Repeat, Users } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-function ShowContent() {
+export default function ActivityDetailsPage(): JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [imageError, setImageError] = useState(false);
-
-  let id = searchParams.get('id') || 1;
-  if (typeof id === 'string') {
-    id = Number.parseInt(id);
-  }
-
   const [activity, setActivity] = useState<ActivityWithOccurences>();
+  const [imageError, setImageError] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isMember, setIsMember] = useState(false);
 
+  const id = Number(searchParams.get('id')) || 1;
   const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/activities/activity_${activity?.activity.id}`;
   const placeholder = '/placeholder.jpg';
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       const { data, status } = await getActivityOccurences(id);
 
       if (status === 404) {
@@ -37,53 +40,137 @@ function ShowContent() {
         return;
       }
       setActivity(data);
+      const user = await getUserFromCookie();
+      if (user && (await checkSubscriptionStatus(user)) === 'approved') {
+        setIsMember(true);
+      }
+      setLoading(false);
     };
 
     fetchData();
   }, [id, router]);
+
+  const formatDaysOfWeek = (days: string[]) => {
+    const dayNames = days.map((day) => {
+      switch (day) {
+        case 'monday':
+          return 'Lundi';
+        case 'tuesday':
+          return 'Mardi';
+        case 'wednesday':
+          return 'Mercredi';
+        case 'thursday':
+          return 'Jeudi';
+        case 'friday':
+          return 'Vendredi';
+        case 'saturday':
+          return 'Samedi';
+        case 'sunday':
+          return 'Dimanche';
+        default:
+          return day;
+      }
+    });
+    return dayNames.join(', ');
+  };
+
+  const formatFrequency = (frequency: string) => {
+    switch (frequency) {
+      case 'weekly':
+        return 'Hebdomadaire';
+      case 'monthly':
+        return 'Mensuel';
+      case 'yearly':
+        return 'Annuel';
+      default:
+        return frequency;
+    }
+  };
+
+  if (loading) {
+    return <ActivitySkeleton />;
+  }
+
+  const sessionInfo = activity?.activity;
+
   return (
-    <div className="my-12">
-      <div className="flex justify-center text-3xl font-bold">{activity?.activity.name}</div>
-      <Separator className="my-4" />
-      <div className="flex justify-center">
-        <Image
-          className="object-cover rounded-sm"
-          width={1000}
-          height={1000}
-          src={imageError ? placeholder : imageUrl}
-          alt={activity?.activity.name || ''}
-          style={{ width: '40vw', height: 'auto' }}
-          onError={() => setImageError(true)}
-        />
-      </div>
-      <Separator className="my-4" />
-      <div>
-        {activity?.activity.description?.split('\n').map((i, key) => {
-          return (
-            <div key={i} className=" text-justify mb-4">
-              {i}
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-0">
+          <CardTitle className="text-3xl font-bold text-center">{activity?.activity.name}</CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="aspect-video relative rounded-lg overflow-hidden mb-6">
+            <Image
+              fill
+              className="object-cover"
+              src={imageError ? placeholder : imageUrl}
+              alt={activity?.activity.name || ''}
+              onError={() => setImageError(true)}
+            />
+          </div>
+
+          <div className="space-y-4 mb-6">
+            {activity?.activity.description?.split('\n').map((paragraph, index) => (
+              <p key={activity.activity.id + paragraph} className="text-justify">
+                {paragraph}
+              </p>
+            ))}
+          </div>
+
+          <Separator className="my-6" />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-2">
+              <Calendar className="h-5 w-5 text-muted-foreground" />
+              <span>Jours : {sessionInfo ? formatDaysOfWeek(sessionInfo.days_of_week) : 'Non spécifié'}</span>
             </div>
-          );
-        })}
-      </div>
-      <Separator className="my-4" />
-      <div className="flex justify-center">
-        <div className="dark:bg-slate-600 bg-slate-300 rounded-lg p-2">
-          Pour vous inscrire, veuillez vous rendre sur l'espace membre.
-        </div>
-      </div>
+            <div className="flex items-center space-x-2">
+              <Clock className="h-5 w-5 text-muted-foreground" />
+              <span>
+                Horaire : {sessionInfo ? `${sessionInfo.start_time} - ${sessionInfo.end_time}` : 'Non spécifié'}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Repeat className="h-5 w-5 text-muted-foreground" />
+              <span>Fréquence : {sessionInfo ? formatFrequency(sessionInfo.frequency) : 'Non spécifié'}</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Users className="h-5 w-5 text-muted-foreground" />
+              <span>Limite : {activity?.activity.max_participants} participants</span>
+            </div>
+          </div>
+
+          <Separator className="my-6" />
+
+          {isMember && (
+            <div className="flex justify-center">
+              <Link href={`/members/activities/details?id=${activity?.activity.id}`}>
+                <Button size="lg">S'inscrire sur l'espace membre</Button>
+              </Link>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
-function page() {
-  return (
-    <main>
-      <Suspense fallback={<Loading />}>
-        <ShowContent />
-      </Suspense>
-    </main>
-  );
-}
-
-export default page;
+const ActivitySkeleton = () => (
+  <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <Card>
+      <CardHeader className="pb-0">
+        <Skeleton className="h-8 w-3/4 mx-auto" />
+      </CardHeader>
+      <CardContent className="p-6">
+        <Skeleton className="aspect-video w-full mb-6" />
+        <div className="space-y-4 mb-6">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+        </div>
+        <Skeleton className="h-10 w-full" />
+      </CardContent>
+    </Card>
+  </div>
+);

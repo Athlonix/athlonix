@@ -1,6 +1,7 @@
 'use server';
 
 import type { Activity, ActivityWithOccurences, Address, Sport, User } from '@/app/lib/type/Activities';
+import { cookies } from 'next/headers';
 
 const urlApi = process.env.ATHLONIX_API_URL;
 
@@ -39,6 +40,10 @@ export async function getActivityOccurences(id: number): Promise<{ data: Activit
       'Content-Type': 'application/json',
     },
   });
+
+  if (!res.ok) {
+    return { data: {} as ActivityWithOccurences, status: res.status };
+  }
 
   return { data: await res.json(), status: res.status };
 }
@@ -97,6 +102,7 @@ export async function getActivityUsers(
 }
 
 export async function joinActivity(id: number, date: string): Promise<{ data: User; status: number }> {
+  const token = cookies().get('access_token')?.value;
   const formattedDate = date.split('T')[0];
 
   if (!formattedDate) {
@@ -111,6 +117,7 @@ export async function joinActivity(id: number, date: string): Promise<{ data: Us
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
   });
 

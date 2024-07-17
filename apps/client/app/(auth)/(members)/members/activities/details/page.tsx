@@ -3,9 +3,11 @@
 import type { ActivityWithOccurences, Address, Sport, User } from '@/app/lib/type/Activities';
 import { getActivityOccurences, getActivityUsers, getAddresses, getSports } from '@/app/lib/utils/activities';
 import Occurences from '@/app/ui/components/activities/Occurences';
-import { Badge } from '@ui/components/ui/badge';
-import { Separator } from '@ui/components/ui/separator';
+import { Badge } from '@repo/ui/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/components/ui/card';
+import { Skeleton } from '@ui/components/ui/skeleton';
 import { toast } from '@ui/components/ui/sonner';
+import { Activity, Clock, MapPin, Repeat } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -26,196 +28,203 @@ const FrenchDays: Record<'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'frid
   sunday: 'Dimanche',
 };
 
-function ShowContent({ sports, addresses }: { sports: Sport[]; addresses: Address[] }) {
+function ActivityDetailsSkeleton() {
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <Skeleton className="h-10 w-3/4 mx-auto mb-6" />
+      <Skeleton className="aspect-video w-full mb-6" />
+      <div className="space-y-4 mb-6">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+      </div>
+      <Skeleton className="h-40 w-full mb-6" />
+      <Skeleton className="h-60 w-full" />
+    </div>
+  );
+}
+
+function ActivityDetails({ sports, addresses }: { sports: Sport[]; addresses: Address[] }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [imageError, setImageError] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const user = localStorage.getItem('user');
-      if (!user) {
-        router.push('/login');
-        return;
-      }
-    }
-  }, [router]);
-
-  let id = searchParams.get('id') || 1;
-  if (typeof id === 'string') {
-    id = Number.parseInt(id);
-  }
-
   const [activity, setActivity] = useState<ActivityWithOccurences>();
   const [usersSet1, setUsersSet1] = useState<User[]>([]);
   const [usersSet2, setUsersSet2] = useState<User[]>([]);
   const [usersSet3, setUsersSet3] = useState<User[]>([]);
 
-  const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/activities/activity_${activity?.activity.id}`;
-  const placeholder = '/placeholder.jpg';
+  const id = Number(searchParams.get('id')) || 1;
 
   useEffect(() => {
+    if (!localStorage.getItem('user')) {
+      router.push('/login');
+      return;
+    }
+
     const fetchData = async () => {
-      const { data, status } = await getActivityOccurences(id);
-
-      if (status === 404) {
-        router.push('/not-found');
-      }
-      if (status !== 200) {
-        toast.error("Erreur lors de la récupération de l'activité", { duration: 5000 });
-      }
-      setActivity(data);
-
-      if (data.occurences[0]) {
-        const { data: usersData, status: usersStatus } = await getActivityUsers(id, data.occurences[0].date);
-
-        if (usersStatus === 200) {
-          setUsersSet1(usersData.data);
-        } else {
-          toast.error('Une erreur est survenue lors de la récupération des utilisateurs', { duration: 2000 });
+      try {
+        const { data, status } = await getActivityOccurences(id);
+        if (status === 404) {
+          router.push('/not-found');
+          return;
         }
-      }
-
-      if (data.occurences[1]) {
-        const { data: usersData, status: usersStatus } = await getActivityUsers(id, data.occurences[1].date);
-
-        if (usersStatus === 200) {
-          setUsersSet2(usersData.data);
-        } else {
-          toast.error('Une erreur est survenue lors de la récupération des utilisateurs', { duration: 2000 });
+        if (status !== 200) {
+          throw new Error("Erreur lors de la récupération de l'activité");
         }
-      }
+        setActivity(data);
 
-      if (data.occurences[2]) {
-        const { data: usersData, status: usersStatus } = await getActivityUsers(id, data.occurences[2].date);
+        const fetchSession = async (occurenceIndex: number) => {
+          if (data.occurences[occurenceIndex]) {
+            const { data: usersData, status: usersStatus } = await getActivityUsers(
+              id,
+              data.occurences[occurenceIndex].date,
+            );
+            if (usersStatus === 200) {
+              return usersData.data;
+            }
+            throw new Error('Erreur lors de la récupération des utilisateurs');
+          }
+          return [];
+        };
 
-        if (usersStatus === 200) {
-          setUsersSet3(usersData.data);
-        } else {
-          toast.error('Une erreur est survenue lors de la récupération des utilisateurs', { duration: 2000 });
-        }
+        const [users1, users2, users3] = await Promise.all([fetchSession(0), fetchSession(1), fetchSession(2)]);
+
+        setUsersSet1(users1);
+        setUsersSet2(users2);
+        setUsersSet3(users3);
+      } catch (_error) {
+        toast.error("Erreur lors de la récupération de l'activité");
       }
     };
 
     fetchData();
   }, [id, router]);
+
+  if (!activity) return null;
+
+  const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/activities/activity_${activity.activity.id}`;
+  const placeholder = '/placeholder.jpg';
+
   return (
-    <div className="my-12">
-      <div className="flex justify-center text-3xl font-bold">{activity?.activity.name}</div>
-      <Separator className="my-4" />
-      <div className="flex justify-center">
-        <Image
-          className="object-cover rounded-sm"
-          width={1000}
-          height={1000}
-          src={imageError ? placeholder : imageUrl}
-          alt={activity?.activity.name || ''}
-          style={{ width: '40vw', height: 'auto' }}
-          onError={() => setImageError(true)}
-        />
-      </div>
-      <Separator className="my-4" />
-      <div>
-        {activity?.activity.description?.split('\n').map((i, key) => {
-          return (
-            <div key={i} className=" text-justify mb-4">
-              {i}
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <h1 className="text-3xl font-bold text-center mb-6">{activity.activity.name}</h1>
+      <Card className="mb-8">
+        <CardContent className="p-0">
+          <div className="relative aspect-video">
+            <Image
+              fill
+              className="object-cover rounded-t-lg"
+              src={imageError ? placeholder : imageUrl}
+              alt={activity.activity.name || ''}
+              onError={() => setImageError(true)}
+            />
+          </div>
+          <div className="p-6">
+            {activity.activity?.description && <p className="mb-4">{activity.activity.description}</p>}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Informations</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center">
+              <Activity className="h-5 w-5 mr-2" />
+              <span className="font-semibold mr-2">Sport:</span>
+              {activity.activity.id_sport
+                ? sports.find((sport) => sport.id === activity.activity.id_sport)?.name
+                : 'Aucun'}
             </div>
-          );
-        })}
-      </div>
-      <Separator className="my-4" />
-      <div className="flex justify-center text-3xl font-bold">Informations</div>
-      <Separator className="my-4" />
-      <div className="grid grid-cols-3">
-        <div className="flex gap-4 items-center justify-center border-e-2">
-          <Badge className="text-md">Sport :</Badge>
-          {activity?.activity.id_sport
-            ? sports.find((sport) => sport.id === activity.activity.id_sport)?.name
-            : 'Aucun'}
-        </div>
-        <div className="flex gap-4 items-center justify-center border-e-2">
-          <Badge className="text-md">Adresse :</Badge>
-          {activity?.activity.id_address
-            ? addresses.find((address) => address.id === activity.activity.id_address)?.name
-            : 'Aucune'}
-        </div>
-        <div className="flex gap-4 items-center justify-center">
-          <Badge className="text-md">Fréquence :</Badge>
-          {activity?.activity.frequency ? FrenchFrequency[activity.activity.frequency] : 'Aucune'}
-        </div>
-      </div>
-      <Separator className="my-4" />
-      {activity?.activity.frequency === 'weekly' && (
-        <>
-          <div className="flex justify-center text-lg w-full gap-4">
-            {Object.entries(FrenchDays).map(([key, value]) => (
-              <Badge
-                key={key}
-                variant={
-                  activity.activity.days_of_week.includes(key as keyof typeof FrenchDays) ? 'default' : 'secondary'
-                }
-                className="text-md"
-              >
-                {value}
-              </Badge>
-            ))}
+            <div className="flex items-center">
+              <MapPin className="h-5 w-5 mr-2" />
+              <span className="font-semibold mr-2">Adresse:</span>
+              {activity.activity.id_address
+                ? addresses.find((address) => address.id === activity.activity.id_address)?.name
+                : 'Aucune'}
+            </div>
+            <div className="flex items-center">
+              <Repeat className="h-5 w-5 mr-2" />
+              <span className="font-semibold mr-2">Fréquence:</span>
+              {activity.activity.frequency ? FrenchFrequency[activity.activity.frequency] : 'Aucune'}
+            </div>
           </div>
-          <Separator className="my-4" />
-        </>
-      )}
-      <div className="grid grid-cols-2 gap-4 items-center justify-center">
-        <div className="flex items-center justify-center gap-4 border-e-2">
-          <Badge className="text-md">Heure de début :</Badge>
-          <div>
-            {activity?.activity.start_date && activity?.activity.start_time
-              ? `${activity.activity.start_time.split(':')[0]}:${activity.activity.start_time.split(':')[1]}`
-              : ''}
+
+          {activity.activity.frequency === 'weekly' && (
+            <div className="mt-4">
+              <span className="font-semibold mr-2">Jours:</span>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {Object.entries(FrenchDays).map(([key, value]) => (
+                  <Badge
+                    key={key}
+                    variant={
+                      activity.activity.days_of_week.includes(key as keyof typeof FrenchDays) ? 'default' : 'secondary'
+                    }
+                  >
+                    {value}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="flex items-center">
+              <Clock className="h-5 w-5 mr-2" />
+              <span className="font-semibold mr-2">Heure de début:</span>
+              {activity.activity.start_time
+                ? `${activity.activity.start_time.split(':')[0]}:${activity.activity.start_time.split(':')[1]}`
+                : 'Non spécifié'}
+            </div>
+            <div className="flex items-center">
+              <Clock className="h-5 w-5 mr-2" />
+              <span className="font-semibold mr-2">Heure de fin:</span>
+              {activity.activity.end_time
+                ? `${activity.activity.end_time.split(':')[0]}:${activity.activity.end_time.split(':')[1]}`
+                : 'Non spécifié'}
+            </div>
           </div>
-        </div>
-        <div className="flex items-center justify-center gap-4">
-          <Badge className="text-md">Heure de fin :</Badge>
-          <div>
-            {activity?.activity.end_date && activity?.activity.end_time
-              ? `${activity.activity.end_time.split(':')[0]}:${activity.activity.end_time.split(':')[1]}`
-              : ''}
-          </div>
-        </div>
-      </div>
-      <Separator className="my-4" />
-      {activity?.activity && activity?.occurences && (
-        <Occurences
-          activity={activity.activity}
-          occurences={activity.occurences}
-          users1={usersSet1}
-          users2={usersSet2}
-          users3={usersSet3}
-        />
-      )}
+          {activity.activity && activity.occurences && (
+            <div className="mt-12">
+              <Occurences
+                activity={activity.activity}
+                occurences={activity.occurences}
+                users1={usersSet1}
+                users2={usersSet2}
+                users3={usersSet3}
+              />
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
 
-function page() {
+export default function ActivityDetailsPage() {
   const [sports, setSports] = useState<Sport[]>([]);
   const [addresses, setAddresses] = useState<Address[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: sportsData, status: sportsStatus } = await getSports();
+      try {
+        const [sportsResponse, addressesResponse] = await Promise.all([getSports(), getAddresses()]);
 
-      if (sportsStatus === 200) {
-        setSports(sportsData.data);
-      } else {
-        toast.error('Une erreur est survenue lors de la récupération des sports', { duration: 2000 });
-      }
+        if (sportsResponse.status === 200) {
+          setSports(sportsResponse.data.data);
+        } else {
+          throw new Error('Erreur lors de la récupération des sports');
+        }
 
-      const { data: addressesData, status: addressesStatus } = await getAddresses();
-
-      if (addressesStatus === 200) {
-        setAddresses(addressesData.data);
-      } else {
-        toast.error('Une erreur est survenue lors de la récupération des adresses', { duration: 2000 });
+        if (addressesResponse.status === 200) {
+          setAddresses(addressesResponse.data.data);
+        } else {
+          throw new Error('Erreur lors de la récupération des adresses');
+        }
+      } catch (_error) {
+        toast.error('Erreur lors de la récupération des données');
       }
     };
 
@@ -224,11 +233,9 @@ function page() {
 
   return (
     <main>
-      <Suspense fallback={<div>Chargement...</div>}>
-        <ShowContent sports={sports} addresses={addresses} />
+      <Suspense fallback={<ActivityDetailsSkeleton />}>
+        <ActivityDetails sports={sports} addresses={addresses} />
       </Suspense>
     </main>
   );
 }
-
-export default page;

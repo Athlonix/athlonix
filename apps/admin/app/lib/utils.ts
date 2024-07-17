@@ -43,14 +43,14 @@ export async function getAllMembersForAssembly(attendees: number[]): Promise<{ d
   if (!response.ok) {
     throw new Error('Failed to fetch members');
   }
-  const data = await response.json();
+  const data = (await response.json()) as { data: User[]; count: number };
   const members = data.data.filter(
     (member: User) =>
       member.date_validity && new Date(member.date_validity) > new Date() && !attendees.includes(member.id),
   );
   return {
     data: members,
-    count: data.length,
+    count: data.count,
   };
 }
 

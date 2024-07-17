@@ -156,7 +156,7 @@ function ActivityRow(props: ActivityRowProps) {
       <TableCell>{FrenchFrequency[frequency]}</TableCell>
       {frequency === 'weekly' && (
         <TableCell>
-          {days.map((day) => FrenchDays[day]).join(', ')} de{' '}
+          {days?.map((day) => FrenchDays[day]).join(', ')} de{' '}
           {`${new Date(`2000-01-01T${startTime}`).getHours().toString().padStart(2, '0')}:${new Date(
             `2000-01-01T${startTime}`,
           )

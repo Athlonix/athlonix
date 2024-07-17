@@ -56,7 +56,7 @@ function ActivityDetails({ sports, addresses }: { sports: Sport[]; addresses: Ad
   const id = Number(searchParams.get('id')) || 1;
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem('user')) {
+    if (!localStorage.getItem('user')) {
       router.push('/login');
       return;
     }

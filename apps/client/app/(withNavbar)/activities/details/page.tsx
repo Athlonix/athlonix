@@ -6,57 +6,27 @@ import { getActivityOccurences } from '@/app/lib/utils/activities';
 import { Button } from '@repo/ui/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Separator } from '@repo/ui/components/ui/separator';
-import { Skeleton } from '@repo/ui/components/ui/skeleton';
 import { toast } from '@repo/ui/components/ui/sonner';
+import Loading from '@ui/components/ui/loading';
 import { Calendar, Clock, Repeat, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-function ActivitySkeleton() {
-  return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <Card>
-        <CardHeader className="pb-0">
-          <Skeleton className="h-8 w-3/4 mx-auto" />
-        </CardHeader>
-        <CardContent className="p-6">
-          <Skeleton className="aspect-video w-full mb-6" />
-          <div className="space-y-4 mb-6">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-          </div>
-          <Skeleton className="h-10 w-full" />
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function ActivityContentWrapper({ activity, isMember }: { activity: ActivityWithOccurences; isMember: boolean }) {
-  return (
-    <Suspense fallback={<ActivitySkeleton />}>
-      <ActivityContent activity={activity} isMember={isMember} />
-    </Suspense>
-  );
-}
-
-export default function ActivityDetailsPage(): JSX.Element {
+function ActivityDetails() {
   const searchParams = useSearchParams();
   const id = searchParams.get('id');
   const router = useRouter();
-  const [activity, setActivity] = useState<ActivityWithOccurences>();
+  const [activity, setActivity] = useState<ActivityWithOccurences | null>(null);
   const [isMember, setIsMember] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!id) return;
       try {
-        setLoading(true);
         const { data, status } = await getActivityOccurences(Number(id));
-
         if (status === 404) {
           router.push('/not-found');
           return;
@@ -70,26 +40,16 @@ export default function ActivityDetailsPage(): JSX.Element {
         if (user && (await checkSubscriptionStatus(user)) === 'approved') {
           setIsMember(true);
         }
-      } catch (_error) {
+      } catch (error) {
         toast.error("Erreur lors de la récupération de l'activité");
-      } finally {
-        setLoading(false);
       }
     };
-
     if (id) fetchData();
   }, [id, router]);
 
-  if (loading || !activity) {
-    return <ActivitySkeleton />;
-  }
+  if (!activity) return null;
 
-  return <ActivityContentWrapper activity={activity} isMember={isMember} />;
-}
-
-function ActivityContent({ activity, isMember }: { activity: ActivityWithOccurences; isMember: boolean }) {
-  const [imageError, setImageError] = useState(false);
-  const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/activities/activity_${activity?.activity.id}`;
+  const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/activities/activity_${activity.activity.id}`;
   const placeholder = '/placeholder.jpg';
 
   const formatDaysOfWeek = (days: string[]) => {
@@ -114,13 +74,13 @@ function ActivityContent({ activity, isMember }: { activity: ActivityWithOccuren
     return frequencies[frequency] || frequency;
   };
 
-  const sessionInfo = activity?.activity;
+  const sessionInfo = activity.activity;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <Card className="overflow-hidden">
         <CardHeader className="pb-0">
-          <CardTitle className="text-3xl font-bold text-center">{activity?.activity.name}</CardTitle>
+          <CardTitle className="text-3xl font-bold text-center">{activity.activity.name}</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
           <div className="aspect-video relative rounded-lg overflow-hidden mb-6">
@@ -128,14 +88,14 @@ function ActivityContent({ activity, isMember }: { activity: ActivityWithOccuren
               fill
               className="object-cover"
               src={imageError ? placeholder : imageUrl}
-              alt={activity?.activity.name || ''}
+              alt={activity.activity.name || ''}
               onError={() => setImageError(true)}
             />
           </div>
 
           <div className="space-y-4 mb-6">
-            {activity?.activity.description?.split('\n').map((paragraph: string) => (
-              <p key={`${activity.activity.id}-${paragraph}`} className="text-justify">
+            {activity.activity.description?.split('\n').map((paragraph, index) => (
+              <p key={`${activity.activity.id}-${index}`} className="text-justify">
                 {paragraph}
               </p>
             ))}
@@ -160,7 +120,7 @@ function ActivityContent({ activity, isMember }: { activity: ActivityWithOccuren
             </div>
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-muted-foreground" />
-              <span>Limite : {activity?.activity.max_participants} participants</span>
+              <span>Limite : {activity.activity.max_participants || 'Non spécifié'} participants</span>
             </div>
           </div>
 
@@ -168,7 +128,7 @@ function ActivityContent({ activity, isMember }: { activity: ActivityWithOccuren
 
           {isMember && (
             <div className="flex justify-center">
-              <Link href={`/members/activities/details?id=${activity?.activity.id}`}>
+              <Link href={`/members/activities/details?id=${activity.activity.id}`}>
                 <Button size="lg">S'inscrire sur l'espace membre</Button>
               </Link>
             </div>
@@ -176,5 +136,13 @@ function ActivityContent({ activity, isMember }: { activity: ActivityWithOccuren
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ActivityDetailsPage(): JSX.Element {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ActivityDetails />
+    </Suspense>
   );
 }

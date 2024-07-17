@@ -40,6 +40,10 @@ export async function getActivityOccurences(id: number): Promise<{ data: Activit
     },
   });
 
+  if (!res.ok) {
+    return { data: {} as ActivityWithOccurences, status: res.status };
+  }
+
   return { data: await res.json(), status: res.status };
 }
 export async function getSports(): Promise<{ data: { data: Sport[]; count: number }; status: number }> {

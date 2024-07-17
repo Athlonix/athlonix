@@ -12,84 +12,107 @@ import { Calendar, Clock, Repeat, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
+
+function ActivitySkeleton() {
+  return (
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <Card>
+        <CardHeader className="pb-0">
+          <Skeleton className="h-8 w-3/4 mx-auto" />
+        </CardHeader>
+        <CardContent className="p-6">
+          <Skeleton className="aspect-video w-full mb-6" />
+          <div className="space-y-4 mb-6">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+          <Skeleton className="h-10 w-full" />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function ActivityContentWrapper({ activity, isMember }: { activity: ActivityWithOccurences; isMember: boolean }) {
+  return (
+    <Suspense fallback={<ActivitySkeleton />}>
+      <ActivityContent activity={activity} isMember={isMember} />
+    </Suspense>
+  );
+}
 
 export default function ActivityDetailsPage(): JSX.Element {
   const searchParams = useSearchParams();
+  const id = searchParams.get('id');
   const router = useRouter();
   const [activity, setActivity] = useState<ActivityWithOccurences>();
-  const [imageError, setImageError] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [isMember, setIsMember] = useState(false);
-
-  const id = Number(searchParams.get('id')) || 1;
-  const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/activities/activity_${activity?.activity.id}`;
-  const placeholder = '/placeholder.jpg';
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
-      const { data, status } = await getActivityOccurences(id);
+      try {
+        setLoading(true);
+        const { data, status } = await getActivityOccurences(Number(id));
 
-      if (status === 404) {
-        router.push('/not-found');
-        return;
+        if (status === 404) {
+          router.push('/not-found');
+          return;
+        }
+        if (status !== 200) {
+          throw new Error("Erreur lors de la récupération de l'activité");
+        }
+        setActivity(data);
+
+        const user = await getUserFromCookie();
+        if (user && (await checkSubscriptionStatus(user)) === 'approved') {
+          setIsMember(true);
+        }
+      } catch (_error) {
+        toast.error("Erreur lors de la récupération de l'activité");
+      } finally {
+        setLoading(false);
       }
-      if (status !== 200) {
-        toast.error("Erreur lors de la récupération de l'activité", { duration: 5000 });
-        return;
-      }
-      setActivity(data);
-      const user = await getUserFromCookie();
-      if (user && (await checkSubscriptionStatus(user)) === 'approved') {
-        setIsMember(true);
-      }
-      setLoading(false);
     };
 
-    fetchData();
+    if (id) fetchData();
   }, [id, router]);
 
+  if (loading || !activity) {
+    return <ActivitySkeleton />;
+  }
+
+  return <ActivityContentWrapper activity={activity} isMember={isMember} />;
+}
+
+function ActivityContent({ activity, isMember }: { activity: ActivityWithOccurences; isMember: boolean }) {
+  const [imageError, setImageError] = useState(false);
+  const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/activities/activity_${activity?.activity.id}`;
+  const placeholder = '/placeholder.jpg';
+
   const formatDaysOfWeek = (days: string[]) => {
-    const dayNames = days.map((day) => {
-      switch (day) {
-        case 'monday':
-          return 'Lundi';
-        case 'tuesday':
-          return 'Mardi';
-        case 'wednesday':
-          return 'Mercredi';
-        case 'thursday':
-          return 'Jeudi';
-        case 'friday':
-          return 'Vendredi';
-        case 'saturday':
-          return 'Samedi';
-        case 'sunday':
-          return 'Dimanche';
-        default:
-          return day;
-      }
-    });
-    return dayNames.join(', ');
+    const dayNames: { [key: string]: string } = {
+      monday: 'Lundi',
+      tuesday: 'Mardi',
+      wednesday: 'Mercredi',
+      thursday: 'Jeudi',
+      friday: 'Vendredi',
+      saturday: 'Samedi',
+      sunday: 'Dimanche',
+    };
+    return days.map((day) => dayNames[day] || day).join(', ');
   };
 
   const formatFrequency = (frequency: string) => {
-    switch (frequency) {
-      case 'weekly':
-        return 'Hebdomadaire';
-      case 'monthly':
-        return 'Mensuel';
-      case 'yearly':
-        return 'Annuel';
-      default:
-        return frequency;
-    }
+    const frequencies: { [key: string]: string } = {
+      weekly: 'Hebdomadaire',
+      monthly: 'Mensuel',
+      yearly: 'Annuel',
+    };
+    return frequencies[frequency] || frequency;
   };
-
-  if (loading) {
-    return <ActivitySkeleton />;
-  }
 
   const sessionInfo = activity?.activity;
 
@@ -111,8 +134,8 @@ export default function ActivityDetailsPage(): JSX.Element {
           </div>
 
           <div className="space-y-4 mb-6">
-            {activity?.activity.description?.split('\n').map((paragraph, index) => (
-              <p key={activity.activity.id + paragraph} className="text-justify">
+            {activity?.activity.description?.split('\n').map((paragraph: string) => (
+              <p key={`${activity.activity.id}-${paragraph}`} className="text-justify">
                 {paragraph}
               </p>
             ))}
@@ -155,22 +178,3 @@ export default function ActivityDetailsPage(): JSX.Element {
     </div>
   );
 }
-
-const ActivitySkeleton = () => (
-  <div className="container mx-auto px-4 py-8 max-w-4xl">
-    <Card>
-      <CardHeader className="pb-0">
-        <Skeleton className="h-8 w-3/4 mx-auto" />
-      </CardHeader>
-      <CardContent className="p-6">
-        <Skeleton className="aspect-video w-full mb-6" />
-        <div className="space-y-4 mb-6">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-3/4" />
-        </div>
-        <Skeleton className="h-10 w-full" />
-      </CardContent>
-    </Card>
-  </div>
-);

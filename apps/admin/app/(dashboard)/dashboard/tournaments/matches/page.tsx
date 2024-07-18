@@ -1,6 +1,6 @@
 'use client';
 
-import type { Tournament } from '@/app/(dashboard)/dashboard/tournaments/page';
+import type { Match, Round, Team, Tournament } from '@/app/lib/type/Tournaments';
 import AddRound from '@/app/ui/dashboard/tournaments/matches/AddRound';
 import CancelTeam from '@/app/ui/dashboard/tournaments/matches/CancelTeam';
 import MatchesList from '@/app/ui/dashboard/tournaments/matches/MatchesList';
@@ -15,41 +15,15 @@ import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
 
-type Round = {
-  id: number;
-  name: string;
-  id_tournament: number;
-  order: number;
-};
-
-export type Team = {
-  id: number;
-  name: string;
-  validate: boolean;
-  users: {
-    id: number;
-    username: string;
-  }[];
-};
-
-type Match = {
-  id: number;
-  start_time: string | null;
-  end_time: string | null;
-  id_round: number;
-  winner: number[];
-  teams: Team[];
-};
-
-type RoundsData = {
+interface RoundsData {
   data: Round[];
   count: number;
-};
+}
 
-type MatchesData = {
+interface MatchesData {
   data: Match[];
   count: number;
-};
+}
 
 function ShowContent() {
   const searchParams = useSearchParams();

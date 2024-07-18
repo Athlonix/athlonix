@@ -1,5 +1,7 @@
 'use client';
 
+import type { Address, Sport, Tournament } from '@/app/lib/type/Tournaments';
+import { getTournament } from '@/app/lib/utils/tournaments';
 import AddTournaments from '@/app/ui/dashboard/tournaments/AddTournaments';
 import TournamentsList from '@/app/ui/dashboard/tournaments/TournamentsList';
 import PaginationComponent from '@repo/ui/components/ui/PaginationComponent';
@@ -7,36 +9,10 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/c
 import { Input } from '@repo/ui/components/ui/input';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@repo/ui/components/ui/table';
 import { Tabs, TabsContent } from '@repo/ui/components/ui/tabs';
+import { toast } from '@ui/components/ui/sonner';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-
-export type Tournament = {
-  id: number;
-  created_at: string;
-  default_match_length: number | null;
-  name: string;
-  max_participants: number;
-  team_capacity: number;
-  rules: string | null;
-  prize: string | null;
-  id_address: number | null;
-  id_sport: number | null;
-  description: string | null;
-};
-
-export type Sport = {
-  id: number;
-  name: string;
-};
-
-export type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
 
 function ShowContent({ addresses, sports }: { addresses: Address[]; sports: Sport[] }): JSX.Element {
   const searchParams = useSearchParams();
@@ -50,35 +26,18 @@ function ShowContent({ addresses, sports }: { addresses: Address[]; sports: Spor
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   useEffect(() => {
-    const urlApi = process.env.NEXT_PUBLIC_API_URL;
+    const timer = setTimeout(async () => {
+      const { data, status } = await getTournament(page, searchTerm);
 
-    const timer = setTimeout(() => {
-      const queryParams = new URLSearchParams({
-        skip: `${page - 1}`,
-        take: '10',
-        search: searchTerm,
-      });
-
-      fetch(`${urlApi}/tournaments?${queryParams}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-      })
-        .then((response) => {
-          if (response.status === 403) {
-            router.push('/');
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setTournaments(data.data);
-          setMaxPage(Math.ceil(data.count / 10));
-        })
-        .catch((error: Error) => {
-          console.error(error);
-        });
+      if (status === 403) {
+        router.push('/');
+        return;
+      }
+      if (status !== 200) {
+        toast.error('Erreur', { duration: 2000, description: 'Une erreur est survenue' });
+      }
+      setTournaments(data.data);
+      setMaxPage(Math.ceil(data.count / 10));
     }, 500);
 
     return () => clearTimeout(timer);
@@ -93,7 +52,12 @@ function ShowContent({ addresses, sports }: { addresses: Address[]; sports: Spor
       <Card x-chunk="dashboard-06-chunk-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Tournois</CardTitle>
-          <AddTournaments tournaments={tournaments} setTournaments={setTournaments} addresses={addresses} />
+          <AddTournaments
+            tournaments={tournaments}
+            setTournaments={setTournaments}
+            addresses={addresses}
+            sports={sports}
+          />
         </CardHeader>
         <CardContent>
           <div className="ml-auto flex items-center gap-2">

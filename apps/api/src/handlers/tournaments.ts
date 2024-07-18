@@ -1,4 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { uploadFile } from '../libs/storage.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -87,7 +88,11 @@ tournaments.openapi(getTournamentById, async (c) => {
 });
 
 tournaments.openapi(createTournament, async (c) => {
-  const { name, default_match_length, max_participants, team_capacity, rules, prize, id_address } = c.req.valid('json');
+  const { name, default_match_length, max_participants, team_capacity, rules, prize, id_address, image } =
+    c.req.valid('form');
+  if (image === null) {
+    return c.json({ error: 'You must provide an image' }, 400);
+  }
   const user = c.get('user');
   const roles = user.roles;
   await checkRole(roles, false);
@@ -101,6 +106,8 @@ tournaments.openapi(createTournament, async (c) => {
   if (error || !data) {
     return c.json({ error: 'Failed to create tournament' }, 500);
   }
+
+  await uploadFile(`tournaments/tournament_${data.id}`, image, 'image');
 
   return c.json(data, 201);
 });

@@ -204,6 +204,7 @@ function ActivityRow(props: ActivityRowProps) {
             .padStart(2, '0')}`}
         </TableCell>
       )}
+      {!frequency && <TableCell />}
       {name !== 'Supprimé' && (
         <TableCell>
           <DropdownMenu>

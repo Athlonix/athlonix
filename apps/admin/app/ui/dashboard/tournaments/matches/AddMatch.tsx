@@ -1,4 +1,4 @@
-import type { Team } from '@/app/(dashboard)/dashboard/tournaments/matches/page';
+import type { Team } from '@/app/lib/type/Tournaments';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import { Button } from '@repo/ui/components/ui/button';

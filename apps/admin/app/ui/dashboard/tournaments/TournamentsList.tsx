@@ -1,4 +1,4 @@
-import type { Address, Sport, Tournament } from '@/app/(dashboard)/dashboard/tournaments/page';
+import type { Address, Sport, Tournament } from '@/app/lib/type/Tournaments';
 import TournamentRow from '@/app/ui/dashboard/tournaments/TournamentRow';
 
 interface TournamentRowProps {

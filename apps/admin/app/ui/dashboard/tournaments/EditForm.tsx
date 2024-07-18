@@ -1,4 +1,4 @@
-import type { Address, Sport, Tournament } from '@/app/(dashboard)/dashboard/tournaments/page';
+import type { Address, Sport, Tournament } from '@/app/lib/type/Tournaments';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';

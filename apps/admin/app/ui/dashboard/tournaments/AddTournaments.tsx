@@ -1,6 +1,7 @@
 'use client';
 
-import type { Tournament } from '@/app/(dashboard)/dashboard/tournaments/page';
+import type { Address, Sport, Tournament } from '@/app/lib/type/Tournaments';
+import { createTournament } from '@/app/lib/utils/tournaments';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -19,28 +20,26 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from '@repo/ui/components/ui/sonner';
 import { Textarea } from '@repo/ui/components/ui/textarea';
 import { PlusCircle } from 'lucide-react';
+import { Paperclip } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
-
 interface Props {
   tournaments: Tournament[];
   setTournaments: React.Dispatch<React.SetStateAction<Tournament[]>>;
   addresses: Address[];
+  sports: Sport[];
 }
 
-function AddTournaments({ tournaments, setTournaments, addresses }: Props): JSX.Element {
+const MAX_FILE_SIZE = 1024 * 1024 * 5;
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+function AddTournaments({ tournaments, setTournaments, addresses, sports }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const router = useRouter();
 
   const formSchema = z.object({
@@ -56,8 +55,17 @@ function AddTournaments({ tournaments, setTournaments, addresses }: Props): JSX.
       .number({ message: 'Le champ doit contenir un nombre' })
       .min(1, { message: "La capacité de l'équipe ne peut être inférieur à 1" }),
     id_address: z.number().min(1).optional(),
+    id_sport: z.number().min(1).optional(),
     rules: z.string().optional(),
     prize: z.string().optional(),
+    image: z
+      .any()
+      .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, {
+        message: `L'image doit faire moins de ${MAX_FILE_SIZE / 1000000} Mo`,
+      })
+      .refine((files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type), {
+        message: "L'image doit être au format jpeg, png ou wepb",
+      }),
   });
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -68,34 +76,38 @@ function AddTournaments({ tournaments, setTournaments, addresses }: Props): JSX.
       max_participants: 1,
       team_capacity: 1,
       id_address: undefined,
+      id_sport: undefined,
       rules: '',
       prize: '',
     },
   });
 
   async function submit(values: z.infer<typeof formSchema>) {
-    const urlApi = process.env.NEXT_PUBLIC_API_URL;
+    const formData = new FormData();
+    formData.append('name', values.name);
+    if (values.default_match_length) formData.append('default_match_length', values.default_match_length.toString());
+    formData.append('max_participants', values.max_participants.toString());
+    formData.append('team_capacity', values.team_capacity.toString());
+    if (values.id_address) formData.append('id_address', values.id_address.toString());
+    if (values.id_sport) formData.append('id_sport', values.id_sport.toString());
+    if (values.rules) formData.append('rules', values.rules);
+    if (values.prize) formData.append('prize', values.prize);
+    formData.append('image', values.image[0]);
 
-    fetch(`${urlApi}/tournaments`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-      body: JSON.stringify(values),
-    })
-      .then((response) => {
-        if (response.status === 403) {
-          router.push('/');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        toast.success('Tournoi ajouté', { duration: 2000, description: 'Le tournoi a été ajouté avec succès' });
-        setTournaments([...tournaments, data]);
-        setOpen(false);
-        form.reset();
-      });
+    const { data, status } = await createTournament(formData);
+
+    if (status === 403) {
+      router.push('/');
+      return;
+    }
+    if (status !== 201) {
+      toast.error('Erreur', { duration: 2000, description: 'Une erreur est survenue' });
+      return;
+    }
+    toast.success('Tournoi ajouté', { duration: 2000, description: 'Le tournoi a été ajouté avec succès' });
+    setTournaments([...tournaments, data]);
+    setOpen(false);
+    form.reset();
   }
 
   return (
@@ -123,6 +135,46 @@ function AddTournaments({ tournaments, setTournaments, addresses }: Props): JSX.
                             <Label className="font-bold">Nom du tournoi</Label>
                             <FormControl>
                               <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="image"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Image</Label>
+                            {selectedImage && (
+                              <div>
+                                <img src={URL.createObjectURL(selectedImage)} alt="Selected" />
+                              </div>
+                            )}
+                            <FormControl>
+                              <div>
+                                <Button size="lg" type="button">
+                                  <input
+                                    type="file"
+                                    className="hidden"
+                                    id="fileInput"
+                                    accept="image/*"
+                                    onBlur={field.onBlur}
+                                    name={field.name}
+                                    onChange={(e) => {
+                                      field.onChange(e.target.files);
+                                      setSelectedImage(e.target.files?.[0] || null);
+                                    }}
+                                    ref={field.ref}
+                                  />
+                                  <label htmlFor="fileInput" className="inline-flex items-center">
+                                    <Paperclip />
+                                    <span className="whitespace-nowrap">Choisir une image</span>
+                                  </label>
+                                </Button>
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -180,7 +232,34 @@ function AddTournaments({ tournaments, setTournaments, addresses }: Props): JSX.
                         name="id_address"
                         render={({ field }) => (
                           <FormItem>
-                            <Label className="font-bold">Tournoi</Label>
+                            <Label className="font-bold">Adresse</Label>
+                            <Select onValueChange={field.onChange} defaultValue="-1">
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Aucun" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="-1">Aucune</SelectItem>
+                                {addresses.map((address) => (
+                                  <SelectItem key={address.id} value={address.id.toString()}>
+                                    {address.name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <div className="grid">
+                      <FormField
+                        control={form.control}
+                        name="id_sport"
+                        render={({ field }) => (
+                          <FormItem>
+                            <Label className="font-bold">Sport</Label>
                             <Select onValueChange={field.onChange} defaultValue="-1">
                               <FormControl>
                                 <SelectTrigger>
@@ -189,9 +268,9 @@ function AddTournaments({ tournaments, setTournaments, addresses }: Props): JSX.
                               </FormControl>
                               <SelectContent>
                                 <SelectItem value="-1">Aucun</SelectItem>
-                                {addresses.map((address) => (
-                                  <SelectItem key={address.id} value={address.id.toString()}>
-                                    {address.name}
+                                {sports.map((sport) => (
+                                  <SelectItem key={sport.id} value={sport.id.toString()}>
+                                    {sport.name}
                                   </SelectItem>
                                 ))}
                               </SelectContent>

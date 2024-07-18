@@ -24,9 +24,11 @@ export async function LogoutUser(): Promise<void> {
       Authorization: `Bearer ${token}`,
     },
   })
-    .then((response) => {
+    .then(async (response) => {
       if (response.status === 200) {
-        deleteUserCookie();
+        await deleteUserCookie();
+        localStorage.removeItem('user');
+        localStorage.removeItem('access_token');
       }
     })
     .catch((error: Error) => console.error(error));

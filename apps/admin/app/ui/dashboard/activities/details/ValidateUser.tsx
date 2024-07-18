@@ -2,7 +2,7 @@ import type { User } from '@/app/lib/type/Activities';
 import { validateUsers } from '@/app/lib/utils/activities';
 import { Button } from '@ui/components/ui/button';
 import { toast } from '@ui/components/ui/sonner';
-import { Check } from 'lucide-react';
+import { Check, PlusCircleIcon } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
 
 function ValidateUser({
@@ -26,8 +26,8 @@ function ValidateUser({
     }
   }
   return (
-    <Button onClick={handleJoinTeam} size="sm" variant="success" className="h-8 gap-1">
-      <Check />
+    <Button onClick={handleJoinTeam} size="sm" variant="success" className="h-8 gap-1 ml-2">
+      <PlusCircleIcon size={16} />
     </Button>
   );
 }

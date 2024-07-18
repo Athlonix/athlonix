@@ -9,7 +9,9 @@ import {
 } from '@/app/(dashboard)/dashboard/assemblies/utils';
 import type { User } from '@/app/lib/type/User';
 import { getAllMembersForAssembly } from '@/app/lib/utils';
+import { Badge } from '@ui/components/ui/badge';
 import { Button } from '@ui/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -21,13 +23,14 @@ import {
 } from '@ui/components/ui/dialog';
 import { Label } from '@ui/components/ui/label';
 import Loading from '@ui/components/ui/loading';
+import { ScrollArea } from '@ui/components/ui/scroll-area';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@ui/components/ui/select';
 import { toast } from '@ui/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
 import { Textarea } from '@ui/components/ui/textarea';
 import { BookOpenText, CircleArrowLeft, HomeIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { type Address, getOneAddress } from '../../addresses/utils';
 
 export default function AssemblyDetail(): JSX.Element {
@@ -44,6 +47,7 @@ export default function AssemblyDetail(): JSX.Element {
   const [qrCode, setQrCode] = useState<string>('');
   const [started, setStarted] = useState<boolean>(false);
   const [location, setLocation] = useState<Address | null>(null);
+  const [roles, setRoles] = useState<{ id_role: number; id_user: number }[]>([]);
 
   useEffect(() => {
     const fetchAssembly = async () => {
@@ -54,8 +58,7 @@ export default function AssemblyDetail(): JSX.Element {
         setAttendees(data.attendees?.length ?? 0);
         setIsClosed(data.closed);
 
-        const attendeesArray = (data?.attendees ?? []).map((attendee) => attendee.id);
-        const membersData = await getAllMembersForAssembly(attendeesArray);
+        const membersData = await getAllMembersForAssembly();
         setMembers(membersData.data);
 
         setStarted(new Date().getTime() > new Date(data.date).getTime());
@@ -111,6 +114,15 @@ export default function AssemblyDetail(): JSX.Element {
     setOpenQrCode(true);
   }
 
+  const currentRoles: { id_role: number; id_user: number }[] = members?.reduce(
+    (acc: { id_role: number; id_user: number }[], member) => {
+      const roles = member.roles.map((role) => ({ id_role: role.id, id_user: member.id }));
+      return acc.concat(roles);
+    },
+    [],
+  );
+  console.log('members', members, 'currentRoles', currentRoles);
+
   if (loading) {
     return <Loading />;
   }
@@ -164,12 +176,16 @@ export default function AssemblyDetail(): JSX.Element {
         </div>
       )}
       {started && (
+        <RoleSelectionComponent users={members} roles={roles} setRoles={setRoles} currentRoles={currentRoles} />
+      )}
+      {started && (
         <>
           <div className="flex items-center gap-5">
             <h1 className="text-lg font-semibold md:text-2xl">Membres de l'assemblée ({attendees})</h1>
             {!isClosed && (
               <div className="ml-auto flex gap-5">
                 <AddAttendeeDialog
+                  attendees={assembly?.attendees}
                   openAddAttendee={openAddAttendee}
                   setOpenAddAttendee={setOpenAddAttendee}
                   members={members}
@@ -214,16 +230,20 @@ export default function AssemblyDetail(): JSX.Element {
 }
 
 function AddAttendeeDialog({
+  attendees,
   openAddAttendee,
   setOpenAddAttendee,
   members,
   handleAddAttendee,
 }: {
+  attendees: Assembly['attendees'];
   openAddAttendee: boolean;
   setOpenAddAttendee: (value: boolean) => void;
   members: User[];
   handleAddAttendee: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  members = members?.filter((member) => !attendees?.some((attendee) => attendee.id === member.id)) ?? [];
+
   return (
     <Dialog open={openAddAttendee} onOpenChange={setOpenAddAttendee}>
       <DialogTrigger asChild>
@@ -335,5 +355,119 @@ function QrCodeDialog({
         </div>
       </DialogContent>
     </Dialog>
+  );
+}
+
+enum ElectionRole {
+  Président = 1,
+  Vice_président = 2,
+  Secrétaire = 3,
+  Trésorier = 4,
+  Chargé_de_communication = 5,
+  Chef_de_projet = 6,
+}
+
+interface RoleSelection {
+  id_role: number;
+  id_user: number;
+}
+
+interface RoleSelectionComponentProps {
+  users: User[];
+  roles: RoleSelection[];
+  setRoles: React.Dispatch<React.SetStateAction<RoleSelection[]>>;
+  currentRoles?: RoleSelection[];
+}
+
+function RoleSelectionComponent({ users, roles, setRoles, currentRoles = [] }: RoleSelectionComponentProps) {
+  const handleRoleChange = (roleId: number, userId: number) => {
+    setRoles((prevRoles) => {
+      const newRoles = prevRoles.filter((role) => role.id_role !== roleId);
+      if (userId !== 0 && !newRoles.some((role) => role.id_user === userId)) {
+        newRoles.push({ id_role: roleId, id_user: userId });
+      }
+      return newRoles;
+    });
+  };
+
+  const clearAllSelections = () => {
+    setRoles([]);
+  };
+
+  const getUserName = (userId: number) => {
+    const user = users.find((u) => u.id === userId);
+    return user ? `${user.first_name} ${user.last_name}` : 'Aucun';
+  };
+
+  const memoizedUsers = useMemo(() => {
+    return [
+      { id: 0, first_name: 'Aucun', last_name: '' },
+      ...users.sort((a, b) => a.last_name.localeCompare(b.last_name)),
+    ];
+  }, [users]);
+
+  return (
+    <Card className="mb-4">
+      <CardHeader>
+        <CardTitle className="flex justify-between items-center">
+          <span>Election des membres du bureau</span>
+          <Button variant="outline" size="sm" onClick={clearAllSelections}>
+            Effacer les sélections
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ScrollArea className="h-[400px]">
+          <table className="w-full">
+            <thead>
+              <tr>
+                <th className="text-left pb-2">Rôle</th>
+                <th className="text-left pb-2">Membre actuel</th>
+                <th className="text-left pb-2">Nouveau membre</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(ElectionRole)
+                .filter(([roleName, roleId]) => typeof roleName === 'string' && typeof roleId === 'number')
+                .map(([roleName, roleId]) => {
+                  const currentRoleHolder = currentRoles.find((r) => r.id_role === roleId);
+                  const selectedUser = roles.find((r) => r.id_role === roleId)?.id_user;
+                  return (
+                    <tr key={roleId} className="border-t">
+                      <td className="py-2">
+                        <Label htmlFor={`role-${roleId}`}>{roleName.replaceAll('_', ' ')}</Label>
+                      </td>
+                      <td className="py-2">
+                        {currentRoleHolder ? (
+                          <Badge variant="secondary">{getUserName(currentRoleHolder.id_user)}</Badge>
+                        ) : (
+                          <Badge variant="outline">Aucun</Badge>
+                        )}
+                      </td>
+                      <td className="py-2">
+                        <Select
+                          onValueChange={(value) => handleRoleChange(Number(roleId), Number(value))}
+                          value={selectedUser?.toString() || '0'}
+                        >
+                          <SelectTrigger id={`role-${roleId}`} className="w-full">
+                            <SelectValue placeholder="Sélectionner un membre" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {memoizedUsers.map((user: { id: number; first_name: string; last_name: string }) => (
+                              <SelectItem key={user.id} value={user.id.toString()}>
+                                {user.first_name} {user.last_name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        </ScrollArea>
+      </CardContent>
+    </Card>
   );
 }

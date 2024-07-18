@@ -6,8 +6,11 @@ import CancelTeam from '@/app/ui/dashboard/tournaments/matches/CancelTeam';
 import MatchesList from '@/app/ui/dashboard/tournaments/matches/MatchesList';
 import ValidateTeam from '@/app/ui/dashboard/tournaments/matches/ValidateTeam';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
+import { Badge } from '@repo/ui/components/ui/badge';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { Separator } from '@ui/components/ui/separator';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/components/ui/card';
+import { ScrollArea } from '@ui/components/ui/scroll-area';
+import { UsersIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
@@ -155,73 +158,88 @@ function ShowContent() {
       });
   }, [router, idTournament]);
 
+  const TeamStatus = ({ team }: { team: Team }) => {
+    if (team.users.length === tournament?.team_capacity) {
+      return team.validate ? (
+        <Badge className="bg-green-500">Validée</Badge>
+      ) : (
+        <Badge className="bg-yellow-500">En attente</Badge>
+      );
+    }
+    return <Badge className="bg-red-500">Incomplète</Badge>;
+  };
+
   return (
     <>
-      <div className="py-10 rounded-lg border-2 shadow-sm p-4">
-        <div className="w-full">
-          <div className="flex justify-between">
-            <div className="mb-4 font-bold text-lg">Equipes</div>
-          </div>
-          <Separator className="mb-4" />
-          <div className="flex flex-col gap-4">
-            {teams.map((team) => (
-              <div key={team.id} className="flex justify-between items-center">
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value={`${team.name}`}>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <UsersIcon className="w-5 h-5" />
+              Equipes
+            </span>
+            <Badge>{teams.length}</Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {teams.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">Aucune équipe inscrite pour le moment</div>
+          ) : (
+            <ScrollArea className="h-[400px] pr-4">
+              <Accordion type="single" collapsible className="w-full">
+                {teams.map((team) => (
+                  <AccordionItem key={team.id} value={`${team.name}`}>
                     <AccordionTrigger>
-                      <div
-                        className={`flex gap-4 ${team.users.length === tournament?.team_capacity ? (team.validate ? 'text-green-400' : 'text-orange-400') : ''}`}
-                      >
-                        <div className="font-bold">
+                      <div className="flex items-center justify-between w-full">
+                        <span>
                           {team.name} ({team.users.length}/{tournament?.team_capacity})
-                        </div>
+                        </span>
+                        <TeamStatus team={team} />
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="flex flex-col gap-4">
+                      <div className="space-y-2 ml-4">
                         {team.users.map((user) => (
-                          <div key={user.id} className="flex flex-row items-center gap-4 ms-4">
-                            <div>{user.username}</div>
+                          <div key={user.id} className="flex items-center gap-2">
+                            <UsersIcon className="w-4 h-4" />
+                            {user.username}
                           </div>
                         ))}
                       </div>
+                      <div className="mt-4 flex justify-end">
+                        {team.users.length === tournament?.team_capacity && !team.validate && (
+                          <ValidateTeam team={team} id_tournament={Number(idTournament)} setter={setTeams} />
+                        )}
+                        {team.validate && (
+                          <CancelTeam team={team} id_tournament={Number(idTournament)} setter={setTeams} />
+                        )}
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
-                </Accordion>
-                <div className="flex gap-4">
-                  {team.users.length === tournament?.team_capacity && !team.validate && (
-                    <ValidateTeam
-                      team={team}
-                      id_tournament={idTournament ? Number.parseInt(idTournament) : 0}
-                      setter={setTeams}
-                    />
-                  )}
-                  {team.validate && (
-                    <CancelTeam
-                      team={team}
-                      id_tournament={idTournament ? Number.parseInt(idTournament) : 0}
-                      setter={setTeams}
-                    />
-                  )}
-                </div>
-              </div>
+                ))}
+              </Accordion>
+            </ScrollArea>
+          )}
+        </CardContent>
+      </Card>
+
+      {teams.length > 0 && idTournament ? (
+        <>
+          <div className="space-y-8">
+            {rounds.map((round) => (
+              <MatchesList key={round.id} round={round} matches={matches} teams={teams} idTournament={idTournament} />
             ))}
+
+            <div className="flex justify-center">
+              {roundsLoading ? '' : <AddRound id_tournament={idTournament || ''} order={rounds.length} />}
+            </div>
           </div>
-        </div>
-      </div>
-      <Separator className="my-4" />
-      <div className="flex flex-col gap-4">
-        {rounds.map((round) => (
-          <MatchesList key={round.id} round={round} matches={matches} teams={teams} idTournament={idTournament || ''} />
-        ))}
-      </div>
-      <div className="py-10 rounded-lg border-2 shadow-sm p-4">
-        <div className="w-full">
-          <div className="flex justify-center">
-            {roundsLoading ? '' : <AddRound id_tournament={idTournament || ''} order={rounds.length} />}
-          </div>
-        </div>
-      </div>
+        </>
+      ) : (
+        <p className="text-center text-muted-foreground">
+          Une fois les équipes inscrites, la création des rounds sera possible
+        </p>
+      )}
     </>
   );
 }

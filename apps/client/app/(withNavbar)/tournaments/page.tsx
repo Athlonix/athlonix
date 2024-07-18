@@ -96,7 +96,7 @@ function ShowContent() {
       </div>
       <div className="grid gap-4">
         {tournaments.map((tournament) => (
-          <TournamentCard key={tournament.id} tournament={tournament} />
+          <TournamentCard key={tournament.id} tournament={tournament} member={false} />
         ))}
       </div>
       <div className="mt-8">

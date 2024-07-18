@@ -12,7 +12,9 @@ function ActivityCard({ activity, member }: { activity: Activity; member: boolea
     <div className="h-44 p-4 shadow-lg">
       <div className="flex gap-6 h-full">
         <div className="relative w-64 h-36">
-          <Link href={`/activities/details?id=${activity.id}`}>
+          <Link
+            href={member ? `/members/activities/details?id=${activity.id}` : `/activities/details?id=${activity.id}`}
+          >
             <Image
               className="object-cover"
               width={256}

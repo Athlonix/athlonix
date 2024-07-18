@@ -7,6 +7,7 @@ import JoinTeam from '@/app/ui/components/tournaments/JoinTeam';
 import LeaveTeam from '@/app/ui/components/tournaments/LeaveTeam';
 import { Separator } from '@repo/ui/components/ui/separator';
 import { toast } from '@repo/ui/components/ui/sonner';
+import Loading from '@ui/components/ui/loading';
 import { User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
@@ -34,7 +35,7 @@ function ShowContent() {
   const [currentUser, setCurrentUser] = useState<{ id: number; username: string } | null>(null);
   const [currentTeam, setCurrentTeam] = useState<number>(0);
   const [validatedTeams, setValidatedTeams] = useState<number>(0);
-  const [tournament, setTournament] = useState<Tournament>(placeholder);
+  const [tournament, setTournament] = useState<Tournament | null>(null);
   const [teams, setTeams] = useState<Team[]>([]);
 
   useEffect(() => {
@@ -85,12 +86,20 @@ function ShowContent() {
 
       setTeams(data.data);
 
+      if (!tournament?.max_participants) {
+        return;
+      }
+
       if (validated >= tournament.max_participants) {
         setTeams((prev) => prev.filter((team) => team.validate));
       }
     };
     fetchTeams();
-  }, [id, currentUser?.username, router, tournament.max_participants]);
+  }, [id, currentUser?.username, router, tournament?.max_participants]);
+
+  if (!tournament) {
+    return <Loading />;
+  }
 
   return (
     <>

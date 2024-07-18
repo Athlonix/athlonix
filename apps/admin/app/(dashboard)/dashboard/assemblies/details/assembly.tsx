@@ -121,7 +121,6 @@ export default function AssemblyDetail(): JSX.Element {
     },
     [],
   );
-  console.log('members', members, 'currentRoles', currentRoles);
 
   if (loading) {
     return <Loading />;
@@ -401,7 +400,7 @@ function RoleSelectionComponent({ users, roles, setRoles, currentRoles = [] }: R
 
   const memoizedUsers = useMemo(() => {
     return [
-      { id: 0, first_name: 'Aucun', last_name: '' },
+      { id: 0, first_name: 'Pas de changement', last_name: '' },
       ...users.sort((a, b) => a.last_name.localeCompare(b.last_name)),
     ];
   }, [users]);

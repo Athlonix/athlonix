@@ -1,6 +1,6 @@
 import type { Activity, Occurence, User } from '@/app/lib/type/Activities';
 import ValidateUser from '@/app/ui/dashboard/activities/details/ValidateUser';
-import { Avatar, AvatarFallback, AvatarImage } from '@repo/ui/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { ScrollArea } from '@repo/ui/components/ui/scroll-area';

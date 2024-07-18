@@ -2,40 +2,7 @@ import { createRoute, z } from '@hono/zod-openapi';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
 import { badRequestSchema, idParamValidator, notFoundSchema, serverErrorSchema } from '../validators/general.js';
-
-export const tournamentSchema = z.object({
-  id: z.number(),
-  default_match_length: z.number().min(1).nullable(),
-  name: z.string().max(255),
-  max_participants: z.number().min(1),
-  team_capacity: z.number().min(1),
-  rules: z.string().nullable(),
-  prize: z.string().nullable(),
-  id_address: z.number().min(1).nullable(),
-  created_at: z.string().datetime(),
-  description: z.string().nullable(),
-  id_sport: z.number().min(1).nullable(),
-});
-
-export const matchSchema = z.object({
-  id: z.number().min(1),
-  start_time: z.string().datetime().nullable(),
-  end_time: z.string().datetime().nullable(),
-  winner: z.array(z.number()).nullable(),
-  teams: z.array(
-    z.object({
-      id: z.number().min(1),
-      name: z.string().max(255),
-    }),
-  ),
-});
-
-export const createMatchSchema = z.object({
-  start_time: z.string().datetime().nullable(),
-  end_time: z.string().datetime().nullable(),
-  teams: z.array(z.number().min(1)).optional(),
-  winner: z.array(z.number().min(1)).optional(),
-});
+import { createMatchSchema, createTournamentSchema, matchSchema, tournamentSchema } from '../validators/tournaments.js';
 
 export const getAllTournaments = createRoute({
   method: 'get',
@@ -100,18 +67,8 @@ export const createTournament = createRoute({
   request: {
     body: {
       content: {
-        'application/json': {
-          schema: z.object({
-            default_match_length: z.number().min(1).optional(),
-            name: z.string().max(255),
-            max_participants: z.number().min(1),
-            team_capacity: z.number().min(1),
-            rules: z.string().optional(),
-            prize: z.string().optional(),
-            id_address: z.number().min(1).optional(),
-            description: z.string().optional(),
-            id_sport: z.number().min(1).optional(),
-          }),
+        'multipart/form-data': {
+          schema: createTournamentSchema,
         },
       },
     },
@@ -125,6 +82,7 @@ export const createTournament = createRoute({
         },
       },
     },
+    400: badRequestSchema,
     500: serverErrorSchema,
   },
   tags: ['tournament'],

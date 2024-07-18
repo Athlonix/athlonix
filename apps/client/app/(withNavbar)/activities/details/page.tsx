@@ -65,6 +65,25 @@ function ActivityDetails() {
     return days.map((day) => dayNames[day] || day).join(', ');
   };
 
+  const formatMonth = (date: string) => {
+    const formatDate = new Date(date);
+    const monthNames = [
+      'Janvier',
+      'Février',
+      'Mars',
+      'Avril',
+      'Mai',
+      'Juin',
+      'Juillet',
+      'Août',
+      'Septembre',
+      'Octobre',
+      'Novembre',
+      'Décembre',
+    ];
+    return `${formatDate.getDate()} ${monthNames[formatDate.getMonth()]}`;
+  };
+
   const formatFrequency = (frequency: string) => {
     const frequencies: { [key: string]: string } = {
       weekly: 'Hebdomadaire',
@@ -107,7 +126,12 @@ function ActivityDetails() {
             <div className="flex items-center space-x-2">
               <Calendar className="h-5 w-5 text-muted-foreground" />
               <span className="font-semibold mr-2">Jours : </span>
-              <span>{sessionInfo ? formatDaysOfWeek(sessionInfo.days_of_week) : 'Non spécifié'}</span>
+              {sessionInfo.frequency === 'weekly' && (
+                <span>{sessionInfo ? formatDaysOfWeek(sessionInfo.days_of_week) : 'Non spécifié'}</span>
+              )}
+              {(sessionInfo.frequency === 'monthly' || sessionInfo.frequency === 'yearly') && (
+                <span>{sessionInfo ? formatMonth(sessionInfo.start_date) : 'Non spécifié'}</span>
+              )}
             </div>
             <div className="flex items-center space-x-2">
               <Clock className="h-5 w-5 text-muted-foreground" />

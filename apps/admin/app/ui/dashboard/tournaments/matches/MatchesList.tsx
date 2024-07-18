@@ -1,4 +1,4 @@
-import type { Team } from '@/app/(dashboard)/dashboard/tournaments/matches/page';
+import type { Team } from '@/app/lib/type/Tournaments';
 import AddMatch from '@/app/ui/dashboard/tournaments/matches/AddMatch';
 import DeleteMatch from '@/app/ui/dashboard/tournaments/matches/DeleteMatch';
 import DeleteRound from '@/app/ui/dashboard/tournaments/matches/DeleteRound';

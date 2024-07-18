@@ -1,14 +1,32 @@
 'use client';
 
 import type { Tournament } from '@/app/lib/type/Tournaments';
+import { checkSubscriptionStatus, getUserFromCookie } from '@/app/lib/utils';
 import { getTournaments } from '@/app/lib/utils/tournament';
-import { Separator } from '@repo/ui/components/ui/separator';
+import { Button } from '@repo/ui/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
+import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
+import { Skeleton } from '@repo/ui/components/ui/skeleton';
 import { toast } from '@repo/ui/components/ui/sonner';
-import Loading from '@ui/components/ui/loading';
+import { InfoIcon, ScrollTextIcon, TrophyIcon, UsersIcon } from 'lucide-react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+
+function LoadingSkeleton() {
+  return (
+    <div className="space-y-8">
+      <Skeleton className="w-3/4 h-12 mx-auto" />
+      <Skeleton className="w-full h-[400px]" />
+      <div className="space-y-4">
+        <Skeleton className="w-full h-6" />
+        <Skeleton className="w-full h-6" />
+        <Skeleton className="w-3/4 h-6" />
+      </div>
+    </div>
+  );
+}
 
 function ShowContent() {
   const searchParams = useSearchParams();
@@ -17,92 +35,154 @@ function ShowContent() {
 
   const [tournament, setTournament] = useState<Tournament | null>(null);
   const [imageError, setImageError] = useState(false);
+  const [isMember, setIsMember] = useState(false);
 
   useEffect(() => {
     const fetchTournament = async () => {
-      const { data, status } = await getTournaments({ id });
-      if (status === 404) {
-        router.push('/not-found');
-        return;
+      try {
+        const { data, status } = await getTournaments({ id });
+        if (status === 404) {
+          router.push('/not-found');
+          return;
+        }
+        if (status !== 200) {
+          toast.error('Erreur lors de la récupération du tournoi');
+          return;
+        }
+        const user = await getUserFromCookie();
+        if (user && (await checkSubscriptionStatus(user)) === 'approved') {
+          setIsMember(true);
+        }
+        setTournament(data);
+      } catch (_error) {
+        toast.error('Erreur lors de la récupération du tournoi');
       }
-      if (status !== 200) {
-        toast.error('Erreur lors de la récupération du tournoi', { duration: 5000 });
-        return;
-      }
-      setTournament(data);
     };
     fetchTournament();
   }, [id, router]);
 
-  if (!tournament) return <Loading />;
+  if (!tournament) return <LoadingSkeleton />;
 
   const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/tournaments/tournament_${tournament.id}`;
   const placeholder = '/placeholder.jpg';
 
   return (
-    <>
-      <div className="flex justify-center w-full my-4">
-        <h1 className="font-bold">{tournament.name}</h1>
-      </div>
-      <Separator className="my-8" />
-      <div className="flex justify-center">
-        <Image
-          className="object-cover"
-          width={1000}
-          height={1000}
-          src={imageError ? placeholder : imageUrl}
-          style={{ width: '40vw', height: 'auto' }}
-          alt={tournament.name}
-          onError={() => setImageError(true)}
-        />
-      </div>
-      <Separator className="my-8" />
-      <div className="grid gap-2 text-4xl mx-12">
-        {tournament.description?.split('\n').map((line) => (
-          <p key={`${line}`}>{line}</p>
-        ))}
-      </div>
-      <Separator className="my-8" />
-      <div className="flex justify-center w-full my-4">
-        <h2 className="font-bold">Règles</h2>
-      </div>
-      <Separator className="my-8" />
-      <div className="grid gap-2 text-4xl mx-12">
-        {tournament.rules?.split('\n').map((line) => (
-          <p key={`${line}`}>{line}</p>
-        ))}
-      </div>
-      {tournament.prize && (
-        <>
-          <div className="flex justify-center w-full my-4">
-            <h2 className="font-bold">Prix</h2>
+    <div className="container mx-auto py-8 space-y-8">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-3xl font-bold text-center">{tournament.name}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="relative w-full h-[600px] mb-8">
+            <Image
+              className="object-cover rounded-lg"
+              src={imageError ? placeholder : imageUrl}
+              alt={tournament.name}
+              layout="fill"
+              onError={() => setImageError(true)}
+            />
           </div>
-          <Separator className="my-8" />
-          <div className="grid gap-2 text-4xl mx-12">
-            {tournament.prize.split('\n').map((line) => (
-              <p key={`${line}`}>{line}</p>
-            ))}
+
+          <div className="space-y-6">
+            {tournament.description && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <InfoIcon className="w-5 h-5" />
+                    Description
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[200px]">
+                    {tournament.description?.split('\n').map((line, index) => (
+                      <p key={`desc-${line}`} className="mb-2">
+                        {line}
+                      </p>
+                    ))}
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            )}
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UsersIcon className="w-5 h-5" />
+                  Informations
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="font-semibold">Participants maximum:</p>
+                    <p>{tournament.max_participants}</p>
+                  </div>
+                  <div>
+                    <p className="font-semibold">Capacité des équipes:</p>
+                    <p>{tournament.team_capacity}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ScrollTextIcon className="w-5 h-5" />
+                  Règles
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[200px]">
+                  {tournament.rules?.split('\n').map((line, index) => (
+                    <p key={`rules-${line}`} className="mb-2">
+                      {line}
+                    </p>
+                  ))}
+                </ScrollArea>
+              </CardContent>
+            </Card>
+
+            {tournament.prize && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrophyIcon className="w-5 h-5" />
+                    Récompenses
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[200px]">
+                    {tournament.prize?.split('\n').map((line, index) => (
+                      <p key={`prize-${line}`} className="mb-2">
+                        {line}
+                      </p>
+                    ))}
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            )}
           </div>
-        </>
-      )}
-      <Separator className="my-8" />
-      <div className="flex justify-center">
-        <div className="dark:bg-slate-600 bg-slate-300 rounded-lg p-2">
-          Pour vous inscrire, veuillez vous rendre sur l'espace membre.
-        </div>
-      </div>
-    </>
+
+          {isMember && (
+            <div className="mt-8 flex justify-center">
+              <Link href={`/members/tournaments/details?id=${tournament.id}`}>
+                <Button size="lg">S'inscrire sur l'espace membre</Button>
+              </Link>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
-function page() {
+export default function Page() {
   return (
     <main>
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<LoadingSkeleton />}>
         <ShowContent />
       </Suspense>
     </main>
   );
 }
-
-export default page;

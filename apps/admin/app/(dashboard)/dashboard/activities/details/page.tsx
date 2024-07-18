@@ -8,9 +8,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/ui
 import { Skeleton } from '@repo/ui/components/ui/skeleton';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { Separator } from '@ui/components/ui/separator';
-import { CalendarIcon, ClockIcon, MapPinIcon, Medal, RepeatIcon, SproutIcon } from 'lucide-react';
+import { ClockIcon, MapPinIcon, Medal, RepeatIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 const FrenchFrequency: Record<string, string> = {
   weekly: 'Hebdomadaire',
@@ -128,7 +128,7 @@ function LoadingSkeleton() {
   );
 }
 
-export default function Page() {
+function PageContent() {
   const searchParams = useSearchParams();
   const idActivity = Number(searchParams.get('id') || 1);
 
@@ -175,7 +175,7 @@ export default function Page() {
   }
 
   return (
-    <main className="flex flex-col gap-6 p-4 lg:p-6 max-w-4xl mx-auto">
+    <div className="flex flex-col gap-6 p-4 lg:p-6 max-w-4xl mx-auto">
       <ActivityDetails activity={activity} sports={sports} addresses={addresses} />
       <Occurences
         activity={activity.activity}
@@ -187,6 +187,15 @@ export default function Page() {
         setUsers2={setUsersSet2}
         setUsers3={setUsersSet3}
       />
+    </div>
+  );
+}
+export default function Page() {
+  return (
+    <main>
+      <Suspense fallback={<LoadingSkeleton />}>
+        <PageContent />
+      </Suspense>
     </main>
   );
 }

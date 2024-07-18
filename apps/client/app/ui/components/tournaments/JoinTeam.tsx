@@ -40,7 +40,14 @@ function JoinTeam(props: JoinTeamProps) {
   }
 
   return (
-    <Button size="sm" variant="info" className="h-8" onClick={() => handleJoinTeam()}>
+    <Button
+      size="sm"
+      variant="info"
+      className="h-8"
+      onClick={() => handleJoinTeam()}
+      title="Rejoindre l'équipe"
+      aria-label="Rejoindre l'équipe"
+    >
       <CornerLeftDown />
     </Button>
   );

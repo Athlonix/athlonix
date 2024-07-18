@@ -42,7 +42,14 @@ function LeaveTeam(props: LeaveTeamProps) {
   }
 
   return (
-    <Button size="sm" variant="destructive" className="h-8" onClick={() => handleLeaveTeam()}>
+    <Button
+      size="sm"
+      variant="destructive"
+      className="h-8"
+      onClick={() => handleLeaveTeam()}
+      title="Quitter l'équipe"
+      aria-label="Quitter l'équipe"
+    >
       <CornerLeftUp />
     </Button>
   );

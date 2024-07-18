@@ -38,7 +38,7 @@ const UserList = ({
 }) => (
   <ScrollArea className="h-[300px]">
     {users.map((user) => (
-      <div key={user.id} className="flex items-center justify-between p-2 hover:bg-accent rounded-lg">
+      <div key={user.id} className="flex items-center justify-between p-2 hover:bg-slate-100 rounded-lg">
         <div className="flex items-center space-x-4">
           <Avatar>
             <AvatarFallback>{user.username.slice(0, 2).toUpperCase()}</AvatarFallback>
@@ -137,9 +137,6 @@ function Occurences({ activity, occurences, users1, users2, users3, setUsers1, s
                     </Badge>
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-center text-muted-foreground">Aucun participant pour cette session.</p>
-                </CardContent>
                 <CardContent>
                   <UserList users={validatedUsers} occurence={occurence} activity={activity} setUsers={setUsers} />
                 </CardContent>

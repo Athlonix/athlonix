@@ -28,6 +28,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from '@ui/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
 import { Textarea } from '@ui/components/ui/textarea';
+import { is } from 'date-fns/locale';
 import { BookOpenText, CircleArrowLeft, HomeIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { type FormEvent, useEffect, useMemo, useState } from 'react';
@@ -89,6 +90,7 @@ export default function AssemblyDetail(): JSX.Element {
       const data = await getAssembly(Number(idPoll));
       setAttendees(data.attendees?.length ?? 0);
       setAssembly(data);
+      toast.success("Membre ajouté à l'assemblée");
     } catch (_error) {
       toast.error("Erreur lors de l'ajout du membre");
     }
@@ -96,12 +98,20 @@ export default function AssemblyDetail(): JSX.Element {
 
   async function handleEndAssembly(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const lawsuit = formData.get('lawsuit') as string;
-    await closeAssembly(Number(idPoll), lawsuit);
-    setOpenCloseAssembly(false);
-    const data = await getAssembly(Number(idPoll));
-    setAssembly(data);
+    try {
+      const formData = new FormData(event.currentTarget);
+      const lawsuit = formData.get('lawsuit') as string;
+      await closeAssembly(Number(idPoll), lawsuit, roles);
+      setOpenCloseAssembly(false);
+      const data = await getAssembly(Number(idPoll));
+      setAssembly(data);
+      const membersData = await getAllMembersForAssembly();
+      setMembers(membersData.data);
+      setIsClosed(true);
+      toast.success("L'assemblée a bien été clôturée");
+    } catch (_error) {
+      toast.error("Erreur lors de la clôture de l'assemblée");
+    }
   }
 
   async function requestQrCode() {
@@ -175,53 +185,65 @@ export default function AssemblyDetail(): JSX.Element {
         </div>
       )}
       {started && (
-        <RoleSelectionComponent users={members} roles={roles} setRoles={setRoles} currentRoles={currentRoles} />
+        <RoleSelectionComponent
+          users={members}
+          roles={roles}
+          setRoles={setRoles}
+          currentRoles={currentRoles}
+          isClosed={isClosed}
+        />
       )}
       {started && (
         <>
-          <div className="flex items-center gap-5">
-            <h1 className="text-lg font-semibold md:text-2xl">Membres de l'assemblée ({attendees})</h1>
-            {!isClosed && (
-              <div className="ml-auto flex gap-5">
-                <AddAttendeeDialog
-                  attendees={assembly?.attendees}
-                  openAddAttendee={openAddAttendee}
-                  setOpenAddAttendee={setOpenAddAttendee}
-                  members={members}
-                  handleAddAttendee={handleAddAttendee}
-                />
-                <QrCodeDialog
-                  openQrCode={openQrCode}
-                  setOpenQrCode={setOpenQrCode}
-                  qrCode={qrCode}
-                  requestQrCode={requestQrCode}
-                />
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-5">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nom et Prénom</TableHead>
-                  <TableHead>Email</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {attendees === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={2}>Aucun membre n'a encore été ajouté à cette assemblée</TableCell>
-                  </TableRow>
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                <span>Membres de l'assemblée ({attendees})</span>
+                {!isClosed && (
+                  <div className="flex gap-2">
+                    <AddAttendeeDialog
+                      attendees={assembly?.attendees}
+                      openAddAttendee={openAddAttendee}
+                      setOpenAddAttendee={setOpenAddAttendee}
+                      members={members}
+                      handleAddAttendee={handleAddAttendee}
+                    />
+                    <QrCodeDialog
+                      openQrCode={openQrCode}
+                      setOpenQrCode={setOpenQrCode}
+                      qrCode={qrCode}
+                      requestQrCode={requestQrCode}
+                    />
+                  </div>
                 )}
-                {assembly?.attendees?.map((member) => (
-                  <TableRow key={member.id}>
-                    <TableCell>{`${member.first_name} ${member.last_name}`}</TableCell>
-                    <TableCell>{member.email}</TableCell>
-                  </TableRow>
-                )) ?? []}
-              </TableBody>
-            </Table>
-          </div>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[400px]">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nom et Prénom</TableHead>
+                      <TableHead>Email</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {attendees === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={2}>Aucun membre n'a encore été ajouté à cette assemblée</TableCell>
+                      </TableRow>
+                    )}
+                    {assembly?.attendees?.map((member) => (
+                      <TableRow key={member.id}>
+                        <TableCell>{`${member.first_name} ${member.last_name}`}</TableCell>
+                        <TableCell>{member.email}</TableCell>
+                      </TableRow>
+                    )) ?? []}
+                  </TableBody>
+                </Table>
+              </ScrollArea>
+            </CardContent>
+          </Card>
         </>
       )}
     </>
@@ -316,7 +338,7 @@ function CloseAssemblyDialog({
             />
           </div>
           <DialogFooter>
-            <Button type="submit">Terminer</Button>
+            <Button type="submit">Terminer l'assemblée</Button>
           </DialogFooter>
         </form>
       </DialogContent>
@@ -358,12 +380,12 @@ function QrCodeDialog({
 }
 
 enum ElectionRole {
-  Président = 1,
-  Vice_président = 2,
-  Secrétaire = 3,
-  Trésorier = 4,
-  Chargé_de_communication = 5,
-  Chef_de_projet = 6,
+  Président = 6,
+  Vice_président = 9,
+  Secrétaire = 7,
+  Trésorier = 8,
+  Chargé_de_communication = 11,
+  Chef_de_projet = 12,
 }
 
 interface RoleSelection {
@@ -376,9 +398,16 @@ interface RoleSelectionComponentProps {
   roles: RoleSelection[];
   setRoles: React.Dispatch<React.SetStateAction<RoleSelection[]>>;
   currentRoles?: RoleSelection[];
+  isClosed?: boolean;
 }
 
-function RoleSelectionComponent({ users, roles, setRoles, currentRoles = [] }: RoleSelectionComponentProps) {
+function RoleSelectionComponent({
+  users,
+  roles,
+  setRoles,
+  currentRoles = [],
+  isClosed = false,
+}: RoleSelectionComponentProps) {
   const handleRoleChange = (roleId: number, userId: number) => {
     setRoles((prevRoles) => {
       const newRoles = prevRoles.filter((role) => role.id_role !== roleId);
@@ -410,7 +439,7 @@ function RoleSelectionComponent({ users, roles, setRoles, currentRoles = [] }: R
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <span>Election des membres du bureau</span>
-          <Button variant="outline" size="sm" onClick={clearAllSelections}>
+          <Button variant="outline" size="sm" onClick={clearAllSelections} disabled={isClosed}>
             Effacer les sélections
           </Button>
         </CardTitle>
@@ -447,6 +476,7 @@ function RoleSelectionComponent({ users, roles, setRoles, currentRoles = [] }: R
                         <Select
                           onValueChange={(value) => handleRoleChange(Number(roleId), Number(value))}
                           value={selectedUser?.toString() || '0'}
+                          disabled={isClosed}
                         >
                           <SelectTrigger id={`role-${roleId}`} className="w-full">
                             <SelectValue placeholder="Sélectionner un membre" />

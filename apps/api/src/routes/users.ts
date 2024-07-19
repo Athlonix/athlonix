@@ -390,3 +390,37 @@ export const setStatus = createRoute({
   },
   tags: ['user'],
 });
+
+export const subscribeNewsletter = createRoute({
+  method: 'post',
+  path: '/users/newsletter',
+  summary: 'Subscribe to the newsletter',
+  description: 'Subscribe to the newsletter',
+  request: {
+    body: {
+      content: {
+        'application/json': {
+          schema: z.object({
+            email: z.string().email(),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            message: z.string(),
+          }),
+        },
+      },
+    },
+    500: serverErrorSchema,
+    400: badRequestSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});

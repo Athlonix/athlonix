@@ -18,6 +18,7 @@ export type selectUser = {
   id_auth: number;
   date_validity: string | null;
   created_at: string;
+  newsletter: boolean;
   roles:
     | {
         id_role: number;
@@ -40,6 +41,7 @@ export const userSchema = z.object({
   deleted_at: z.string().datetime().nullable(),
   invoice: z.string().nullable(),
   subscription: z.string().nullable(),
+  newsletter: z.boolean().default(false),
   status: z.enum(['applied', 'approved', 'rejected']).nullable(),
 });
 

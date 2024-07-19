@@ -101,3 +101,28 @@ export async function sendWelcomeEmail(user: { email: string; first_name: string
     `,
   });
 }
+
+export async function sendNewsletterSubscriptionEmail(email: string) {
+  const resend = new Resend(process.env.RESEND_KEY);
+
+  if (!resend.emails) {
+    throw new Error('Emails feature is not enabled');
+  }
+
+  await resend.emails.send({
+    from: 'onboarding@resend.dev',
+    to: email,
+    subject: 'Abonnement à la newsletter Athlonix',
+    html: `
+      <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h2>Abonnement à la newsletter Athlonix</h2>
+          <p>Bonjour,</p>
+          <p>Merci de vous être abonné(e) à notre newsletter !</p>
+          <p>Vous recevrez prochainement nos dernières actualités, événements et offres exclusives.</p>
+          <p>À très bientôt !</p>
+          </body>
+      </html>
+    `,
+  });
+}

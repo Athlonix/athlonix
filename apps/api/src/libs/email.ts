@@ -126,3 +126,29 @@ export async function sendNewsletterSubscriptionEmail(email: string) {
     `,
   });
 }
+
+export async function sendInvoiceEmail(invoice: string, email: string) {
+  const resend = new Resend(process.env.RESEND_KEY);
+
+  if (!resend.emails) {
+    throw new Error('Emails feature is not enabled');
+  }
+
+  await resend.emails.send({
+    from: 'onboarding@resend.dev',
+    to: email,
+    subject: 'Votre facture Athlonix',
+    html: `
+      <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+          <h2>Votre facture Athlonix</h2>
+          <p>Bonjour,</p>
+          <p>Vous trouverez à ce lien votre facture pour votre abonnement annuel à Athlonix :</p>
+          <p><a href="${invoice}">Voir la facture</a></p>
+          <p>Si vous avez des questions, n'hésitez pas à contacter notre équipe de support</p>
+          <p>À très bientôt !</p>
+        </body>
+      </html>
+    `,
+  });
+}

@@ -179,6 +179,9 @@ const AthlonixBot = () => {
               chatButton: {
                 icon: 'https://static.vecteezy.com/system/resources/previews/004/996/790/non_2x/robot-chatbot-icon-sign-free-vector.jpg',
               },
+              audio: {
+                disabled: true,
+              },
               theme: {},
               tooltip: { text: "Besoin d'aide ?" },
               chatHistory: { storageKey: 'example_faq_bot' },

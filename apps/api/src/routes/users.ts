@@ -424,3 +424,28 @@ export const subscribeNewsletter = createRoute({
   },
   tags: ['user'],
 });
+
+export const getUserInvoice = createRoute({
+  method: 'get',
+  path: '/users/invoice',
+  summary: 'Return your last invoice',
+  description: 'Return your last invoice',
+  security: [{ Bearer: [] }],
+  middleware: authMiddleware,
+  responses: {
+    200: {
+      description: 'Successful response',
+      content: {
+        'application/json': {
+          schema: z.object({
+            invoice: z.string().nullable(),
+          }),
+        },
+      },
+    },
+    400: badRequestSchema,
+    500: serverErrorSchema,
+    404: notFoundSchema,
+  },
+  tags: ['user'],
+});

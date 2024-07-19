@@ -225,11 +225,10 @@ assemblies.openapi(updateAssembly, async (c) => {
 
 assemblies.openapi(closeAssembly, async (c) => {
   const user = c.get('user');
-  const roles = user.roles;
-  await checkRole(roles, false);
+  await checkRole(user.roles, false);
 
   const { id } = c.req.valid('param');
-  const { lawsuit } = c.req.valid('json');
+  const { lawsuit, roles } = c.req.valid('json');
 
   const { data: assembly, error: assemblyError } = await supabase.from('ASSEMBLIES').select('id').eq('id', id).single();
 
@@ -241,6 +240,19 @@ assemblies.openapi(closeAssembly, async (c) => {
 
   if (error) {
     return c.json({ error: 'Failed to close assembly' }, 500);
+  }
+
+  if (roles) {
+    for (const role of roles) {
+      await supabase.from('USERS_ROLES').delete().eq('id_role', role.id_role);
+      const { error: updateRole } = await supabase
+        .from('USERS_ROLES')
+        .insert({ id_user: role.id_user, id_role: role.id_role });
+
+      if (updateRole) {
+        return c.json({ error: 'Failed to update roles' }, 500);
+      }
+    }
   }
 
   return c.json({ message: 'Assembly closed' }, 200);

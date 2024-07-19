@@ -2,7 +2,7 @@ import type { User } from '@/app/lib/type/Activities';
 import { validateUsers } from '@/app/lib/utils/activities';
 import { Button } from '@ui/components/ui/button';
 import { toast } from '@ui/components/ui/sonner';
-import { Check, PlusCircleIcon } from 'lucide-react';
+import { PlusCircleIcon } from 'lucide-react';
 import type { Dispatch, SetStateAction } from 'react';
 
 function ValidateUser({

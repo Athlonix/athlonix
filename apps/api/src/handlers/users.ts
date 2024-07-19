@@ -33,7 +33,7 @@ users.openapi(getAllUsers, async (c) => {
 
   const query = supabase
     .from('USERS')
-    .select('*, roles:ROLES!inner(id, name)', { count: 'exact' })
+    .select('*, roles:ROLES(id, name)', { count: 'exact' })
     .filter('deleted_at', 'is', null)
     .order('created_at', { ascending: true });
 
@@ -46,19 +46,19 @@ users.openapi(getAllUsers, async (c) => {
     query.range(from, to);
   }
 
+  let { data, error, count } = await query;
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
   if (role) {
     const { data: roleFound } = await supabase.from('ROLES').select('id').eq('name', role.toUpperCase()).single();
 
     if (!roleFound) {
       return c.json({ error: 'Role not found in query' }, 404);
     }
-    query.eq('ROLES.id', roleFound.id);
-  }
-
-  const { data, error, count } = await query;
-
-  if (error) {
-    return c.json({ error: error.message }, 500);
+    data = data?.filter((user) => user.roles.some((userRole) => userRole.id === roleFound.id)) || [];
   }
 
   const responseData = {

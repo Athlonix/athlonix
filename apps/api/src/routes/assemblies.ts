@@ -141,7 +141,10 @@ export const closeAssembly = createRoute({
     body: {
       content: {
         'application/json': {
-          schema: z.object({ lawsuit: z.string() }),
+          schema: z.object({
+            lawsuit: z.string().min(20),
+            roles: z.array(z.object({ id_user: z.number().positive(), id_role: z.number().positive() })).optional(),
+          }),
         },
       },
     },

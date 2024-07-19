@@ -133,8 +133,8 @@ function PageContent() {
   const idActivity = Number(searchParams.get('id') || 1);
 
   const [activity, setActivity] = useState<ActivityWithOccurences>();
-  const [sports, setSports] = useState<Sport[]>([]);
-  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [sports, setSports] = useState<Sport[] | null>(null);
+  const [addresses, setAddresses] = useState<Address[] | null>(null);
   const [usersSet1, setUsersSet1] = useState<User[]>([]);
   const [usersSet2, setUsersSet2] = useState<User[]>([]);
   const [usersSet3, setUsersSet3] = useState<User[]>([]);
@@ -170,7 +170,7 @@ function PageContent() {
     fetchData();
   }, [idActivity]);
 
-  if (!activity || sports.length === 0 || addresses.length === 0) {
+  if (!activity || !sports || !addresses) {
     return <LoadingSkeleton />;
   }
 

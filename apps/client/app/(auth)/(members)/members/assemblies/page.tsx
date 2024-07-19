@@ -34,7 +34,7 @@ export default async function AssemblyPage() {
   const badgeFrench = {
     current: 'En cours',
     upcoming: 'À venir',
-    past: 'Passée',
+    past: 'Terminée',
   };
 
   return (
@@ -50,7 +50,14 @@ export default async function AssemblyPage() {
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
             <CalendarIcon className="text-muted-foreground" />
-            <span>{new Date(assembly.date).toLocaleDateString()}</span>
+            <span>
+              {`${new Date(assembly.date).toLocaleDateString('fr-FR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })} à ${new Date(assembly.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`}
+            </span>
           </div>
           <div className="flex items-center space-x-2">
             <MapPinIcon className="text-muted-foreground" />
@@ -60,18 +67,18 @@ export default async function AssemblyPage() {
             <div className="flex items-center space-x-2">
               <UsersIcon className="text-muted-foreground" />
               <span>
-                {status === 'current' && assembly.attendees
-                  ? `${Object.keys(assembly.attendees).length} attendees`
-                  : 'Pas de participants confirmés pour le moment'}
-                {status === 'past' && assembly.attendees
-                  ? `${Object.keys(assembly.attendees).length} attendees`
-                  : 'Aucun participants confirmés'}
+                {status === 'current' &&
+                  assembly.attendees &&
+                  `${Object.keys(assembly.attendees).length} membres sont présents`}
+                {status === 'past' &&
+                  assembly.attendees &&
+                  `${Object.keys(assembly.attendees).length} membres ont participé`}
               </span>
             </div>
           )}
           {assembly.lawsuit && (
             <div className="mt-4">
-              <h3 className="font-semibold">Lawsuit:</h3>
+              <h3 className="font-semibold">Compte rendu de l'assemblée :</h3>
               <p>{assembly.lawsuit}</p>
             </div>
           )}

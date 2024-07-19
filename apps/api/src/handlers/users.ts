@@ -1,6 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import type { PostgrestError } from '@supabase/supabase-js';
-import { sendNewsletterSubscriptionEmail } from '../libs/email.js';
+import { sendInvoiceEmail, sendNewsletterSubscriptionEmail } from '../libs/email.js';
 import { type User, buildHierarchy } from '../libs/hiearchy.js';
 import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
@@ -11,6 +11,7 @@ import {
   getHierarchy,
   getMe,
   getOneUser,
+  getUserInvoice,
   getUsersActivities,
   removeUserRole,
   setStatus,
@@ -150,6 +151,23 @@ users.openapi(subscribeNewsletter, async (c) => {
   }
 
   return c.json({ message: 'Subscribed to newsletter' }, 200);
+});
+
+users.openapi(getUserInvoice, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles || [];
+  await checkRole(roles, true);
+  const { data, error } = await supabase.from('USERS').select('invoice').eq('id', user.id).single();
+
+  if (error || !data) {
+    return c.json({ error: 'Invoice not found' }, 404);
+  }
+
+  if (data.invoice && process.env.ENABLE_EMAILS === 'true') {
+    await sendInvoiceEmail(data.invoice, user.email);
+  }
+
+  return c.json(data, 200);
 });
 
 users.openapi(getOneUser, async (c) => {

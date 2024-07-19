@@ -1,5 +1,6 @@
 'use client';
 
+import { type Address, getOneAddress } from '@/app/(dashboard)/dashboard/addresses/utils';
 import {
   type Assembly,
   addAttendee,
@@ -28,11 +29,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from '@ui/components/ui/sonner';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@ui/components/ui/table';
 import { Textarea } from '@ui/components/ui/textarea';
-import { is } from 'date-fns/locale';
 import { BookOpenText, CircleArrowLeft, HomeIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { type FormEvent, useEffect, useMemo, useState } from 'react';
-import { type Address, getOneAddress } from '../../addresses/utils';
 
 export default function AssemblyDetail(): JSX.Element {
   const searchParams = useSearchParams();

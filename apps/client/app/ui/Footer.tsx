@@ -3,9 +3,29 @@ import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
 import { toast } from '@ui/components/ui/sonner';
 import Link from 'next/link';
-import type { SVGProps } from 'react';
+import { type SVGProps, useState } from 'react';
 
 export default function Footer(): JSX.Element {
+  const [email, setEmail] = useState('');
+
+  const handleNewsletter = async (email: string) => {
+    const api = process.env.NEXT_PUBLIC_API_URL;
+    try {
+      const response = await fetch(`${api}/users/newsletter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      if (response.ok) {
+        toast.success("Vous êtes inscrit à la newsletter d'Athlonix");
+      }
+    } catch (error) {
+      toast.error("Une erreur est survenue lors de l'inscription à la newsletter");
+    }
+  };
+
   return (
     <footer className="bg-primary-foreground py-12 border-b-slate-800 border-t-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -13,10 +33,17 @@ export default function Footer(): JSX.Element {
           <div className="space-y-4">
             <h5 className="text-xl font-semibold">Newsletter</h5>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Input placeholder="Votre email" className="border p-2 flex-grow" type="email" />
+              <Input
+                placeholder="Votre email"
+                className="border p-2 flex-grow"
+                type="email"
+                onChange={(e) => setEmail(e.target.value)}
+              />
               <Button
                 className="bg-accent text-accent-foreground px-4 py-2"
-                onClick={() => toast.success('Inscription réussie')}
+                onClick={() => {
+                  handleNewsletter(email);
+                }}
               >
                 S'inscrire
               </Button>

@@ -90,7 +90,7 @@ export function LoginForm(): JSX.Element {
                   <FormItem>
                     <Label className="font-bold text-lg">Email</Label>
                     <FormControl>
-                      <Input placeholder="Votre email" {...field} />
+                      <Input placeholder="Votre email" {...field} autoComplete="email" required />
                     </FormControl>
                     <FormDescription />
                     <FormMessage />
@@ -106,7 +106,13 @@ export function LoginForm(): JSX.Element {
                   <FormItem>
                     <Label className="font-bold text-lg">Mot de passe</Label>
                     <FormControl>
-                      <Input placeholder="Votre mot de passe" type="password" {...field} />
+                      <Input
+                        placeholder="Votre mot de passe"
+                        type="password"
+                        {...field}
+                        autoComplete="current-password"
+                        required
+                      />
                     </FormControl>
                     <FormDescription />
                     <FormMessage />
@@ -114,7 +120,7 @@ export function LoginForm(): JSX.Element {
                 )}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
+            <Button type="submit" className="w-full" disabled={!form.formState.isValid} aria-label="Connexion">
               Connexion
             </Button>
           </div>

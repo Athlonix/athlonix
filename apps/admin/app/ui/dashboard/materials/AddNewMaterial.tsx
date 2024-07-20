@@ -102,7 +102,7 @@ function AddNewMaterial({ materials, addresses, setMaterials }: Props): JSX.Elem
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="flex gap-2">
+        <Button className="flex gap-2" disabled={materials.length === 0}>
           <PlusCircle />
           <div>Ajouter du matériel à une adresse</div>
         </Button>
@@ -157,11 +157,14 @@ function AddNewMaterial({ materials, addresses, setMaterials }: Props): JSX.Elem
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {materials?.map((material) => (
-                                <SelectItem key={material.id} value={material.id.toString()}>
-                                  {material.name}
-                                </SelectItem>
-                              ))}
+                              {materials?.map(
+                                (material) =>
+                                  material?.id && (
+                                    <SelectItem key={material.id} value={String(material.id)}>
+                                      {material.name}
+                                    </SelectItem>
+                                  ),
+                              )}
                             </SelectContent>
                           </Select>
                           <FormMessage />

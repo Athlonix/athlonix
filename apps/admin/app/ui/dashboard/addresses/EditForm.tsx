@@ -187,7 +187,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 <FormItem>
                   <Label className="font-bold">Code postal</Label>
                   <FormControl>
-                    <Input {...field} type="number" min={1} />
+                    <Input {...field} type="number" min={1} autoComplete="postal-code" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -214,7 +214,7 @@ function addAddress({ addresses, setAddresses }: Props): JSX.Element {
                         <FormItem>
                           <Label className="font-bold">Code postal</Label>
                           <FormControl>
-                            <Input {...field} type="number" min={0} />
+                            <Input {...field} type="number" min={0} autoComplete="postal-code" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

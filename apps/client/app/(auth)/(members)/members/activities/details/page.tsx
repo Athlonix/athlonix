@@ -3,6 +3,7 @@
 import type { ActivityWithOccurences, Address, Sport, User } from '@/app/lib/type/Activities';
 import { getActivityOccurences, getActivityUsers, getAddresses, getSports } from '@/app/lib/utils/activities';
 import Occurences from '@/app/ui/components/activities/Occurences';
+import Unique from '@/app/ui/components/activities/Unique';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@ui/components/ui/card';
 import { Skeleton } from '@ui/components/ui/skeleton';
@@ -16,6 +17,7 @@ const FrenchFrequency: Record<string, string> = {
   weekly: 'Hebdomadaire',
   monthly: 'Mensuel',
   yearly: 'Annuel',
+  unique: 'Unique',
 };
 
 const FrenchDays: Record<'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday', string> = {
@@ -186,7 +188,23 @@ function ActivityDetails({ sports, addresses }: { sports: Sport[]; addresses: Ad
                 : 'Non spécifié'}
             </div>
           </div>
-          {activity.activity && activity.occurences && (
+          {activity.activity && activity.occurences && activity.activity.frequency === 'unique' && (
+            <div className="mt-12">
+              <Unique
+                activity={activity.activity}
+                occurences={[
+                  {
+                    date: `${activity.activity.start_date}T00:00:00`,
+                    id_activity: activity.activity.id,
+                    max_participants: activity.activity.max_participants,
+                    min_participants: activity.activity.min_participants,
+                  },
+                ]}
+                users={usersSet1}
+              />
+            </div>
+          )}
+          {activity.activity && activity.occurences && activity.activity.frequency !== 'unique' && (
             <div className="mt-12">
               <Occurences
                 activity={activity.activity}

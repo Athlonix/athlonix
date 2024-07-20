@@ -3,6 +3,7 @@
 import type { ActivityWithOccurences, Address, Sport, User } from '@/app/lib/type/Activities';
 import { getActivityOccurences, getActivityUsers, getAddresses, getSports } from '@/app/lib/utils/activities';
 import Occurences from '@/app/ui/dashboard/activities/details/Occurences';
+import Unique from '@/app/ui/dashboard/activities/details/Unique';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import { Skeleton } from '@repo/ui/components/ui/skeleton';
@@ -16,6 +17,7 @@ const FrenchFrequency: Record<string, string> = {
   weekly: 'Hebdomadaire',
   monthly: 'Mensuel',
   yearly: 'Annuel',
+  unique: 'Unique',
 };
 
 const FrenchDays: Record<'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday', string> = {
@@ -177,16 +179,21 @@ function PageContent() {
   return (
     <div className="flex flex-col gap-6 p-4 lg:p-6 max-w-4xl mx-auto">
       <ActivityDetails activity={activity} sports={sports} addresses={addresses} />
-      <Occurences
-        activity={activity.activity}
-        occurences={activity.occurences}
-        users1={usersSet1}
-        users2={usersSet2}
-        users3={usersSet3}
-        setUsers1={setUsersSet1}
-        setUsers2={setUsersSet2}
-        setUsers3={setUsersSet3}
-      />
+      {activity.activity.frequency === 'unique' && (
+        <Unique activity={activity.activity} users={usersSet1} setUsers={setUsersSet1} />
+      )}
+      {activity.activity.frequency !== 'unique' && (
+        <Occurences
+          activity={activity.activity}
+          occurences={activity.occurences}
+          users1={usersSet1}
+          users2={usersSet2}
+          users3={usersSet3}
+          setUsers1={setUsersSet1}
+          setUsers2={setUsersSet2}
+          setUsers3={setUsersSet3}
+        />
+      )}
     </div>
   );
 }

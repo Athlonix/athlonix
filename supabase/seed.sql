@@ -132,7 +132,7 @@ INSERT INTO public."SPORTS" (name, description, image, max_players, min_players)
 INSERT INTO public."ACTIVITIES" (max_participants, name, id_sport, id_address, end_date, description, min_participants, start_date, end_time, frequency, days_of_week, start_time)
 VALUES (10, 'Activity 1', 1, 1, '2022-12-31', 'Description 1', 5, '2022-01-01', '18:00:00', 'weekly', ARRAY['monday', 'tuesday']::days[], '09:00:00'),
        (15, 'Activity 2', 2, 2, '2022-12-30', 'Description 2', 8, '2022-01-02', '19:00:00', 'monthly', ARRAY['tuesday']::days[], '10:00:00'),
-       (20, 'Activity 3', 3, 3, '2022-12-29', 'Description 3', 10, '2022-01-03', '20:00:00', 'daily', ARRAY['wednesday']::days[], '11:00:00'),
+       (20, 'Activity 3', 3, 3, '2022-12-29', 'Description 3', 10, '2022-01-03', '20:00:00', 'unique', ARRAY['wednesday']::days[], '11:00:00'),
        (25, 'Activity 4', 4, 4, '2022-12-28', 'Description 4', 12, '2022-01-04', '21:00:00', 'weekly', ARRAY['thursday']::days[], '12:00:00'),
        (30, 'Activity 5', 5, 5, '2022-12-27', 'Description 5', 15, '2022-01-05', '22:00:00', 'yearly', ARRAY['friday']::days[], '13:00:00');
 

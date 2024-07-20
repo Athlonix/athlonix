@@ -36,7 +36,7 @@ interface Setter {
   startTime: Dispatch<SetStateAction<string>>;
   endTime: Dispatch<SetStateAction<string>>;
   description: Dispatch<SetStateAction<string | null>>;
-  frequency: Dispatch<SetStateAction<'weekly' | 'monthly' | 'yearly'>>;
+  frequency: Dispatch<SetStateAction<'weekly' | 'monthly' | 'yearly' | 'unique'>>;
 }
 
 type Sport = {
@@ -86,7 +86,7 @@ function EditForm(props: EditFormProps): JSX.Element {
         .min(1, { message: 'Le champ est requis' }),
       id_sport: z.coerce.number().int().optional(),
       id_address: z.coerce.number().int().optional(),
-      frequency: z.enum(['weekly', 'monthly', 'yearly']),
+      frequency: z.enum(['weekly', 'monthly', 'yearly', 'unique']),
       days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).optional()),
       date: z.date(),
       start_time: z.date(),
@@ -345,6 +345,12 @@ function EditForm(props: EditFormProps): JSX.Element {
                             <RadioGroupItem value="annual" />
                           </FormControl>
                           <FormLabel className="font-normal">Annuelle</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-3 space-y-0">
+                          <FormControl>
+                            <RadioGroupItem value="unique" />
+                          </FormControl>
+                          <FormLabel className="font-normal">Unique</FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>

@@ -135,6 +135,23 @@ activities.openapi(getOneActivityOccurences, async (c) => {
     );
   }
 
+  if (activityFound.frequency === 'unique') {
+    return c.json(
+      {
+        activity: activityFound,
+        occurences: [
+          {
+            id_exception: null,
+            date: activityFound.start_date ? new Date(activityFound.start_date) : new Date(),
+            max_participants: activityFound.max_participants,
+            min_participants: activityFound.min_participants,
+          },
+        ],
+      },
+      200,
+    );
+  }
+
   if (activityFound.start_date) {
     if (new Date(activityFound.start_date) > new Date(start_date)) {
       start_date = activityFound.start_date;
@@ -217,7 +234,7 @@ activities.openapi(createActivity, async (c) => {
     image,
   } = c.req.valid('form');
 
-  if (image === null) {
+  if (!image) {
     return c.json({ error: 'You must provide an image' }, 400);
   }
 
@@ -226,13 +243,7 @@ activities.openapi(createActivity, async (c) => {
 
   await checkRole(roles, false);
 
-  const uniqueEventInvalid: boolean = !start_date || !end_date || !start_time || !end_time;
-
-  if (uniqueEventInvalid) {
-    return c.json({ error: 'You must provide date and time to create a unique event' }, 400);
-  }
-
-  if (frequency === 'daily' && (!days_of_week || !start_time || !end_time)) {
+  if (frequency === 'weekly' && (!days_of_week || !start_time || !end_time)) {
     return c.json({ error: 'You must provide days of week for weekly frequency' }, 400);
   }
 

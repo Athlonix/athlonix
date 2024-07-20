@@ -33,6 +33,7 @@ const FrenchFrequency: Record<string, string> = {
   weekly: 'Hebdomadaire',
   monthly: 'Mensuel',
   yearly: 'Annuel',
+  unique: 'Unique',
 };
 
 const FrenchDays: Record<string, string> = {
@@ -242,6 +243,9 @@ function ActivityRow(props: ActivityRowProps) {
         <TableCell>{monthlyScheduleDisplay(startDate, endDate, startTime, endTime)}</TableCell>
       )}
       {frequency === 'yearly' && <TableCell>{yearlyScheduleDisplay(startDate, endDate, startTime, endTime)}</TableCell>}
+      {frequency === 'unique' && (
+        <TableCell>{monthlyScheduleDisplay(startDate, endDate, startTime, endTime)}</TableCell>
+      )}
       {!frequency && <TableCell />}
       {name !== 'Supprimé' && (
         <TableCell>

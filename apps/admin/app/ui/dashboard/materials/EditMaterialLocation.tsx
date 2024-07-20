@@ -1,5 +1,6 @@
 'use client';
 
+import type { Material } from '@/app/lib/type/Materials';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -21,21 +22,14 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-type Material = {
+interface Props {
+  id_material: number;
   id_address: number;
   quantity: number;
-  id: number;
-  name: string;
-  weight_grams: number | null;
-};
-
-interface Props {
-  material: Material;
-  materials: Material[];
   setMaterials: React.Dispatch<React.SetStateAction<Material[]>>;
 }
 
-function EditMaterialLocation({ material, materials, setMaterials }: Props): JSX.Element {
+function EditMaterialLocation({ id_material, id_address, quantity, setMaterials }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
@@ -46,14 +40,14 @@ function EditMaterialLocation({ material, materials, setMaterials }: Props): JSX
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      quantity: material.quantity,
+      quantity: quantity,
     },
   });
 
   async function submit(values: z.infer<typeof formSchema>) {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    fetch(`${urlApi}/materials/${material.id}/quantity`, {
+    fetch(`${urlApi}/materials/${id_material}/quantity`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -61,7 +55,7 @@ function EditMaterialLocation({ material, materials, setMaterials }: Props): JSX
       },
       body: JSON.stringify({
         quantity: values.quantity,
-        id_address: material.id_address,
+        id_address: id_address,
       }),
     })
       .then(async (response) => {
@@ -74,7 +68,18 @@ function EditMaterialLocation({ material, materials, setMaterials }: Props): JSX
       })
       .then(() => {
         toast.success('Matériel modifié', { duration: 2000, description: 'Le Matériel a été modifié avec succès' });
-        setMaterials((prevMaterials) => prevMaterials.map((m) => (m.id === material.id ? { ...m, ...values } : m)));
+        setMaterials((prevMaterials) =>
+          prevMaterials.map((material) =>
+            material.id === id_material
+              ? {
+                  ...material,
+                  addresses: material.addresses.map((address) =>
+                    address.id_address === id_address ? { ...address, quantity: values.quantity } : address,
+                  ),
+                }
+              : material,
+          ),
+        );
         setOpen(false);
       })
       .catch((error: Error) => {

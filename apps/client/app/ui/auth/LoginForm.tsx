@@ -80,7 +80,7 @@ export default function LoginForm(): JSX.Element {
                       <FormItem>
                         <Label className="font-bold text-lg">Email</Label>
                         <FormControl>
-                          <Input placeholder="Votre email" {...field} />
+                          <Input placeholder="Votre email" {...field} autoComplete="email" required />
                         </FormControl>
                         <FormDescription />
                         <FormMessage />
@@ -96,7 +96,13 @@ export default function LoginForm(): JSX.Element {
                       <FormItem>
                         <Label className="font-bold text-lg">Mot de passe</Label>
                         <FormControl>
-                          <Input placeholder="Votre mot de passe" type="password" {...field} />
+                          <Input
+                            placeholder="Votre mot de passe"
+                            type="password"
+                            {...field}
+                            autoComplete="current-password"
+                            required
+                          />
                         </FormControl>
                         <FormDescription />
                         <FormMessage />
@@ -104,17 +110,12 @@ export default function LoginForm(): JSX.Element {
                     )}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
+                <Button type="submit" className="w-full" disabled={!form.formState.isValid} aria-label="Connexion">
                   Connexion
                 </Button>
               </div>
             </form>
           </Form>
-          <div className="text-center text-sm">
-            <Link href="/forgot-password" className="ml-auto inline-block text-sm underline">
-              Mot de passe oublié ?
-            </Link>
-          </div>
           <div className="text-center text-sm">
             Vous n&apos;avez pas de compte ?{' '}
             <Link href="signup" className="underline">

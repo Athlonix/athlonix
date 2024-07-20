@@ -79,6 +79,10 @@ function AddressRow(address: AddressProps) {
     setOpenDelete(false);
   }
 
+  if (!address || name === 'Supprimé') {
+    return null;
+  }
+
   return (
     <TableRow key={address.id}>
       <TableCell className="font-medium">{name}</TableCell>
@@ -131,7 +135,7 @@ function AddressRow(address: AddressProps) {
                       <DialogDescription>
                         <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet adresse ?</div>
                         <div className="flex w-full justify-end gap-4">
-                          <Button variant="destructive" onClick={deleteAddress}>
+                          <Button variant="destructive" onClick={deleteAddress} disabled={name === 'Supprimé'}>
                             Supprimer
                           </Button>
                           <Button variant="secondary" onClick={() => setOpenDelete(false)}>

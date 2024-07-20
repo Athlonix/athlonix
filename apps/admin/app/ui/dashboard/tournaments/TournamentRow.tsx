@@ -84,6 +84,10 @@ function TournamentRow(props: TournamentRowProps) {
     setOpenDelete(false);
   }
 
+  if (!props.tournament || name === 'Supprimé') {
+    return null;
+  }
+
   return (
     <TableRow key={props.tournament.id}>
       <TableCell className="font-medium">

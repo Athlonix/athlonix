@@ -141,7 +141,11 @@ export default function AssembliesPage(): JSX.Element {
                   defaultValue={editAssembly ? new Date(editAssembly.date).toISOString().slice(0, 16) : ''}
                   required
                 />
-                <Select name="location" required defaultValue={editAssembly ? String(editAssembly.location) : '0'}>
+                <Select
+                  name="location"
+                  required
+                  defaultValue={editAssembly?.location ? String(editAssembly.location) : '0'}
+                >
                   <SelectTrigger className="w-full rounded-lg bg-background pl-8 text-black border border-gray-300">
                     <SelectValue placeholder="Lieu" />
                   </SelectTrigger>
@@ -188,66 +192,68 @@ export default function AssembliesPage(): JSX.Element {
       </div>
 
       <div className="flex items-center gap-5">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Titre</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Lieu</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {assemblies?.length === 0 && (
+        <div className="w-full overflow-auto" style={{ maxHeight: '60vh' }}>
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
-                  Aucune assemblée générale programmée
-                </TableCell>
+                <TableHead>Titre</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Lieu</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
-            )}
+            </TableHeader>
+            <TableBody>
+              {assemblies?.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">
+                    Aucune assemblée générale programmée
+                  </TableCell>
+                </TableRow>
+              )}
 
-            {filteredAssemblies?.map((assembly) => (
-              <TableRow key={assembly.id} className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-                <TableCell>
-                  <Link href={`/dashboard/assemblies/details?id=${assembly.id}`}>{assembly.name}</Link>
-                </TableCell>
-                <TableCell>
-                  {new Date(assembly.date).toLocaleDateString()} {new Date(assembly.date).toLocaleTimeString()}
-                </TableCell>
-                <TableCell>
-                  {assembly.description && assembly.description.length > 50
-                    ? `${assembly.description.slice(0, 50)}...`
-                    : assembly.description || 'Pas de description'}
-                </TableCell>
-                <TableCell>
-                  {assembly.location ? location?.find((loc) => loc.id === assembly.location)?.city : 'En ligne'}
-                </TableCell>
-                <TableCell>
-                  {assembly.closed ? (
-                    <span className="text-red-500">Terminée</span>
-                  ) : new Date(assembly.date).getTime() < Date.now() ? (
-                    <span className="text-green-500">En cours</span>
-                  ) : (
-                    <span className="text-blue-500">Programmer</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <EditIcon
-                      className="cursor-pointer"
-                      color="#1f6feb"
-                      onClick={() => {
-                        setEditAssembly(assembly);
-                        setOpen(true);
-                      }}
-                    />
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+              {filteredAssemblies?.map((assembly) => (
+                <TableRow key={assembly.id} className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                  <TableCell>
+                    <Link href={`/dashboard/assemblies/details?id=${assembly.id}`}>{assembly.name}</Link>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(assembly.date).toLocaleDateString()} {new Date(assembly.date).toLocaleTimeString()}
+                  </TableCell>
+                  <TableCell>
+                    {assembly.description && assembly.description.length > 50
+                      ? `${assembly.description.slice(0, 50)}...`
+                      : assembly.description || 'Pas de description'}
+                  </TableCell>
+                  <TableCell>
+                    {assembly.location ? location?.find((loc) => loc.id === assembly.location)?.city : 'En ligne'}
+                  </TableCell>
+                  <TableCell>
+                    {assembly.closed ? (
+                      <span className="text-red-500">Terminée</span>
+                    ) : new Date(assembly.date).getTime() < Date.now() ? (
+                      <span className="text-green-500">En cours</span>
+                    ) : (
+                      <span className="text-blue-500">Programmer</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <EditIcon
+                        className="cursor-pointer"
+                        color="#1f6feb"
+                        onClick={() => {
+                          setEditAssembly(assembly);
+                          setOpen(true);
+                        }}
+                      />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     </div>
   );

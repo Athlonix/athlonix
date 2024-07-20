@@ -50,7 +50,6 @@ export default function Page(): JSX.Element {
     });
   }
 
-  console.log(posts);
   const postsElements = posts.map((post) => <BlogPost key={post.id} {...post} handleLikeButton={handleLikeButton} />);
 
   return (

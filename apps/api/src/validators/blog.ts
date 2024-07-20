@@ -23,8 +23,9 @@ export const postCardSchemaResponse = z.object({
   likes_number: z.number().min(0),
 });
 
-export const commentSchema = z.object({
+export const postCommentSchema = z.object({
   id: z.number().min(1),
+  content: z.string().min(1),
   created_at: z.string(),
   author: z.object({
     id: z.number().min(1),
@@ -41,7 +42,7 @@ export const singlePostSchema = z.object({
   description: z.string().nullable(),
   author: z.object({ id: z.number(), username: z.string() }).nullable(),
   categories: z.object({ id: z.number().nullable(), name: z.string().nullable() }).array(),
-  comments: commentSchema.array(),
+  comments: postCommentSchema.array(),
   reports: z.object({ id: z.number() }).array(),
   comments_number: z.number().min(0),
   views_number: z.number().min(0),
@@ -67,6 +68,16 @@ export const updatePostSchema = z.object({
 export const responseSchema = z.object({
   id: z.number().min(1),
   content: z.string().max(255),
+});
+
+export const commentSchema = z.object({
+  id: z.number().min(1),
+  content: z.string().max(255),
+  id_post: z.number().min(1).nullable(),
+  responses: z.array(responseSchema).optional(),
+  updated_at: z.string().datetime().nullable(),
+  created_at: z.string().datetime(),
+  id_user: z.number().min(1),
 });
 
 export const insertResponseSchema = z.object({

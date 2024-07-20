@@ -1,9 +1,8 @@
 import type { SinglePost } from '@/app/lib/type/SinglePost';
 import { getBlogPost } from '@/app/lib/utils/blog';
-import BlogComment from '@/app/ui/components/BlogComment';
+import BlogCommentSection from '@/app/ui/components/BlogCommentSection';
 import LikeIcon from '@/app/ui/svg/LikeIcon';
 import { Avatar, AvatarFallback } from '@ui/components/ui/avatar';
-import { Button } from '@ui/components/ui/button';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { BookOpenCheck, MessageSquare } from 'lucide-react';
@@ -13,20 +12,6 @@ async function Page({ params }: { params: { id: string } }) {
   const data = await getBlogPost(Number(params.id));
   const post: SinglePost = data.data;
   const coverImageUrl = `${process.env.ATHLONIX_STORAGE_URL}/image/blog_posts/${post.cover_image}`;
-
-  const postComments = post.comments.map((comment) => {
-    return (
-      <BlogComment
-        key={comment.id}
-        likeNumber={4}
-        author={comment.author.username}
-        content={comment.content}
-        created_at={comment.created_at}
-      />
-    );
-  });
-
-  function handleLikeButton() {}
 
   return (
     <main className="flex flex-col items-center gap-y-8 py-4">
@@ -44,7 +29,7 @@ async function Page({ params }: { params: { id: string } }) {
             </p>
           </div>
         </div>
-        <h1>{post.title}</h1>
+        <h1 className="mt-4">{post.title}</h1>
         <div className="w-[600px] h-[232px] mt-6 mb-6">
           <img
             className="h-full w-full object-cover"
@@ -75,22 +60,7 @@ async function Page({ params }: { params: { id: string } }) {
             </div>
           </div>
         </div>
-        <section className="mt-8">
-          <div className="flex items-center w-full gap-4 justify-start">
-            <Avatar className="self-start">
-              <AvatarFallback className="bg-slate-400">{post.author.username.charAt(0).toUpperCase()}</AvatarFallback>
-            </Avatar>
-            <textarea
-              className="w-full leading-6  border-accent border-2 rounded-3xl px-4 py-4 placeholder:text-accent placeholder:opacity-70"
-              placeholder="Ecrire un commentaire..."
-              name="comment"
-            />
-          </div>
-          <div className="flex justify-end mt-4">
-            <Button>Envoyer</Button>
-          </div>
-          <div className="flex flex-col gap-7">{postComments}</div>
-        </section>
+        <BlogCommentSection post={post} />
       </div>
     </main>
   );

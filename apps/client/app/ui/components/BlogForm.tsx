@@ -70,18 +70,13 @@ function BlogForm() {
       body: formData,
     })
       .then(async (response) => {
-        if (response.status === 403) {
-          console.log('bad');
-        }
         if (response.status !== 201) {
           const error = await response.json();
-          console.log(error);
           throw new Error(error.message);
         }
         return response.json();
       })
       .then((data: { id: number }) => {
-        console.log(data);
         router.push(`/blog/posts/${data.id}`);
       })
       .catch((error: Error) => {

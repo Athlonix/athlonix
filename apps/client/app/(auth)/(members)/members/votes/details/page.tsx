@@ -71,7 +71,7 @@ function ShowContent() {
       <div className="flex justify-center text-4xl font-bold mt-4">{poll.title}</div>
       <Separator className="my-4" />
       <div className="flex flex-col items-center justify-center text-lg">
-        {poll.description?.split('\n').map((i, key) => {
+        {poll.description?.split('\n').map((i, _key) => {
           return (
             <div key={i} className=" text-justify">
               {i}
@@ -90,7 +90,7 @@ function ShowContent() {
               </span>
               <span>tour</span>
             </TabsTrigger>
-            {poll.sub_polls.map((subPoll) => (
+            {poll?.sub_polls.map((subPoll) => (
               <TabsTrigger key={subPoll.id} value={subPoll.id.toString()} className="flex gap-1 w-[200px]">
                 <span>
                   {subPoll.round}
@@ -127,7 +127,7 @@ function ShowContent() {
 function page() {
   return (
     <main>
-      <Suspense fallback={<div>Chargement...</div>}>
+      <Suspense fallback={<Loading />}>
         <ShowContent />
       </Suspense>
     </main>

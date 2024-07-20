@@ -259,7 +259,7 @@ activities.openapi(createActivity, async (c) => {
     return c.json({ error: 'Failed to create activity' }, 500);
   }
 
-  await uploadFile(`activities/activity_${data.id}`, image, 'image');
+  if (image) await uploadFile(`activities/activity_${data.id}`, image, 'image');
 
   return c.json(data, 201);
 });

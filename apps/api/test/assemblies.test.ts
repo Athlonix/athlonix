@@ -1,12 +1,14 @@
 import app from '../src/index.js';
+import { addUserToAssembly, checkAssemblyAndUser, getAssemblyWithCode } from '../src/utils/assemblies.js';
 import { Role } from '../src/validators/general.js';
-import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
+import { deleteAdmin, insertRole, setInvalidSubscription, setValidSubscription } from './utils.js';
 
 describe('Activities tests', () => {
   let id_admin: number;
   let id_auth: string;
   let id_assembly: number;
   let jwt: string;
+  let QRcode: string;
   const next_month = new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString();
 
   test('Create admin', async () => {
@@ -113,6 +115,41 @@ describe('Activities tests', () => {
       },
     });
     expect(res.status).toBe(200);
+    const { qrCode }: { qrCode: string } = await res.json();
+    QRcode = qrCode;
+  });
+
+  test('Add member to assembly', async () => {
+    const res = await addUserToAssembly(id_assembly, id_admin);
+    expect(res).toBe(true);
+  });
+
+  test('Check assembly and user validation', async () => {
+    const res = await checkAssemblyAndUser(id_assembly, id_admin);
+    expect(res).toBe(true);
+  });
+
+  test('Check assembly and user validation with invalid subscription', async () => {
+    await setInvalidSubscription(id_admin);
+    const res = await checkAssemblyAndUser(id_assembly, id_admin);
+    expect(res).toHaveProperty('error');
+    await setValidSubscription(id_admin);
+  });
+
+  test('Check assembly and user validation with invalid assembly', async () => {
+    const res = await checkAssemblyAndUser(0, id_admin);
+    expect(res).toHaveProperty('error');
+  });
+
+  test('Check assembly and user validation with invalid member', async () => {
+    const res = await checkAssemblyAndUser(id_assembly, 0);
+    expect(res).toHaveProperty('error');
+  });
+
+  test('Get assembly with code from QRcode', async () => {
+    const code = QRcode.split('?code=')[1] || QRcode;
+    const res = await getAssemblyWithCode(code);
+    expect(res).not.toHaveProperty('error');
   });
 
   test('Close assembly', async () => {

@@ -2,7 +2,7 @@ import { z } from '@hono/zod-openapi';
 import type { Context } from 'hono';
 import { describe, vi } from 'vitest';
 import app from '../src/index.js';
-import { getOccurencesWeekly } from '../src/libs/activities.js';
+import { getOccurencesMonthly, getOccurencesWeekly, getOccurencesYearly } from '../src/libs/activities.js';
 import { zodErrorHook } from '../src/libs/zodError.js';
 import { accountRolesValidity } from '../src/middlewares/auth.js';
 import { checkBanned, checkRole } from '../src/utils/context.js';
@@ -90,6 +90,58 @@ describe('Other general tests', () => {
     ]);
 
     const invalid = getOccurencesWeekly(new Date('2022-01-10'), new Date('2022-01-01'), daysToFind, exceptions);
+    expect(invalid).toEqual([]);
+  });
+
+  test('Check getOccurencesMonthly', () => {
+    const startDate = new Date('2022-01-01');
+    const endDate = new Date('2022-01-31');
+    const exceptions = [
+      {
+        date: '2022-01-03',
+        id: 1,
+        id_activity: 1,
+        max_participants: 10,
+        min_participants: 5,
+      },
+    ];
+    const occurences = getOccurencesMonthly(startDate, endDate, exceptions);
+    expect(occurences).toEqual([
+      {
+        id_exception: null,
+        date: new Date('2022-01-01'),
+        max_participants: null,
+        min_participants: null,
+      },
+    ]);
+
+    const invalid = getOccurencesMonthly(new Date('2022-01-31'), new Date('2022-01-01'), exceptions);
+    expect(invalid).toEqual([]);
+  });
+
+  test('Check getOccurencesYearly', () => {
+    const startDate = new Date('2022-01-01');
+    const endDate = new Date('2022-12-31');
+    const exceptions = [
+      {
+        date: '2022-01-03',
+        id: 1,
+        id_activity: 1,
+        max_participants: 10,
+        min_participants: 5,
+      },
+    ];
+    const occurences = getOccurencesYearly(startDate, endDate, exceptions);
+    expect(occurences).toEqual([
+      {
+        date: new Date('2022-01-01'),
+        id_exception: null,
+        max_participants: null,
+        min_participants: null,
+      },
+    ]);
+
+    const invalid = getOccurencesYearly(new Date('2022-12-31'), new Date('2022-01-01'), exceptions);
     expect(invalid).toEqual([]);
   });
 

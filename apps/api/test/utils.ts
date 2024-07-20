@@ -18,3 +18,9 @@ export async function setValidSubscription(id: number): Promise<void> {
   const { error } = await supAdmin.from('USERS').update({ date_validity, subscription: 'approved' }).eq('id', id);
   if (error) throw new Error('Error while updating user');
 }
+
+export async function setInvalidSubscription(id: number): Promise<void> {
+  const date_validity = new Date(new Date().setFullYear(new Date().getFullYear() - 2)).toLocaleString();
+  const { error } = await supAdmin.from('USERS').update({ date_validity, subscription: 'rejected' }).eq('id', id);
+  if (error) throw new Error('Error while updating user');
+}

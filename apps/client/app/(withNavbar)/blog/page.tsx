@@ -20,7 +20,11 @@ export default function Page(): JSX.Element {
       })
       .then((postsData) => {
         if (postsData?.data) {
-          setPosts(postsData.data);
+          const transformedData = postsData.data.map((post: { created_at: string | number | Date }) => ({
+            ...post,
+            createdAt: new Date(post.created_at),
+          }));
+          setPosts(transformedData);
         }
       });
   }, []);
@@ -46,6 +50,7 @@ export default function Page(): JSX.Element {
     });
   }
 
+  console.log(posts);
   const postsElements = posts.map((post) => <BlogPost key={post.id} {...post} handleLikeButton={handleLikeButton} />);
 
   return (

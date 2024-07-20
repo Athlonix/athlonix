@@ -3,9 +3,12 @@
 import type { Post } from '@/app/lib/type/Post';
 import LikeIcon from '@/app/ui/svg/LikeIcon';
 import { Badge } from '@repo/ui/components/ui/badge';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { BookOpenCheck, Ellipsis, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 type PostProps = Post & {
   handleLikeButton: (id: number) => void;
@@ -24,7 +27,10 @@ export const BlogPost: React.FC<PostProps> = ({
   categories,
   handleLikeButton,
 }: PostProps) => {
-  const coverImageName: string = cover_image.split('.')[0] || '';
+  const coverImageUrl = `${process.env.ATHLONIX_STORAGE_URL}/image/blog_posts/${cover_image}`;
+  const placeholder = '/blog_post_default.jpg';
+
+  const [imageError, setImageError] = useState(false);
 
   const badgesElements = categories.map((badge) => (
     <Badge key={badge.id} className="min-w-16 flex items-center justify-center">
@@ -41,23 +47,26 @@ export const BlogPost: React.FC<PostProps> = ({
               className="object-cover"
               width={256}
               height={144}
-              src={`${process.env.ATHLONIX_STORAGE_URL}/image/blog_posts/${cover_image}`}
+              src={imageError ? placeholder : coverImageUrl}
               style={{ width: '256px', height: '144px' }} // optional
-              alt={coverImageName}
+              alt="illu"
+              onError={() => setImageError(true)}
             />
           </Link>
         </div>
         <div className="h-full max-w-[624px]">
-          <h2 className="truncate cursor-pointer hover:text-slate-400" title={title}>
-            {title}
-          </h2>
+          <Link href={`/blog/posts/${id}`}>
+            <h2 className="truncate cursor-pointer hover:text-slate-400" title={title}>
+              {title}
+            </h2>
+          </Link>
           <div className="flex items-center gap-6">
             <p>
               Par{' '}
               <Link href="simon" className="font-medium text-accent underline underline-offset-2 max-w-32 truncate">
                 {author.username}
               </Link>
-              {/* , <span>{createdAt.toString()}</span> */}
+              , <span>{format(createdAt, 'EEE dd MMMM', { locale: fr })}</span>
             </p>
             <div className="flex items-center gap-3">{badgesElements}</div>
           </div>

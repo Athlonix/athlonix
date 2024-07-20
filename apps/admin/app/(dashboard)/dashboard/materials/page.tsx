@@ -1,5 +1,6 @@
 'use client';
 
+import type { Address, Material } from '@/app/lib/type/Materials';
 import AddMaterial from '@/app/ui/dashboard/materials/AddMaterial';
 import AddNewMaterial from '@/app/ui/dashboard/materials/AddNewMaterial';
 import DeleteMaterial from '@/app/ui/dashboard/materials/DeleteMaterial';
@@ -11,31 +12,15 @@ import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-type Material = {
-  id_address: number;
-  quantity: number;
-  id: number;
-  name: string;
-  weight_grams: number | null;
-};
-
-type MaterialData = {
+interface MaterialData {
   data: Material[];
   count: number;
-};
+}
 
-type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
-
-type AddressData = {
+interface AddressData {
   data: Address[];
   count: number;
-};
+}
 
 function ShowContent({ addresses }: { addresses: Address[] }): JSX.Element {
   const router = useRouter();

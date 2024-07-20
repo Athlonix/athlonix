@@ -1,3 +1,4 @@
+import type { Material } from '@/app/lib/type/Materials';
 import { Button } from '@repo/ui/components/ui/button';
 import {
   Dialog,
@@ -11,14 +12,6 @@ import { toast } from '@repo/ui/components/ui/sonner';
 import { CircleX } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-
-type Material = {
-  id_address: number;
-  quantity: number;
-  id: number;
-  name: string;
-  weight_grams: number | null;
-};
 
 interface Props {
   material: Material;

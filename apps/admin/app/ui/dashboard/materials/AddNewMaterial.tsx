@@ -1,5 +1,6 @@
 'use client';
 
+import type { Address, Material } from '@/app/lib/type/Materials';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -22,22 +23,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-type Material = {
-  id_address: number;
-  quantity: number;
-  id: number;
-  name: string;
-  weight_grams: number | null;
-};
-
-type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
-
 interface Props {
   materials: Material[];
   addresses: Address[];
@@ -47,8 +32,6 @@ interface Props {
 function AddNewMaterial({ materials, addresses, setMaterials }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-
-  const usedAddresses = materials?.map((material) => material.id_address);
 
   const formSchema = z.object({
     id_material: z.coerce.number({ message: 'Le champ est requis' }).min(1, { message: 'Le champ est requis' }),
@@ -128,14 +111,11 @@ function AddNewMaterial({ materials, addresses, setMaterials }: Props): JSX.Elem
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {addresses.map(
-                                (address) =>
-                                  !usedAddresses.includes(address.id) && (
-                                    <SelectItem key={address.id} value={address.id.toString()}>
-                                      {address.name ?? `${address.number}, ${address.road}`}
-                                    </SelectItem>
-                                  ),
-                              )}
+                              {addresses.map((address) => (
+                                <SelectItem key={address.id} value={address.id.toString()}>
+                                  {address.name ?? `${address.number}, ${address.road}`}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />

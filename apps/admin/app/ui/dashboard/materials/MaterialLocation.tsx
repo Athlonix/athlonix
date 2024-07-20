@@ -1,24 +1,9 @@
+import type { Address, Material } from '@/app/lib/type/Materials';
 import AddMaterialLocation from '@/app/ui/dashboard/materials/AddMaterialLocation';
 import DeleteMaterialLocation from '@/app/ui/dashboard/materials/DeleteMaterialLocation';
 import EditMaterialLocation from '@/app/ui/dashboard/materials/EditMaterialLocation';
 import { AccordionContent, AccordionItem, AccordionTrigger } from '@repo/ui/components/ui/accordion';
 import type React from 'react';
-
-type Material = {
-  id_address: number;
-  quantity: number;
-  id: number;
-  name: string;
-  weight_grams: number | null;
-};
-
-type Address = {
-  id: number;
-  road: string;
-  number: number;
-  complement: string | null;
-  name: string | null;
-};
 
 interface Props {
   materials: Material[];
@@ -27,7 +12,12 @@ interface Props {
 }
 
 function MaterialLocation({ materials, address, setMaterials }: Props) {
-  const materialsFiltered = materials.filter((material) => material.id_address === address.id);
+  const materialsFiltered = materials
+    .filter((material) => material.addresses.some((a) => a.id_address === address.id))
+    .map((material) => ({
+      ...material,
+      addresses: material.addresses.filter((a) => a.id_address === address.id),
+    }));
   if (materialsFiltered.length === 0) return null;
   return (
     <AccordionItem value={`value-${address.id}`}>
@@ -43,13 +33,18 @@ function MaterialLocation({ materials, address, setMaterials }: Props) {
               <div>{material.name}</div>
               <div>
                 {material.weight_grams
-                  ? `${(material.weight_grams * material.quantity) / 100} kg (${material.weight_grams} g/u)`
+                  ? `${(material.weight_grams * (material.addresses[0]?.quantity ?? 0)) / 100} kg (${material.weight_grams} g/u)`
                   : 'Non renseigné'}
               </div>
-              <div>{material.quantity} unité(s)</div>
+              <div>{material.addresses[0]?.quantity ?? 0} unité(s)</div>
               <div className="flex w-full justify-end gap-4">
-                <EditMaterialLocation material={material} materials={materials} setMaterials={setMaterials} />
-                <DeleteMaterialLocation material={material} setMaterials={setMaterials} />
+                <EditMaterialLocation
+                  id_material={material.id}
+                  id_address={address.id}
+                  quantity={material.addresses[0]?.quantity ?? 0}
+                  setMaterials={setMaterials}
+                />
+                <DeleteMaterialLocation id_material={material.id} id_address={address.id} setMaterials={setMaterials} />
               </div>
             </div>
           ))}

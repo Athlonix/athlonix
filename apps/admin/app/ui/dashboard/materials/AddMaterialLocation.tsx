@@ -1,5 +1,7 @@
 'use client';
 
+import type { Material } from '@/app/lib/type/Materials';
+import { addMaterial } from '@/app/lib/utils/Materials';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
 import {
@@ -22,14 +24,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-type Material = {
-  id_address: number;
-  quantity: number;
-  id: number;
-  name: string;
-  weight_grams: number | null;
-};
-
 interface Props {
   materials: Material[];
   id_address: number;
@@ -41,7 +35,7 @@ function AddMaterialLocation({ materials, id_address, setMaterials }: Props): JS
   const router = useRouter();
 
   const formSchema = z.object({
-    id_material: z.number({ message: 'Le champ est requis' }).min(1, { message: 'Le champ est requis' }),
+    id_material: z.coerce.number({ message: 'Le champ est requis' }).min(1, { message: 'Le champ est requis' }),
     quantity: z.coerce.number().min(1, { message: 'Le champ est requis' }),
   });
 
@@ -54,37 +48,26 @@ function AddMaterialLocation({ materials, id_address, setMaterials }: Props): JS
   });
 
   async function submit(values: z.infer<typeof formSchema>) {
-    const urlApi = process.env.NEXT_PUBLIC_API_URL;
-
-    fetch(`${urlApi}/materials/${values.id_material}/add`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-      body: JSON.stringify({
-        id_address: id_address,
-        quantity: values.quantity,
-      }),
-    })
-      .then(async (response) => {
-        if (response.status === 403) {
-          router.push('/');
-        }
-        if (response.status !== 201) {
-          throw new Error(await response.text());
-        }
-        return response.json();
-      })
-      .then((data) => {
-        toast.success('Matériel ajouté', { duration: 2000, description: 'Le Matériel a été ajouté avec succès' });
-        setMaterials([...materials, data]);
-        setOpen(false);
-        form.reset();
-      })
-      .catch((error: Error) => {
-        toast.error('Erreur', { duration: 20000, description: error.message });
-      });
+    const { status } = await addMaterial(values.id_material, id_address, values.quantity);
+    if (status === 403) {
+      router.push('/');
+    }
+    if (status !== 201) {
+      toast.error('Erreur', { duration: 20000, description: 'Une erreur est survenue' });
+      return;
+    }
+    toast.success('Matériel ajouté', { duration: 2000, description: 'Le matériel a été ajouté avec succès' });
+    setMaterials((prevMaterials) =>
+      prevMaterials.map((material) =>
+        material.id === values.id_material
+          ? {
+              ...material,
+              addresses: [...material.addresses, { id_address: id_address, quantity: values.quantity }],
+            }
+          : material,
+      ),
+    );
+    setOpen(false);
   }
 
   return (

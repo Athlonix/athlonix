@@ -24,8 +24,6 @@ function Occurences({
     };
   }
 
-  console.log(users);
-
   const validatedUser1 = users.filter((user) => user.active === true);
 
   const [pendingJoin1, setPendingJoin1] = useState<User>();

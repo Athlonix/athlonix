@@ -70,9 +70,9 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
         .int()
         .positive()
         .min(1, { message: 'Le champ est requis' }),
-      id_sport: z.coerce.number().int().positive().optional(),
-      id_address: z.coerce.number().int().positive().optional(),
-      frequency: z.enum(['weekly', 'monthly', 'yearly']),
+      id_sport: z.coerce.number().int().optional(),
+      id_address: z.coerce.number().int().optional(),
+      frequency: z.enum(['weekly', 'monthly', 'yearly', 'unique']),
       days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).optional()),
       start_date: z.date(),
       end_date: z.date(),
@@ -401,6 +401,12 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                                     <RadioGroupItem value="annual" />
                                   </FormControl>
                                   <FormLabel className="font-normal">Annuelle</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-3 space-y-0">
+                                  <FormControl>
+                                    <RadioGroupItem value="unique" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal">Unique</FormLabel>
                                 </FormItem>
                               </RadioGroup>
                             </FormControl>

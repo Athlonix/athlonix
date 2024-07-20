@@ -11,7 +11,7 @@ export type Activity = {
   start_time: string;
   end_time: string;
   description: string | null;
-  frequency: 'weekly' | 'monthly' | 'yearly';
+  frequency: 'weekly' | 'monthly' | 'yearly' | 'unique';
 };
 
 export type Occurence = {

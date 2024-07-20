@@ -130,7 +130,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 <FormItem>
                   <Label className="font-bold">Durée par défaut d'un match</Label>
                   <FormControl>
-                    <Input {...field} type="number" />
+                    <Input {...field} type="number" min={1} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -145,7 +145,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 <FormItem>
                   <Label className="font-bold">Nombre d'équipe max</Label>
                   <FormControl>
-                    <Input {...field} type="number" />
+                    <Input {...field} type="number" min={1} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -160,7 +160,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 <FormItem>
                   <Label className="font-bold">Nombre de joueur par équipe</Label>
                   <FormControl>
-                    <Input {...field} type="number" />
+                    <Input {...field} type="number" min={1} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -281,6 +281,7 @@ function EditForm(props: EditFormProps): JSX.Element {
               e.preventDefault();
               props.closeDialog();
             }}
+            disabled={form.formState.isSubmitting || !form.formState.isValid}
           >
             Annuler
           </Button>

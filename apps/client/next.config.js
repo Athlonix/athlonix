@@ -3,7 +3,16 @@ module.exports = {
   transpilePackages: ['@repo/ui'],
   output: 'standalone',
   images: {
-    domains: [process.env.SUPABASE_DOMAIN, '127.0.0.1', '*.supabase.co'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      {
+        protocol: 'http',
+        hostname: '127.0.0.1',
+      },
+    ],
     minimumCacheTTL: 60,
   },
   env: {

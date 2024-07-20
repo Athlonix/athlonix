@@ -63,8 +63,7 @@ materials.openapi(getAllMaterials, async (c) => {
     const { addresses, ...rest } = material;
     return {
       ...rest,
-      id_address: addresses?.[0]?.id_address ?? 0,
-      quantity: addresses?.reduce((acc, { quantity }) => acc + quantity, 0) ?? 0,
+      addresses: addresses,
     };
   });
 
@@ -96,8 +95,7 @@ materials.openapi(getMaterialById, async (c) => {
     id: data.id,
     name: data.name,
     weight_grams: data.weight_grams,
-    id_address: data.addresses[0].id_address,
-    quantity: data.addresses.reduce((acc, { quantity }) => acc + quantity, 0),
+    addresses: data.addresses,
   };
 
   return c.json(formattedData, 200);
@@ -182,6 +180,10 @@ materials.openapi(addMaterial, async (c) => {
   await checkRole(roles, false);
 
   const { error } = await supabase.from('ADDRESSES_MATERIALS').insert([{ id_material: id, id_address, quantity }]);
+
+  if (error && error.code === '23505') {
+    return c.json({ error: 'Material already exists in this address' }, 409);
+  }
 
   if (error) {
     return c.json({ error: "Material or address doesn't exist" }, 404);

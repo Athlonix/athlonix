@@ -154,7 +154,7 @@ function addAddress({ addresses, setAddresses }: Props): JSX.Element {
                         <FormItem>
                           <Label className="font-bold">Numéro</Label>
                           <FormControl>
-                            <Input {...field} type="number" />
+                            <Input {...field} type="number" min={1} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -214,7 +214,7 @@ function addAddress({ addresses, setAddresses }: Props): JSX.Element {
                         <FormItem>
                           <Label className="font-bold">Code postal</Label>
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} type="number" min={0} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -223,7 +223,11 @@ function addAddress({ addresses, setAddresses }: Props): JSX.Element {
                   </div>
                 </div>
                 <div className="flex gap-4 mt-4">
-                  <Button type="submit" className="w-full">
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={form.formState.isSubmitting || !form.formState.isValid}
+                  >
                     Créer
                   </Button>
                   <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">

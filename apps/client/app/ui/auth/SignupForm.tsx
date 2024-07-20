@@ -60,7 +60,7 @@ export default function SignupForm(): JSX.Element {
   }
 
   return (
-    <div className="w-full lg:grid lg:h-screen lg:grid-cols-2">
+    <div className={`w-full lg:grid lg:h-screen lg:grid-cols-2 ${showForm ? 'pb-10 mb-20' : ''}`}>
       <div className="hidden bg-muted lg:block">
         <Image
           src="/running_track.jpg"
@@ -124,7 +124,7 @@ export default function SignupForm(): JSX.Element {
                         <FormItem>
                           <Label className="font-bold text-lg">Nom d'utilisateur</Label>
                           <FormControl>
-                            <Input placeholder="Votre nom d'utilisateur" {...field} />
+                            <Input placeholder="Votre nom d'utilisateur" {...field} autoComplete="nickname" />
                           </FormControl>
                           <FormDescription />
                           <FormMessage />
@@ -140,7 +140,7 @@ export default function SignupForm(): JSX.Element {
                         <FormItem>
                           <Label className="font-bold text-lg">Prénom</Label>
                           <FormControl>
-                            <Input placeholder="Votre prénom" {...field} />
+                            <Input placeholder="Votre prénom" {...field} autoComplete="given-name" />
                           </FormControl>
                           <FormDescription />
                           <FormMessage />
@@ -156,7 +156,7 @@ export default function SignupForm(): JSX.Element {
                         <FormItem>
                           <Label className="font-bold text-lg">Nom</Label>
                           <FormControl>
-                            <Input placeholder="Votre nom" {...field} />
+                            <Input placeholder="Votre nom" {...field} autoComplete="family-name" />
                           </FormControl>
                           <FormDescription />
                           <FormMessage />
@@ -172,7 +172,7 @@ export default function SignupForm(): JSX.Element {
                         <FormItem>
                           <Label className="font-bold text-lg">Email</Label>
                           <FormControl>
-                            <Input placeholder="Votre email" {...field} />
+                            <Input placeholder="Votre email" {...field} autoComplete="email" required />
                           </FormControl>
                           <FormDescription />
                           <FormMessage />
@@ -188,7 +188,12 @@ export default function SignupForm(): JSX.Element {
                         <FormItem>
                           <Label className="font-bold text-lg">Mot de passe</Label>
                           <FormControl>
-                            <Input placeholder="Votre mot de passe" type="password" {...field} />
+                            <Input
+                              placeholder="Votre mot de passe"
+                              type="password"
+                              {...field}
+                              autoComplete="new-password"
+                            />
                           </FormControl>
                           <FormDescription>
                             <span>Le mot de passe doit comporter 8 caractères minimum</span>
@@ -214,7 +219,7 @@ export default function SignupForm(): JSX.Element {
                       )}
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={!form.formState.isValid}>
+                  <Button type="submit" className="w-full" disabled={!form.formState.isValid} aria-label="S'inscrire">
                     S'inscrire
                   </Button>
                 </div>

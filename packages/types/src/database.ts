@@ -1768,7 +1768,7 @@ export type Database = {
     };
     Enums: {
       days: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
-      frequency: 'weekly' | 'monthly' | 'yearly' | 'daily';
+      frequency: 'weekly' | 'monthly' | 'yearly' | 'unique';
       majorities: 'simple' | 'absolute' | 'two-third' | 'unanimous';
       priority: 'P0' | 'P1' | 'P2' | 'P3';
       reaction: 'like';

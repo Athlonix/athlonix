@@ -9,7 +9,7 @@ export const activitySchema = z.object({
   days_of_week: z
     .array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']))
     .nullable(),
-  frequency: z.enum(['weekly', 'monthly', 'yearly', 'daily']),
+  frequency: z.enum(['weekly', 'monthly', 'yearly', 'unique']),
   start_date: z.string().date().nullable(),
   end_date: z.string().date().nullable(),
   start_time: z.string().time().nullable(),
@@ -24,7 +24,7 @@ export const createActivitySchema = z.object({
   max_participants: z.coerce.number().min(1),
   min_participants: z.coerce.number().min(1),
   days_of_week: z.string().optional(),
-  frequency: z.enum(['weekly', 'monthly', 'yearly', 'daily']),
+  frequency: z.enum(['weekly', 'monthly', 'yearly', 'unique']),
   start_date: z.string().date().optional(),
   end_date: z.string().date().optional(),
   start_time: z.string().time().optional(),
@@ -43,7 +43,7 @@ export const activitySchemaReponse = z.object({
   days_of_week: z
     .array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']))
     .nullable(),
-  frequency: z.enum(['weekly', 'monthly', 'yearly', 'daily']).nullable(),
+  frequency: z.enum(['weekly', 'monthly', 'yearly', 'unique']).nullable(),
   start_date: z.string().date().nullable(),
   end_date: z.string().date().nullable(),
   start_time: z.string().time().nullable(),

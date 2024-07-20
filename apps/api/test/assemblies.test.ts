@@ -1,7 +1,7 @@
 import app from '../src/index.js';
 import { addUserToAssembly, checkAssemblyAndUser, getAssemblyWithCode } from '../src/utils/assemblies.js';
 import { Role } from '../src/validators/general.js';
-import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
+import { deleteAdmin, insertRole, setInvalidSubscription, setValidSubscription } from './utils.js';
 
 describe('Activities tests', () => {
   let id_admin: number;
@@ -127,6 +127,23 @@ describe('Activities tests', () => {
   test('Check assembly and user validation', async () => {
     const res = await checkAssemblyAndUser(id_assembly, id_admin);
     expect(res).toBe(true);
+  });
+
+  test('Check assembly and user validation with invalid subscription', async () => {
+    await setInvalidSubscription(id_admin);
+    const res = await checkAssemblyAndUser(id_assembly, id_admin);
+    expect(res).toHaveProperty('error');
+    await setValidSubscription(id_admin);
+  });
+
+  test('Check assembly and user validation with invalid assembly', async () => {
+    const res = await checkAssemblyAndUser(0, id_admin);
+    expect(res).toHaveProperty('error');
+  });
+
+  test('Check assembly and user validation with invalid member', async () => {
+    const res = await checkAssemblyAndUser(id_assembly, 0);
+    expect(res).toHaveProperty('error');
   });
 
   test('Get assembly with code from QRcode', async () => {

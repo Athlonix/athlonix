@@ -1,4 +1,5 @@
 import app from '../src/index.js';
+import { addUserToAssembly, checkAssemblyAndUser, getAssemblyWithCode } from '../src/utils/assemblies.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
@@ -7,6 +8,7 @@ describe('Activities tests', () => {
   let id_auth: string;
   let id_assembly: number;
   let jwt: string;
+  let QRcode: string;
   const next_month = new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString();
 
   test('Create admin', async () => {
@@ -113,6 +115,24 @@ describe('Activities tests', () => {
       },
     });
     expect(res.status).toBe(200);
+    const { qrCode }: { qrCode: string } = await res.json();
+    QRcode = qrCode;
+  });
+
+  test('Add member to assembly', async () => {
+    const res = await addUserToAssembly(id_assembly, id_admin);
+    expect(res).toBe(true);
+  });
+
+  test('Check assembly and user validation', async () => {
+    const res = await checkAssemblyAndUser(id_assembly, id_admin);
+    expect(res).toBe(true);
+  });
+
+  test('Get assembly with code from QRcode', async () => {
+    const code = QRcode.split('?code=')[1] || QRcode;
+    const res = await getAssemblyWithCode(code);
+    expect(res).not.toHaveProperty('error');
   });
 
   test('Close assembly', async () => {

@@ -79,13 +79,41 @@ blog.openapi(getAllPosts, async (c) => {
 
 blog.openapi(getPost, async (c) => {
   const { id } = c.req.valid('param');
-  const { data, error } = await supabase.from('POSTS').select('*').eq('id', id).single();
+
+  const { data, error } = await supabase
+    .from('POSTS')
+    .select(
+      `id,title,content,created_at,cover_image,description,
+      author:USERS!public_POSTS_user_id_fkey(id,username),
+      categories:POSTS_CATEGORIES(CATEGORIES(id,name)),
+      comments_number:COMMENTS(count),
+      views_number:POSTS_VIEWS(count),
+      likes_number:POSTS_REACTIONS(count),
+      comments:COMMENTS(id,content,created_at,author:USERS!public_COMMENTS_id_user_fkey(id,username)),
+      reports:REPORTS(id)`,
+    )
+    .eq('id', id)
+    .single();
 
   if (error || !data) {
     return c.json({ error: 'Post not found' }, 404);
   }
 
-  return c.json(data, 200);
+  const finalData = {
+    ...data,
+    author: data.author ? { id: data.author.id, username: data.author.username } : null,
+    categories: data.categories
+      ? data.categories.map((category) => ({
+          id: category.CATEGORIES?.id ?? null,
+          name: category.CATEGORIES?.name ?? null,
+        }))
+      : [],
+    comments_number: data.comments_number[0]?.count || 0,
+    views_number: data.views_number[0]?.count || 0,
+    likes_number: data.likes_number[0]?.count || 0,
+  };
+
+  return c.json(finalData, 200);
 });
 
 blog.openapi(createPost, async (c) => {

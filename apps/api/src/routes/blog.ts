@@ -7,6 +7,7 @@ import {
   insertPostSchema,
   insertResponseSchema,
   postCardListSchemaResponse,
+  postCardSchemaResponse,
   postSchema,
   responseSchema,
   updatePostSchema,
@@ -51,7 +52,7 @@ export const getPost = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: postSchema,
+          schema: postCardSchemaResponse,
         },
       },
     },

@@ -1,7 +1,7 @@
 'use client';
 
 import type { FullPoll } from '@/app/lib/type/Votes';
-import { getUserVoted, getVote } from '@/app/lib/utils/votes';
+import { getAssembly, getUserVoted, getVote } from '@/app/lib/utils/votes';
 import VotesOptions from '@/app/ui/components/votes/VotesOptions';
 import VotesResults from '@/app/ui/components/votes/VotesResults';
 import Loading from '@repo/ui/components/ui/loading';
@@ -21,6 +21,7 @@ function ShowContent() {
 
   const [poll, setPoll] = useState<FullPoll>();
   const [hasVoted, setHasVoted] = useState<number[]>([]);
+  const [present, setPresent] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -35,6 +36,15 @@ function ShowContent() {
       }
       setPoll(data);
 
+      if (data.assembly) {
+        const { data: assembly, status: assemblyStatus } = await getAssembly(data.assembly);
+        if (assemblyStatus !== 200) {
+          toast.error("Une erreur est survenue lors de la récupération de l'assemblée", { duration: 2000 });
+          return;
+        }
+        setPresent(assembly.attendees?.some((attendee) => attendee.id === data.id_user) || false);
+      }
+
       const { data: userVote, status: userVoteStatus } = await getUserVoted();
       if (userVoteStatus === 200) {
         setHasVoted(userVote.voted);
@@ -45,6 +55,16 @@ function ShowContent() {
   }, [id, router]);
 
   if (!poll || loading) return <Loading />;
+
+  if (poll.assembly && !present) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="flex justify-center text-4xl font-bold mt-4 border-4 p-8 rounded-lg">
+          Veuillez valider votre présence à l'assemblée pour voter
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

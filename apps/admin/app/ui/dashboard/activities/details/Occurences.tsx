@@ -1,151 +1,164 @@
 import type { Activity, Occurence, User } from '@/app/lib/type/Activities';
 import ValidateUser from '@/app/ui/dashboard/activities/details/ValidateUser';
+import { Avatar, AvatarFallback } from '@repo/ui/components/ui/avatar';
+import { Badge } from '@repo/ui/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
+import { ScrollArea } from '@repo/ui/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@repo/ui/components/ui/tabs';
-import { Separator } from '@ui/components/ui/separator';
-import type { Dispatch, SetStateAction } from 'react';
+import { CalendarIcon, UserCheckIcon, UserPlusIcon } from 'lucide-react';
+import type React from 'react';
+import { useMemo } from 'react';
 
-function Occurences({
-  activity,
-  occurences,
-  users1,
-  users2,
-  users3,
-  setUsers1,
-  setUsers2,
-  setUsers3,
-}: {
+type OccurenceProps = {
   activity: Activity;
   occurences: Occurence[];
   users1: User[];
   users2: User[];
   users3: User[];
-  setUsers1: Dispatch<SetStateAction<User[]>>;
-  setUsers2: Dispatch<SetStateAction<User[]>>;
-  setUsers3: Dispatch<SetStateAction<User[]>>;
-}) {
-  const validatedUser1 = users1.filter((user) => user.active === true);
-  const validatedUser2 = users2.filter((user) => user.active === true);
-  const validatedUser3 = users3.filter((user) => user.active === true);
+  setUsers1: React.Dispatch<React.SetStateAction<User[]>>;
+  setUsers2: React.Dispatch<React.SetStateAction<User[]>>;
+  setUsers3: React.Dispatch<React.SetStateAction<User[]>>;
+};
 
-  const pendingUser1 = users1.filter((user) => user.active === false);
-  const pendingUser2 = users2.filter((user) => user.active === false);
-  const pendingUser3 = users3.filter((user) => user.active === false);
+const formatDate = (date: string) => {
+  const d = new Date(date);
+  return `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+};
+
+const UserList = ({
+  users,
+  occurence,
+  activity,
+  setUsers,
+}: {
+  users: User[];
+  occurence: Occurence;
+  activity: Activity;
+  setUsers: React.Dispatch<React.SetStateAction<User[]>>;
+}) => (
+  <ScrollArea className="h-[300px]">
+    {users.map((user) => (
+      <div key={user.id} className="flex items-center justify-between p-2 hover:bg-slate-100 rounded-lg">
+        <div className="flex items-center space-x-4">
+          <Avatar>
+            <AvatarFallback>{user.username.slice(0, 2).toUpperCase()}</AvatarFallback>
+          </Avatar>
+          <span>{user.username}</span>
+        </div>
+        {user.active ? (
+          <Badge variant="success" className="text-xs ml-4">
+            Validé
+          </Badge>
+        ) : (
+          <ValidateUser user={user} setUser={setUsers} id_activity={activity.id} date={occurence.date} />
+        )}
+      </div>
+    ))}
+  </ScrollArea>
+);
+
+function Occurences({ activity, occurences, users1, users2, users3, setUsers1, setUsers2, setUsers3 }: OccurenceProps) {
+  const filteredOccurences = useMemo(() => {
+    const now = new Date();
+    return occurences
+      .filter((occurence) => new Date(occurence.date) > now)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, 3);
+  }, [occurences]);
+
+  const userSets = [
+    { users: users1, setUsers: setUsers1 },
+    { users: users2, setUsers: setUsers2 },
+    { users: users3, setUsers: setUsers3 },
+  ];
+
+  if (filteredOccurences.length === 0) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <p className="text-center text-muted-foreground">Aucune session future n'est prévue pour cette activité.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <Tabs defaultValue="activity1">
-      <div className="flex justify-center my-4">
-        <TabsList>
-          {occurences[0] && (
-            <TabsTrigger value="activity1">{`${new Date(occurences[0]?.date).getDate().toString().padStart(2, '0')}/${(new Date(occurences[0]?.date).getMonth() + 1).toString().padStart(2, '0')}/${new Date(occurences[0]?.date).getFullYear().toString().padStart(2, '0')}`}</TabsTrigger>
-          )}
-          {occurences[1] && (
-            <TabsTrigger value="activity2">{`${new Date(occurences[1]?.date).getDate().toString().padStart(2, '0')}/${(new Date(occurences[1]?.date).getMonth() + 1).toString().padStart(2, '0')}/${new Date(occurences[1]?.date).getFullYear().toString().padStart(2, '0')}`}</TabsTrigger>
-          )}
-          {occurences[2] && (
-            <TabsTrigger value="activity3">{`${new Date(occurences[2]?.date).getDate().toString().padStart(2, '0')}/${(new Date(occurences[2]?.date).getMonth() + 1).toString().padStart(2, '0')}/${new Date(occurences[2]?.date).getFullYear().toString().padStart(2, '0')}`}</TabsTrigger>
-          )}
-        </TabsList>
-      </div>
-      <div className="flex justify-center my-4">
-        <TabsContent value="activity1" className="w-6/12">
-          <div className="flex text-3xl mb-4 justify-center">
-            Participants : ({validatedUser1.length}/{activity.max_participants})
-          </div>
-          <div className="grid grid-cols-3 justify-center">
-            {validatedUser1.map((user) => (
-              <div key={user.id} className="flex justify-center text-lg">
-                <div>{user.username}</div>
-              </div>
-            ))}
-          </div>
-          <Separator className="my-4" />
-          <div className="flex text-3xl mb-4 justify-center">En attentes ({pendingUser1.length})</div>
-          <div className="grid grid-cols-2 justify-center gap-4">
-            {pendingUser1.map((user) => (
-              <>
-                <div key={user.id} className="flex justify-center text-lg">
-                  <div>{user.username}</div>
-                </div>
-                <div key={user.id} className="flex justify-center">
-                  {occurences[0] && (
-                    <ValidateUser user={user} setUser={setUsers1} id_activity={activity.id} date={occurences[0].date} />
-                  )}
-                </div>
-              </>
-            ))}
-          </div>
-        </TabsContent>
-        <TabsContent value="activity2">
-          <div className="flex text-3xl mb-4 justify-center">
-            Participants : ({validatedUser2.length}/{activity.max_participants})
-          </div>
-          <div className="grid grid-cols-3 justify-center">
-            {validatedUser2.map((user) => (
-              <>
-                <div key={user.id} className="flex justify-center">
-                  <div>{user.username}</div>
-                </div>
-                <div key={user.id} className="flex justify-center">
-                  {occurences[1] && (
-                    <ValidateUser user={user} setUser={setUsers2} id_activity={activity.id} date={occurences[1].date} />
-                  )}
-                </div>
-              </>
-            ))}
-          </div>
-          <Separator className="my-4" />
-          <div className="flex text-3xl mb-4 justify-center">En attentes ({pendingUser2.length})</div>
-          <div className="grid grid-cols-2 justify-center gap-4">
-            {pendingUser2.map((user) => (
-              <>
-                <div key={user.id} className="flex justify-center text-lg">
-                  <div>{user.username}</div>
-                </div>
-                <div key={user.id} className="flex justify-center">
-                  {occurences[1] && (
-                    <ValidateUser user={user} setUser={setUsers2} id_activity={activity.id} date={occurences[1].date} />
-                  )}
-                </div>
-              </>
-            ))}
-          </div>
-        </TabsContent>
-        <TabsContent value="activity3">
-          <div className="flex text-3xl mb-4 justify-center">
-            Participants : ({validatedUser3.length}/{activity.max_participants})
-          </div>
-          <div className="grid grid-cols-3 justify-center">
-            {validatedUser3.map((user) => (
-              <>
-                <div key={user.id} className="flex justify-center">
-                  <div>{user.username}</div>
-                </div>
-                <div key={user.id} className="flex justify-center">
-                  {occurences[2] && (
-                    <ValidateUser user={user} setUser={setUsers3} id_activity={activity.id} date={occurences[2].date} />
-                  )}
-                </div>
-              </>
-            ))}
-          </div>
-          <Separator className="my-4" />
-          <div className="flex text-3xl mb-4 justify-center">En attentes ({pendingUser3.length})</div>
-          <div className="grid grid-cols-2 justify-center gap-4">
-            {pendingUser3.map((user) => (
-              <>
-                <div key={user.id} className="flex justify-center text-lg">
-                  <div>{user.username}</div>
-                </div>
-                <div key={user.id} className="flex justify-center">
-                  {occurences[2] && (
-                    <ValidateUser user={user} setUser={setUsers3} id_activity={activity.id} date={occurences[2].date} />
-                  )}
-                </div>
-              </>
-            ))}
-          </div>
-        </TabsContent>
-      </div>
+    <Tabs defaultValue={`activity-${filteredOccurences[0]?.date}`} className="w-full">
+      <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${filteredOccurences.length}, 1fr)` }}>
+        {filteredOccurences.map((occurence) => (
+          <TabsTrigger key={occurence.date} value={`activity-${occurence.date}`}>
+            <CalendarIcon className="w-4 h-4 mr-2" />
+            {formatDate(occurence.date)}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {filteredOccurences.map((occurence, index) => {
+        const { users, setUsers } = userSets[index] || { users: [], setUsers: () => {} };
+        const validatedUsers = users.filter((user) => user.active);
+        const pendingUsers = users.filter((user) => !user.active);
+
+        if (pendingUsers.length === 0 && validatedUsers.length === 0) {
+          return (
+            <TabsContent key={occurence.date} value={`activity-${occurence.date}`}>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center">
+                      <UserCheckIcon className="w-5 h-5 mr-2" />
+                      Participants
+                    </span>
+                    <Badge variant="secondary">
+                      {validatedUsers.length}/{activity.max_participants}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-center text-muted-foreground">
+                    Aucun participants inscrit pour cette session pour le moment.
+                  </p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          );
+        }
+
+        return (
+          <TabsContent key={occurence.date} value={`activity-${occurence.date}`}>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center">
+                      <UserCheckIcon className="w-5 h-5 mr-2" />
+                      Participants
+                    </span>
+                    <Badge variant="secondary">
+                      {validatedUsers.length}/{activity.max_participants}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <UserList users={validatedUsers} occurence={occurence} activity={activity} setUsers={setUsers} />
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="flex items-center">
+                      <UserPlusIcon className="w-5 h-5 mr-2" />
+                      En attente
+                    </span>
+                    <Badge variant="secondary">{pendingUsers.length}</Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <UserList users={pendingUsers} occurence={occurence} activity={activity} setUsers={setUsers} />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        );
+      })}
     </Tabs>
   );
 }

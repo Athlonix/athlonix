@@ -20,7 +20,7 @@
   "devDependencies": {
     "@repo/biome-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@turbo/gen": "^2.0.7",
+    "@turbo/gen": "^2.0.9",
     "@types/node": "^20.14.11",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -50,7 +50,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
-    "lucide-react": "^0.408.0",
+    "lucide-react": "^0.411.0",
     "next-themes": "^0.3.0",
     "react-aria": "^3.33.1",
     "react-day-picker": "^8.10.1",

@@ -259,7 +259,7 @@ activities.openapi(createActivity, async (c) => {
     return c.json({ error: 'Failed to create activity' }, 500);
   }
 
-  await uploadFile(`activities/activity_${data.id}`, image, 'image');
+  if (image) await uploadFile(`activities/activity_${data.id}`, image, 'image');
 
   return c.json(data, 201);
 });
@@ -337,7 +337,8 @@ activities.openapi(applyToActivity, async (c) => {
   const { data: activity, error: errorActivity } = await supabase.from('ACTIVITIES').select('*').eq('id', id).single();
 
   if (errorActivity || !activity) return c.json({ error: 'Activity not found' }, 404);
-  if (new Date(date) < new Date()) return c.json({ error: 'Activity has already ended' }, 400);
+  if (new Date(`${date}T${activity.start_time}`) < new Date())
+    return c.json({ error: 'Activity has already ended' }, 400);
 
   const { count } = await supabase
     .from('ACTIVITIES_USERS')

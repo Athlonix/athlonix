@@ -227,7 +227,7 @@ export default function AssembliesPage(): JSX.Element {
                   {assembly.closed ? (
                     <span className="text-red-500">Terminée</span>
                   ) : new Date(assembly.date).getTime() < Date.now() ? (
-                    <span className="text-green-500">En cour</span>
+                    <span className="text-green-500">En cours</span>
                   ) : (
                     <span className="text-blue-500">Programmer</span>
                   )}

@@ -30,3 +30,21 @@ export type PollsVote = {
   id_option: number;
   id_poll: number;
 };
+
+export type Assembly = {
+  id: number;
+  name: string;
+  description: string | null;
+  date: string;
+  location: number | null;
+  attendees: [
+    {
+      id: number;
+      first_name: string;
+      last_name: string;
+      email: string;
+    },
+  ];
+  lawsuit: string;
+  closed: boolean;
+};

@@ -39,7 +39,10 @@ function EditForm(props: EditFormProps): JSX.Element {
       .min(5, { message: 'Le code postal doit contenir 5 chiffres' }),
     complement: z.string().optional(),
     city: z.string().min(1, { message: 'Le champ est requis' }),
-    number: z.number({ message: 'Le numéro doit être un nombre' }).int().min(1, { message: 'Le champ est requis' }),
+    number: z.coerce
+      .number({ message: 'Le numéro doit être un nombre' })
+      .int()
+      .min(1, { message: 'Le champ est requis' }),
     name: z.string().optional(),
   });
 
@@ -124,7 +127,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 <FormItem>
                   <Label className="font-bold">Numéro</Label>
                   <FormControl>
-                    <Input {...field} type="number" />
+                    <Input {...field} type="number" min={1} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -184,7 +187,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 <FormItem>
                   <Label className="font-bold">Code postal</Label>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} type="number" min={1} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -193,7 +196,9 @@ function EditForm(props: EditFormProps): JSX.Element {
           </div>
         </div>
         <div className="flex gap-4 mt-4">
-          <Button type="submit">Modifier</Button>
+          <Button type="submit" disabled={form.formState.isSubmitting || !form.formState.isValid}>
+            Modifier
+          </Button>
           <Button
             variant="secondary"
             onClick={(e) => {

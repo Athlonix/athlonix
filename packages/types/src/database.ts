@@ -1613,6 +1613,7 @@ export type Database = {
           id_referer: number | null;
           invoice: string | null;
           last_name: string;
+          newsletter: boolean;
           status: Database['public']['Enums']['subscription status'] | null;
           subscription: string | null;
           username: string;
@@ -1628,6 +1629,7 @@ export type Database = {
           id_referer?: number | null;
           invoice?: string | null;
           last_name: string;
+          newsletter?: boolean;
           status?: Database['public']['Enums']['subscription status'] | null;
           subscription?: string | null;
           username: string;
@@ -1643,6 +1645,7 @@ export type Database = {
           id_referer?: number | null;
           invoice?: string | null;
           last_name?: string;
+          newsletter?: boolean;
           status?: Database['public']['Enums']['subscription status'] | null;
           subscription?: string | null;
           username?: string;

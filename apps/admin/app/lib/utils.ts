@@ -24,15 +24,17 @@ export async function LogoutUser(): Promise<void> {
       Authorization: `Bearer ${token}`,
     },
   })
-    .then((response) => {
+    .then(async (response) => {
       if (response.status === 200) {
-        deleteUserCookie();
+        await deleteUserCookie();
+        localStorage.removeItem('user');
+        localStorage.removeItem('access_token');
       }
     })
     .catch((error: Error) => console.error(error));
 }
 
-export async function getAllMembersForAssembly(attendees: number[]): Promise<{ data: User[]; count: number }> {
+export async function getAllMembersForAssembly(): Promise<{ data: User[]; count: number }> {
   const urlApi = process.env.ATHLONIX_API_URL;
   const token = cookies().get('access_token')?.value;
   const response = await fetch(`${urlApi}/users?all=true&role=MEMBER`, {
@@ -43,14 +45,13 @@ export async function getAllMembersForAssembly(attendees: number[]): Promise<{ d
   if (!response.ok) {
     throw new Error('Failed to fetch members');
   }
-  const data = await response.json();
+  const data = (await response.json()) as { data: User[]; count: number };
   const members = data.data.filter(
-    (member: User) =>
-      member.date_validity && new Date(member.date_validity) > new Date() && !attendees.includes(member.id),
+    (member: User) => member.date_validity && new Date(member.date_validity) > new Date(),
   );
   return {
     data: members,
-    count: data.length,
+    count: data.count,
   };
 }
 

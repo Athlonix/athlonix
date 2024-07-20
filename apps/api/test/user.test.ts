@@ -1,4 +1,5 @@
 import app from '../src/index.js';
+import { supAdmin } from '../src/libs/supabase.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
 
@@ -164,6 +165,9 @@ describe('User tests', () => {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${jwt}` },
     });
     expect(res.status).toBe(200);
+
+    const { error } = await supAdmin.from('USERS').delete().eq('id', id_user);
+    if (error) throw new Error('Error while deleting user');
   });
 
   afterAll(async () => {

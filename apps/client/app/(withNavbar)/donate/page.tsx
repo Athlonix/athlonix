@@ -23,7 +23,7 @@ export default async function DonationPage(): Promise<JSX.Element> {
           alt="Donation Cause"
           className="mx-auto rounded-xl"
           height="400"
-          src="https://picsum.photos/600/400"
+          src="donate.webp"
           style={{
             aspectRatio: '600/400',
             objectFit: 'cover',

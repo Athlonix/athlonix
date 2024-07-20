@@ -34,6 +34,23 @@ export default function UserAccount() {
     fetchData();
   }, []);
 
+  const requestInvoice = async function handleRequestInvoice() {
+    try {
+      const token = localStorage.getItem('access_token') || '';
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/invoice`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (_error) {
+      throw new Error('Une erreur est survenue lors de la demande de facture');
+    } finally {
+      toast.success('Facture envoyée par email');
+    }
+  };
+
   async function handleUpateUserInformation(user: User) {
     try {
       await updateUserInformation(user.id, user.username, user.first_name, user.last_name);
@@ -131,6 +148,7 @@ export default function UserAccount() {
                   onClick={() => {
                     handleUpateUserInformation(user);
                   }}
+                  disabled={user?.username === '' || user?.first_name === '' || user?.last_name === ''}
                 >
                   Editer
                 </Button>
@@ -182,11 +200,16 @@ export default function UserAccount() {
               </Button>
             )}
             {status === 'approved' && (
-              <Button variant="secondary" className="mr-2">
-                <Link href="https://billing.stripe.com/p/login/test_8wMdSB7u77k87D2bII" target="_blank">
-                  Editer mes informations
-                </Link>
-              </Button>
+              <>
+                <Button variant="secondary" className="mr-2">
+                  <Link href="https://billing.stripe.com/p/login/test_8wMdSB7u77k87D2bII" target="_blank">
+                    Editer mes informations
+                  </Link>
+                </Button>
+                <Button variant="secondary" className="mr-2" onClick={requestInvoice}>
+                  Demander une facture
+                </Button>
+              </>
             )}
           </CardFooter>
         </Card>

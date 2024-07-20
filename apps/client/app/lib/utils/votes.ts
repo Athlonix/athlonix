@@ -1,6 +1,6 @@
 'use server';
 import { cookies } from 'next/headers';
-import type { FullPoll } from '../type/Votes';
+import type { Assembly, FullPoll } from '../type/Votes';
 
 const urlApi = process.env.ATHLONIX_API_URL;
 
@@ -46,6 +46,16 @@ export async function voteToPoll(
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ options }),
+  });
+
+  return { data: await response.json(), status: response.status };
+}
+
+export async function getAssembly(id: number): Promise<{ data: Assembly; status: number }> {
+  const token = cookies().get('access_token')?.value;
+  const response = await fetch(`${urlApi}/assemblies/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: 'no-cache',
   });
 
   return { data: await response.json(), status: response.status };

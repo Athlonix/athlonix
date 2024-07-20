@@ -109,7 +109,11 @@ export async function addAttendee(id_assembly: number, id_user: number): Promise
   }
 }
 
-export async function closeAssembly(id: number, lawsuit: string): Promise<void> {
+export async function closeAssembly(
+  id: number,
+  lawsuit: string,
+  roles?: { id_role: number; id_user: number }[],
+): Promise<void> {
   const urlApi = process.env.ATHLONIX_API_URL;
   const token = cookies().get('access_token')?.value;
   await fetch(`${urlApi}/assemblies/${id}/close`, {
@@ -118,7 +122,7 @@ export async function closeAssembly(id: number, lawsuit: string): Promise<void> 
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ lawsuit }),
+    body: JSON.stringify({ lawsuit, roles }),
   });
 }
 

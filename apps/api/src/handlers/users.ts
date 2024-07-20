@@ -1,5 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import type { PostgrestError } from '@supabase/supabase-js';
+import { sendInvoiceEmail, sendNewsletterSubscriptionEmail } from '../libs/email.js';
 import { type User, buildHierarchy } from '../libs/hiearchy.js';
 import { supAdmin, supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
@@ -10,10 +11,12 @@ import {
   getHierarchy,
   getMe,
   getOneUser,
+  getUserInvoice,
   getUsersActivities,
   removeUserRole,
   setStatus,
   softDeleteUser,
+  subscribeNewsletter,
   updateUser,
   updateUserRole,
 } from '../routes/users.js';
@@ -33,7 +36,7 @@ users.openapi(getAllUsers, async (c) => {
 
   const query = supabase
     .from('USERS')
-    .select('*, roles:ROLES!inner(id, name)', { count: 'exact' })
+    .select('*, roles:ROLES(id, name)', { count: 'exact' })
     .filter('deleted_at', 'is', null)
     .order('created_at', { ascending: true });
 
@@ -46,19 +49,19 @@ users.openapi(getAllUsers, async (c) => {
     query.range(from, to);
   }
 
+  let { data, error, count } = await query;
+
+  if (error) {
+    return c.json({ error: error.message }, 500);
+  }
+
   if (role) {
     const { data: roleFound } = await supabase.from('ROLES').select('id').eq('name', role.toUpperCase()).single();
 
     if (!roleFound) {
       return c.json({ error: 'Role not found in query' }, 404);
     }
-    query.eq('ROLES.id', roleFound.id);
-  }
-
-  const { data, error, count } = await query;
-
-  if (error) {
-    return c.json({ error: error.message }, 500);
+    data = data?.filter((user) => user.roles.some((userRole) => userRole.id === roleFound.id)) || [];
   }
 
   const responseData = {
@@ -115,6 +118,56 @@ users.openapi(getHierarchy, async (c) => {
   }
 
   return c.json(hierarchy, 200);
+});
+
+users.openapi(subscribeNewsletter, async (c) => {
+  const { email } = c.req.valid('json');
+
+  const { data, error: errorID } = await supabase
+    .from('USERS')
+    .select('id, deleted_at, newsletter')
+    .eq('email', email)
+    .single();
+  if (errorID || !data) {
+    return c.json({ error: 'User not found' }, 404);
+  }
+
+  if (data.deleted_at) {
+    return c.json({ error: 'The user was deleted' }, 400);
+  }
+
+  if (data.newsletter) {
+    return c.json({ message: 'Already subscribed' }, 200);
+  }
+
+  const { error } = await supabase.from('USERS').update({ newsletter: true }).eq('id', data.id);
+
+  if (error) {
+    return c.json({ error: 'Failed to subscribe' }, 400);
+  }
+
+  if (process.env.ENABLE_EMAILS === 'true') {
+    await sendNewsletterSubscriptionEmail(email);
+  }
+
+  return c.json({ message: 'Subscribed to newsletter' }, 200);
+});
+
+users.openapi(getUserInvoice, async (c) => {
+  const user = c.get('user');
+  const roles = user.roles || [];
+  await checkRole(roles, true);
+  const { data, error } = await supabase.from('USERS').select('invoice').eq('id', user.id).single();
+
+  if (error || !data) {
+    return c.json({ error: 'Invoice not found' }, 404);
+  }
+
+  if (data.invoice && process.env.ENABLE_EMAILS === 'true') {
+    await sendInvoiceEmail(data.invoice, user.email);
+  }
+
+  return c.json(data, 200);
 });
 
 users.openapi(getOneUser, async (c) => {

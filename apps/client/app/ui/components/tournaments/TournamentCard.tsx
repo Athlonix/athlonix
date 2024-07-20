@@ -2,25 +2,38 @@ import type { Tournament } from '@/app/(withNavbar)/tournaments/page';
 import { User, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
-function TournamentCard({ tournament }: { tournament: Tournament }) {
+function TournamentCard({ tournament, member }: { tournament: Tournament; member: boolean }) {
+  const [imageError, setImageError] = useState(false);
+  const imageUrl = `${process.env.NEXT_PUBLIC_ATHLONIX_STORAGE_URL}/image/tournaments/tournament_${tournament.id}`;
+  const placeholder = '/placeholder.jpg';
   return (
     <div className="h-44 p-4 shadow-lg">
       <div className="flex gap-6 h-full">
         <div className="relative w-64 h-36">
-          <Link href={`/tournaments/details?id=${tournament.id}`}>
+          <Link
+            href={
+              member ? `/members/tournaments/details?id=${tournament.id}` : `/tournaments/details?id=${tournament.id}`
+            }
+          >
             <Image
               className="object-cover"
               width={256}
               height={144}
-              src={'/placeholder.jpg'}
+              src={imageError ? placeholder : imageUrl}
               style={{ width: '256px', height: '144px' }}
-              alt={'placeholder'}
+              alt={tournament.name}
+              onError={() => setImageError(true)}
             />
           </Link>
         </div>
         <div className="h-full max-w-[624px]">
-          <Link href={`/tournaments/details?id=${tournament.id}`}>
+          <Link
+            href={
+              member ? `/members/tournaments/details?id=${tournament.id}` : `/tournaments/details?id=${tournament.id}`
+            }
+          >
             <h2 className="truncate cursor-pointer hover:text-slate-400" title={tournament.name}>
               {tournament.name}
             </h2>

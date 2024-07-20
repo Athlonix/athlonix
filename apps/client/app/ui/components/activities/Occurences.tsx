@@ -66,33 +66,42 @@ function Occurences({
       </div>
       <div className="flex justify-center my-4">
         <TabsContent value="activity1" className="w-6/12">
-          <div className="flex text-3xl mb-4 justify-center">
-            Places restantes : {activity.max_participants - validatedUser1.length}
-          </div>
-          <div className="flex justify-center">
-            {pendingJoin1 && (
-              <div className="flex justify-center text-lg">
-                <div>Vous avez déjà fait une demande</div>
+          {occurences[0] &&
+          new Date(`${occurences[0]?.date.split('T')[0]}T${activity.start_time}`).getTime() < new Date().getTime() ? (
+            <div className="flex text-xl mb-4 justify-center">
+              <div>L'activité de cette journée a déjà commencé</div>
+            </div>
+          ) : (
+            <>
+              <div className="flex text-3xl mb-4 justify-center">
+                Places restantes : {activity.max_participants - validatedUser1.length}
               </div>
-            )}
-            {joined1 && (
-              <div className="flex justify-center text-lg">
-                <div>Vous êtes inscrit</div>
+              <div className="flex justify-center">
+                {pendingJoin1 && (
+                  <div className="flex justify-center text-lg">
+                    <div>Vous avez déjà fait une demande</div>
+                  </div>
+                )}
+                {joined1 && (
+                  <div className="flex justify-center text-lg">
+                    <div>Vous êtes inscrit</div>
+                  </div>
+                )}
+                {activity.max_participants - validatedUser1.length > 0 &&
+                  occurences[0] &&
+                  pendingJoin1 === undefined &&
+                  joined1 === undefined &&
+                  userId !== 0 && (
+                    <JoinActivity
+                      id_activity={activity.id}
+                      date={occurences[0].date}
+                      user={userData}
+                      setPendingJoin={setPendingJoin1}
+                    />
+                  )}
               </div>
-            )}
-            {activity.max_participants - validatedUser1.length > 0 &&
-              occurences[0] &&
-              pendingJoin1 === undefined &&
-              joined1 === undefined &&
-              userId !== 0 && (
-                <JoinActivity
-                  id_activity={activity.id}
-                  date={occurences[0].date}
-                  user={userData}
-                  setPendingJoin={setPendingJoin1}
-                />
-              )}
-          </div>
+            </>
+          )}
         </TabsContent>
         <TabsContent value="activity2">
           <div className="flex text-3xl mb-4 justify-center">

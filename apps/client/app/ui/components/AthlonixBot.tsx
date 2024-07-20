@@ -168,16 +168,19 @@ const AthlonixBot = () => {
             options={{
               botBubble: {
                 avatar:
-                  'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
+                  'https://static.vecteezy.com/system/resources/previews/004/996/790/non_2x/robot-chatbot-icon-sign-free-vector.jpg',
                 showAvatar: true,
               },
               header: {
                 avatar:
-                  'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
-                title: 'Shrek le sportif',
+                  'https://static.vecteezy.com/system/resources/previews/004/996/790/non_2x/robot-chatbot-icon-sign-free-vector.jpg',
+                title: 'Athlonix Bot',
               },
               chatButton: {
-                icon: 'https://www.francetvinfo.fr/pictures/KI83JKIWxYVA8ng-cUtYxM6l-z8/1200x1200/2016/08/23/shrek-5.jpg',
+                icon: 'https://static.vecteezy.com/system/resources/previews/004/996/790/non_2x/robot-chatbot-icon-sign-free-vector.jpg',
+              },
+              audio: {
+                disabled: true,
               },
               theme: {},
               tooltip: { text: "Besoin d'aide ?" },

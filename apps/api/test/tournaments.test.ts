@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
@@ -45,18 +47,23 @@ describe('Tournaments tests', () => {
   });
 
   test('Create tournament', async () => {
+    const formData = new FormData();
+    formData.append('name', 'tournament test');
+    formData.append('default_match_length', '10');
+    formData.append('max_participants', '10');
+    formData.append('team_capacity', '5');
+
+    const imagePath = path.join(__dirname, 'files', 'mock_image.png');
+    const imageBuffer = fs.readFileSync(imagePath);
+    const imageBlob = new Blob([imageBuffer], { type: 'image/png' });
+    formData.append('image', imageBlob, 'mock_image.png');
+
     const res = await app.request('/tournaments', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
-      body: JSON.stringify({
-        name: 'tournament test',
-        default_match_length: 10,
-        max_participants: 10,
-        team_capacity: 5,
-      }),
+      body: formData,
     });
     expect(res.status).toBe(201);
     const tournament: { id: number } = await res.json();

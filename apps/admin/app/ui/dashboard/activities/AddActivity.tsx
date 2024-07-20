@@ -63,13 +63,15 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
       min_participants: z.coerce
         .number({ message: 'Le champ doit uniquement contenir un nombre' })
         .int()
+        .positive()
         .min(1, { message: 'Le champ est requis' }),
       max_participants: z.coerce
         .number({ message: 'Le champ doit uniquement contenir un nombre' })
         .int()
+        .positive()
         .min(1, { message: 'Le champ est requis' }),
-      id_sport: z.coerce.number().int().optional(),
-      id_address: z.coerce.number().int().optional(),
+      id_sport: z.coerce.number().int().positive().optional(),
+      id_address: z.coerce.number().int().positive().optional(),
       frequency: z.enum(['weekly', 'monthly', 'yearly']),
       days: z.array(z.enum(['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']).optional()),
       start_date: z.date(),
@@ -293,7 +295,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                           <FormItem>
                             <Label className="font-bold">Minimum de participants</Label>
                             <FormControl>
-                              <Input {...field} type="number" />
+                              <Input {...field} type="number" min={1} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -308,7 +310,7 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
                           <FormItem>
                             <Label className="font-bold">Maximum de participants</Label>
                             <FormControl>
-                              <Input {...field} type="number" />
+                              <Input {...field} type="number" min={form.watch('min_participants')} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

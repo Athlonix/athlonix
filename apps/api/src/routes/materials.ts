@@ -6,8 +6,12 @@ export const materialSchema = z.object({
   id: z.number().min(1),
   name: z.string().min(2),
   weight_grams: z.number().positive().nullable(),
-  id_address: z.number().min(1),
-  quantity: z.number().positive(),
+  addresses: z.array(
+    z.object({
+      id_address: z.number().min(1),
+      quantity: z.number().positive(),
+    }),
+  ),
 });
 
 export const getAllMaterials = createRoute({
@@ -90,7 +94,7 @@ export const createMaterial = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: materialSchema.omit({ id_address: true, quantity: true }),
+          schema: materialSchema.omit({ addresses: true }),
         },
       },
     },
@@ -125,7 +129,7 @@ export const updateMaterial = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: materialSchema.omit({ id_address: true, quantity: true }),
+          schema: materialSchema.omit({ addresses: true }),
         },
       },
     },
@@ -221,6 +225,14 @@ export const addMaterial = createRoute({
       content: {
         'application/json': {
           schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    409: {
+      description: 'Conflict',
+      content: {
+        'application/json': {
+          schema: z.object({ error: z.string() }),
         },
       },
     },

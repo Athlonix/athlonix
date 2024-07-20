@@ -160,7 +160,6 @@ function AddActivity({ activities, setActivities, addresses, sports }: Props): J
         }
         if (response.status !== 201) {
           const error = await response.json();
-          console.log(error);
           throw new Error(error.message);
         }
         return response.json();

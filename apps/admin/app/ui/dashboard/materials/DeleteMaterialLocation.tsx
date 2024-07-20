@@ -1,3 +1,4 @@
+import type { Material } from '@/app/lib/type/Materials';
 import { Button } from '@repo/ui/components/ui/button';
 import {
   Dialog,
@@ -12,33 +13,26 @@ import { CircleX } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-type Material = {
-  id_address: number;
-  quantity: number;
-  id: number;
-  name: string;
-  weight_grams: number | null;
-};
-
 interface Props {
-  material: Material;
+  id_material: number;
+  id_address: number;
   setMaterials: React.Dispatch<React.SetStateAction<Material[]>>;
 }
 
-function DeleteMaterial({ material, setMaterials }: Props): JSX.Element {
+function DeleteMaterial({ id_material, id_address, setMaterials }: Props): JSX.Element {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
   function deleteMaterial() {
     const urlApi = process.env.NEXT_PUBLIC_API_URL;
 
-    fetch(`${urlApi}/materials/${material.id}/remove`, {
+    fetch(`${urlApi}/materials/${id_material}/remove`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       },
-      body: JSON.stringify({ id_address: material.id_address }),
+      body: JSON.stringify({ id_address: id_address }),
     })
       .then(async (response) => {
         if (response.status === 403) {
@@ -51,8 +45,17 @@ function DeleteMaterial({ material, setMaterials }: Props): JSX.Element {
       })
       .then(() => {
         toast.success('Matériel supprimé', { duration: 2000, description: 'Le Matériel a été supprimé avec succès' });
-        setMaterials((prevMaterials) => prevMaterials.filter((m) => m.id !== material.id));
         setOpen(false);
+        setMaterials((prevMaterials) =>
+          prevMaterials.map((material) =>
+            material.id === id_material
+              ? {
+                  ...material,
+                  addresses: material.addresses.filter((address) => address.id_address !== id_address),
+                }
+              : material,
+          ),
+        );
       })
       .catch((error: Error) => {
         toast.error('Erreur', { duration: 20000, description: error.message });

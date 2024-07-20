@@ -3,13 +3,28 @@
 import type { Post } from '@/app/lib/type/Post';
 import { BlogPost } from '@/app/ui/components/BlogPost';
 import { PostFiltering } from '@/app/ui/components/PostFiltering';
-import { Button } from '@repo/ui/components/ui/button';
 import { Input } from '@repo/ui/components/ui/input';
 import { toast } from '@repo/ui/components/ui/sonner';
+import { Button } from '@ui/components/ui/button';
 import { Plus, Search } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export default function Page(): JSX.Element {
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/posts?skip=0&take=20`)
+      .then((r) => {
+        return r.json();
+      })
+      .then((postsData) => {
+        if (postsData?.data) {
+          setPosts(postsData.data);
+        }
+      });
+  }, []);
+
   function handleLikeButton(id: number) {
     setPosts((prevPosts) => {
       return prevPosts.map((post) => {
@@ -30,20 +45,6 @@ export default function Page(): JSX.Element {
       }) as Post[];
     });
   }
-
-  const [posts, setPosts] = useState<Post[]>([]);
-
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/posts?skip=0&take=10`)
-      .then((r) => {
-        return r.json();
-      })
-      .then((postsData) => {
-        if (postsData?.data) {
-          setPosts(postsData.data);
-        }
-      });
-  }, []);
 
   const postsElements = posts.map((post) => <BlogPost key={post.id} {...post} handleLikeButton={handleLikeButton} />);
 
@@ -68,7 +69,7 @@ export default function Page(): JSX.Element {
             className="bg-transparent text-secondary-foreground border-2 border-primary rounded-3xl hover:bg-primary hover:text-primary-foreground"
           >
             <Plus className="mr-2" />
-            Ecrire un article
+            <Link href="/blog/create">Ecrire un article</Link>
           </Button>
         </div>
         <section className="w-full flex flex-col gap-y-6">{postsElements}</section>

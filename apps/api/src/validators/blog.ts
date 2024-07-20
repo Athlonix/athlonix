@@ -25,7 +25,12 @@ export const postCardSchemaResponse = z.object({
 
 export const postCardListSchemaResponse = z.array(postCardSchemaResponse);
 
-export const insertPostSchema = postSchema.omit({ id: true });
+export const insertPostSchema = z.object({
+  title: z.string(),
+  description: z.string().optional(),
+  content: z.string(),
+  cover_image: z.instanceof(File).optional(),
+});
 
 export const updatePostSchema = z.object({
   title: z.string().optional(),

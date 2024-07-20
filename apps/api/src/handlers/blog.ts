@@ -1,4 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { uploadFile } from '../libs/storage.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -88,19 +89,32 @@ blog.openapi(getPost, async (c) => {
 });
 
 blog.openapi(createPost, async (c) => {
-  const { title, content, cover_image, description } = c.req.valid('json');
+  const { title, content, cover_image, description } = c.req.valid('form');
   const user = c.get('user');
   const id_user = user.id;
-  await checkRole(user.roles, false, [Role.REDACTOR, Role.MODERATOR]);
+  await checkRole(user.roles, false, [Role.REDACTOR, Role.MODERATOR, Role.ADMIN]);
+
+  let coverImageName = '';
+  if (cover_image) {
+    try {
+      coverImageName = crypto.randomUUID();
+    } catch (exception) {
+      console.log(exception);
+    }
+  }
 
   const { data, error } = await supabase
     .from('POSTS')
-    .insert({ title, content, id_user, cover_image, description })
+    .insert({ title, content, id_user, cover_image: coverImageName, description })
     .select()
     .single();
 
   if (error || !data) {
     return c.json({ error: 'Failed to create post' }, 400);
+  }
+
+  if (cover_image) {
+    await uploadFile(`blog_posts/${coverImageName}`, cover_image, 'image');
   }
 
   return c.json(data, 201);

@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
@@ -8,6 +10,7 @@ describe('Blog tests', () => {
   let jwt: string;
   let id_post: number;
   let id_comment: number;
+  let postImage: string;
 
   beforeAll(async () => {
     const res = await app.request('/auth/signup', {
@@ -44,22 +47,28 @@ describe('Blog tests', () => {
 
   describe('Post operations', () => {
     test('Create post', async () => {
-      const res = await app.request('/blog/posts', {
+      const formData = new FormData();
+      formData.append('title', 'Post test');
+      formData.append('description', 'Post test description');
+      formData.append('content', 'Post test content');
+
+      const imagePath = path.join(__dirname, 'files', 'mock_image.png');
+      const imageBuffer = fs.readFileSync(imagePath);
+      const imageBlob = new Blob([imageBuffer], { type: 'image/png' });
+      formData.append('cover_image', imageBlob, 'mock_image.png');
+
+      const res = await app.request('/activities', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
           Authorization: `Bearer ${jwt}`,
         },
-        body: JSON.stringify({
-          title: 'Post test',
-          content: 'Post test content',
-          cover_image: 'https://example.com/image.jpg',
-          description: 'Post test description',
-        }),
+        body: formData,
       });
+
       expect(res.status).toBe(201);
-      const post: { id: number; title: string; content: string } = await res.json();
+      const post: { id: number; title: string; content: string; cover_image: string } = await res.json();
       id_post = post.id;
+      postImage = post.cover_image;
       expect(post.title).toBe('Post test');
       expect(post.content).toBe('Post test content');
     });
@@ -76,7 +85,7 @@ describe('Blog tests', () => {
       expect(post).toMatchObject({
         title: 'Post test',
         content: 'Post test content',
-        cover_image: 'https://example.com/image.jpg',
+        cover_image: postImage,
         description: 'Post test description',
       });
     });

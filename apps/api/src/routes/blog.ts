@@ -71,7 +71,7 @@ export const createPost = createRoute({
   request: {
     body: {
       content: {
-        'application/json': {
+        'multipart/form-data': {
           schema: insertPostSchema,
         },
       },

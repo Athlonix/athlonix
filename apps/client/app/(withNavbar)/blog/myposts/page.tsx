@@ -1,6 +1,7 @@
 'use client';
 
 import type { Post } from '@/app/lib/type/Post';
+import { type User, getUserFromCookie } from '@/app/lib/utils';
 import { BlogPost } from '@/app/ui/components/BlogPost';
 import { PostFiltering } from '@/app/ui/components/PostFiltering';
 import { Input } from '@repo/ui/components/ui/input';
@@ -8,13 +9,28 @@ import { toast } from '@repo/ui/components/ui/sonner';
 import { Button } from '@ui/components/ui/button';
 import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page(): JSX.Element {
+  const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/posts?skip=0&take=20`)
+    async function checkUser() {
+      const user = await getUserFromCookie();
+      if (user) {
+        setUser(user);
+      } else {
+        router.push('/');
+      }
+    }
+    checkUser();
+  }, [router]);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/posts?skip=0&take=20&userId=${user?.id}`)
       .then((r) => {
         return r.json();
       })
@@ -27,7 +43,7 @@ export default function Page(): JSX.Element {
           setPosts(transformedData);
         }
       });
-  }, []);
+  }, [user]);
 
   function handleLikeButton(id: number) {
     setPosts((prevPosts) => {

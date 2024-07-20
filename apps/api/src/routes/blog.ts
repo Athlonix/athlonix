@@ -1,4 +1,5 @@
 import { createRoute, z } from '@hono/zod-openapi';
+import { number } from 'zod';
 import authMiddleware from '../middlewares/auth.js';
 import { queryAllSchema } from '../utils/pagnination.js';
 import {
@@ -20,7 +21,7 @@ export const getAllPosts = createRoute({
   summary: 'Get all posts',
   description: 'Get all posts',
   request: {
-    query: queryAllSchema,
+    query: queryAllSchema.extend({ userId: z.coerce.number().min(1).optional() }),
   },
   responses: {
     200: {

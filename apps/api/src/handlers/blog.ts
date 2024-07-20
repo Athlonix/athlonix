@@ -25,7 +25,7 @@ export const blog = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 blog.openapi(getAllPosts, async (c) => {
-  const { all, search, skip, take } = c.req.valid('query');
+  const { all, search, skip, take, userId } = c.req.valid('query');
 
   const query = supabase
     .from('POSTS')
@@ -50,6 +50,10 @@ blog.openapi(getAllPosts, async (c) => {
   if (!all) {
     const { from, to } = getPagination(skip, take - 1);
     query.range(from, to);
+  }
+
+  if (userId) {
+    query.eq('id_user', userId);
   }
 
   const { data, error, count } = await query;

@@ -10,6 +10,9 @@ import BlogComment from './BlogComment';
 
 function BlogCommentSection({ post: firstPost }: { post: SinglePost }) {
   const [user, setUser] = useState<User | null>(null);
+  const [newComment, setNewComment] = useState('');
+  const [newCommentError, setNewCommentError] = useState<string | undefined>(undefined);
+  const [post, setPost] = useState<SinglePost>(firstPost);
 
   useEffect(() => {
     async function checkUser() {
@@ -20,10 +23,6 @@ function BlogCommentSection({ post: firstPost }: { post: SinglePost }) {
     }
     checkUser();
   }, []);
-
-  const [newComment, setNewComment] = useState('');
-  const [newCommentError, setNewCommentError] = useState<string | undefined>(undefined);
-  const [post, setPost] = useState<SinglePost>(firstPost);
 
   const commentsSorted = post.comments.sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),

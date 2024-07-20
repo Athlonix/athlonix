@@ -18,7 +18,7 @@ export default function AboutUs() {
             </div>
             <div className="flex items-center justify-center">
               <img
-                src="https://picsum.photos/500/500"
+                src="about-us.webp"
                 style={{
                   aspectRatio: '500/500',
                   objectFit: 'cover',
@@ -37,7 +37,7 @@ export default function AboutUs() {
           <div className="grid gap-8 md:grid-cols-2 lg:gap-16">
             <div className="flex items-center justify-center">
               <img
-                src="https://picsum.photos/500/500"
+                src="sports-values.webp"
                 style={{
                   aspectRatio: '500/500',
                   objectFit: 'cover',
@@ -78,7 +78,7 @@ export default function AboutUs() {
             </div>
             <div className="flex items-center justify-center">
               <img
-                src="https://picsum.photos/500/500"
+                src="sports-about.webp"
                 style={{
                   aspectRatio: '500/500',
                   objectFit: 'cover',

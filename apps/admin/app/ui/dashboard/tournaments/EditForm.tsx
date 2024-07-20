@@ -130,7 +130,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 <FormItem>
                   <Label className="font-bold">Durée par défaut d'un match</Label>
                   <FormControl>
-                    <Input {...field} type="number" min={1} />
+                    <Input {...field} type="number" min={1} max={2000} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -145,7 +145,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 <FormItem>
                   <Label className="font-bold">Nombre d'équipe max</Label>
                   <FormControl>
-                    <Input {...field} type="number" min={1} required />
+                    <Input {...field} type="number" min={1} max={100} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -160,7 +160,7 @@ function EditForm(props: EditFormProps): JSX.Element {
                 <FormItem>
                   <Label className="font-bold">Nombre de joueur par équipe</Label>
                   <FormControl>
-                    <Input {...field} type="number" min={1} required />
+                    <Input {...field} type="number" min={1} max={1000} required />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

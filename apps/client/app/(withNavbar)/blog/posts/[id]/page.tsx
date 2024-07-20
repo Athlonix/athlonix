@@ -1,5 +1,6 @@
 import type { SinglePost } from '@/app/lib/type/SinglePost';
 import { getBlogPost } from '@/app/lib/utils/blog';
+import BlogComment from '@/app/ui/components/BlogComment';
 import LikeIcon from '@/app/ui/svg/LikeIcon';
 import { Avatar, AvatarFallback } from '@ui/components/ui/avatar';
 import { Button } from '@ui/components/ui/button';
@@ -12,6 +13,18 @@ async function Page({ params }: { params: { id: string } }) {
   const data = await getBlogPost(Number(params.id));
   const post: SinglePost = data.data;
   const coverImageUrl = `${process.env.ATHLONIX_STORAGE_URL}/image/blog_posts/${post.cover_image}`;
+
+  const postComments = post.comments.map((comment) => {
+    return (
+      <BlogComment
+        key={comment.id}
+        likeNumber={4}
+        author={comment.author.username}
+        content={comment.content}
+        created_at={comment.created_at}
+      />
+    );
+  });
 
   function handleLikeButton() {}
 
@@ -76,58 +89,7 @@ async function Page({ params }: { params: { id: string } }) {
           <div className="flex justify-end mt-4">
             <Button>Envoyer</Button>
           </div>
-          <div className="flex flex-col gap-7">
-            <div className="flex gap-4">
-              <Avatar>
-                <AvatarFallback className="bg-slate-400">{post.author.username.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="flex items-center gap-2">
-                  <p>
-                    <Link
-                      href="simon"
-                      className="font-medium text-accent underline underline-offset-2 max-w-32 truncate"
-                    >
-                      {post.author.username}
-                    </Link>
-                    , <span>{format(new Date(post.created_at), 'EEE dd MMMM', { locale: fr })}</span>
-                  </p>
-                </div>
-                <p>Super ce document</p>
-                <div className="flex items-center gap-1 font-medium text-sm">
-                  <span>{post.likes_number}</span>
-                  <button type="button" className="cursor-pointer">
-                    <LikeIcon isClicked={true} />
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-4">
-              <Avatar>
-                <AvatarFallback className="bg-slate-400">{post.author.username.charAt(0).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="flex items-center gap-2">
-                  <p>
-                    <Link
-                      href="simon"
-                      className="font-medium text-accent underline underline-offset-2 max-w-32 truncate"
-                    >
-                      {post.author.username}
-                    </Link>
-                    , <span>{format(new Date(post.created_at), 'EEE dd MMMM', { locale: fr })}</span>
-                  </p>
-                </div>
-                <p>Super ce document</p>
-                <div className="flex items-center gap-1 font-medium text-sm">
-                  <span>{post.likes_number}</span>
-                  <button type="button" className="cursor-pointer">
-                    <LikeIcon isClicked={true} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div className="flex flex-col gap-7">{postComments}</div>
         </section>
       </div>
     </main>

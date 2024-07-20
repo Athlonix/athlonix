@@ -45,6 +45,8 @@ const FrenchDays: Record<string, string> = {
   sunday: 'Dimanche',
 };
 
+const dayOrder = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+
 function ActivityRow(props: ActivityRowProps) {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
@@ -61,9 +63,6 @@ function ActivityRow(props: ActivityRowProps) {
   const [endTime, setEndTime] = useState(props.activity.end_time);
   const [description, setDescription] = useState(props.activity.description);
   const [frequency, setFrequency] = useState(props.activity.frequency);
-
-  const startDateFormat = new Date(`${startDate}T${startTime}`);
-  const endDateFormat = new Date(`${endDate}T${endTime}`);
 
   const setter = {
     name: setName,
@@ -113,6 +112,86 @@ function ActivityRow(props: ActivityRowProps) {
     setOpenDelete(false);
   }
 
+  const formatTime = (time: string) => {
+    const date = new Date(`2000-01-01T${time}`);
+    return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', hour12: false });
+  };
+
+  const WeeklyScheduleDisplay = ({
+    frequency,
+    days,
+    startTime,
+    endTime,
+  }: { frequency: string; days: string[]; startTime: string; endTime: string }) => {
+    if (frequency !== 'weekly') return null;
+
+    const sortedDays = days?.sort((a, b) => dayOrder.indexOf(a) - dayOrder.indexOf(b)) || [];
+    const formattedDays = sortedDays.map((day) => FrenchDays[day]).join(', ');
+    const isAllDays = sortedDays.length === 7;
+    const displayDays = isAllDays ? 'Tous les jours' : formattedDays;
+
+    const timeRange = `${formatTime(startTime)}h - ${formatTime(endTime)}h`;
+
+    return (
+      <TableCell>
+        <div>{displayDays}</div>
+        <div>{timeRange}</div>
+      </TableCell>
+    );
+  };
+
+  const yearlyScheduleDisplay = (startDate: string, endDate: string, startTime: string, endTime: string) => {
+    const startDateFormat = new Date(`${startDate}T${startTime}`);
+    const endDateFormat = new Date(`${endDate}T${endTime}`);
+
+    return (
+      <TableCell>
+        {`Du ${startDateFormat.getDate()}/${(startDateFormat.getMonth() + 1)
+          .toString()
+          .padStart(2, '0')} ${startDateFormat
+          .getHours()
+          .toString()
+          .padStart(
+            2,
+            '0',
+          )}:${startDateFormat.getMinutes().toString().padStart(2, '0')}h jusqu'au ${endDateFormat.getDate()}/${(
+          endDateFormat.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, '0')} ${endDateFormat.getHours().toString().padStart(2, '0')}:${endDateFormat
+          .getMinutes()
+          .toString()
+          .padStart(2, '0')}h`}
+      </TableCell>
+    );
+  };
+
+  const monthlyScheduleDisplay = (startDate: string, endDate: string, startTime: string, endTime: string) => {
+    const startDateFormat = new Date(`${startDate}T${startTime}`);
+    const endDateFormat = new Date(`${endDate}T${endTime}`);
+
+    return (
+      <TableCell>
+        {`Du ${startDateFormat.getDate()}/${(startDateFormat.getMonth() + 1)
+          .toString()
+          .padStart(2, '0')} ${startDateFormat
+          .getHours()
+          .toString()
+          .padStart(
+            2,
+            '0',
+          )}:${startDateFormat.getMinutes().toString().padStart(2, '0')}h jusqu'au ${endDateFormat.getDate()}/${(
+          endDateFormat.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, '0')} ${endDateFormat.getHours().toString().padStart(2, '0')}:${endDateFormat
+          .getMinutes()
+          .toString()
+          .padStart(2, '0')}h`}
+      </TableCell>
+    );
+  };
+
   if (name === 'Supprimé') {
     return null;
   }
@@ -156,54 +235,13 @@ function ActivityRow(props: ActivityRowProps) {
       <TableCell>{FrenchFrequency[frequency]}</TableCell>
       {frequency === 'weekly' && (
         <TableCell>
-          {days?.map((day) => FrenchDays[day]).join(', ')} de{' '}
-          {`${new Date(`2000-01-01T${startTime}`).getHours().toString().padStart(2, '0')}:${new Date(
-            `2000-01-01T${startTime}`,
-          )
-            .getMinutes()
-            .toString()
-            .padStart(2, '0')} - ${new Date(`2000-01-01T${endTime}`).getHours().toString().padStart(2, '0')}:${new Date(
-            `2000-01-01T${endTime}`,
-          )
-            .getMinutes()
-            .toString()
-            .padStart(2, '0')}`}
+          <WeeklyScheduleDisplay frequency={frequency} days={days} startTime={startTime} endTime={endTime} />
         </TableCell>
       )}
       {frequency === 'monthly' && (
-        <TableCell>
-          {`Du ${startDateFormat.getDate()} de ${startDateFormat
-            .getHours()
-            .toString()
-            .padStart(
-              2,
-              '0',
-            )}:${startDateFormat.getMinutes().toString().padStart(2, '0')} jusqu'au ${endDateFormat.getDate()} à ${endDateFormat
-            .getHours()
-            .toString()
-            .padStart(2, '0')}:${endDateFormat.getMinutes().toString().padStart(2, '0')}`}
-        </TableCell>
+        <TableCell>{monthlyScheduleDisplay(startDate, endDate, startTime, endTime)}</TableCell>
       )}
-      {frequency === 'yearly' && (
-        <TableCell>
-          {`Du ${startDateFormat.getDate()} ${(startDateFormat.getMonth() + 1)
-            .toString()
-            .padStart(2, '0')} de ${startDateFormat
-            .getHours()
-            .toString()
-            .padStart(
-              2,
-              '0',
-            )}:${startDateFormat.getMinutes().toString().padStart(2, '0')} jusqu'au ${endDateFormat.getDate()} ${(
-            endDateFormat.getMonth() + 1
-          )
-            .toString()
-            .padStart(2, '0')} ${endDateFormat.getHours().toString().padStart(2, '0')}:${endDateFormat
-            .getMinutes()
-            .toString()
-            .padStart(2, '0')}`}
-        </TableCell>
-      )}
+      {frequency === 'yearly' && <TableCell>{yearlyScheduleDisplay(startDate, endDate, startTime, endTime)}</TableCell>}
       {!frequency && <TableCell />}
       {name !== 'Supprimé' && (
         <TableCell>

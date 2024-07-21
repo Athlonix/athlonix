@@ -16,6 +16,6 @@ export async function getBlogPost(id: number): Promise<{ data: SinglePost; statu
   });
 
   const data = await res.json();
-  revalidatePath(queryPath);
+  revalidatePath(`/blog/posts/${id}`);
   return { data: data, status: res.status };
 }

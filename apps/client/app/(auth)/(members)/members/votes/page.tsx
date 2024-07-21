@@ -153,7 +153,11 @@ export default function ListVotes() {
               <p className={`text-sm text-gray-600 dark:text-gray-300 mb-4 ${getStatusColor(poll)}`}>
                 {getStatusText(poll)}
               </p>
-              <p className="text-justify line-clamp-3 min-h-24">{poll.description}</p>
+              <p className="break-words text-sm text-gray-600 dark:text-gray-300 mb-4 h-[100px]">
+                {poll.description && poll.description.length > 200
+                  ? `${poll.description.slice(0, 200)}...`
+                  : poll.description}
+              </p>
               <div className="mt-4 flex items-center text-sm text-gray-500">
                 <Calendar className="mr-2 h-4 w-4" />
                 <span>

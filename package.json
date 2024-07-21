@@ -1,6 +1,7 @@
 {
   "name": "athlonix-turbo",
   "private": true,
+  "version": "2.0.0",
   "scripts": {
     "clean": "turbo clean && rm -rf node_modules/ .turbo/ pnpm-lock.yaml",
     "build": "turbo build --env-mode=loose",

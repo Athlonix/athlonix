@@ -128,13 +128,19 @@ function AddFileDialog({
                 type="text"
                 name="name"
                 required
+                placeholder="Nom du fichier"
                 defaultValue={editFile ? editFile.name : ''}
                 readOnly={!!editFile}
               />
             </div>
             <div>
               <Label htmlFor="description">Description</Label>
-              <Textarea id="description" name="description" defaultValue={editFile ? editFile.description : ''} />
+              <Textarea
+                id="description"
+                name="description"
+                defaultValue={editFile ? editFile.description : ''}
+                placeholder="Description du fichier"
+              />
             </div>
             <div className="flex items-center space-x-2">
               <Label
@@ -181,7 +187,7 @@ function AddFolderDialog({
           <div className="grid gap-4 py-4">
             <div>
               <Label htmlFor="foldername">Nom</Label>
-              <Input id="foldername" type="text" name="name" required />
+              <Input id="foldername" type="text" name="name" required placeholder="Nom du dossier" />
             </div>
             <div className="flex items-center space-x-2">
               <Label
@@ -194,7 +200,7 @@ function AddFolderDialog({
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={isUploading}>
+            <Button type="submit" disabled={isUploading} onClick={() => setOpen(false)}>
               Enregistrer
             </Button>
           </DialogFooter>

@@ -66,8 +66,8 @@ describe('Report tests', () => {
     expect(resPost.status).toBe(201);
     const post: { id: number; title: string; content: string; cover_image: string } = await resPost.json();
     id_post = post.id;
-    expect(post.title).toBe('Post test');
-    expect(post.content).toBe('Post test content');
+    expect(post.title).toBe('Post test report');
+    expect(post.content).toBe('Post test content for reporting');
 
     const commentRes = await app.request(`/blog/posts/${id_post}/comments`, {
       method: 'POST',

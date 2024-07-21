@@ -60,13 +60,12 @@ function EditRound(props: EditRoundProps) {
           router.push('/');
           return;
         }
+        const url = `/dashboard/tournaments/matches?id_tournament=${props.round.id_tournament}&updated=true`;
+        window.location.href = url;
       })
       .catch((error) => {
         console.error(error);
       });
-
-    const url = `/dashboard/tournaments/matches?id_tournament=${props.round.id_tournament}&updated=true`;
-    window.location.href = url;
   }
 
   return (

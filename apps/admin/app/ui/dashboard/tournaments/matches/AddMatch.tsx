@@ -98,13 +98,12 @@ function AddMatch(props: AddMatchProps) {
           router.push('/');
           return;
         }
+        const url = `/dashboard/tournaments/matches?id_tournament=${props.idTournament}&created=true`;
+        window.location.href = url;
       })
       .catch((error) => {
         console.error(error);
       });
-
-    const url = `/dashboard/tournaments/matches?id_tournament=${props.idTournament}&created=true`;
-    window.location.href = url;
   }
 
   return (

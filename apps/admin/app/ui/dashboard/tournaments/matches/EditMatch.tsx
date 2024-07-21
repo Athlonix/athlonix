@@ -120,13 +120,12 @@ function EditMatch(props: EditMatchProps) {
           router.push('/');
           return;
         }
+        const url = `/dashboard/tournaments/matches?id_tournament=${props.idTournament}&updated=true`;
+        window.location.href = url;
       })
       .catch((error) => {
         console.error(error);
       });
-
-    const url = `/dashboard/tournaments/matches?id_tournament=${props.idTournament}&updated=true`;
-    window.location.href = url;
   }
 
   return (

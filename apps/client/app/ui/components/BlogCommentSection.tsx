@@ -98,27 +98,29 @@ function BlogCommentSection({ post: firstPost }: { post: SinglePost }) {
   return (
     <section className="mt-8">
       {user && (
-        <div className="flex items-center w-full gap-4 justify-start">
-          <Avatar className="self-start">
-            <AvatarFallback className="bg-slate-400">{user.username.charAt(0).toUpperCase()}</AvatarFallback>
-          </Avatar>
-          <textarea
-            value={newComment}
-            className="w-full leading-6  border-accent border-2 rounded-3xl px-4 py-4 placeholder:text-accent placeholder:opacity-70"
-            placeholder="Ecrire un commentaire..."
-            name="comment"
-            onChange={handleCommentChange}
-          />
-        </div>
+        <>
+          <div className="flex items-center w-full gap-4 justify-start">
+            <Avatar className="self-start">
+              <AvatarFallback className="bg-slate-400">{user.username.charAt(0).toUpperCase()}</AvatarFallback>
+            </Avatar>
+            <textarea
+              value={newComment}
+              className="w-full leading-6  border-accent border-2 rounded-3xl px-4 py-4 placeholder:text-accent placeholder:opacity-70"
+              placeholder="Ecrire un commentaire..."
+              name="comment"
+              onChange={handleCommentChange}
+            />
+          </div>
+          {newCommentError && (
+            <div className="flex justify-end text-red-500">
+              <p>{newCommentError}</p>
+            </div>
+          )}
+          <div className="flex justify-end mt-4">
+            <Button onClick={sendComment}>Envoyer</Button>
+          </div>
+        </>
       )}
-      {newCommentError && (
-        <div className="flex justify-end text-red-500">
-          <p>{newCommentError}</p>
-        </div>
-      )}
-      <div className="flex justify-end mt-4">
-        <Button onClick={sendComment}>Envoyer</Button>
-      </div>
       <div className="flex flex-col gap-7">{postComments}</div>
     </section>
   );

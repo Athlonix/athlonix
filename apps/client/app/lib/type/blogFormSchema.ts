@@ -23,3 +23,15 @@ export const blogFormSchema = z.object({
     })
     .optional(),
 });
+
+export const blogFormUpdateSchema = z.object({
+  title: z
+    .string()
+    .min(5, { message: 'Le champ est requis et doit faire minimum 5 caracteres' })
+    .max(200, { message: 'Maximum 200 caractères' }),
+  content: z
+    .string()
+    .min(10, { message: 'Le champs est requis et doit faire au minimum 10 caractères' })
+    .max(5000, { message: 'Maximum 5000 caractères' }),
+  description: z.string().optional(),
+});

@@ -15,6 +15,8 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@ui/components/ui/dropdown-menu';
@@ -105,27 +107,34 @@ export const BlogPost: React.FC<PostProps> = ({
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 {isUserPost && (
-                  <Button variant="ghost" className="w-full p-0 font-normal pl-2">
-                    <Dialog open={openDelete} onOpenChange={setOpenDelete}>
-                      <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Suppression du post</DialogTitle>
-                          <DialogDescription>
-                            <div className="mb-4">Êtes-vous sûr de vouloir supprimer ce post?</div>
-                            <div className="flex w-full justify-end gap-4">
-                              <Button variant="destructive" onClick={() => deletePost(id)}>
-                                Supprimer
-                              </Button>
-                              <Button variant="secondary" onClick={() => setOpenDelete(false)}>
-                                Annuler
-                              </Button>
-                            </div>
-                          </DialogDescription>
-                        </DialogHeader>
-                      </DialogContent>
-                    </Dialog>
-                  </Button>
+                  <DropdownMenuGroup>
+                    <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+                      <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+                        <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Suppression du post</DialogTitle>
+                            <DialogDescription>
+                              <div className="mb-4">Êtes-vous sûr de vouloir supprimer ce post?</div>
+                              <div className="flex w-full justify-end gap-4">
+                                <Button variant="destructive" onClick={() => deletePost(id)}>
+                                  Supprimer
+                                </Button>
+                                <Button variant="secondary" onClick={() => setOpenDelete(false)}>
+                                  Annuler
+                                </Button>
+                              </div>
+                            </DialogDescription>
+                          </DialogHeader>
+                        </DialogContent>
+                      </Dialog>
+                    </Button>
+                    <Button variant="ghost" className="w-full justify-start" asChild>
+                      <Link href={`/blog/update/${id}`} className="w-full p-0 font-normal pl-2 text-left">
+                        Editer
+                      </Link>
+                    </Button>
+                  </DropdownMenuGroup>
                 )}
               </DropdownMenuContent>
             </DropdownMenu>

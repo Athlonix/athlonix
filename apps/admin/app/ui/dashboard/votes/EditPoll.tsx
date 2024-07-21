@@ -85,6 +85,7 @@ function EditPoll({ poll, setter, assemblies }: Props) {
         setter.title(data.title);
         setter.description(data.description);
         setter.maxChoices(data.max_choices);
+        setOpen(false);
         toast.success('Succès', { duration: 2000, description: 'Le vote a été modifié avec succès' });
       })
       .catch((error: Error) => {
@@ -190,7 +191,11 @@ function EditPoll({ poll, setter, assemblies }: Props) {
                   />
                 </div>
                 <div className="flex gap-4 mt-4">
-                  <Button type="submit" className="w-full">
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={form.formState.isSubmitting || !form.formState.isValid}
+                  >
                     Modifier
                   </Button>
                   <Button variant="secondary" type="button" className="w-full">

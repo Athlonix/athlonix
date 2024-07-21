@@ -3,10 +3,10 @@ import type { FullPoll } from '@/app/lib/type/Votes';
 import { getAllVotes, getUserVoted } from '@/app/lib/utils/votes';
 import { Badge } from '@repo/ui/components/ui/badge';
 import { Button } from '@repo/ui/components/ui/button';
-import { Card } from '@repo/ui/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@repo/ui/components/ui/card';
 import Loading from '@repo/ui/components/ui/loading';
 import { toast } from '@repo/ui/components/ui/sonner';
-import { Separator } from '@ui/components/ui/separator';
+import { Calendar, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -26,7 +26,15 @@ export default function ListVotes() {
         return;
       }
 
-      setPolls(allVotes.data);
+      setPolls(
+        allVotes.data.sort((a, b) => {
+          const now = new Date();
+          const aIsOngoing = new Date(a.start_at) <= now && new Date(a.end_at) >= now;
+          const bIsOngoing = new Date(b.start_at) <= now && new Date(b.end_at) >= now;
+          if (aIsOngoing !== bIsOngoing) return aIsOngoing ? -1 : 1;
+          return new Date(a.start_at).getTime() - new Date(b.start_at).getTime();
+        }),
+      );
       setUsersVotes(userVote.voted);
       setLoading(false);
     }
@@ -82,22 +90,26 @@ export default function ListVotes() {
   const filteredVotes = () => {
     switch (filter) {
       case 'ongoing':
-        return polls.filter((poll) => {
-          if (isOnGoing(poll)) {
-            return poll;
-          }
-        });
+        return polls.filter((poll) => isOnGoing(poll));
       case 'finished':
-        return polls.filter((poll) => {
-          if (isFinished(poll)) {
-            return poll;
-          }
-        });
+        return polls.filter((poll) => isFinished(poll));
       case 'not_started':
         return polls.filter((vote) => new Date(vote.start_at) > new Date());
       default:
         return polls;
     }
+  };
+
+  const getStatusColor = (poll: FullPoll) => {
+    if (isOnGoing(poll)) return 'text-green-700';
+    if (isFinished(poll)) return 'text-red-700';
+    return 'text-gray-700';
+  };
+
+  const getStatusText = (poll: FullPoll) => {
+    if (isOnGoing(poll)) return 'En cours';
+    if (isFinished(poll)) return 'Terminé';
+    return 'Non commencé';
   };
 
   if (loading) {
@@ -130,43 +142,54 @@ export default function ListVotes() {
           </div>
         )}
         {filteredVotes().map((poll) => (
-          <Card key={poll.id} className="p-4">
-            <div className="flex gap-2">
-              <h2 className="text-lg font-semibold flex-1 line-clamp-1">{poll.title}</h2>
-            </div>
-            <Separator />
-            <div className="flex my-4 justify-center gap-4">
-              {poll.max_choices > 1 ? (
-                <Badge variant="info">Choix multiples</Badge>
-              ) : (
-                <Badge variant="info">Choix unique</Badge>
-              )}
-              {isOnGoing(poll) ? (
-                <Badge variant="info">En cours</Badge>
-              ) : isFinished(poll) ? (
-                <Badge variant="destructive">Terminé le {new Date(poll.end_at).toLocaleDateString()}</Badge>
-              ) : (
-                <Badge variant="secondary">Non commencé</Badge>
-              )}
-            </div>
-            <Separator />
-            <p className="text-justify line-clamp-3 min-h-24">{poll.description}</p>
-            {isOnGoing(poll) && !hasVoted(poll) && (
-              <Link href={`/members/votes/details?id=${poll.id}`}>
-                <Button className="mt-4">Je vote</Button>
-              </Link>
-            )}
-            {hasVoted(poll) && (
-              <Link href={`/members/votes/details?id=${poll.id}`}>
-                <Button className="mt-4">Voir les résultats</Button>
-              </Link>
-            )}
-            {new Date(poll.start_at) > new Date() && (
-              <p className="mt-4 text-gray-500 dark:text-gray-400">
-                Commence le{' '}
-                {`${new Date(poll.start_at).toLocaleDateString()} à ${new Date(poll.start_at).toLocaleTimeString()}`}
+          <Card key={poll.id} className={'overflow-hidden border-2'}>
+            <CardHeader>
+              <CardTitle className="flex justify-between items-center">
+                <span className="text-lg font-semibold line-clamp-1">{poll.title}</span>
+                <Badge variant="outline">{poll.max_choices > 1 ? 'Choix multiples' : 'Choix unique'}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className={`text-sm text-gray-600 dark:text-gray-300 mb-4 ${getStatusColor(poll)}`}>
+                {getStatusText(poll)}
               </p>
-            )}
+              <p className="text-justify line-clamp-3 min-h-24">{poll.description}</p>
+              <div className="mt-4 flex items-center text-sm text-gray-500">
+                <Calendar className="mr-2 h-4 w-4" />
+                <span>
+                  {isFinished(poll)
+                    ? `Terminé le ${new Date(poll.end_at).toLocaleDateString()}`
+                    : `${new Date(poll.start_at).toLocaleDateString()} - ${new Date(poll.end_at).toLocaleDateString()}`}
+                </span>
+              </div>
+              {!isFinished(poll) && (
+                <div className="mt-2 flex items-center text-sm text-gray-500">
+                  <Clock className="mr-2 h-4 w-4" />
+                  <span>
+                    {isOnGoing(poll)
+                      ? `Se termine à ${new Date(poll.end_at).toLocaleTimeString()}`
+                      : `Commence à ${new Date(poll.start_at).toLocaleTimeString()}`}
+                  </span>
+                </div>
+              )}
+            </CardContent>
+            <CardFooter>
+              {isOnGoing(poll) && !hasVoted(poll) && (
+                <Link href={`/members/votes/details?id=${poll.id}`} className="w-full">
+                  <Button className="w-full">Je vote</Button>
+                </Link>
+              )}
+              {hasVoted(poll) && (
+                <Link href={`/members/votes/details?id=${poll.id}`} className="w-full">
+                  <Button className="w-full">Voir les résultats</Button>
+                </Link>
+              )}
+              {!isOnGoing(poll) && !isFinished(poll) && (
+                <Button className="w-full" disabled>
+                  Vote à venir
+                </Button>
+              )}
+            </CardFooter>
           </Card>
         ))}
       </div>

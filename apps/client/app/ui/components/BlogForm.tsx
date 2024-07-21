@@ -1,89 +1,22 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
+import type { blogFormSchema } from '@/app/lib/type/blogFormSchema';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@repo/ui/components/ui/form';
 import { Button } from '@ui/components/ui/button';
 import { Input } from '@ui/components/ui/input';
 import { Label } from '@ui/components/ui/label';
-import { toast } from '@ui/components/ui/sonner';
 import { Textarea } from '@ui/components/ui/textarea';
 import { Paperclip } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import type { UseFormReturn } from 'react-hook-form';
+import type { z } from 'zod';
 
-function BlogForm() {
-  const MAX_FILE_SIZE = 1024 * 1024 * 5;
-  const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+interface BlogFormProps {
+  form: UseFormReturn<z.infer<typeof blogFormSchema>>;
+  submitBlogPost: (values: z.infer<typeof blogFormSchema>) => Promise<void>;
+  setSelectedImage: React.Dispatch<React.SetStateAction<File | null>>;
+}
 
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const router = useRouter();
-  const formSchema = z.object({
-    title: z
-      .string()
-      .min(5, { message: 'Le champ est requis et doit faire minimum 5 caracteres' })
-      .max(200, { message: 'Maximum 200 caractères' }),
-    content: z
-      .string()
-      .min(10, { message: 'Le champs est requis et doit faire au minimum 10 caractères' })
-      .max(5000, { message: 'Maximum 5000 caractères' }),
-    description: z.string().optional(),
-    cover_image: z
-      .any()
-      .refine((files) => files?.[0]?.size <= MAX_FILE_SIZE, {
-        message: `L'image doit faire moins de ${MAX_FILE_SIZE / 1000000} Mo`,
-      })
-      .refine((files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type), {
-        message: "L'image doit être au format jpeg, png ou wepb",
-      }),
-  });
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: '',
-      cover_image: undefined,
-      content: '',
-      description: '',
-    },
-  });
-
-  async function submitBlogPost(values: z.infer<typeof formSchema>) {
-    const urlApi = process.env.NEXT_PUBLIC_API_URL;
-
-    const formData = new FormData();
-    formData.append('title', values.title);
-    if (values.description) {
-      formData.append('description', values.description);
-    }
-    if (values.cover_image) {
-      formData.append('cover_image', values.cover_image[0]);
-    }
-    formData.append('content', values.content);
-
-    fetch(`${urlApi}/blog/posts`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-      body: formData,
-    })
-      .then(async (response) => {
-        if (response.status !== 201) {
-          const error = await response.json();
-          throw new Error(error.message);
-        }
-        return response.json();
-      })
-      .then((data: { id: number }) => {
-        router.push(`/blog/posts/${data.id}`);
-      })
-      .catch((error: Error) => {
-        toast.error('Erreur', { duration: 20000, description: error?.message });
-      });
-  }
-
+function BlogForm({ form, submitBlogPost, setSelectedImage }: BlogFormProps) {
   return (
     <div className="w-full">
       <Form {...form}>
@@ -110,15 +43,7 @@ function BlogForm() {
               render={({ field }) => (
                 <FormItem>
                   <Label className="font-bold">Image</Label>
-                  {selectedImage && (
-                    <div className="w-[600px] h-[232px]">
-                      <img
-                        className="h-full w-full object-cover"
-                        src={URL.createObjectURL(selectedImage)}
-                        alt="selectionné"
-                      />
-                    </div>
-                  )}
+
                   <FormControl>
                     <div>
                       <Button size="lg" type="button">

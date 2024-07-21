@@ -37,7 +37,7 @@ async function Page({ params }: { params: { id: string } }) {
             alt="selectionné"
           />
         </div>
-        <p className="text-base leading-7 font-medium">{post.content}</p>
+        <p className="text-base leading-7 font-medium whitespace-pre-wrap">{post.content}</p>
         <div className=" mt-7 pb-8 w-full flex justify-start items-center gap-8 border-x-slate-800 border-b-2">
           <div className="flex items-center gap-1 font-medium text-sm">
             <span>{post.likes_number}</span>

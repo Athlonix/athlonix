@@ -72,7 +72,7 @@ export default function SportsPage(): JSX.Element {
         <h1 className="text-xl font-bold">Sports</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button>Ajouter un sport</Button>
+            <Button onClick={() => setEditSport(null)}>Ajouter un sport</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
@@ -82,13 +82,21 @@ export default function SportsPage(): JSX.Element {
               <div className="grid gap-4 py-4">
                 <div>
                   <Label htmlFor="name">Nom</Label>
-                  <Input id="name" type="text" name="name" required defaultValue={editSport ? editSport.name : ''} />
+                  <Input
+                    id="name"
+                    type="text"
+                    name="name"
+                    required
+                    defaultValue={editSport ? editSport.name : ''}
+                    placeholder="Nom du sport"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
                     name="description"
+                    placeholder="Description du sport"
                     defaultValue={editSport?.description ? editSport.description : ''}
                   />
                 </div>
@@ -98,6 +106,8 @@ export default function SportsPage(): JSX.Element {
                     id="min_players"
                     type="number"
                     name="min_players"
+                    placeholder="0"
+                    min="0"
                     required
                     defaultValue={editSport ? Number(editSport.min_players) : ''}
                   />
@@ -108,12 +118,20 @@ export default function SportsPage(): JSX.Element {
                     id="max_players"
                     type="number"
                     name="max_players"
+                    placeholder="10"
+                    min="1"
                     defaultValue={editSport?.max_players ? Number(editSport.max_players) : ''}
                   />
                 </div>
                 <div>
                   <Label htmlFor="image">Image</Label>
-                  <Input id="image" type="text" name="image" defaultValue={editSport?.image ? editSport.image : ''} />
+                  <Input
+                    id="image"
+                    type="text"
+                    name="image"
+                    defaultValue={editSport?.image ? editSport.image : ''}
+                    placeholder='URL de l"image'
+                  />
                 </div>
               </div>
               <DialogFooter>

@@ -13,6 +13,7 @@ import {
   LandPlot,
   Landmark,
   Newspaper,
+  PackageOpen,
   PencilRuler,
   Trophy,
   Users,
@@ -138,6 +139,13 @@ export default function RootLayout({
                   >
                     <PencilRuler className="h-4 w-4" />
                     Matériaux & Fournitures
+                  </Link>
+                  <Link
+                    href="/dashboard/proposals"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  >
+                    <PackageOpen className="h-4 w-4" />
+                    Boite à idées
                   </Link>
                 </nav>
               </div>

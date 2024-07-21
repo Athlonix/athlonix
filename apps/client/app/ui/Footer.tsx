@@ -37,6 +37,7 @@ export default function Footer(): JSX.Element {
                 placeholder="Votre email"
                 className="border p-2 flex-grow"
                 type="email"
+                autoComplete="email"
                 onChange={(e) => setEmail(e.target.value)}
               />
               <Button

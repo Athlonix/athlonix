@@ -3,7 +3,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 interface PostFilteringProps {
   handleFilter: (value: string) => void;
 }
-function PostFiltering({ handleFilter }: PostFilteringProps) {
+
+export function PostFiltering({ handleFilter }: PostFilteringProps) {
   return (
     <div className="flex items-center justify-normal gap-6">
       <Select name="filterPost" required onValueChange={handleFilter} defaultValue={'true'}>
@@ -18,5 +19,3 @@ function PostFiltering({ handleFilter }: PostFilteringProps) {
     </div>
   );
 }
-
-export default PostFiltering;

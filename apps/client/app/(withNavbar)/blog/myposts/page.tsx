@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 export default function Page(): JSX.Element {
   const router = useRouter();
   const [posts, setPosts] = useState<Post[]>([]);
+  const [sortAsc, setSortAsc] = useState(true);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -92,16 +93,28 @@ export default function Page(): JSX.Element {
       });
   }
 
-  const postsElements = posts.map((post) => (
+  const filteredPosts = sortAsc
+    ? posts.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    : posts.sort((b, a) => a.createdAt.getTime() - b.createdAt.getTime());
+
+  const postsElements = filteredPosts.map((post) => (
     <BlogPost key={post.id} {...post} isUserPost={true} deletePost={deletePost} handleLikeButton={handleLikeButton} />
   ));
+
+  function handleFilter(value: string) {
+    if (value === 'true') {
+      setSortAsc(true);
+    } else {
+      setSortAsc(false);
+    }
+  }
 
   return (
     <>
       <main className="flex flex-col items-center gap-y-8 py-4">
         <div className="flex items-center justify-between w-full">
           <div className="w-full gap-4 flex items-center">
-            <PostFiltering />
+            <PostFiltering handleFilter={handleFilter} />
             <div className="relative md:grow-0">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input

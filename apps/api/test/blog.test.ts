@@ -57,7 +57,7 @@ describe('Blog tests', () => {
       const imageBlob = new Blob([imageBuffer], { type: 'image/png' });
       formData.append('cover_image', imageBlob, 'mock_image.png');
 
-      const res = await app.request('/activities', {
+      const res = await app.request('/blog/posts', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${jwt}`,

@@ -3,7 +3,7 @@
 import type { Post } from '@/app/lib/type/Post';
 import { type User, getUserFromCookie } from '@/app/lib/utils';
 import { BlogPost } from '@/app/ui/components/BlogPost';
-import PostFiltering from '@/app/ui/components/PostFiltering';
+import { PostFiltering } from '@/app/ui/components/PostFiltering';
 import { Input } from '@repo/ui/components/ui/input';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { Button } from '@ui/components/ui/button';

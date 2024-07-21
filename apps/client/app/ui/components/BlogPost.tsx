@@ -96,16 +96,16 @@ export const BlogPost: React.FC<PostProps> = ({
           </div>
         </div>
         <div className=" flex flex-col justify-between ml-auto">
-          <div className="flex justify-end w-full">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="link">
-                  <Ellipsis />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                {isUserPost && (
+          {isUserPost && (
+            <div className="flex justify-end w-full">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="link">
+                    <Ellipsis />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
                   <DropdownMenuGroup>
                     <Button variant="ghost" className="w-full p-0 font-normal pl-2">
                       <Dialog open={openDelete} onOpenChange={setOpenDelete}>
@@ -134,10 +134,10 @@ export const BlogPost: React.FC<PostProps> = ({
                       </Link>
                     </Button>
                   </DropdownMenuGroup>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
           <div className="w-full flex justify-end items-center gap-4">
             <div className="flex items-center gap-1 font-medium text-sm">
               <span>{likes_number}</span>

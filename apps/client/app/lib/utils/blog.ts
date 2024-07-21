@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import type { SinglePost } from '../type/SinglePost';
 
 const urlApi = process.env.ATHLONIX_API_URL;
@@ -15,5 +16,6 @@ export async function getBlogPost(id: number): Promise<{ data: SinglePost; statu
   });
 
   const data = await res.json();
+  revalidatePath(queryPath);
   return { data: data, status: res.status };
 }

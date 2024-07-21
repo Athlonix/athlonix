@@ -106,6 +106,7 @@ export async function sendNewsletterSubscriptionEmail(email: string) {
   const resend = new Resend(process.env.RESEND_KEY);
 
   if (!resend.emails) {
+    console.log('Emails feature is not enabled');
     throw new Error('Emails feature is not enabled');
   }
 
@@ -125,6 +126,8 @@ export async function sendNewsletterSubscriptionEmail(email: string) {
       </html>
     `,
   });
+
+  console.log(`Email sent to ${email}`);
 }
 
 export async function sendInvoiceEmail(invoice: string, email: string) {

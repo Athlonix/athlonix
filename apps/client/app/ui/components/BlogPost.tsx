@@ -3,6 +3,21 @@
 import type { Post } from '@/app/lib/type/Post';
 import LikeIcon from '@/app/ui/svg/LikeIcon';
 import { Badge } from '@repo/ui/components/ui/badge';
+import { Button } from '@ui/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@ui/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@ui/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { BookOpenCheck, Ellipsis, MessageSquare } from 'lucide-react';
@@ -12,6 +27,8 @@ import { useState } from 'react';
 
 type PostProps = Post & {
   handleLikeButton: (id: number) => void;
+  deletePost: (id: number) => void;
+  isUserPost: boolean;
 };
 
 export const BlogPost: React.FC<PostProps> = ({
@@ -26,11 +43,14 @@ export const BlogPost: React.FC<PostProps> = ({
   comments_number,
   categories,
   handleLikeButton,
+  deletePost,
+  isUserPost,
 }: PostProps) => {
   const coverImageUrl = `${process.env.ATHLONIX_STORAGE_URL}/image/blog_posts/${cover_image}`;
   const placeholder = '/blog_post_default.jpg';
 
   const [imageError, setImageError] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
   const badgesElements = categories.map((badge) => (
     <Badge key={badge.id} className="min-w-16 flex items-center justify-center">
@@ -61,13 +81,13 @@ export const BlogPost: React.FC<PostProps> = ({
             </h2>
           </Link>
           <div className="flex items-center gap-6">
-            <p>
+            <div>
               Par{' '}
               <Link href="simon" className="font-medium text-accent underline underline-offset-2 max-w-32 truncate">
                 {author.username}
               </Link>
               , <span>{format(createdAt, 'EEE dd MMMM', { locale: fr })}</span>
-            </p>
+            </div>
             <div className="flex items-center gap-3">{badgesElements}</div>
           </div>
           <div>
@@ -76,9 +96,39 @@ export const BlogPost: React.FC<PostProps> = ({
         </div>
         <div className=" flex flex-col justify-between ml-auto">
           <div className="flex justify-end w-full">
-            <Link href="/">
-              <Ellipsis />
-            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="link">
+                  <Ellipsis />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                {isUserPost && (
+                  <Button variant="ghost" className="w-full p-0 font-normal pl-2">
+                    <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+                      <DialogTrigger className="w-full text-left">Supprimer</DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Suppression du post</DialogTitle>
+                          <DialogDescription>
+                            <div className="mb-4">Êtes-vous sûr de vouloir supprimer ce post?</div>
+                            <div className="flex w-full justify-end gap-4">
+                              <Button variant="destructive" onClick={() => deletePost(id)}>
+                                Supprimer
+                              </Button>
+                              <Button variant="secondary" onClick={() => setOpenDelete(false)}>
+                                Annuler
+                              </Button>
+                            </div>
+                          </DialogDescription>
+                        </DialogHeader>
+                      </DialogContent>
+                    </Dialog>
+                  </Button>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           <div className="w-full flex justify-end items-center gap-4">
             <div className="flex items-center gap-1 font-medium text-sm">

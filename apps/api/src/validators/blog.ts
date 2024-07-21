@@ -1,5 +1,4 @@
 import { z } from '@hono/zod-openapi';
-import { ZodLazy } from 'zod';
 
 export const postSchema = z.object({
   id: z.number().min(1),

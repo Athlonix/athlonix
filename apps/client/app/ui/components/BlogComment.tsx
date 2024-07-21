@@ -2,7 +2,6 @@ import { Avatar, AvatarFallback } from '@ui/components/ui/avatar';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import Link from 'next/link';
-import React from 'react';
 import LikeIcon from '../svg/LikeIcon';
 
 interface BlogCommentProps {

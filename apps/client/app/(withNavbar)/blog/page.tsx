@@ -6,6 +6,7 @@ import { PostFiltering } from '@/app/ui/components/PostFiltering';
 import { Input } from '@repo/ui/components/ui/input';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { Button } from '@ui/components/ui/button';
+import { ScrollArea } from '@ui/components/ui/scroll-area';
 import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -50,7 +51,11 @@ export default function Page(): JSX.Element {
     });
   }
 
-  const postsElements = posts.map((post) => <BlogPost key={post.id} {...post} handleLikeButton={handleLikeButton} />);
+  function deletePost(id: number) {}
+
+  const postsElements = posts.map((post) => (
+    <BlogPost key={post.id} {...post} deletePost={deletePost} isUserPost={false} handleLikeButton={handleLikeButton} />
+  ));
 
   return (
     <>
@@ -85,7 +90,9 @@ export default function Page(): JSX.Element {
             <Link href="/blog/myposts">Gérer mes posts</Link>
           </Button>
         </div>
-        <section className="w-full flex flex-col gap-y-6">{postsElements}</section>
+        <ScrollArea className="h-[800px] w-full">
+          <section className="w-full flex flex-col gap-y-6">{postsElements}</section>
+        </ScrollArea>
       </main>
     </>
   );

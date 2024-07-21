@@ -7,6 +7,7 @@ import { PostFiltering } from '@/app/ui/components/PostFiltering';
 import { Input } from '@repo/ui/components/ui/input';
 import { toast } from '@repo/ui/components/ui/sonner';
 import { Button } from '@ui/components/ui/button';
+import { ScrollArea } from '@ui/components/ui/scroll-area';
 import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -22,6 +23,7 @@ export default function Page(): JSX.Element {
       const user = await getUserFromCookie();
       if (user) {
         setUser(user);
+        fetchPosts(user);
       } else {
         router.push('/');
       }
@@ -29,7 +31,8 @@ export default function Page(): JSX.Element {
     checkUser();
   }, [router]);
 
-  useEffect(() => {
+  function fetchPosts(user: User | null) {
+    console.log('user : ', user);
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/posts?skip=0&take=20&userId=${user?.id}`)
       .then((r) => {
         return r.json();
@@ -43,7 +46,7 @@ export default function Page(): JSX.Element {
           setPosts(transformedData);
         }
       });
-  }, [user]);
+  }
 
   function handleLikeButton(id: number) {
     setPosts((prevPosts) => {
@@ -66,7 +69,32 @@ export default function Page(): JSX.Element {
     });
   }
 
-  const postsElements = posts.map((post) => <BlogPost key={post.id} {...post} handleLikeButton={handleLikeButton} />);
+  function deletePost(id: number) {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/posts/${id}/soft`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    })
+      .then((r) => {
+        if (r.status === 404 || r.status === 500) {
+          throw new Error();
+        }
+        return r.json();
+      })
+      .then((postsData) => {
+        toast.success('Post supprimé avec succès');
+        fetchPosts(user);
+      })
+      .catch((error) => {
+        toast.error('Erreur lors de la suppression du post');
+      });
+  }
+
+  const postsElements = posts.map((post) => (
+    <BlogPost key={post.id} {...post} isUserPost={true} deletePost={deletePost} handleLikeButton={handleLikeButton} />
+  ));
 
   return (
     <>
@@ -101,7 +129,9 @@ export default function Page(): JSX.Element {
             <Link href="/blog/myposts">Gérer mes posts</Link>
           </Button>
         </div>
-        <section className="w-full flex flex-col gap-y-6">{postsElements}</section>
+        <ScrollArea className="h-[800px] w-full">
+          <section className="w-full flex flex-col gap-y-6">{postsElements}</section>
+        </ScrollArea>
       </main>
     </>
   );

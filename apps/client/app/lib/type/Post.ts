@@ -3,6 +3,7 @@ export interface Post {
   title: string;
   createdAt: Date;
   cover_image: string;
+  content: string;
   description: string;
   userLiked: boolean;
   author: {

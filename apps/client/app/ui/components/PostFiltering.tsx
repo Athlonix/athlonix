@@ -1,41 +1,21 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@repo/ui/components/ui/select';
-import type React from 'react';
 
-export const PostFiltering: React.FC = () => {
+interface PostFilteringProps {
+  handleFilter: (value: string) => void;
+}
+
+export function PostFiltering({ handleFilter }: PostFilteringProps) {
   return (
     <div className="flex items-center justify-normal gap-6">
-      <Select>
+      <Select name="filterPost" required onValueChange={handleFilter} defaultValue={'true'}>
         <SelectTrigger className="w-[148px]">
-          <SelectValue placeholder="Light" />
+          <SelectValue placeholder="Trier par date" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="light">Light</SelectItem>
-          <SelectItem value="dark">Dark</SelectItem>
-          <SelectItem value="system">System</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select>
-        <SelectTrigger className="w-[148px]">
-          <SelectValue placeholder="Theme" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="light">Light</SelectItem>
-          <SelectItem value="dark">Dark</SelectItem>
-          <SelectItem value="system">System</SelectItem>
-        </SelectContent>
-      </Select>
-
-      <Select>
-        <SelectTrigger className="w-[148px]">
-          <SelectValue placeholder="Theme" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="light">Light</SelectItem>
-          <SelectItem value="dark">Dark</SelectItem>
-          <SelectItem value="system">System</SelectItem>
+          <SelectItem value="true">Croissant</SelectItem>
+          <SelectItem value="false">Décroissant</SelectItem>
         </SelectContent>
       </Select>
     </div>
   );
-};
+}

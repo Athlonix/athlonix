@@ -7,6 +7,7 @@ import {
   insertPostSchema,
   insertResponseSchema,
   postCardListSchemaResponse,
+  postCardSchemaResponse,
   postSchema,
   responseSchema,
   updatePostSchema,
@@ -19,7 +20,7 @@ export const getAllPosts = createRoute({
   summary: 'Get all posts',
   description: 'Get all posts',
   request: {
-    query: queryAllSchema,
+    query: queryAllSchema.extend({ userId: z.coerce.number().min(1).optional() }),
   },
   responses: {
     200: {
@@ -51,7 +52,7 @@ export const getPost = createRoute({
       description: 'Successful response',
       content: {
         'application/json': {
-          schema: postSchema,
+          schema: postCardSchemaResponse,
         },
       },
     },
@@ -71,7 +72,7 @@ export const createPost = createRoute({
   request: {
     body: {
       content: {
-        'application/json': {
+        'multipart/form-data': {
           schema: insertPostSchema,
         },
       },

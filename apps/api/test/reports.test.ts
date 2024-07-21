@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import app from '../src/index.js';
 import { Role } from '../src/validators/general.js';
 import { deleteAdmin, insertRole, setValidSubscription } from './utils.js';
@@ -42,22 +44,30 @@ describe('Report tests', () => {
     const loginUser: { token: string } = await loginRes.json();
     jwt = loginUser.token;
 
-    const postRes = await app.request('/blog/posts', {
+    const formData = new FormData();
+
+    formData.append('title', 'Post test report');
+    formData.append('description', 'Post test description');
+    formData.append('content', 'Post test content for reporting');
+
+    const imagePath = path.join(__dirname, 'files', 'mock_image.png');
+    const imageBuffer = fs.readFileSync(imagePath);
+    const imageBlob = new Blob([imageBuffer], { type: 'image/png' });
+    formData.append('cover_image', imageBlob, 'mock_image.png');
+
+    const resPost = await app.request('/blog/posts', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${jwt}`,
       },
-      body: JSON.stringify({
-        title: 'Post test report',
-        content: 'Post test content for reporting',
-        cover_image: 'https://example.com/image.jpg',
-        description: 'Post test description',
-      }),
+      body: formData,
     });
-    expect(postRes.status).toBe(201);
-    const post = await postRes.json();
+
+    expect(resPost.status).toBe(201);
+    const post: { id: number; title: string; content: string; cover_image: string } = await resPost.json();
     id_post = post.id;
+    expect(post.title).toBe('Post test report');
+    expect(post.content).toBe('Post test content for reporting');
 
     const commentRes = await app.request(`/blog/posts/${id_post}/comments`, {
       method: 'POST',

@@ -1,4 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { uploadFile } from '../libs/storage.js';
 import { supabase } from '../libs/supabase.js';
 import { zodErrorHook } from '../libs/zodError.js';
 import {
@@ -24,7 +25,7 @@ export const blog = new OpenAPIHono<{ Variables: Variables }>({
 });
 
 blog.openapi(getAllPosts, async (c) => {
-  const { all, search, skip, take } = c.req.valid('query');
+  const { all, search, skip, take, userId } = c.req.valid('query');
 
   const query = supabase
     .from('POSTS')
@@ -49,6 +50,10 @@ blog.openapi(getAllPosts, async (c) => {
   if (!all) {
     const { from, to } = getPagination(skip, take - 1);
     query.range(from, to);
+  }
+
+  if (userId) {
+    query.eq('id_user', userId);
   }
 
   const { data, error, count } = await query;
@@ -78,29 +83,70 @@ blog.openapi(getAllPosts, async (c) => {
 
 blog.openapi(getPost, async (c) => {
   const { id } = c.req.valid('param');
-  const { data, error } = await supabase.from('POSTS').select('*').eq('id', id).single();
+
+  const { data, error } = await supabase
+    .from('POSTS')
+    .select(
+      `id,title,content,created_at,cover_image,description,
+      author:USERS!public_POSTS_user_id_fkey(id,username),
+      categories:POSTS_CATEGORIES(CATEGORIES(id,name)),
+      comments_number:COMMENTS(count),
+      views_number:POSTS_VIEWS(count),
+      likes_number:POSTS_REACTIONS(count),
+      comments:COMMENTS(id,content,created_at,author:USERS!public_COMMENTS_id_user_fkey(id,username)),
+      reports:REPORTS(id)`,
+    )
+    .eq('id', id)
+    .single();
 
   if (error || !data) {
     return c.json({ error: 'Post not found' }, 404);
   }
 
-  return c.json(data, 200);
+  const finalData = {
+    ...data,
+    author: data.author ? { id: data.author.id, username: data.author.username } : null,
+    categories: data.categories
+      ? data.categories.map((category) => ({
+          id: category.CATEGORIES?.id ?? null,
+          name: category.CATEGORIES?.name ?? null,
+        }))
+      : [],
+    comments_number: data.comments_number[0]?.count || 0,
+    views_number: data.views_number[0]?.count || 0,
+    likes_number: data.likes_number[0]?.count || 0,
+  };
+
+  return c.json(finalData, 200);
 });
 
 blog.openapi(createPost, async (c) => {
-  const { title, content, cover_image, description } = c.req.valid('json');
+  const { title, content, cover_image, description } = c.req.valid('form');
   const user = c.get('user');
   const id_user = user.id;
-  await checkRole(user.roles, false, [Role.REDACTOR, Role.MODERATOR]);
+  await checkRole(user.roles, false, [Role.REDACTOR, Role.MODERATOR, Role.ADMIN]);
+
+  let coverImageName = '';
+  if (cover_image) {
+    try {
+      coverImageName = crypto.randomUUID();
+    } catch (exception) {
+      console.log(exception);
+    }
+  }
 
   const { data, error } = await supabase
     .from('POSTS')
-    .insert({ title, content, id_user, cover_image, description })
+    .insert({ title, content, id_user, cover_image: coverImageName, description })
     .select()
     .single();
 
   if (error || !data) {
     return c.json({ error: 'Failed to create post' }, 400);
+  }
+
+  if (cover_image) {
+    await uploadFile(`blog_posts/${coverImageName}`, cover_image, 'image');
   }
 
   return c.json(data, 201);

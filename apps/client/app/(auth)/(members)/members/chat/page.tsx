@@ -42,45 +42,16 @@ export default function ChatView() {
       setMessages(messages);
     };
     fetchMessages();
-  }, []);
 
-  useEffect(() => {
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_ENDPOINT || '');
-    setSocket(socket);
+    socket.on('receivedMessage', (payload: SocketMessage) => {
+      fetchMessages();
+    });
 
     return () => {
       socket.disconnect();
     };
   }, []);
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('receivedMessage', (payload: SocketMessage) => {
-        const fetchData = async () => {
-          if (payload.event === 'INSERT') {
-            setMessages((prev) => ({ ...prev, data: [...prev.data, payload.new as Message] }));
-          } else if (payload.event === 'UPDATE') {
-            setMessages((prev) => ({
-              ...prev,
-              data: prev?.data.map((m) => (m.id === payload.new?.id ? (payload.new as Message) : m)),
-            }));
-          } else if (payload.event === 'DELETE') {
-            setMessages((prev) => ({
-              ...prev,
-              data: prev?.data.filter((m) => m.id !== payload.old?.id),
-            }));
-          }
-        };
-        fetchData();
-      });
-
-      return () => {
-        if (socket) {
-          socket.off('receivedMessage');
-        }
-      };
-    }
-  }, [socket]);
 
   const handleSubmit = form.handleSubmit(async (data) => {
     const message = await sendMessage({ id_sender: id, message: data.message });

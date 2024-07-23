@@ -32,7 +32,12 @@ function ShowContent() {
         router.push('/dashboard/votes');
       }
       setPoll(data);
-      setTotalVotes(data.results.reduce((acc, result) => acc + result.votes, 0));
+      setTotalVotes(
+        Math.max(
+          1,
+          data.results.reduce((acc, result) => acc + result.votes, 0),
+        ),
+      );
     };
 
     fetchData();
@@ -91,7 +96,10 @@ function ShowContent() {
             votes: subPoll.results.find((subPollResult) => subPollResult.id_original === result.id_original)?.votes,
           };
         });
-        const subPollTotalVotes = slicedResults?.reduce((total, result) => total + (result.votes ?? 0), 0);
+        const subPollTotalVotes = Math.max(
+          1,
+          slicedResults?.reduce((total, result) => total + (result.votes ?? 0), 0) || 0,
+        );
 
         return (
           <div

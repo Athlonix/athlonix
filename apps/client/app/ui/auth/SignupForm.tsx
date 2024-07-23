@@ -60,7 +60,7 @@ export default function SignupForm(): JSX.Element {
   }
 
   return (
-    <div className={`w-full lg:grid lg:h-screen lg:grid-cols-2 ${showForm ? 'pb-10 mb-20' : ''}`}>
+    <div className={'w-full lg:grid lg:grid-cols-2'}>
       <div className="hidden bg-muted lg:block">
         <Image
           src="/running_track.jpg"

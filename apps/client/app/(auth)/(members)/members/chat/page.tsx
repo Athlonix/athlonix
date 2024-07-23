@@ -85,6 +85,7 @@ export default function ChatView() {
   const handleSubmit = form.handleSubmit(async (data) => {
     const message = await sendMessage({ id_sender: id, message: data.message });
     if (message) {
+      setMessages((prev) => ({ ...prev, data: [...prev.data, message] }));
       form.reset();
     }
   });
@@ -95,12 +96,20 @@ export default function ChatView() {
     const message = await updateMessage(editingId, data.message);
     if (message) {
       setEditingId(null);
+      setMessages((prev) => ({
+        ...prev,
+        data: prev.data.map((m) => (m.id === message.id ? message : m)),
+      }));
       editForm.reset();
     }
   });
 
   const handleDelete = async (messageId: number) => {
     if (!window.confirm('Voulez-vous vraiment supprimer ce message ?')) return;
+    setMessages((prev) => ({
+      ...prev,
+      data: prev.data.filter((m) => m.id !== messageId),
+    }));
     await deleteMessage(messageId);
   };
 

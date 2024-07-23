@@ -146,7 +146,9 @@ export default function ListVotes() {
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
                 <span className="text-lg font-semibold line-clamp-1">{poll.title}</span>
-                <Badge variant="outline">{poll.max_choices > 1 ? 'Choix multiples' : 'Choix unique'}</Badge>
+                <Badge variant="outline" className="flex-shrink-0">
+                  {poll.max_choices > 1 ? 'Choix multiples' : 'Choix unique'}
+                </Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>

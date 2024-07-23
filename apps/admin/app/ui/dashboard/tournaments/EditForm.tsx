@@ -281,6 +281,7 @@ function EditForm(props: EditFormProps): JSX.Element {
               e.preventDefault();
               props.closeDialog();
             }}
+            disabled={form.formState.isSubmitting}
           >
             Annuler
           </Button>

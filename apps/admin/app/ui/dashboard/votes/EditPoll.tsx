@@ -191,7 +191,7 @@ function EditPoll({ poll, setter, assemblies }: Props) {
                   />
                 </div>
                 <div className="flex gap-4 mt-4">
-                  <Button type="submit" className="w-full">
+                  <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                     Modifier
                   </Button>
                   <Button variant="secondary" type="button" className="w-full">

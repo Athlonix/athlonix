@@ -22,8 +22,8 @@ export const createTournamentSchema = z.object({
   rules: z.string().optional(),
   prize: z.string().optional(),
   id_address: z.coerce.number().min(1).optional(),
-  description: z.string().optional(),
   id_sport: z.coerce.number().min(1).optional(),
+  description: z.string().optional(),
   image: z.instanceof(File),
 });
 

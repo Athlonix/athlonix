@@ -196,7 +196,9 @@ function EditForm(props: EditFormProps): JSX.Element {
           </div>
         </div>
         <div className="flex gap-4 mt-4">
-          <Button type="submit">Modifier</Button>
+          <Button type="submit" disabled={form.formState.isSubmitting}>
+            Modifier
+          </Button>
           <Button
             variant="secondary"
             onClick={(e) => {

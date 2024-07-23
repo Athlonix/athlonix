@@ -262,11 +262,7 @@ function AddPoll({ polls, setPolls, assemblies }: Props) {
                     </Button>
                   </div>
                   <div className="flex gap-4 mt-4">
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={form.formState.isSubmitting || !form.formState.isValid}
-                    >
+                    <Button type="submit" className="w-full">
                       Créer
                     </Button>
                     <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">

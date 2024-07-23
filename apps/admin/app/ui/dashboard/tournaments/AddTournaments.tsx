@@ -54,8 +54,8 @@ function AddTournaments({ tournaments, setTournaments, addresses, sports }: Prop
     team_capacity: z.coerce
       .number({ message: 'Le champ doit contenir un nombre' })
       .min(1, { message: "La capacité de l'équipe ne peut être inférieur à 1" }),
-    id_address: z.number().min(1).optional(),
-    id_sport: z.number().min(1).optional(),
+    id_address: z.coerce.number().min(1).optional(),
+    id_sport: z.coerce.number().min(1).optional(),
     rules: z.string().optional(),
     prize: z.string().optional(),
     image: z
@@ -312,11 +312,7 @@ function AddTournaments({ tournaments, setTournaments, addresses, sports }: Prop
                     </div>
                   </div>
                   <div className="flex gap-4 mt-4">
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={form.formState.isSubmitting || !form.formState.isValid}
-                    >
+                    <Button type="submit" className="w-full">
                       Créer
                     </Button>
                     <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">

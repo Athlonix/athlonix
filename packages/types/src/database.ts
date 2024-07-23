@@ -313,7 +313,7 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_ADDRESS_id_lease_fkey';
+            foreignKeyName: 'ADDRESSES_id_lease_fkey';
             columns: ['id_lease'];
             isOneToOne: false;
             referencedRelation: 'LEASE';
@@ -1589,7 +1589,7 @@ export type Database = {
             foreignKeyName: 'TOURNAMENTS_id_address_fkey';
             columns: ['id_address'];
             isOneToOne: false;
-            referencedRelation: 'TOURNAMENTS';
+            referencedRelation: 'ADDRESSES';
             referencedColumns: ['id'];
           },
           {
@@ -1718,14 +1718,14 @@ export type Database = {
         };
         Relationships: [
           {
-            foreignKeyName: 'public_USERS_TEAMS_id_team_fkey';
+            foreignKeyName: 'USERS_TEAMS_id_team_fkey';
             columns: ['id_team'];
             isOneToOne: false;
             referencedRelation: 'TEAMS';
             referencedColumns: ['id'];
           },
           {
-            foreignKeyName: 'public_USERS_TEAMS_id_user_fkey';
+            foreignKeyName: 'USERS_TEAMS_id_user_fkey';
             columns: ['id_user'];
             isOneToOne: false;
             referencedRelation: 'USERS';
@@ -2055,10 +2055,6 @@ export type Database = {
           metadata: Json;
           updated_at: string;
         }[];
-      };
-      operation: {
-        Args: Record<PropertyKey, never>;
-        Returns: string;
       };
       search: {
         Args: {

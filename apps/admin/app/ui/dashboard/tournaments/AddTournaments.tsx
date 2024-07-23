@@ -54,8 +54,8 @@ function AddTournaments({ tournaments, setTournaments, addresses, sports }: Prop
     team_capacity: z.coerce
       .number({ message: 'Le champ doit contenir un nombre' })
       .min(1, { message: "La capacité de l'équipe ne peut être inférieur à 1" }),
-    id_address: z.number().min(1).optional(),
-    id_sport: z.number().min(1).optional(),
+    id_address: z.coerce.number().optional(),
+    id_sport: z.coerce.number().optional(),
     rules: z.string().optional(),
     prize: z.string().optional(),
     image: z
@@ -75,8 +75,8 @@ function AddTournaments({ tournaments, setTournaments, addresses, sports }: Prop
       default_match_length: undefined,
       max_participants: 1,
       team_capacity: 1,
-      id_address: undefined,
-      id_sport: undefined,
+      id_address: -1,
+      id_sport: -1,
       rules: '',
       prize: '',
     },
@@ -88,8 +88,8 @@ function AddTournaments({ tournaments, setTournaments, addresses, sports }: Prop
     if (values.default_match_length) formData.append('default_match_length', values.default_match_length.toString());
     formData.append('max_participants', values.max_participants.toString());
     formData.append('team_capacity', values.team_capacity.toString());
-    if (values.id_address) formData.append('id_address', values.id_address.toString());
-    if (values.id_sport) formData.append('id_sport', values.id_sport.toString());
+    if (values.id_address !== -1 && values.id_address) formData.append('id_address', values.id_address.toString());
+    if (values.id_sport !== -1 && values.id_sport) formData.append('id_sport', values.id_sport.toString());
     if (values.rules) formData.append('rules', values.rules);
     if (values.prize) formData.append('prize', values.prize);
     formData.append('image', values.image[0]);
@@ -312,11 +312,7 @@ function AddTournaments({ tournaments, setTournaments, addresses, sports }: Prop
                     </div>
                   </div>
                   <div className="flex gap-4 mt-4">
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={form.formState.isSubmitting || !form.formState.isValid}
-                    >
+                    <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
                       Créer
                     </Button>
                     <Button variant="secondary" type="button" onClick={() => setOpen(false)} className="w-full">

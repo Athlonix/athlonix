@@ -33,7 +33,6 @@ export default function Page(): JSX.Element {
   }, [router]);
 
   function fetchPosts(user: User | null) {
-    console.log('user : ', user);
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/blog/posts?skip=0&take=20&userId=${user?.id}`)
       .then((r) => {
         return r.json();

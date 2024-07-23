@@ -88,8 +88,9 @@ tournaments.openapi(getTournamentById, async (c) => {
 });
 
 tournaments.openapi(createTournament, async (c) => {
-  const { name, default_match_length, max_participants, team_capacity, rules, prize, id_address, image } =
+  const { name, default_match_length, max_participants, team_capacity, rules, prize, id_address, id_sport, image } =
     c.req.valid('form');
+
   if (image === null) {
     return c.json({ error: 'You must provide an image' }, 400);
   }
@@ -99,7 +100,7 @@ tournaments.openapi(createTournament, async (c) => {
 
   const { data, error } = await supabase
     .from('TOURNAMENTS')
-    .insert({ name, default_match_length, max_participants, team_capacity, rules, prize, id_address })
+    .insert({ name, default_match_length, max_participants, team_capacity, rules, prize, id_address, id_sport })
     .select()
     .single();
 

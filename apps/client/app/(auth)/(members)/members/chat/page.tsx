@@ -1,5 +1,5 @@
 'use client';
-import type { Message, SocketMessage } from '@/app/lib/type/Messages';
+import type { Message } from '@/app/lib/type/Messages';
 import { deleteMessage, getMessages, sendMessage, updateMessage } from '@/app/lib/utils/messages';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@repo/ui/components/ui/button';
@@ -44,11 +44,13 @@ export default function ChatView() {
     fetchMessages();
 
     const socket = io(process.env.NEXT_PUBLIC_SOCKET_ENDPOINT || '');
-    socket.on('receivedMessage', (payload: SocketMessage) => {
+    socket.on('receivedMessage', (payload) => {
+      console.log(payload);
       fetchMessages();
     });
 
     return () => {
+      socket.off('receivedMessage');
       socket.disconnect();
     };
   }, []);

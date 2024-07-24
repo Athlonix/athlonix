@@ -52,7 +52,7 @@ function AddRound({ poll, setPoll }: Props) {
       start_at: z.string(),
       end_at: z.string(),
       end_condition: z.enum(['simple', 'absolute', 'two-third', 'unanimous']),
-      keep: z.number().min(2, { message: 'Le nombre de choix à conserver doit être supérieur à 1' }),
+      keep: z.coerce.number().min(2, { message: 'Le nombre de choix à conserver doit être supérieur à 1' }),
       max_choices: z.coerce.number().min(1, { message: 'Le nombre de choix doit être supérieur à 0' }),
     })
     .refine((data) => new Date(data.start_at) < new Date(data.end_at), {

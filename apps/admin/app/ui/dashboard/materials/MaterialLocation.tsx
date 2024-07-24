@@ -13,7 +13,7 @@ interface Props {
 
 function MaterialLocation({ materials, address, setMaterials }: Props) {
   const materialsFiltered = materials
-    .filter((material) => material.addresses.some((a) => a.id_address === address.id))
+    .filter((material) => material.addresses?.some((a) => a.id_address === address.id))
     .map((material) => ({
       ...material,
       addresses: material.addresses.filter((a) => a.id_address === address.id),

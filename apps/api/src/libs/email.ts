@@ -46,26 +46,28 @@ export async function sendNewAssemblyEmail(name: string, date: string, location:
       : `${location?.number} ${location?.road}, ${location?.city} ${location?.postal_code}`;
 
   for (const member of members) {
-    await resend.emails.send({
-      from: 'onboarding@resend.dev',
-      to: member.email,
-      subject: 'ATHLONIX - Nouvelle Assemblée Générale',
-      html: `
-        <html>
-          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <h2>Nouvelle Assemblée Générale : ${name}</h2>
-            <p>Cher(e) ${member.first_name},</p>
-            <p>Nous avons le plaisir de vous informer qu'une nouvelle assemblée générale a été ajoutée au planning :</p>
-            <ul>
-              <li><strong>Date :</strong> ${formattedDate}</li>
-              <li><strong>Lieu :</strong> ${address}</li>
-            </ul>
-            <p>Votre présence est importante pour notre association. Si vous ne pouvez pas assister à cette assemblée, merci de nous en informer dès que possible.</p>
-            <p>Cordialement,<br>L'équipe d'Athlonix</p>
-          </body>
-        </html>
-      `,
-    });
+    setTimeout(async () => {
+      await resend.emails.send({
+        from: 'onboarding@resend.dev',
+        to: member.email,
+        subject: 'ATHLONIX - Nouvelle Assemblée Générale',
+        html: `
+          <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+              <h2>Nouvelle Assemblée Générale : ${name}</h2>
+              <p>Cher(e) ${member.first_name},</p>
+              <p>Nous avons le plaisir de vous informer qu'une nouvelle assemblée générale a été ajoutée au planning :</p>
+              <ul>
+                <li><strong>Date :</strong> ${formattedDate}</li>
+                <li><strong>Lieu :</strong> ${address}</li>
+              </ul>
+              <p>Votre présence est importante pour notre association. Si vous ne pouvez pas assister à cette assemblée, merci de nous en informer dès que possible.</p>
+              <p>Cordialement,<br>L'équipe d'Athlonix</p>
+            </body>
+          </html>
+        `,
+      });
+    }, 500);
   }
 }
 

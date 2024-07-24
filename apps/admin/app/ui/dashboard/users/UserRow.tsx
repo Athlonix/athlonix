@@ -152,10 +152,9 @@ function UserRow(user: UserProps) {
       <TableCell>{firstName}</TableCell>
       <TableCell>{lastName}</TableCell>
       <TableCell>{user.email}</TableCell>
-      <TableCell>TODO</TableCell>
       <TableCell>
         {roles && roles.length > 0 ? (
-          roles.map((role) => (
+          roles?.map((role) => (
             <Badge
               className="m-[2px]"
               key={role.id}
@@ -214,7 +213,7 @@ function UserRow(user: UserProps) {
                           username={username}
                           firstName={firstName}
                           lastName={lastName}
-                          roles={roles.map((role) => role.id)}
+                          roles={roles?.map((role) => role.id)}
                           closeDialog={() => setOpenEdit(false)}
                           setter={setter}
                         />
@@ -255,7 +254,7 @@ function UserRow(user: UserProps) {
                       <DialogDescription>
                         <div className="mb-4">Êtes-vous sûr de vouloir supprimer cet utilisateur ?</div>
                         <div className="flex w-full justify-end gap-4">
-                          <Button variant="destructive" onClick={deleteUser}>
+                          <Button variant="destructive" onClick={deleteUser} disabled={username === 'Supprimé'}>
                             Supprimer
                           </Button>
                           <Button variant="secondary" onClick={() => setOpenDelete(false)}>

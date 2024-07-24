@@ -107,7 +107,6 @@ function ShowContent() {
                 <TableHead>Prénom</TableHead>
                 <TableHead>Nom</TableHead>
                 <TableHead>Email</TableHead>
-                <TableHead>Référant</TableHead>
                 <TableHead>Rôle</TableHead>
                 <TableHead>Date d'éxpiration</TableHead>
                 <TableHead>Date de création</TableHead>

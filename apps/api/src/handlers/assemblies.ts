@@ -137,14 +137,14 @@ assemblies.openapi(isAlreadyConfirmed, async (c) => {
     return c.json({ error: assembly.error }, assembly.status);
   }
 
-  const { data: attendee, error: attendeeError } = await supabase
+  const { data: attendee } = await supabase
     .from('ASSEMBLIES_ATTENDEES')
     .select('id')
     .eq('id_assembly', assembly.id)
     .eq('id_member', user.id)
     .single();
 
-  if (attendeeError || attendee) {
+  if (attendee) {
     return c.json({ confirmed: true }, 200);
   }
 

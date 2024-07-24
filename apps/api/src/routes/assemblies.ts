@@ -227,7 +227,6 @@ export const handleAssemblyCheckIn = createRoute({
   security: [{ Bearer: [] }],
   middleware: authMiddleware,
   request: {
-    params: idParamValidator,
     body: {
       content: {
         'application/json': {
